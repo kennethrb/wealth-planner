@@ -1,7 +1,6 @@
 const BASE_URL =
 "https://script.google.com/macros/s/AKfycbwZGBobKrROvavAglc9QZlBmbSggBudqJBH6dT7LrkPopdZDQVbCZ4FWhE926f1Z_Y-NQ/exec";
 
-
 async function loadAccounts() {
 
   const response =
@@ -27,7 +26,7 @@ async function loadAccounts() {
         </div>
 
         <div class="balance">
-          Balance: ₱${account.currentBalance}
+          Balance: ₱${Number(account.currentBalance).toLocaleString()}
         </div>
 
       </div>
@@ -50,30 +49,67 @@ async function loadBudget() {
   const data =
     await response.json();
 
-  const container =
-    document.getElementById("budget");
+  const months = [];
 
-  let html = "";
+  const categories = {};
 
   data.forEach(item => {
 
-    html += `
-      <div class="budget-item">
+    if (!months.includes(item.month)) {
+      months.push(item.month);
+    }
 
-        <strong>${item.category}</strong>
+    if (!categories[item.category]) {
+      categories[item.category] = {};
+    }
 
-        <br>
-
-        ${item.month}
-        -
-        ₱${item.plannedAmount}
-
-      </div>
-    `;
+    categories[item.category][item.month] =
+      item.plannedAmount;
 
   });
 
-  container.innerHTML = html;
+  let html = `
+
+    <table border="1" cellpadding="8" cellspacing="0">
+
+      <tr>
+        <th>Category</th>
+  `;
+
+  months.forEach(month => {
+    html += `<th>${month}</th>`;
+  });
+
+  html += `</tr>`;
+
+  Object.keys(categories).forEach(category => {
+
+    html += `
+      <tr>
+        <td><strong>${category}</strong></td>
+    `;
+
+    months.forEach(month => {
+
+      const amount =
+        categories[category][month] || "";
+
+      html += `
+        <td>
+          ${amount}
+        </td>
+      `;
+
+    });
+
+    html += `</tr>`;
+
+  });
+
+  html += `</table>`;
+
+  document.getElementById("budget")
+    .innerHTML = html;
 
 }
 
