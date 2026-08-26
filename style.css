@@ -1,29 +1,42 @@
-body {
+body{
   font-family: Arial, sans-serif;
-  margin: 20px;
+  margin:20px;
 }
 
-h1 {
-  color: #1e7e34;
+h1{
+  color:#198754;
 }
 
-.card {
-  border: 1px solid #ddd;
-  padding: 12px;
-  margin-bottom: 10px;
-  border-radius: 8px;
+.card{
+  border:1px solid #ddd;
+  border-radius:8px;
+  padding:12px;
+  margin-bottom:10px;
 }
 
-.account-name {
-  font-weight: bold;
-  font-size: 18px;
+.account-name{
+  font-weight:bold;
 }
 
-.balance {
-  color: green;
+.balance{
+  color:green;
 }
 
-.budget-item {
-  border-bottom: 1px solid #eee;
-  padding: 8px 0;
+table{
+  border-collapse:collapse;
+  width:100%;
+}
+
+th{
+  background:#198754;
+  color:white;
+}
+
+td,th{
+  padding:10px;
+  text-align:center;
+}
+
+tr:hover{
+  background:#f5f5f5;
 }
