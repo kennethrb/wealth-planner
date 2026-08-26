@@ -1,0 +1,29 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+
+h1 {
+  color: #1e7e34;
+}
+
+.card {
+  border: 1px solid #ddd;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+}
+
+.account-name {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.balance {
+  color: green;
+}
+
+.budget-item {
+  border-bottom: 1px solid #eee;
+  padding: 8px 0;
+}
