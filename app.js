@@ -1,6 +1,11 @@
 const BASE_URL =
 "https://script.google.com/macros/s/AKfycbwZGBobKrROvavAglc9QZlBmbSggBudqJBH6dT7LrkPopdZDQVbCZ4FWhE926f1Z_Y-NQ/exec";
 
+
+// ====================
+// ACCOUNTS
+// ====================
+
 async function loadAccounts() {
 
   const response =
@@ -39,21 +44,45 @@ async function loadAccounts() {
 }
 
 
-async function loadBudget() {
 
-  const response =
+// ====================
+// BUDGET PLANNER
+// ====================
+
+async function loadBudgetPlanner() {
+
+  const budgetResponse =
     await fetch(
       `${BASE_URL}?action=getBudgetPlan`
     );
 
-  const data =
-    await response.json();
+  const categoryResponse =
+    await fetch(
+      `${BASE_URL}?action=getCategories`
+    );
+
+  const budgetData =
+    await budgetResponse.json();
+
+  const categoryData =
+    await categoryResponse.json();
 
   const months = [];
-
   const categories = {};
+  const categoryTypes = {};
 
-  data.forEach(item => {
+  // Store category types
+
+  categoryData.forEach(cat => {
+
+    categoryTypes[cat.categoryName] =
+      cat.budgetType;
+
+  });
+
+  // Build planner structure
+
+  budgetData.forEach(item => {
 
     if (!months.includes(item.month)) {
       months.push(item.month);
@@ -64,12 +93,14 @@ async function loadBudget() {
     }
 
     categories[item.category][item.month] =
-      item.plannedAmount;
+      Number(item.plannedAmount);
 
   });
 
-  let html = `
+  const container =
+    document.getElementById("budget");
 
+  let html = `
     <table border="1" cellpadding="8" cellspacing="0">
 
       <tr>
@@ -82,37 +113,66 @@ async function loadBudget() {
 
   html += `</tr>`;
 
-  Object.keys(categories).forEach(category => {
+  const sections = [
+    "Income",
+    "Expense",
+    "Savings",
+    "Debt"
+  ];
+
+  sections.forEach(section => {
 
     html += `
-      <tr>
-        <td><strong>${category}</strong></td>
+      <tr style="background:#dff0d8;">
+        <td colspan="${months.length + 1}">
+          <strong>${section.toUpperCase()}</strong>
+        </td>
+      </tr>
     `;
 
-    months.forEach(month => {
+    Object.keys(categories).forEach(category => {
 
-      const amount =
-        categories[category][month] || "";
+      if (
+        categoryTypes[category] === section
+      ) {
 
-      html += `
-        <td>
-          ${amount}
-        </td>
-      `;
+        html += `
+          <tr>
+            <td>${category}</td>
+        `;
+
+        months.forEach(month => {
+
+          const amount =
+            categories[category][month] || "";
+
+          html += `
+            <td>
+              ${amount}
+            </td>
+          `;
+
+        });
+
+        html += `</tr>`;
+
+      }
 
     });
-
-    html += `</tr>`;
 
   });
 
   html += `</table>`;
 
-  document.getElementById("budget")
-    .innerHTML = html;
+  container.innerHTML = html;
 
 }
 
 
+
+// ====================
+// LOAD APP
+// ====================
+
 loadAccounts();
-loadBudget();
+loadBudgetPlanner();
