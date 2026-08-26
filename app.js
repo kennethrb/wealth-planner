@@ -1,25 +1,36 @@
-const API_URL =
-  "https://script.google.com/macros/s/AKfycbwZGBobKrROvavAglc9QZlBmbSggBudqJBH6dT7LrkPopdZDQVbCZ4FWhE926f1Z_Y-NQ/exec?action=getAccounts";
+const BASE_URL =
+"https://script.google.com/macros/s/AKfycbwZGBobKrROvavAglc9QZlBmbSggBudqJBH6dT7LrkPopdZDQVbCZ4FWhE926f1Z_Y-NQ/exec";
+
 
 async function loadAccounts() {
 
-  const response = await fetch(API_URL);
+  const response =
+    await fetch(
+      `${BASE_URL}?action=getAccounts`
+    );
 
-  const accounts = await response.json();
+  const data =
+    await response.json();
 
   const container =
     document.getElementById("accounts");
 
   let html = "";
 
-  accounts.forEach(account => {
+  data.forEach(account => {
 
     html += `
-      <div>
-        <h3>${account.accountName}</h3>
-        <p>Balance: ₱${account.currentBalance}</p>
+      <div class="card">
+
+        <div class="account-name">
+          ${account.accountName}
+        </div>
+
+        <div class="balance">
+          Balance: ₱${account.currentBalance}
+        </div>
+
       </div>
-      <hr>
     `;
 
   });
@@ -28,4 +39,44 @@ async function loadAccounts() {
 
 }
 
+
+async function loadBudget() {
+
+  const response =
+    await fetch(
+      `${BASE_URL}?action=getBudgetPlan`
+    );
+
+  const data =
+    await response.json();
+
+  const container =
+    document.getElementById("budget");
+
+  let html = "";
+
+  data.forEach(item => {
+
+    html += `
+      <div class="budget-item">
+
+        <strong>${item.category}</strong>
+
+        <br>
+
+        ${item.month}
+        -
+        ₱${item.plannedAmount}
+
+      </div>
+    `;
+
+  });
+
+  container.innerHTML = html;
+
+}
+
+
 loadAccounts();
+loadBudget();
