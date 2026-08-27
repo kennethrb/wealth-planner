@@ -455,9 +455,83 @@ async function loadGoals() {
 
 }
 
+async function loadNetWorth() {
+
+  const response =
+    await fetch(
+      `${BASE_URL}?action=getAccounts`
+    );
+
+  const accounts =
+    await response.json();
+
+  let assets = 0;
+  let liabilities = 0;
+
+  accounts.forEach(account => {
+
+    const balance =
+      Number(account.currentBalance);
+
+    if (
+      account.netWorthType === "Asset"
+    ) {
+
+      assets += balance;
+
+    }
+
+    if (
+      account.netWorthType === "Liability"
+    ) {
+
+      liabilities += balance;
+
+    }
+
+  });
+
+  const netWorth =
+    assets - liabilities;
+
+  document.getElementById("networth")
+    .innerHTML = `
+
+      <div class="card">
+
+        <h2>💎 Net Worth</h2>
+
+        <p>
+          Assets:
+          <strong>
+            ₱${assets.toLocaleString()}
+          </strong>
+        </p>
+
+        <p>
+          Liabilities:
+          <strong>
+            ₱${liabilities.toLocaleString()}
+          </strong>
+        </p>
+
+        <p>
+          Net Worth:
+          <strong>
+            ₱${netWorth.toLocaleString()}
+          </strong>
+        </p>
+
+      </div>
+
+    `;
+
+}
+
 // ====================
 // LOAD APP
 // ====================
+loadNetWorth();
 loadDashboard();
 loadGoals();
 loadAccounts();
