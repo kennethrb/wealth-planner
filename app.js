@@ -865,29 +865,14 @@ async function loadNetWorth() {
 
 async function loadProjection() {
 
-  const accountsResponse =
-    await fetch(
-      `${BASE_URL}?action=getAccounts`
-    );
-
-  const budgetResponse =
-    await fetch(
-      `${BASE_URL}?action=getBudgetPlan`
-    );
-
-  const categoryResponse =
-    await fetch(
-      `${BASE_URL}?action=getCategories`
-    );
-
   const accounts =
-    await accountsResponse.json();
+  appData.accounts;
 
   const budgetData =
-    await budgetResponse.json();
-
+    appData.budget;
+  
   const categories =
-    await categoryResponse.json();
+    appData.categories;
 
   const categoryTypes = {};
 
