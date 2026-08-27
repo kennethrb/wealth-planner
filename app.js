@@ -1320,6 +1320,46 @@ if (
   const annualDifference =
   (scenarioSurplus - currentSurplus) * 12;
 
+  const assets =
+  appData.accounts
+    .filter(
+      a =>
+        a.netWorthType === "Asset"
+    )
+    .reduce(
+      (sum, a) =>
+        sum +
+        Number(a.currentBalance),
+      0
+    );
+
+  const liabilities =
+    appData.accounts
+      .filter(
+        a =>
+          a.netWorthType === "Liability"
+      )
+      .reduce(
+        (sum, a) =>
+          sum +
+          Number(a.currentBalance),
+        0
+      );
+
+  const currentProjectedNetWorth =
+  assets +
+  (currentSurplus * 12) -
+  liabilities;
+
+  const scenarioProjectedNetWorth =
+    assets +
+    (scenarioSurplus * 12) -
+    liabilities;
+  
+  const netWorthDifference =
+    scenarioProjectedNetWorth -
+    currentProjectedNetWorth;
+
   document.getElementById(
     "scenarioResult"
   ).innerHTML = `
@@ -1378,6 +1418,29 @@ if (
         Annual Impact:
         <strong>
           ₱${annualDifference.toLocaleString()}
+        </strong>
+      </p>
+
+      <hr>
+
+      <p>
+        Current Projected Net Worth:
+        <strong>
+          ₱${currentProjectedNetWorth.toLocaleString()}
+        </strong>
+      </p>
+      
+      <p>
+        Scenario Projected Net Worth:
+        <strong>
+          ₱${scenarioProjectedNetWorth.toLocaleString()}
+        </strong>
+      </p>
+      
+      <p>
+        Net Worth Impact:
+        <strong>
+          ₱${netWorthDifference.toLocaleString()}
         </strong>
       </p>
 
