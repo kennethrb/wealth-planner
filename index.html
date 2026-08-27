@@ -23,8 +23,11 @@
   <div id="projection">
   Loading Wealth Projection...
   </div>
+
   
   <hr>
+
+  
   
   <div id="dashboard">
   Loading Dashboard...
@@ -46,6 +49,44 @@
     Loading Accounts...
   </div>
 
+
+  <hr>
+
+<h2>➕ Add Budget Item</h2>
+
+<div id="addBudgetForm">
+
+  <input
+    type="number"
+    id="newYear"
+    value="2027"
+    placeholder="Year"
+  >
+
+  <input
+    type="text"
+    id="newMonth"
+    placeholder="Month"
+  >
+
+  <input
+    type="text"
+    id="newCategory"
+    placeholder="Category"
+  >
+
+  <input
+    type="number"
+    id="newAmount"
+    placeholder="Amount"
+  >
+
+  <button onclick="addBudgetItem()">
+    ➕ Add
+  </button>
+
+  </div>
+  
   <hr>
 
   <h2>📅 Budget Planner</h2>
