@@ -1179,8 +1179,17 @@ async function saveBudgetChanges() {
 
     try {
 
-      await fetch(url);
-
+      const response =
+        await fetch(url);
+      
+      const result =
+        await response.text();
+      
+      console.log(
+        "SAVE RESULT:",
+        result
+      );
+      
       saveCount++;
 
     } catch(error) {
