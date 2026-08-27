@@ -60,27 +60,100 @@ async function addCategory() {
       "categoryGroup"
     ).value;
 
+  if (
+    !categoryName ||
+    !group
+  ) {
+
+    document.getElementById(
+      "globalStatus"
+    ).innerHTML =
+      "⚠ Please complete all fields.";
+
+    return;
+
+  }
+
   await fetch(
 
     `${BASE_URL}?action=addCategory`
 
     + `&categoryName=${encodeURIComponent(categoryName)}`
-    + `&budgetType=${budgetType}`
+    + `&budgetType=${encodeURIComponent(budgetType)}`
     + `&group=${encodeURIComponent(group)}`
 
   );
 
-  const status =
-    document.getElementById(
-      "globalStatus"
+  await loadCategoryDropdown();
+
+  document.getElementById(
+    "globalStatus"
+  ).innerHTML =
+    `✅ Category ${categoryName} added successfully`;
+
+  document.getElementById(
+    "categoryName"
+  ).value = "";
+
+  document.getElementById(
+    "categoryGroup"
+  ).value = "";
+
+  document.getElementById(
+    "budgetType"
+  ).selectedIndex = 0;
+
+}
+
+async function loadCategoryDropdown() {
+
+  const response =
+    await fetch(
+      `${BASE_URL}?action=getCategories`
     );
 
-  if (status) {
+  const categories =
+    await response.json();
 
-    status.innerHTML =
-      `✅ Category ${categoryName} added`;
+  const addSelect =
+    document.getElementById(
+      "newCategory"
+    );
 
-  }
+  const deleteSelect =
+    document.getElementById(
+      "deleteCategorySelect"
+    );
+
+  if (addSelect)
+    addSelect.innerHTML = "";
+
+  if (deleteSelect)
+    deleteSelect.innerHTML = "";
+
+  categories.forEach(cat => {
+
+    if (addSelect) {
+
+      addSelect.innerHTML += `
+        <option value="${cat.categoryName}">
+          ${cat.categoryName}
+        </option>
+      `;
+
+    }
+
+    if (deleteSelect) {
+
+      deleteSelect.innerHTML += `
+        <option value="${cat.categoryName}">
+          ${cat.categoryName}
+        </option>
+      `;
+
+    }
+
+  });
 
 }
 
@@ -91,9 +164,19 @@ async function deleteCategory() {
       "deleteCategorySelect"
     ).value;
 
+  if (!categoryName) return;
+
+  const confirmDelete =
+    confirm(
+      `Delete category "${categoryName}"?`
+    );
+
+  if (!confirmDelete) return;
+
   await fetch(
 
     `${BASE_URL}?action=deleteCategory`
+
     + `&categoryName=${encodeURIComponent(categoryName)}`
 
   );
@@ -103,7 +186,7 @@ async function deleteCategory() {
   document.getElementById(
     "globalStatus"
   ).innerHTML =
-    `🗑 Deleted ${categoryName}`;
+    `🗑 Category ${categoryName} deleted`;
 
 }
 
@@ -864,16 +947,6 @@ async function loadProjection() {
 
 }
 
-// ====================
-// LOAD APP
-// ====================
-loadNetWorth();
-loadProjection();
-loadDashboard();
-loadGoals();
-loadAccounts();
-loadBudgetPlanner();
-loadSummary();
 
 async function copyJanuaryToWholeYear() {
 
@@ -993,3 +1066,16 @@ async function saveBudgetChanges() {
 
 }
 
+
+// ====================
+// LOAD APP
+// ====================
+loadNetWorth();
+loadProjection();
+loadDashboard();
+loadGoals();
+loadAccounts();
+loadBudgetPlanner();
+loadSummary();
+
+loadCategoryDropdown();
