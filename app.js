@@ -1054,12 +1054,15 @@ Object.keys(totals).forEach(group => {
 
   html += `
 
-    <p>
-      ${group}:
+    <div class="funding-row">
+
+      <span>${group}</span>
+
       <strong>
         ₱${totals[group].toLocaleString()}
       </strong>
-    </p>
+
+    </div>
 
   `;
 
