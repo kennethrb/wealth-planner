@@ -417,22 +417,54 @@ async function loadGoals() {
   goals.forEach(goal => {
 
     const progress =
-      ((goal.current / goal.target) * 100)
-      .toFixed(1);
+      (
+        (goal.current / goal.target) * 100
+      ).toFixed(1);
+
+    const remainingAmount =
+      goal.target - goal.current;
+
+    const monthsRemaining =
+      Math.ceil(
+        remainingAmount /
+        goal.monthlyContribution
+      );
+
+    const completionDate =
+      new Date();
+
+    completionDate.setMonth(
+      completionDate.getMonth() +
+      monthsRemaining
+    );
+
+    const forecast =
+      completionDate.toLocaleDateString(
+        "en-US",
+        {
+          year: "numeric",
+          month: "long"
+        }
+      );
 
     html += `
+
       <div class="card">
 
-        <h3>${goal.goal}</h3>
+        <h3>
+          🎯 ${goal.goal}
+        </h3>
 
         <p>
           Current:
-          ₱${Number(goal.current).toLocaleString()}
+          ₱${Number(goal.current)
+            .toLocaleString()}
         </p>
 
         <p>
           Target:
-          ₱${Number(goal.target).toLocaleString()}
+          ₱${Number(goal.target)
+            .toLocaleString()}
         </p>
 
         <p>
@@ -445,7 +477,26 @@ async function loadGoals() {
           max="${goal.target}">
         </progress>
 
+        <p>
+          Monthly Contribution:
+          ₱${Number(goal.monthlyContribution)
+            .toLocaleString()}
+        </p>
+
+        <p>
+          Months Remaining:
+          ${monthsRemaining}
+        </p>
+
+        <p>
+          Estimated Completion:
+          <strong>
+            ${forecast}
+          </strong>
+        </p>
+
       </div>
+
     `;
 
   });
