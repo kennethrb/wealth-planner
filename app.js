@@ -792,46 +792,38 @@ async function saveBudgetChanges() {
       "input[type='number']"
     );
 
-  const budgetItems = [];
+  let saveCount = 0;
 
-  inputs.forEach(input => {
+  for (const input of inputs) {
 
     const [category, month] =
       input.id.split("|");
 
-    budgetItems.push({
+    const amount =
+      input.value;
 
-      year: 2027,
-      month: month,
-      category: category,
-      amount: Number(
-        input.value
-      )
+    const url =
+      `${BASE_URL}?action=saveBudget`
+      + `&year=2027`
+      + `&month=${month}`
+      + `&category=${encodeURIComponent(category)}`
+      + `&amount=${amount}`;
 
-    });
+    try {
 
-  });
+      await fetch(url);
 
-  await fetch(
-    BASE_URL,
-    {
-      method: "POST",
+      saveCount++;
 
-      headers: {
-        "Content-Type":
-          "application/json"
-      },
+    } catch(error) {
 
-      body: JSON.stringify({
-        action:
-          "saveAllBudgets",
-        budgetItems:
-          budgetItems
-      })
+      console.error(error);
+
     }
-  );
 
-  Promise.all([
+  }
+
+  await Promise.all([
   loadBudgetPlanner(),
   loadSummary(),
   loadDashboard(),
@@ -848,7 +840,10 @@ async function saveBudgetChanges() {
   if (status) {
 
     status.innerHTML =
-      `✅ Saved ${budgetItems.length} budget items`;
+      `✅ ${saveCount} budget items saved at ${new Date().toLocaleTimeString()}`;
+
+    status.style.color = "green";
+    status.style.fontWeight = "bold";
 
   }
 
