@@ -1025,11 +1025,7 @@ let html = `
     💵 CASH TO WITHDRAW
   </h2>
 
-  <h1
-    style="
-      margin:0;
-      font-size:48px;
-    ">
+  <h1>
     ₱${cash.toLocaleString()}
   </h1>
 
