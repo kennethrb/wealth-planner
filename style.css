@@ -126,6 +126,12 @@ h1{
 
 }
 
+.dashboard-grid > div{
+
+  height:100%;
+
+}
+
 
 .account-name{
   font-weight:bold;
