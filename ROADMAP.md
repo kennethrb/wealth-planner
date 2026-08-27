@@ -65,3 +65,20 @@
 - Net Worth History
 - Investment Planning
 - Financial Independence Projections
+
+# Bugs
+
+- None
+
+# Improvements
+
+- Dynamic planning year
+- Better Delete Category validation
+- Category sorting
+
+# Next Features
+
+- Scenario Planner
+- Goal Manager
+- Budget vs Actual
+
