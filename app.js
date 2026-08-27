@@ -1,6 +1,25 @@
 const BASE_URL =
 "https://script.google.com/macros/s/AKfycbwZGBobKrROvavAglc9QZlBmbSggBudqJBH6dT7LrkPopdZDQVbCZ4FWhE926f1Z_Y-NQ/exec";
 
+function showStatus(message) {
+
+  const status =
+    document.getElementById(
+      "globalStatus"
+    );
+
+  if (!status) return;
+
+  status.innerHTML = message;
+
+  setTimeout(() => {
+
+    status.innerHTML = "";
+
+  }, 5000);
+
+}
+
 
 // ====================
 // ACCOUNTS
@@ -86,10 +105,9 @@ async function addCategory() {
 
   await loadCategoryDropdown();
 
-  document.getElementById(
-    "globalStatus"
-  ).innerHTML =
-    `✅ Category ${categoryName} added successfully`;
+  showStatus(
+  `✅ Category ${categoryName} added successfully`
+);
 
   document.getElementById(
     "categoryName"
@@ -183,10 +201,9 @@ async function deleteCategory() {
 
   await loadCategoryDropdown();
 
-  document.getElementById(
-    "globalStatus"
-  ).innerHTML =
-    `🗑 Category ${categoryName} deleted`;
+  showStatus(
+  `🗑 Category ${categoryName} deleted`
+);
 
 }
 
@@ -212,6 +229,20 @@ async function addBudgetItem() {
       "newAmount"
     ).value;
 
+  if (
+  !amount ||
+  Number(amount) <= 0
+  ) {
+  
+    document.getElementById(
+      "globalStatus"
+    ).innerHTML =
+      "⚠ Amount must be greater than zero";
+  
+    return;
+  
+  }
+
   await fetch(
 
     `${BASE_URL}?action=addBudgetItem`
@@ -234,8 +265,9 @@ async function addBudgetItem() {
       "globalStatus"
     );
 
-  status.innerHTML =
-    "✅ Budget Item Added";
+  showStatus(
+  "✅ Budget Item Added"
+);
 
 }
 
@@ -968,8 +1000,9 @@ async function copyJanuaryToWholeYear() {
 
   if (status) {
 
-    status.innerHTML =
-      "✅ January copied to all months";
+    showStatus(
+  "✅ January copied to all months"
+);
 
   }
 
@@ -988,8 +1021,9 @@ async function copyCurrentYearToNextYear() {
 
   if (status) {
 
-    status.innerHTML =
-      "✅ 2028 budget created";
+    showStatus(
+  "✅ 2028 budget created"
+);
 
     status.style.color =
       "green";
@@ -1056,8 +1090,9 @@ async function saveBudgetChanges() {
 
   if (status) {
 
-    status.innerHTML =
-      `✅ ${saveCount} budget items saved at ${new Date().toLocaleTimeString()}`;
+    showStatus(
+  `✅ ${saveCount} budget items saved at ${new Date().toLocaleTimeString()}`
+);
 
     status.style.color = "green";
     status.style.fontWeight = "bold";
