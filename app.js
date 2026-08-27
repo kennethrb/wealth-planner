@@ -828,7 +828,7 @@ async function loadNetWorth() {
   document.getElementById("networth")
     .innerHTML = `
 
-      <div class="card">
+      <div class="hero-card">
 
         <h2>💎 Net Worth</h2>
 
