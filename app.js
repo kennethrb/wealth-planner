@@ -326,21 +326,11 @@ async function deleteBudgetItem(
 
 async function loadBudgetPlanner() {
 
-  const budgetResponse =
-    await fetch(
-      `${BASE_URL}?action=getBudgetPlan`
-    );
-
-  const categoryResponse =
-    await fetch(
-      `${BASE_URL}?action=getCategories`
-    );
-
   const budgetData =
-    await budgetResponse.json();
+  appData.budget;
 
   const categoryData =
-    await categoryResponse.json();
+  appData.categories;
 
   const months = [];
   const categories = {};
