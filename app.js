@@ -831,12 +831,14 @@ async function saveBudgetChanges() {
     }
   );
 
-  await loadBudgetPlanner();
-  await loadSummary();
-  await loadDashboard();
-  await loadProjection();
-  await loadGoals();
-  await loadNetWorth();
+  Promise.all([
+  loadBudgetPlanner(),
+  loadSummary(),
+  loadDashboard(),
+  loadProjection(),
+  loadGoals(),
+  loadNetWorth()
+]);
 
   const status =
     document.getElementById(
