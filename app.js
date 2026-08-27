@@ -1022,14 +1022,7 @@ function loadFundingPlan() {
 
 let html = `
 
-<div class="card"
-     style="
-       background:#dff0d8;
-       padding:20px;
-       border-radius:12px;
-       text-align:center;
-       margin-bottom:15px;
-     ">
+<div class="hero-card">
 
   <h2>
     💵 CASH TO WITHDRAW
@@ -1037,9 +1030,8 @@ let html = `
 
   <h1
     style="
-      color:green;
       margin:0;
-      font-size:42px;
+      font-size:48px;
     ">
     ₱${cash.toLocaleString()}
   </h1>
