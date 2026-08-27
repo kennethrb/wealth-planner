@@ -1216,6 +1216,103 @@ function runScenario() {
   const difference =
     scenarioAmount - currentAmount;
 
+  const categoryInfo =
+  appData.categories.find(
+    c =>
+      c.categoryName === category
+  );
+
+  const budgetType =
+    categoryInfo
+      ? categoryInfo.budgetType
+      : "";
+
+  let income = 0;
+let expense = 0;
+let savings = 0;
+let debt = 0;
+
+appData.budget.forEach(item => {
+
+  if (item.month !== "Jan")
+    return;
+
+  const cat =
+    appData.categories.find(
+      c =>
+        c.categoryName === item.category
+    );
+
+  if (!cat) return;
+
+  const amount =
+    Number(item.plannedAmount);
+
+  if (
+    cat.budgetType === "Income"
+  )
+    income += amount;
+
+  if (
+    cat.budgetType === "Expense"
+  )
+    expense += amount;
+
+  if (
+    cat.budgetType === "Savings"
+  )
+    savings += amount;
+
+  if (
+    cat.budgetType === "Debt"
+  )
+    debt += amount;
+
+});
+
+  const currentSurplus =
+  income -
+  expense -
+  savings -
+  debt;
+
+  let scenarioSurplus =
+  currentSurplus;
+
+if (budgetType === "Income") {
+
+  scenarioSurplus +=
+    difference;
+
+}
+
+if (
+  budgetType === "Expense"
+) {
+
+  scenarioSurplus -=
+    difference;
+
+}
+
+if (
+  budgetType === "Savings"
+) {
+
+  scenarioSurplus -=
+    difference;
+
+}
+
+if (
+  budgetType === "Debt"
+) {
+
+  scenarioSurplus -=
+    difference;
+
+}
+
   document.getElementById(
     "scenarioResult"
   ).innerHTML = `
@@ -1248,9 +1345,25 @@ function runScenario() {
       </p>
 
       <p>
-        Difference:
+  Difference:
+  <strong>
+    ₱${difference.toLocaleString()}
+  </strong>
+      </p>
+      
+      <hr>
+      
+      <p>
+        Current Monthly Surplus:
         <strong>
-          ₱${difference.toLocaleString()}
+          ₱${currentSurplus.toLocaleString()}
+        </strong>
+      </p>
+      
+      <p>
+        Scenario Monthly Surplus:
+        <strong>
+          ₱${scenarioSurplus.toLocaleString()}
         </strong>
       </p>
 
