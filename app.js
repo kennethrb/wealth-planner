@@ -799,11 +799,11 @@ async function saveBudgetChanges() {
   status.style.color = "green";
   status.style.fontWeight = "bold";
 
-  await loadBudgetPlanner();
-  await loadSummary();
-  await loadDashboard();
-  await loadProjection();
-  await loadGoals();
-  await loadNetWorth();
+  //await loadBudgetPlanner();
+  //await loadSummary();
+  //await loadDashboard();
+  //await loadProjection();
+  //await loadGoals();
+  //await loadNetWorth();
 
 }
