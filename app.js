@@ -1059,9 +1059,10 @@ async function copyCurrentYearToNextYear() {
 async function saveBudgetChanges() {
 
   const inputs =
-    document.querySelectorAll(
-      "input[type='number']"
-    );
+  document.querySelectorAll(
+    "#budget input[type='number']"
+  );
+
 
   let saveCount = 0;
 
@@ -1084,8 +1085,6 @@ async function saveBudgetChanges() {
 
       await fetch(url);
 
-      await loadData();
-
       saveCount++;
 
     } catch(error) {
@@ -1095,6 +1094,8 @@ async function saveBudgetChanges() {
     }
 
   }
+
+  await loadData();
 
   await Promise.all([
   loadBudgetPlanner(),
