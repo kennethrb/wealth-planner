@@ -109,6 +109,7 @@ async function addCategory() {
   await loadData();
 
   await loadCategoryDropdown();
+  await loadScenarioCategories();
 
   showStatus(
   `✅ Category ${categoryName} added successfully`
@@ -207,6 +208,7 @@ async function deleteCategory() {
   await loadData();
 
   await loadCategoryDropdown();
+  await loadScenarioCategories();
 
   showStatus(
   `🗑 Category ${categoryName} deleted`
