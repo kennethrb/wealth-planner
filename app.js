@@ -43,6 +43,55 @@ async function loadAccounts() {
 
 }
 
+async function addBudgetItem() {
+
+  const year =
+    document.getElementById(
+      "newYear"
+    ).value;
+
+  const month =
+    document.getElementById(
+      "newMonth"
+    ).value;
+
+  const category =
+    document.getElementById(
+      "newCategory"
+    ).value;
+
+  const amount =
+    document.getElementById(
+      "newAmount"
+    ).value;
+
+  await fetch(
+
+    `${BASE_URL}?action=addBudgetItem`
+
+    + `&year=${year}`
+    + `&month=${month}`
+    + `&category=${encodeURIComponent(category)}`
+    + `&amount=${amount}`
+
+  );
+
+  await Promise.all([
+    loadBudgetPlanner(),
+    loadSummary(),
+    loadDashboard()
+  ]);
+
+  const status =
+    document.getElementById(
+      "globalStatus"
+    );
+
+  status.innerHTML =
+    "✅ Budget Item Added";
+
+}
+
 
 
 // ====================
