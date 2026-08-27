@@ -1182,6 +1182,84 @@ async function loadScenarioCategories() {
 
 }
 
+function getCurrentAmount(category) {
+
+  const item =
+    appData.budget.find(row =>
+      row.category === category &&
+      row.month === "Jan"
+    );
+
+  return item
+    ? Number(item.plannedAmount)
+    : 0;
+
+}
+
+function runScenario() {
+
+  const category =
+    document.getElementById(
+      "scenarioCategory"
+    ).value;
+
+  const scenarioAmount =
+    Number(
+      document.getElementById(
+        "scenarioAmount"
+      ).value
+    );
+
+  const currentAmount =
+    getCurrentAmount(category);
+
+  const difference =
+    scenarioAmount - currentAmount;
+
+  document.getElementById(
+    "scenarioResult"
+  ).innerHTML = `
+
+    <div class="card">
+
+      <h3>
+        Scenario Result
+      </h3>
+
+      <p>
+        Category:
+        <strong>
+          ${category}
+        </strong>
+      </p>
+
+      <p>
+        Current Amount:
+        <strong>
+          ₱${currentAmount.toLocaleString()}
+        </strong>
+      </p>
+
+      <p>
+        Scenario Amount:
+        <strong>
+          ₱${scenarioAmount.toLocaleString()}
+        </strong>
+      </p>
+
+      <p>
+        Difference:
+        <strong>
+          ₱${difference.toLocaleString()}
+        </strong>
+      </p>
+
+    </div>
+
+  `;
+
+}
+
 
 // ====================
 // LOAD APP
