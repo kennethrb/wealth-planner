@@ -985,6 +985,62 @@ async function loadProjection() {
 
 }
 
+function loadFundingPlan() {
+
+  const totals = {};
+
+  appData.budget.forEach(item => {
+
+    if (item.month !== "Jan") {
+      return;
+    }
+
+    const category =
+      appData.categories.find(
+        c =>
+          c.categoryName === item.category
+      );
+
+    if (!category) {
+      return;
+    }
+
+    const group =
+      category.group;
+
+    if (!totals[group]) {
+      totals[group] = 0;
+    }
+
+    totals[group] +=
+      Number(item.plannedAmount);
+
+  });
+
+  let html =
+    `<div class="card">`;
+
+  Object.keys(totals).forEach(group => {
+
+    html += `
+      <p>
+        ${group}:
+        <strong>
+          ₱${totals[group].toLocaleString()}
+        </strong>
+      </p>
+    `;
+
+  });
+
+  html += `</div>`;
+
+  document.getElementById(
+    "fundingPlan"
+  ).innerHTML = html;
+
+}
+
 
 async function copyJanuaryToWholeYear() {
 
@@ -1007,12 +1063,15 @@ async function copyJanuaryToWholeYear() {
     appData.budget.slice(0, 10)
   );
 
+  await loadData();
+
   await loadBudgetPlanner();
   await loadSummary();
   await loadDashboard();
   await loadProjection();
   await loadGoals();
   await loadNetWorth();
+  await loadFundingPlan();
 
   const status =
     document.getElementById(
@@ -1100,13 +1159,14 @@ async function saveBudgetChanges() {
 
   await loadData();
 
-  await Promise.all([
+await Promise.all([
   loadBudgetPlanner(),
   loadSummary(),
   loadDashboard(),
   loadProjection(),
   loadGoals(),
-  loadNetWorth()
+  loadNetWorth(),
+  loadFundingPlan()
 ]);
 
   const status =
@@ -1459,16 +1519,15 @@ async function initializeApp() {
   await loadData();
 
   await Promise.all([
-
-    loadNetWorth(),
-    loadProjection(),
-    loadDashboard(),
-    loadGoals(),
-    loadAccounts(),
-    loadBudgetPlanner(),
-    loadSummary()
-
-  ]);
+  loadNetWorth(),
+  loadProjection(),
+  loadDashboard(),
+  loadGoals(),
+  loadAccounts(),
+  loadBudgetPlanner(),
+  loadSummary(),
+  loadFundingPlan()
+]);
 
   loadCategoryDropdown();
 
