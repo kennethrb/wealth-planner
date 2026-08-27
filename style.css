@@ -323,69 +323,140 @@ tr:hover{
 
 }
 
-/* ====================
-   MOBILE
-==================== */
+/* ==========================
+   TABLET
+========================== */
 
-@media (max-width: 768px){
-
-  table{
-
-  font-size:12px;
-
-}
+@media (max-width: 1024px){
 
   body{
-
-    padding:12px;
-
-  }
-
-  .hero-header h1{
-
-    font-size:36px;
-
+    padding:16px;
   }
 
   .dashboard-grid{
-
-    grid-template-columns:1fr;
-
-    gap:15px;
-
+    grid-template-columns:
+      repeat(2,1fr);
   }
 
-  .hero-card h1{
+}
 
-    font-size:42px;
+/* ==========================
+   MOBILE
+========================== */
 
+@media (max-width: 768px){
+
+  body{
+    padding:12px;
+  }
+
+  .hero-header{
+    text-align:center;
+  }
+
+  .hero-header h1{
+    font-size:32px;
+  }
+
+  .hero-header p{
+    font-size:14px;
+  }
+
+  .dashboard-grid{
+    grid-template-columns:1fr;
+    gap:15px;
   }
 
   .card{
-
     padding:16px;
-
+    margin-bottom:15px;
   }
 
-  button{
+  .hero-card{
+    padding:20px;
+  }
 
-    width:100%;
+  .hero-card h1{
+    font-size:42px;
+  }
 
-    justify-content:center;
+  .hero-card h2{
+    font-size:18px;
+  }
 
-    margin-top:10px;
+  .metric-row{
+    font-size:14px;
+  }
 
+  .funding-row{
+    font-size:14px;
   }
 
   input,
   select{
-
     width:100%;
-
     box-sizing:border-box;
-
     margin-bottom:10px;
+  }
 
+  button{
+    width:100%;
+    justify-content:center;
+    margin-top:8px;
+  }
+
+  #accounts .card{
+    margin-bottom:10px;
+  }
+
+  table{
+    min-width:900px;
+    font-size:12px;
+  }
+
+  td,
+  th{
+    padding:8px;
+  }
+
+}
+
+/* ==========================
+   SMALL PHONES
+========================== */
+
+@media (max-width: 480px){
+
+  body{
+    padding:10px;
+  }
+
+  .hero-header h1{
+    font-size:28px;
+  }
+
+  .hero-card{
+    padding:18px;
+  }
+
+  .hero-card h1{
+    font-size:36px;
+  }
+
+  .hero-card h2{
+    font-size:16px;
+  }
+
+  .metric-row{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:5px;
+  }
+
+  .funding-row{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:5px;
   }
 
 }
