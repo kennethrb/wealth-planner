@@ -4,6 +4,8 @@ body{
   color:#1e293b;
   margin:0;
   padding:24px;
+  max-width:1400px;
+  margin:auto;
 }
 
 .hero-header{
@@ -23,6 +25,26 @@ body{
 .hero-header p{
 
   color:#64748b;
+
+}
+
+.section{
+
+  margin-top:30px;
+  margin-bottom:40px;
+
+}
+
+input,
+select{
+
+  padding:10px;
+
+  border:1px solid #d0d7de;
+
+  border-radius:10px;
+
+  font-size:14px;
 
 }
 
