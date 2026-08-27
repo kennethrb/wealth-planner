@@ -43,6 +43,47 @@ async function loadAccounts() {
 
 }
 
+async function addCategory() {
+
+  const categoryName =
+    document.getElementById(
+      "categoryName"
+    ).value;
+
+  const budgetType =
+    document.getElementById(
+      "budgetType"
+    ).value;
+
+  const group =
+    document.getElementById(
+      "categoryGroup"
+    ).value;
+
+  await fetch(
+
+    `${BASE_URL}?action=addCategory`
+
+    + `&categoryName=${encodeURIComponent(categoryName)}`
+    + `&budgetType=${budgetType}`
+    + `&group=${encodeURIComponent(group)}`
+
+  );
+
+  const status =
+    document.getElementById(
+      "globalStatus"
+    );
+
+  if (status) {
+
+    status.innerHTML =
+      `✅ Category ${categoryName} added`;
+
+  }
+
+}
+
 async function addBudgetItem() {
 
   const year =
