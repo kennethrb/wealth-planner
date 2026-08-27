@@ -1174,12 +1174,24 @@ async function loadData() {
 // ====================
 // LOAD APP
 // ====================
-loadNetWorth();
-loadProjection();
-loadDashboard();
-loadGoals();
-loadAccounts();
-loadBudgetPlanner();
-loadSummary();
+async function initializeApp() {
 
-loadCategoryDropdown();
+  await loadData();
+
+  await Promise.all([
+
+    loadNetWorth(),
+    loadProjection(),
+    loadDashboard(),
+    loadGoals(),
+    loadAccounts(),
+    loadBudgetPlanner(),
+    loadSummary()
+
+  ]);
+
+  loadCategoryDropdown();
+
+}
+
+initializeApp();
