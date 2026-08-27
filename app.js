@@ -408,11 +408,8 @@ async function loadBudgetPlanner() {
             ${category}
             
             <button
+              class="delete-btn"
               onclick="deleteBudgetItem('${category}')"
-              style="
-                margin-left:10px;
-                color:red;
-              "
             >
               🗑
             </button>
