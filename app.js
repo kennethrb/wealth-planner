@@ -1,6 +1,13 @@
 const BASE_URL =
 "https://script.google.com/macros/s/AKfycbwZGBobKrROvavAglc9QZlBmbSggBudqJBH6dT7LrkPopdZDQVbCZ4FWhE926f1Z_Y-NQ/exec";
 
+let appData = {
+  accounts: [],
+  budget: [],
+  categories: [],
+  goals: []
+};
+
 function showStatus(message) {
 
   const status =
@@ -592,21 +599,11 @@ async function loadSummary() {
 
 async function loadDashboard() {
 
-  const budgetResponse =
-    await fetch(
-      `${BASE_URL}?action=getBudgetPlan`
-    );
-
-  const categoryResponse =
-    await fetch(
-      `${BASE_URL}?action=getCategories`
-    );
-
   const budgetData =
-    await budgetResponse.json();
+  appData.budget;
 
-  const categoryData =
-    await categoryResponse.json();
+const categoryData =
+  appData.categories;
 
   const categoryTypes = {};
 
@@ -711,13 +708,8 @@ async function loadDashboard() {
 
 async function loadGoals() {
 
-  const response =
-    await fetch(
-      `${BASE_URL}?action=getGoals`
-    );
-
   const goals =
-    await response.json();
+  appData.goals;
 
   let html = "";
 
@@ -815,13 +807,8 @@ async function loadGoals() {
 
 async function loadNetWorth() {
 
-  const response =
-    await fetch(
-      `${BASE_URL}?action=getAccounts`
-    );
-
   const accounts =
-    await response.json();
+  appData.accounts;
 
   let assets = 0;
   let liabilities = 0;
@@ -1146,6 +1133,40 @@ async function saveBudgetChanges() {
     status.style.fontWeight = "bold";
 
   }
+
+}
+
+async function loadData() {
+
+  const [
+    accounts,
+    budget,
+    categories,
+    goals
+  ] = await Promise.all([
+
+    fetch(
+      `${BASE_URL}?action=getAccounts`
+    ).then(r => r.json()),
+
+    fetch(
+      `${BASE_URL}?action=getBudgetPlan`
+    ).then(r => r.json()),
+
+    fetch(
+      `${BASE_URL}?action=getCategories`
+    ).then(r => r.json()),
+
+    fetch(
+      `${BASE_URL}?action=getGoals`
+    ).then(r => r.json())
+
+  ]);
+
+  appData.accounts = accounts;
+  appData.budget = budget;
+  appData.categories = categories;
+  appData.goals = goals;
 
 }
 
