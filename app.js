@@ -152,7 +152,7 @@ async function loadBudgetPlanner() {
           <input
             type="number"
             value="${amount}"
-            id="${category}_${month}"
+            id="${category}|${month}"
             style="
               width:90px;
               text-align:right;
@@ -751,8 +751,54 @@ loadSummary();
 
 async function saveBudgetChanges() {
 
+  const inputs =
+    document.querySelectorAll(
+      "input[type='number']"
+    );
+
+  for (const input of inputs) {
+
+    const parts =
+      input.id.split("|");
+
+    const category =
+      parts[0];
+
+    const month =
+      parts[1];
+
+    const amount =
+      Number(input.value);
+
+    await fetch(BASE_URL, {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type":
+          "application/json"
+      },
+
+      body: JSON.stringify({
+
+        action: "saveBudget",
+
+        year: 2027,
+
+        month: month,
+
+        category: category,
+
+        amount: amount
+
+      })
+
+    });
+
+  }
+
   alert(
-    "Next step: Save Budget API"
+    "✅ Budget Saved Successfully"
   );
 
 }
