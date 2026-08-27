@@ -758,47 +758,30 @@ async function saveBudgetChanges() {
 
   for (const input of inputs) {
 
-    const parts =
+    const [category, month] =
       input.id.split("|");
 
-    const category =
-      parts[0];
-
-    const month =
-      parts[1];
-
     const amount =
-      Number(input.value);
+      input.value;
 
-    await fetch(BASE_URL, {
+    const url =
+      `${BASE_URL}?action=saveBudget`
+      + `&year=2027`
+      + `&month=${month}`
+      + `&category=${encodeURIComponent(category)}`
+      + `&amount=${amount}`;
 
-      method: "POST",
-
-      headers: {
-        "Content-Type":
-          "application/json"
-      },
-
-      body: JSON.stringify({
-
-        action: "saveBudget",
-
-        year: 2027,
-
-        month: month,
-
-        category: category,
-
-        amount: amount
-
-      })
-
-    });
+    await fetch(url);
 
   }
 
-  alert(
-    "✅ Budget Saved Successfully"
-  );
+  alert("✅ Budget Saved");
+
+  await loadBudgetPlanner();
+  await loadSummary();
+  await loadDashboard();
+  await loadProjection();
+  await loadGoals();
+  await loadNetWorth();
 
 }
