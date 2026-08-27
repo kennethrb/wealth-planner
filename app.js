@@ -178,8 +178,13 @@ async function loadBudgetPlanner() {
   <br>
   
   <button onclick="saveBudgetChanges()">
-    💾 Save Changes
+  💾 Save Changes
   </button>
+  
+  <button onclick="copyJanuaryToWholeYear()">
+    📋 Copy Jan → Whole Year
+  </button>
+
   
   <span id="saveStatus"
         style="margin-left:10px;">
