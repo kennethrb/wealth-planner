@@ -136,14 +136,16 @@ h1{
 }
 
 table{
-
-  width:100%;
-
   background:white;
-
   border-radius:16px;
-
   overflow:hidden;
+  min-width:1200px;
+  width:100%;
+}
+
+#budget{
+
+  overflow-x:auto;
 
 }
 
