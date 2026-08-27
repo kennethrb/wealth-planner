@@ -758,6 +758,33 @@ loadAccounts();
 loadBudgetPlanner();
 loadSummary();
 
+async function copyJanuaryToWholeYear() {
+
+  await fetch(
+    `${BASE_URL}?action=copyJanuaryToWholeYear`
+  );
+
+  await loadBudgetPlanner();
+  await loadSummary();
+  await loadDashboard();
+  await loadProjection();
+  await loadGoals();
+  await loadNetWorth();
+
+  const status =
+    document.getElementById(
+      "globalStatus"
+    );
+
+  if (status) {
+
+    status.innerHTML =
+      "✅ January copied to all months";
+
+  }
+
+}
+
 async function saveBudgetChanges() {
 
   const inputs =
