@@ -196,3 +196,29 @@ tr:hover{
 .info{
   color:#2563eb;
 }
+
+.add-btn{
+
+  background:#198754;
+  color:white;
+
+}
+
+.add-btn:hover{
+
+  background:#157347;
+
+}
+
+.delete-btn{
+
+  background:#dc3545;
+  color:white;
+
+}
+
+.delete-btn:hover{
+
+  background:#bb2d3b;
+
+}
