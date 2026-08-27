@@ -792,36 +792,44 @@ async function saveBudgetChanges() {
       "input[type='number']"
     );
 
-  let saveCount = 0;
+  const budgetItems = [];
 
-  for (const input of inputs) {
+  inputs.forEach(input => {
 
     const [category, month] =
       input.id.split("|");
 
-    const amount =
-      input.value;
+    budgetItems.push({
 
-    const url =
-      `${BASE_URL}?action=saveBudget`
-      + `&year=2027`
-      + `&month=${month}`
-      + `&category=${encodeURIComponent(category)}`
-      + `&amount=${amount}`;
+      year: 2027,
+      month: month,
+      category: category,
+      amount: Number(
+        input.value
+      )
 
-    try {
+    });
 
-      await fetch(url);
+  });
 
-      saveCount++;
+  await fetch(
+    BASE_URL,
+    {
+      method: "POST",
 
-    } catch(error) {
+      headers: {
+        "Content-Type":
+          "application/json"
+      },
 
-      console.error(error);
-
+      body: JSON.stringify({
+        action:
+          "saveAllBudgets",
+        budgetItems:
+          budgetItems
+      })
     }
-
-  }
+  );
 
   await loadBudgetPlanner();
   await loadSummary();
@@ -838,22 +846,9 @@ async function saveBudgetChanges() {
   if (status) {
 
     status.innerHTML =
-      `✅ ${saveCount} budget items saved at ${new Date().toLocaleTimeString()}`;
-
-    status.style.color = "green";
-    status.style.fontWeight = "bold";
-    status.style.padding = "10px";
-    status.style.background =
-      "#d1e7dd";
-    status.style.borderRadius =
-      "6px";
-
-    setTimeout(() => {
-
-      status.innerHTML = "";
-
-    }, 5000);
+      `✅ Saved ${budgetItems.length} budget items`;
 
   }
 
 }
+
