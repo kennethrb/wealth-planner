@@ -484,21 +484,11 @@ async function loadBudgetPlanner() {
 
 async function loadSummary() {
 
-  const budgetResponse =
-    await fetch(
-      `${BASE_URL}?action=getBudgetPlan`
-    );
-
-  const categoryResponse =
-    await fetch(
-      `${BASE_URL}?action=getCategories`
-    );
-
   const budgetData =
-    await budgetResponse.json();
+  appData.budget;
 
-  const categoryData =
-    await categoryResponse.json();
+const categoryData =
+  appData.categories;
 
   const categoryTypes = {};
 
