@@ -797,8 +797,9 @@ async function saveBudgetChanges() {
   await loadGoals();
   await loadNetWorth();
   
-  const status =
-    document.getElementById("saveStatus");
+  console.log(
+  `✅ ${saveCount} budget items saved`
+);
   
   if (status) {
   
