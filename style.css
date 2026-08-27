@@ -155,6 +155,10 @@ table{
 
 }
 
+#summary{
+  overflow-x:auto;
+}
+
 th{
   background:#198754;
   color:white;
