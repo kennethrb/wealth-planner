@@ -84,6 +84,29 @@ async function addCategory() {
 
 }
 
+async function deleteCategory() {
+
+  const categoryName =
+    document.getElementById(
+      "deleteCategorySelect"
+    ).value;
+
+  await fetch(
+
+    `${BASE_URL}?action=deleteCategory`
+    + `&categoryName=${encodeURIComponent(categoryName)}`
+
+  );
+
+  await loadCategoryDropdown();
+
+  document.getElementById(
+    "globalStatus"
+  ).innerHTML =
+    `🗑 Deleted ${categoryName}`;
+
+}
+
 async function addBudgetItem() {
 
   const year =
