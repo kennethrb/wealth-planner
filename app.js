@@ -1155,6 +1155,31 @@ async function loadData() {
 
 }
 
+async function loadScenarioCategories() {
+
+  const dropdown =
+    document.getElementById(
+      "scenarioCategory"
+    );
+
+  if (!dropdown) return;
+
+  dropdown.innerHTML = "";
+
+  appData.categories.forEach(cat => {
+
+    dropdown.innerHTML += `
+      <option
+        value="${cat.categoryName}"
+      >
+        ${cat.categoryName}
+      </option>
+    `;
+
+  });
+
+}
+
 
 // ====================
 // LOAD APP
@@ -1176,6 +1201,8 @@ async function initializeApp() {
   ]);
 
   loadCategoryDropdown();
+
+  loadScenarioCategories();
 
 }
 
