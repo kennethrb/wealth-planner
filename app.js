@@ -271,6 +271,40 @@ async function addBudgetItem() {
 
 }
 
+async function deleteBudgetItem(
+  category
+) {
+
+  const confirmed =
+    confirm(
+      `Delete all budget rows for ${category}?`
+    );
+
+  if (!confirmed) return;
+
+  await fetch(
+
+    `${BASE_URL}?action=deleteBudgetItem`
+
+    + `&category=${encodeURIComponent(category)}`
+
+  );
+
+  await Promise.all([
+
+    loadBudgetPlanner(),
+    loadSummary(),
+    loadDashboard(),
+    loadProjection()
+
+  ]);
+
+  showStatus(
+    `🗑 Deleted ${category}`
+  );
+
+}
+
 
 
 // ====================
