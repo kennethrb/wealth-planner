@@ -180,6 +180,10 @@ async function loadBudgetPlanner() {
   <button onclick="saveBudgetChanges()">
     💾 Save Changes
   </button>
+  
+  <span id="saveStatus"
+        style="margin-left:10px;">
+  </span>
   `;
 
   container.innerHTML = html;
@@ -790,16 +794,10 @@ async function saveBudgetChanges() {
   document.getElementById("saveStatus");
 
   status.innerHTML =
-    `✅ ${saveCount} budget items saved`;
+    `✅ ${saveCount} budget items saved at ${new Date().toLocaleTimeString()}`;
   
   status.style.color = "green";
   status.style.fontWeight = "bold";
-  
-  setTimeout(() => {
-  
-    status.innerHTML = "";
-  
-  }, 3000);
 
   await loadBudgetPlanner();
   await loadSummary();
