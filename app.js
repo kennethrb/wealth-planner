@@ -790,20 +790,24 @@ async function saveBudgetChanges() {
 
   }
 
-  const status =
-  document.getElementById("saveStatus");
-
-  status.innerHTML =
-    `✅ ${saveCount} budget items saved at ${new Date().toLocaleTimeString()}`;
+  await loadBudgetPlanner();
+  await loadSummary();
+  await loadDashboard();
+  await loadProjection();
+  await loadGoals();
+  await loadNetWorth();
   
-  status.style.color = "green";
-  status.style.fontWeight = "bold";
-
-  //await loadBudgetPlanner();
-  //await loadSummary();
-  //await loadDashboard();
-  //await loadProjection();
-  //await loadGoals();
-  //await loadNetWorth();
+  const status =
+    document.getElementById("saveStatus");
+  
+  if (status) {
+  
+    status.innerHTML =
+      `✅ ${saveCount} budget items saved at ${new Date().toLocaleTimeString()}`;
+  
+    status.style.color = "green";
+    status.style.fontWeight = "bold";
+  
+  }
 
 }
