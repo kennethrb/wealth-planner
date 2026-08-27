@@ -989,10 +989,23 @@ async function loadProjection() {
 async function copyJanuaryToWholeYear() {
 
   await fetch(
-    `${BASE_URL}?action=copyJanuaryToWholeYear`
+  `${BASE_URL}?action=copyJanuaryToWholeYear`
   );
   
+  await new Promise(
+    resolve => setTimeout(resolve, 2000)
+  );
+
   await loadData();
+
+  console.log(
+  "Budget rows:",
+  appData.budget.length
+  );
+  
+  console.log(
+    appData.budget.slice(0, 10)
+  );
 
   await loadBudgetPlanner();
   await loadSummary();
