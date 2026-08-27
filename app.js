@@ -405,6 +405,7 @@ async function loadDashboard() {
 // ====================
 // LOAD APP
 // ====================
+loadDashboard();
 loadAccounts();
 loadBudgetPlanner();
 loadSummary();
