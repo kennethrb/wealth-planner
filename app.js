@@ -579,10 +579,152 @@ async function loadNetWorth() {
 
 }
 
+async function loadProjection() {
+
+  const accountsResponse =
+    await fetch(
+      `${BASE_URL}?action=getAccounts`
+    );
+
+  const budgetResponse =
+    await fetch(
+      `${BASE_URL}?action=getBudgetPlan`
+    );
+
+  const categoryResponse =
+    await fetch(
+      `${BASE_URL}?action=getCategories`
+    );
+
+  const accounts =
+    await accountsResponse.json();
+
+  const budgetData =
+    await budgetResponse.json();
+
+  const categories =
+    await categoryResponse.json();
+
+  const categoryTypes = {};
+
+  categories.forEach(cat => {
+
+    categoryTypes[cat.categoryName] =
+      cat.budgetType;
+
+  });
+
+  let assets = 0;
+  let liabilities = 0;
+
+  accounts.forEach(account => {
+
+    const balance =
+      Number(account.currentBalance);
+
+    if (
+      account.netWorthType === "Asset"
+    ) {
+      assets += balance;
+    }
+
+    if (
+      account.netWorthType === "Liability"
+    ) {
+      liabilities += balance;
+    }
+
+  });
+
+  let income = 0;
+  let expense = 0;
+  let savings = 0;
+  let debt = 0;
+
+  budgetData.forEach(item => {
+
+    if (item.month !== "Jan") return;
+
+    const amount =
+      Number(item.plannedAmount);
+
+    const type =
+      categoryTypes[item.category];
+
+    if (type === "Income")
+      income += amount;
+
+    if (type === "Expense")
+      expense += amount;
+
+    if (type === "Savings")
+      savings += amount;
+
+    if (type === "Debt")
+      debt += amount;
+
+  });
+
+  const monthlySurplus =
+    income - expense - savings - debt;
+
+  const annualSurplus =
+    monthlySurplus * 12;
+
+  const projectedAssets =
+    assets + annualSurplus;
+
+  const projectedNetWorth =
+    projectedAssets - liabilities;
+
+  document.getElementById("projection")
+    .innerHTML = `
+
+      <div class="card">
+
+        <h2>📈 Wealth Projection</h2>
+
+        <p>
+          Current Assets:
+          <strong>
+            ₱${assets.toLocaleString()}
+          </strong>
+        </p>
+
+        <p>
+          Current Net Worth:
+          <strong>
+            ₱${(assets - liabilities).toLocaleString()}
+          </strong>
+        </p>
+
+        <hr>
+
+        <p>
+          Projected Assets (12 Months):
+          <strong>
+            ₱${projectedAssets.toLocaleString()}
+          </strong>
+        </p>
+
+        <p>
+          Projected Net Worth:
+          <strong>
+            ₱${projectedNetWorth.toLocaleString()}
+          </strong>
+        </p>
+
+      </div>
+
+    `;
+
+}
+
 // ====================
 // LOAD APP
 // ====================
 loadNetWorth();
+loadProjection();
 loadDashboard();
 loadGoals();
 loadAccounts();
