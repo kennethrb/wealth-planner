@@ -756,13 +756,14 @@ async function saveBudgetChanges() {
       "input[type='number']"
     );
 
+  let saveCount = 0;
+
   for (const input of inputs) {
 
     const [category, month] =
       input.id.split("|");
 
-    const amount =
-      input.value;
+    const amount = input.value;
 
     const url =
       `${BASE_URL}?action=saveBudget`
@@ -771,11 +772,23 @@ async function saveBudgetChanges() {
       + `&category=${encodeURIComponent(category)}`
       + `&amount=${amount}`;
 
-    await fetch(url);
+    try {
+
+      await fetch(url);
+
+      saveCount++;
+
+    } catch(error) {
+
+      console.error(error);
+
+    }
 
   }
 
-  alert("✅ Budget Saved");
+  alert(
+    `✅ ${saveCount} budget items saved`
+  );
 
   await loadBudgetPlanner();
   await loadSummary();
