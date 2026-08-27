@@ -402,10 +402,64 @@ async function loadDashboard() {
 
 }
 
+async function loadGoals() {
+
+  const response =
+    await fetch(
+      `${BASE_URL}?action=getGoals`
+    );
+
+  const goals =
+    await response.json();
+
+  let html = "";
+
+  goals.forEach(goal => {
+
+    const progress =
+      ((goal.current / goal.target) * 100)
+      .toFixed(1);
+
+    html += `
+      <div class="card">
+
+        <h3>${goal.goal}</h3>
+
+        <p>
+          Current:
+          ₱${Number(goal.current).toLocaleString()}
+        </p>
+
+        <p>
+          Target:
+          ₱${Number(goal.target).toLocaleString()}
+        </p>
+
+        <p>
+          Progress:
+          ${progress}%
+        </p>
+
+        <progress
+          value="${goal.current}"
+          max="${goal.target}">
+        </progress>
+
+      </div>
+    `;
+
+  });
+
+  document.getElementById("goals")
+    .innerHTML = html;
+
+}
+
 // ====================
 // LOAD APP
 // ====================
 loadDashboard();
+loadGoals();
 loadAccounts();
 loadBudgetPlanner();
 loadSummary();
