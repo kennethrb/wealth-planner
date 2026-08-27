@@ -1017,23 +1017,63 @@ function loadFundingPlan() {
 
   });
 
-  let html =
-    `<div class="card">`;
+  const cash =
+  totals["Cash"] || 0;
 
-  Object.keys(totals).forEach(group => {
+let html = `
 
-    html += `
-      <p>
-        ${group}:
-        <strong>
-          ₱${totals[group].toLocaleString()}
-        </strong>
-      </p>
-    `;
+<div class="card"
+     style="
+       background:#dff0d8;
+       padding:20px;
+       border-radius:12px;
+       text-align:center;
+       margin-bottom:15px;
+     ">
 
-  });
+  <h2>
+    💵 CASH TO WITHDRAW
+  </h2>
 
-  html += `</div>`;
+  <h1
+    style="
+      color:green;
+      margin:0;
+      font-size:42px;
+    ">
+    ₱${cash.toLocaleString()}
+  </h1>
+
+</div>
+
+<div class="card">
+
+  <h3>
+    📋 Monthly Funding Plan
+  </h3>
+
+`;
+
+Object.keys(totals).forEach(group => {
+
+  if (group === "Cash") {
+    return;
+  }
+
+  html += `
+
+    <p>
+      ${group}:
+      <strong>
+        ₱${totals[group].toLocaleString()}
+      </strong>
+    </p>
+
+  `;
+
+});
+
+html += `</div>`;
 
   document.getElementById(
     "fundingPlan"
