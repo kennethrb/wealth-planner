@@ -34,13 +34,9 @@ function showStatus(message) {
 
 async function loadAccounts() {
 
-  const response =
-    await fetch(
-      `${BASE_URL}?action=getAccounts`
-    );
-
   const data =
-    await response.json();
+    appData.accounts;
+
 
   const container =
     document.getElementById("accounts");
@@ -109,6 +105,8 @@ async function addCategory() {
     + `&group=${encodeURIComponent(group)}`
 
   );
+
+  await loadData();
 
   await loadCategoryDropdown();
 
@@ -206,6 +204,8 @@ async function deleteCategory() {
 
   );
 
+  await loadData();
+
   await loadCategoryDropdown();
 
   showStatus(
@@ -261,6 +261,8 @@ async function addBudgetItem() {
 
   );
 
+  await loadData();
+
   await Promise.all([
     loadBudgetPlanner(),
     loadSummary(),
@@ -296,6 +298,8 @@ async function deleteBudgetItem(
     + `&category=${encodeURIComponent(category)}`
 
   );
+
+  await loadData();
 
   await Promise.all([
 
@@ -995,6 +999,8 @@ async function copyJanuaryToWholeYear() {
   await fetch(
     `${BASE_URL}?action=copyJanuaryToWholeYear`
   );
+  
+  await loadData();
 
   await loadBudgetPlanner();
   await loadSummary();
@@ -1023,6 +1029,8 @@ async function copyCurrentYearToNextYear() {
   await fetch(
     `${BASE_URL}?action=copyCurrentYearToNextYear`
   );
+
+  await loadData();
 
   const status =
     document.getElementById(
@@ -1073,6 +1081,8 @@ async function saveBudgetChanges() {
     try {
 
       await fetch(url);
+
+      await loadData();
 
       saveCount++;
 
