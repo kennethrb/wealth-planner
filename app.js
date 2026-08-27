@@ -283,6 +283,125 @@ async function loadSummary() {
 
 }
 
+async function loadDashboard() {
+
+  const budgetResponse =
+    await fetch(
+      `${BASE_URL}?action=getBudgetPlan`
+    );
+
+  const categoryResponse =
+    await fetch(
+      `${BASE_URL}?action=getCategories`
+    );
+
+  const budgetData =
+    await budgetResponse.json();
+
+  const categoryData =
+    await categoryResponse.json();
+
+  const categoryTypes = {};
+
+  categoryData.forEach(cat => {
+
+    categoryTypes[cat.categoryName] =
+      cat.budgetType;
+
+  });
+
+  let income = 0;
+  let expense = 0;
+  let savings = 0;
+  let debt = 0;
+
+  budgetData.forEach(item => {
+
+    if (item.month !== "Jan") return;
+
+    const type =
+      categoryTypes[item.category];
+
+    const amount =
+      Number(item.plannedAmount);
+
+    if (type === "Income")
+      income += amount;
+
+    if (type === "Expense")
+      expense += amount;
+
+    if (type === "Savings")
+      savings += amount;
+
+    if (type === "Debt")
+      debt += amount;
+
+  });
+
+  const remaining =
+    income - expense - savings - debt;
+
+  const annualSurplus =
+    remaining * 12;
+
+  const savingsRate =
+    ((savings / income) * 100).toFixed(1);
+
+  const debtRate =
+    ((debt / income) * 100).toFixed(1);
+
+  const dashboard =
+    document.getElementById("dashboard");
+
+  dashboard.innerHTML = `
+
+    <div class="card">
+
+      <h2>💰 Financial Health</h2>
+
+      <p>
+        Monthly Surplus:
+        <strong>
+          ₱${remaining.toLocaleString()}
+        </strong>
+      </p>
+
+      <p>
+        Annual Surplus:
+        <strong>
+          ₱${annualSurplus.toLocaleString()}
+        </strong>
+      </p>
+
+      <p>
+        Savings Rate:
+        <strong>
+          ${savingsRate}%
+        </strong>
+      </p>
+
+      <p>
+        Debt Rate:
+        <strong>
+          ${debtRate}%
+        </strong>
+      </p>
+
+      <p>
+        Status:
+        <strong>
+          ${remaining > 0
+            ? "✅ Positive Cash Flow"
+            : "❌ Negative Cash Flow"}
+        </strong>
+      </p>
+
+    </div>
+  `;
+
+}
+
 // ====================
 // LOAD APP
 // ====================
