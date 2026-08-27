@@ -168,11 +168,124 @@ async function loadBudgetPlanner() {
 
 }
 
+async function loadSummary() {
 
+  const budgetResponse =
+    await fetch(
+      `${BASE_URL}?action=getBudgetPlan`
+    );
+
+  const categoryResponse =
+    await fetch(
+      `${BASE_URL}?action=getCategories`
+    );
+
+  const budgetData =
+    await budgetResponse.json();
+
+  const categoryData =
+    await categoryResponse.json();
+
+  const categoryTypes = {};
+
+  categoryData.forEach(cat => {
+    categoryTypes[cat.categoryName] =
+      cat.budgetType;
+  });
+
+  const monthlyTotals = {};
+
+  budgetData.forEach(item => {
+
+    const month = item.month;
+
+    if (!monthlyTotals[month]) {
+
+      monthlyTotals[month] = {
+        Income: 0,
+        Expense: 0,
+        Savings: 0,
+        Debt: 0
+      };
+
+    }
+
+    const type =
+      categoryTypes[item.category];
+
+    if (type) {
+
+      monthlyTotals[month][type] +=
+        Number(item.plannedAmount);
+
+    }
+
+  });
+
+  let html = `
+
+    <table border="1" cellpadding="8" cellspacing="0">
+
+      <tr>
+        <th>Month</th>
+        <th>Income</th>
+        <th>Expense</th>
+        <th>Savings</th>
+        <th>Debt</th>
+        <th>Remaining</th>
+      </tr>
+
+  `;
+
+  Object.keys(monthlyTotals).forEach(month => {
+
+    const income =
+      monthlyTotals[month].Income;
+
+    const expense =
+      monthlyTotals[month].Expense;
+
+    const savings =
+      monthlyTotals[month].Savings;
+
+    const debt =
+      monthlyTotals[month].Debt;
+
+    const remaining =
+      income - expense - savings - debt;
+
+    html += `
+      <tr>
+
+        <td>${month}</td>
+
+        <td>₱${income.toLocaleString()}</td>
+
+        <td>₱${expense.toLocaleString()}</td>
+
+        <td>₱${savings.toLocaleString()}</td>
+
+        <td>₱${debt.toLocaleString()}</td>
+
+        <td>
+          ₱${remaining.toLocaleString()}
+        </td>
+
+      </tr>
+    `;
+
+  });
+
+  html += `</table>`;
+
+  document.getElementById("summary")
+    .innerHTML = html;
+
+}
 
 // ====================
 // LOAD APP
 // ====================
-
 loadAccounts();
 loadBudgetPlanner();
+loadSummary();
