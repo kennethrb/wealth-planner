@@ -828,28 +828,19 @@ async function loadNetWorth() {
       <div class="hero-card">
 
         <h2>💎 Net Worth</h2>
-
+      
+        <h1>
+          ₱${Math.round(netWorth).toLocaleString()}
+        </h1>
+      
         <p>
-          Assets:
-          <strong>
-            ₱${assets.toLocaleString()}
-          </strong>
+          Assets: ₱${Math.round(assets).toLocaleString()}
         </p>
-
+      
         <p>
-          Liabilities:
-          <strong>
-            ₱${liabilities.toLocaleString()}
-          </strong>
+          Liabilities: ₱${Math.round(liabilities).toLocaleString()}
         </p>
-
-        <p>
-          Net Worth:
-          <strong>
-            ₱${netWorth.toLocaleString()}
-          </strong>
-        </p>
-
+      
       </div>
 
     `;
