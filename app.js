@@ -185,6 +185,10 @@ async function loadBudgetPlanner() {
     📋 Copy Jan → Whole Year
   </button>
 
+  <button onclick="copyCurrentYearToNextYear()">
+  📅 Copy 2027 → 2028
+  </button>
+
   
   <span id="saveStatus"
         style="margin-left:10px;">
@@ -784,6 +788,33 @@ async function copyJanuaryToWholeYear() {
   }
 
 }
+
+async function copyCurrentYearToNextYear() {
+
+  await fetch(
+    `${BASE_URL}?action=copyCurrentYearToNextYear`
+  );
+
+  const status =
+    document.getElementById(
+      "globalStatus"
+    );
+
+  if (status) {
+
+    status.innerHTML =
+      "✅ 2028 budget created";
+
+    status.style.color =
+      "green";
+
+    status.style.fontWeight =
+      "bold";
+
+  }
+
+}
+
 
 async function saveBudgetChanges() {
 
