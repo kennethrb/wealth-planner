@@ -147,9 +147,19 @@ async function loadBudgetPlanner() {
             categories[category][month] || "";
 
           html += `
-            <td>
-              ${amount}
-            </td>
+          <td>
+          
+          <input
+            type="number"
+            value="${amount}"
+            id="${category}_${month}"
+            style="
+              width:90px;
+              text-align:right;
+            "
+          >
+          
+          </td>
           `;
 
         });
@@ -162,7 +172,15 @@ async function loadBudgetPlanner() {
 
   });
 
-  html += `</table>`;
+  html += `
+  </table>
+  
+  <br>
+  
+  <button onclick="saveBudgetChanges()">
+    💾 Save Changes
+  </button>
+  `;
 
   container.innerHTML = html;
 
@@ -730,3 +748,11 @@ loadGoals();
 loadAccounts();
 loadBudgetPlanner();
 loadSummary();
+
+async function saveBudgetChanges() {
+
+  alert(
+    "Next step: Save Budget API"
+  );
+
+}
