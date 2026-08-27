@@ -1313,6 +1313,9 @@ if (
 
 }
 
+  const annualDifference =
+  (scenarioSurplus - currentSurplus) * 12;
+
   document.getElementById(
     "scenarioResult"
   ).innerHTML = `
@@ -1364,6 +1367,13 @@ if (
         Scenario Monthly Surplus:
         <strong>
           ₱${scenarioSurplus.toLocaleString()}
+        </strong>
+      </p>
+
+      <p>
+        Annual Impact:
+        <strong>
+          ₱${annualDifference.toLocaleString()}
         </strong>
       </p>
 
