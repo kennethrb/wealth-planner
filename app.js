@@ -786,9 +786,20 @@ async function saveBudgetChanges() {
 
   }
 
-  alert(
-    `✅ ${saveCount} budget items saved`
-  );
+  const status =
+  document.getElementById("saveStatus");
+
+  status.innerHTML =
+    `✅ ${saveCount} budget items saved`;
+  
+  status.style.color = "green";
+  status.style.fontWeight = "bold";
+  
+  setTimeout(() => {
+  
+    status.innerHTML = "";
+  
+  }, 3000);
 
   await loadBudgetPlanner();
   await loadSummary();
