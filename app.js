@@ -583,18 +583,16 @@ const categoryData =
 async function loadDashboard() {
 
   const budgetData =
-  appData.budget;
+    appData.budget;
 
-const categoryData =
-  appData.categories;
+  const categoryData =
+    appData.categories;
 
   const categoryTypes = {};
 
   categoryData.forEach(cat => {
-
     categoryTypes[cat.categoryName] =
       cat.budgetType;
-
   });
 
   let income = 0;
@@ -604,7 +602,8 @@ const categoryData =
 
   budgetData.forEach(item => {
 
-    if (item.month !== "Jan") return;
+    if (item.month !== "Jan")
+      return;
 
     const type =
       categoryTypes[item.category];
@@ -633,60 +632,65 @@ const categoryData =
     remaining * 12;
 
   const savingsRate =
-    ((savings / income) * 100).toFixed(1);
+    ((savings / income) * 100)
+      .toFixed(1);
 
   const debtRate =
-    ((debt / income) * 100).toFixed(1);
+    ((debt / income) * 100)
+      .toFixed(1);
 
-  const dashboard =
-    document.getElementById("dashboard");
-
-  dashboard.innerHTML = `
+  document.getElementById(
+    "dashboard"
+  ).innerHTML = `
 
     <div class="card">
 
-      <h2>💰 Financial Health</h2>
+      <h2>
+        💰 Financial Health
+      </h2>
 
-      <p>
-        Monthly Surplus:
+      <div class="metric-row">
+        <span>Monthly Surplus</span>
         <strong>
-          ₱${remaining.toLocaleString()}
+          ₱${Math.round(remaining).toLocaleString()}
         </strong>
-      </p>
+      </div>
 
-      <p>
-        Annual Surplus:
+      <div class="metric-row">
+        <span>Annual Surplus</span>
         <strong>
-          ₱${annualSurplus.toLocaleString()}
+          ₱${Math.round(annualSurplus).toLocaleString()}
         </strong>
-      </p>
+      </div>
 
-      <p>
-        Savings Rate:
+      <div class="metric-row">
+        <span>Savings Rate</span>
         <strong>
           ${savingsRate}%
         </strong>
-      </p>
+      </div>
 
-      <p>
-        Debt Rate:
+      <div class="metric-row">
+        <span>Debt Rate</span>
         <strong>
           ${debtRate}%
         </strong>
-      </p>
+      </div>
 
-      <p>
-        Status:
+      <div class="metric-row">
+        <span>Status</span>
         <strong>
-          ${remaining > 0
+          ${
+            remaining > 0
             ? "✅ Positive Cash Flow"
-            : "❌ Negative Cash Flow"}
+            : "❌ Negative Cash Flow"
+          }
         </strong>
-      </p>
+      </div>
 
     </div>
-  `;
 
+  `;
 }
 
 async function loadGoals() {
@@ -832,13 +836,15 @@ async function loadNetWorth() {
         <h1>
           ₱${Math.round(netWorth).toLocaleString()}
         </h1>
-      
+        
         <p>
-          Assets: ₱${Math.round(assets).toLocaleString()}
+          Assets:
+          ₱${Math.round(assets).toLocaleString()}
         </p>
-      
+        
         <p>
-          Liabilities: ₱${Math.round(liabilities).toLocaleString()}
+          Liabilities:
+          ₱${Math.round(liabilities).toLocaleString()}
         </p>
       
       </div>
@@ -930,46 +936,55 @@ async function loadProjection() {
   const projectedNetWorth =
     projectedAssets - liabilities;
 
-  document.getElementById("projection")
-    .innerHTML = `
+  document.getElementById(
+  "projection"
+).innerHTML = `
 
-      <div class="card">
+<div class="card">
 
-        <h2>📈 Wealth Projection</h2>
+  <h2>
+    📈 Wealth Projection
+  </h2>
 
-        <p>
-          Current Assets:
-          <strong>
-            ₱${assets.toLocaleString()}
-          </strong>
-        </p>
+  <div class="metric-row">
+    <span>Current Assets</span>
+    <strong>
+      ₱${Math.round(assets).toLocaleString()}
+    </strong>
+  </div>
 
-        <p>
-          Current Net Worth:
-          <strong>
-            ₱${(assets - liabilities).toLocaleString()}
-          </strong>
-        </p>
+  <div class="metric-row">
+    <span>Current Net Worth</span>
+    <strong>
+      ₱${Math.round(
+        assets - liabilities
+      ).toLocaleString()}
+    </strong>
+  </div>
 
-        <hr>
+  <hr>
 
-        <p>
-          Projected Assets (12 Months):
-          <strong>
-            ₱${projectedAssets.toLocaleString()}
-          </strong>
-        </p>
+  <div class="metric-row">
+    <span>Projected Assets</span>
+    <strong>
+      ₱${Math.round(
+        projectedAssets
+      ).toLocaleString()}
+    </strong>
+  </div>
 
-        <p>
-          Projected Net Worth:
-          <strong>
-            ₱${projectedNetWorth.toLocaleString()}
-          </strong>
-        </p>
+  <div class="metric-row">
+    <span>Projected Net Worth</span>
+    <strong>
+      ₱${Math.round(
+        projectedNetWorth
+      ).toLocaleString()}
+    </strong>
+  </div>
 
-      </div>
+</div>
 
-    `;
+`;
 
 }
 
