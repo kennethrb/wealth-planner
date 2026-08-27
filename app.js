@@ -366,7 +366,21 @@ async function loadBudgetPlanner() {
 
         html += `
           <tr>
-            <td>${category}</td>
+            <td>
+
+            ${category}
+            
+            <button
+              onclick="deleteBudgetItem('${category}')"
+              style="
+                margin-left:10px;
+                color:red;
+              "
+            >
+              🗑
+            </button>
+            
+            </td>
         `;
 
         months.forEach(month => {
