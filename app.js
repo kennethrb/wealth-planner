@@ -767,7 +767,8 @@ async function saveBudgetChanges() {
     const [category, month] =
       input.id.split("|");
 
-    const amount = input.value;
+    const amount =
+      input.value;
 
     const url =
       `${BASE_URL}?action=saveBudget`
@@ -796,18 +797,31 @@ async function saveBudgetChanges() {
   await loadProjection();
   await loadGoals();
   await loadNetWorth();
-  
+
   const status =
-  document.getElementById("globalStatus");
+    document.getElementById(
+      "globalStatus"
+    );
 
   if (status) {
-  
+
     status.innerHTML =
       `✅ ${saveCount} budget items saved at ${new Date().toLocaleTimeString()}`;
-  
+
     status.style.color = "green";
     status.style.fontWeight = "bold";
-  
+    status.style.padding = "10px";
+    status.style.background =
+      "#d1e7dd";
+    status.style.borderRadius =
+      "6px";
+
+    setTimeout(() => {
+
+      status.innerHTML = "";
+
+    }, 5000);
+
   }
 
 }
