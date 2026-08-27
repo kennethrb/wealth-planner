@@ -220,3 +220,21 @@ tr:hover{
   background:#bb2d3b;
 
 }
+
+.hero-card h1{
+
+  color:white;
+
+  font-size:56px;
+
+  font-weight:700;
+
+  margin:0;
+
+}
+
+.hero-card h2{
+
+  color:white;
+
+}
