@@ -38,16 +38,22 @@ function showStatus(message) {
 }
 
 // ====================
-// ACCOUNTS (UPDATED)
+// ACCOUNTS (FIXED)
 // ====================
 function loadAccounts() {
   const container = document.getElementById("accountsList");
-  if (!container || !appData.accounts) return;
+  if (!container) return;
+
+  // Handle empty or missing accounts data gracefully
+  if (!appData.accounts || appData.accounts.length === 0) {
+    container.innerHTML = `<div class="account-row"><span class="label">No accounts found</span></div>`;
+    return;
+  }
 
   container.innerHTML = appData.accounts.map(account => `
     <div class="account-row">
-      <span class="label">${account.name || account.accountName}</span>
-      <span class="amount">${formatCurrency(account.currentBalance || account.balance)}</span>
+      <span class="label">${account.name || account.accountName || 'Unnamed Account'}</span>
+      <span class="amount">${formatCurrency(account.currentBalance || account.balance || 0)}</span>
     </div>
   `).join('');
 }
@@ -804,46 +810,53 @@ async function loadProjection() {
 }
 
 // ====================
-// FUNDING BREAKDOWN (UPDATED DYNAMICALLY)
+// FUNDING BREAKDOWN (GROUP TYPE = CASH)
 // ====================
 function loadFundingPlan() {
   const container = document.getElementById("fundingPlanList");
   const cashContainer = document.getElementById("cashToWithdraw");
   if (!container || !appData.budget || !appData.categories) return;
 
-  // Map category types for lookups
+  // Create lookup maps for category properties
   const categoryTypes = {};
+  const categoryGroups = {};
+
   appData.categories.forEach(cat => {
     categoryTypes[cat.categoryName] = cat.budgetType;
+    categoryGroups[cat.categoryName] = cat.group; // Map category group
   });
 
-  // Calculate dynamic totals for January (or baseline month)
   let totalIncome = 0;
   let totalExpense = 0;
   let totalSavings = 0;
   let totalDebt = 0;
+  let cashToWithdraw = 0;
 
+  // Calculate totals for January (or baseline month)
   appData.budget.forEach(item => {
     if (item.month !== "Jan") return;
 
     const type = categoryTypes[item.category];
+    const group = categoryGroups[item.category];
     const amount = Number(item.plannedAmount) || 0;
 
     if (type === "Income") totalIncome += amount;
     if (type === "Expense") totalExpense += amount;
     if (type === "Savings") totalSavings += amount;
     if (type === "Debt") totalDebt += amount;
+
+    // Sum items where Group is explicitly "Cash"
+    if (group === "Cash") {
+      cashToWithdraw += amount;
+    }
   });
 
-  // Cash to Withdraw = Total monthly expenses + debt requirements
-  const cashToWithdraw = totalExpense + totalDebt;
-
-  // Update big banner amount dynamically
+  // Update banner display with total Cash required
   if (cashContainer) {
     cashContainer.textContent = formatCurrency(cashToWithdraw);
   }
 
-  // Render dynamic category breakdown rows
+  // Render rows
   container.innerHTML = `
     <div class="funding-row">
       <span class="label">Total Monthly Income</span>
@@ -860,6 +873,10 @@ function loadFundingPlan() {
     <div class="funding-row">
       <span class="label">Total Debt Payments</span>
       <span class="amount">${formatCurrency(totalDebt)}</span>
+    </div>
+    <div class="funding-row highlight">
+      <span class="label">Cash Requirements</span>
+      <span class="amount">${formatCurrency(cashToWithdraw)}</span>
     </div>
   `;
 }
