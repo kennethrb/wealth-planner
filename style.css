@@ -501,6 +501,69 @@ tr.section-debt td:first-child {
   margin: 0 !important;
 }
 
+/* ====================
+   NET WORTH HERO BANNER
+==================== */
+.networth-banner {
+  border-radius: var(--radius-lg);
+  padding: 24px 28px;
+  margin-bottom: 24px;
+  border: 1px solid var(--border);
+  transition: var(--transition);
+}
+
+/* Positive Net Worth Banner */
+.networth-banner.positive {
+  background-color: var(--primary-light, #ecfdf5);
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
+/* Negative Net Worth Banner */
+.networth-banner.negative {
+  background-color: #fef2f2;
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.networth-banner h2 {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.networth-banner .big-amount {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 12px;
+}
+
+.networth-banner.positive .big-amount {
+  color: var(--primary-hover, #059669);
+}
+
+.networth-banner.negative .big-amount {
+  color: #dc2626;
+}
+
+/* Assets & Liabilities Row */
+.networth-details {
+  display: flex;
+  gap: 24px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  border-top: 1px dashed rgba(0, 0, 0, 0.08);
+  padding-top: 10px;
+}
+
+.networth-details strong {
+  color: var(--text-main);
+}
+
 /* 2. Highlighted Cash to Withdraw Banner */
 .cash-withdraw-banner {
   background-color: var(--primary-light, #ecfdf5);
