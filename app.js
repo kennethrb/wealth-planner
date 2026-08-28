@@ -1961,7 +1961,7 @@ function loadBudgetVsActual() {
     const actual =
       actualMap[cat] || 0;
 
-    const remaining =
+    const variance =
       budget - actual;
 
     rows += `
@@ -1984,15 +1984,19 @@ function loadBudgetVsActual() {
           ${formatCurrency(remaining)}
         </td>
 
-        <td>
-
+        <td class="${
+          variance >= 0
+            ? "text-success"
+            : "text-danger"
+        }">
+        
           ${
-            remaining >= 0
-              ? "✅"
-              : "🔴"
+            variance >= 0
+              ? "+"
+              : ""
           }
-
-        </td>
+        
+          ${formatCurrency
 
       </tr>
 
@@ -2016,9 +2020,7 @@ function loadBudgetVsActual() {
 
           <th>Actual</th>
 
-          <th>Remaining</th>
-
-          <th>Status</th>
+          <th>Variance</th>
 
         </tr>
 
