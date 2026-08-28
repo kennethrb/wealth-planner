@@ -181,39 +181,29 @@ async function loadCategoryDropdown() {
 
 }
 
-async function deleteCategory() {
+// ====================
+// CATEGORIES
+// ====================
 
-  const categoryName =
-    document.getElementById(
-      "deleteCategorySelect"
-    ).value;
+async function deleteCategory() {
+  const categoryName = document.getElementById("deleteCategorySelect").value;
 
   if (!categoryName) return;
 
-  const confirmDelete =
-    confirm(
-      `Delete category "${categoryName}"?`
-    );
-
+  // Confirmation prompt before deletion
+  const confirmDelete = confirm(`Are you sure you want to delete the category "${categoryName}"? This cannot be undone.`);
   if (!confirmDelete) return;
 
   await fetch(
-
-    `${BASE_URL}?action=deleteCategory`
-
-    + `&categoryName=${encodeURIComponent(categoryName)}`
-
+    `${BASE_URL}?action=deleteCategory` +
+    `&categoryName=${encodeURIComponent(categoryName)}`
   );
 
   await loadData();
-
   await loadCategoryDropdown();
   await loadScenarioCategories();
 
-  showStatus(
-  `🗑 Category ${categoryName} deleted`
-);
-
+  showStatus(`🗑 Category ${categoryName} deleted`);
 }
 
 async function addBudgetItem() {
@@ -282,40 +272,30 @@ async function addBudgetItem() {
 
 }
 
-async function deleteBudgetItem(
-  category
-) {
+// ====================
+// BUDGET PLANNER
+// ====================
 
-  const confirmed =
-    confirm(
-      `Delete all budget rows for ${category}?`
-    );
-
+async function deleteBudgetItem(category) {
+  // Confirmation prompt before row deletion
+  const confirmed = confirm(`Are you sure you want to delete all budget entries for "${category}"?`);
   if (!confirmed) return;
 
   await fetch(
-
-    `${BASE_URL}?action=deleteBudgetItem`
-
-    + `&category=${encodeURIComponent(category)}`
-
+    `${BASE_URL}?action=deleteBudgetItem` +
+    `&category=${encodeURIComponent(category)}`
   );
 
   await loadData();
 
   await Promise.all([
-
     loadBudgetPlanner(),
     loadSummary(),
     loadDashboard(),
     loadProjection()
-
   ]);
 
-  showStatus(
-    `🗑 Deleted ${category}`
-  );
-
+  showStatus(`🗑 Deleted ${category}`);
 }
 
 // ====================
@@ -1055,6 +1035,10 @@ async function copyCurrentYearToNextYear() {
 
 
 async function saveBudgetChanges() {
+  // Optional safety check when overwriting/saving budget changes
+  const confirmed = confirm("Are you sure you want to save all changes to the budget?");
+  if (!confirmed) return;
+
   const inputs = document.querySelectorAll("#budget input[type='number']");
   const budgetItems = [];
 
@@ -1072,7 +1056,7 @@ async function saveBudgetChanges() {
     const response = await fetch(BASE_URL, {
       method: "POST",
       headers: {
-        "Content-Type": "text/plain;charset=utf-8" // Avoids CORS preflight options check issue in Apps Script
+        "Content-Type": "text/plain;charset=utf-8"
       },
       body: JSON.stringify({
         action: "saveAllBudgets",
