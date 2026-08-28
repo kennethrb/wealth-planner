@@ -40,23 +40,16 @@ function showStatus(message) {
 // ====================
 // ACCOUNTS (UPDATED)
 // ====================
-async function loadAccounts() {
-  const data = appData.accounts;
-  const container = document.getElementById("accounts");
+function loadAccounts() {
+  const container = document.getElementById("accountsList");
+  if (!container || !appData.accounts) return;
 
-  let html = `<div class="accounts-container">`;
-
-  data.forEach(account => {
-    html += `
-      <div class="account-item">
-        <span class="item-title">${account.accountName}</span>
-        <span class="item-value">₱${Number(account.currentBalance).toLocaleString()}</span>
-      </div>
-    `;
-  });
-
-  html += `</div>`;
-  container.innerHTML = html;
+  container.innerHTML = appData.accounts.map(account => `
+    <div class="account-row">
+      <span class="label">${account.name}</span>
+      <span class="amount">${formatCurrency(account.balance)}</span>
+    </div>
+  `).join('');
 }
 
 async function addCategory() {
@@ -811,90 +804,41 @@ async function loadProjection() {
 }
 
 function loadFundingPlan() {
+  const container = document.getElementById("fundingPlanList");
+  const cashContainer = document.getElementById("cashToWithdraw");
+  if (!container) return;
 
-  const totals = {};
+  // Calculate or retrieve dynamic values
+  const employment = appData.budget?.employment || 0;
+  const online = appData.budget?.online || 0;
+  const emergency = appData.budget?.emergency || 0;
+  const investments = appData.budget?.investments || 0;
+  const cashToWithdraw = appData.budget?.cashToWithdraw || 0;
 
-  appData.budget.forEach(item => {
-
-    if (item.month !== "Jan") {
-      return;
-    }
-
-    const category =
-      appData.categories.find(
-        c =>
-          c.categoryName === item.category
-      );
-
-    if (!category) {
-      return;
-    }
-
-    const group =
-      category.group;
-
-    if (!totals[group]) {
-      totals[group] = 0;
-    }
-
-    totals[group] +=
-      Number(item.plannedAmount);
-
-  });
-
-  const cash =
-  totals["Cash"] || 0;
-
-let html = `
-
-<div class="hero-card">
-
-  <h2>
-    💵 CASH TO WITHDRAW
-  </h2>
-
-  <h1>
-    ₱${cash.toLocaleString()}
-  </h1>
-
-</div>
-
-<div class="card">
-
-  <h3>
-    📋 Monthly Funding Plan
-  </h3>
-
-`;
-
-Object.keys(totals).forEach(group => {
-
-  if (group === "Cash") {
-    return;
+  // Update big banner amount dynamically
+  if (cashContainer) {
+    cashContainer.textContent = formatCurrency(cashToWithdraw);
   }
 
-  html += `
-
+  // Render dynamic list rows
+  container.innerHTML = `
     <div class="funding-row">
-
-      <span>${group}</span>
-
-      <strong>
-        ₱${totals[group].toLocaleString()}
-      </strong>
-
+      <span class="label">Employment</span>
+      <span class="amount">${formatCurrency(employment)}</span>
     </div>
-
+    <div class="funding-row">
+      <span class="label">Online</span>
+      <span class="amount">${formatCurrency(online)}</span>
+    </div>
+    <div class="funding-row">
+      <span class="label">Emergency</span>
+      <span class="amount">${formatCurrency(emergency)}</span>
+    </div>
+    <div class="funding-row">
+      <span class="label">Investments</span>
+      <span class="amount">${formatCurrency(investments)}</span>
+    </div>
   `;
-
-});
-
-html += `</div>`;
-
-  document.getElementById(
-    "fundingPlan"
-  ).innerHTML = html;
-
 }
 
 
