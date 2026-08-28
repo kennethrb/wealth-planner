@@ -862,6 +862,34 @@ input[type="date"]{
   background-color:rgba(255,255,255,.03);
 }
 
+#transactionsList {
+  width: 100%;
+}
+
+#transactionsList .table-responsive {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+#transactionsList td:first-child,
+#transactionsList th:first-child {
+
+  position: sticky;
+  left: 0;
+
+  background: var(--surface);
+
+  z-index: 2;
+
+  box-shadow:
+    2px 0 5px rgba(0,0,0,.2);
+
+}
+
 @keyframes slideIn{
 
   from{
