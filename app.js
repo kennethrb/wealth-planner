@@ -18,7 +18,10 @@ let appData = {
   goals: []
 };
 
-function showStatus(message) {
+function showStatus(
+  message,
+  type = "success"
+) {
 
   const status =
     document.getElementById(
@@ -27,13 +30,38 @@ function showStatus(message) {
 
   if (!status) return;
 
-  status.innerHTML = message;
+  status.className =
+    `status-banner ${type}`;
 
-  setTimeout(() => {
+  status.innerHTML =
+    message;
 
-    status.innerHTML = "";
+  status.style.display =
+    "block";
 
-  }, 5000);
+  clearTimeout(
+    status.timeoutId
+  );
+
+  status.timeoutId =
+    setTimeout(() => {
+
+      status.classList.add(
+        "hide"
+      );
+
+      setTimeout(() => {
+
+        status.style.display =
+          "none";
+
+        status.classList.remove(
+          "hide"
+        );
+
+      }, 300);
+
+    }, 4000);
 
 }
 
@@ -442,13 +470,26 @@ async function loadBudgetPlanner() {
   });
 
   // Close table and table-responsive wrapper before action buttons
+  const years =
+    [...new Set(
+      appData.budget.map(
+        item => Number(item.year)
+      )
+    )];
+  
+  const currentYear =
+    Math.max(...years);
+  
+  const nextYear =
+    currentYear + 1;
+  
   html += `
       </table>
     </div>
     <div class="action-buttons">
       <button onclick="saveBudgetChanges()">💾 Save Changes</button>
       <button onclick="copyJanuaryToWholeYear()">📋 Copy Jan → Whole Year</button>
-      <button onclick="copyCurrentYearToNextYear()">📅 Copy 2027 → 2028</button>
+      <button onclick="copyCurrentYearToNextYear()">📅 Copy ${currentYear} → ${nextYear}</button>
     </div>
     <span id="saveStatus" style="display: block; text-align: center; margin-top: 8px;"></span>
   `;
@@ -978,9 +1019,19 @@ async function copyCurrentYearToNextYear() {
 
   if (status) {
 
+    const years =
+      [...new Set(
+        appData.budget.map(
+          item => Number(item.year)
+        )
+      )];
+    
+    const nextYear =
+      Math.max(...years) + 1;
+    
     showStatus(
-  "✅ 2028 budget created"
-);
+      `✅ ${nextYear} budget created`
+    );
 
     status.style.color =
       "green";
