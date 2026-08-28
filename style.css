@@ -1,5 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+/* ====================
+   VARIABLES & BASE
+==================== */
 :root {
   --primary: #10b981;
   --primary-hover: #059669;
@@ -17,6 +20,10 @@
   --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background-color: var(--bg-main);
@@ -28,9 +35,37 @@ body {
 }
 
 /* ====================
-   HEADER & BANNER
+   LAYOUT & CONTAINERS
 ==================== */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
 
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.divider {
+  margin: 16px 0;
+  border: 0;
+  border-top: 1px solid var(--border);
+}
+
+/* ====================
+   HEADER & CARDS
+==================== */
 .hero-header {
   margin-bottom: 36px;
 }
@@ -47,17 +82,6 @@ body {
   color: var(--text-muted);
   font-size: 16px;
   font-weight: 400;
-}
-
-/* ====================
-   CARDS & GRID
-==================== */
-
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 20px;
-  margin-bottom: 32px;
 }
 
 .card {
@@ -100,10 +124,19 @@ body {
 }
 
 /* ====================
-   FORM ELEMENTS
+   FORMS & INPUTS
 ==================== */
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
 
-input, select {
+.form-row input, 
+.form-row select {
+  flex: 1;
+  min-width: 140px;
   padding: 10px 14px;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -123,7 +156,6 @@ input:focus, select:focus {
 /* ====================
    BUTTONS
 ==================== */
-
 button {
   background-color: var(--primary);
   color: white;
@@ -136,6 +168,7 @@ button {
   transition: var(--transition);
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   box-shadow: var(--shadow-sm);
 }
@@ -158,18 +191,41 @@ button:active {
   background-color: #dc2626;
 }
 
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.action-buttons button {
+  padding: 10px 16px;
+  font-weight: 600;
+}
+
 /* ====================
-   TABLES
+   TABLES & RESPONSIVE SCROLL
 ==================== */
+.table-responsive, #summary, #budget {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  box-sizing: border-box;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 1rem;
+}
 
 table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  border: 1px solid var(--border);
-  background: var(--surface);
+  border-collapse: collapse;
+  table-layout: auto;
 }
 
 th {
@@ -183,13 +239,11 @@ th {
 }
 
 td, th {
-  padding: 14px 16px;
-  text-align: left;
-}
-
-td {
+  padding: 10px 12px;
+  text-align: center;
+  white-space: nowrap;
   border-bottom: 1px solid var(--border);
-  font-size: 14px;
+  font-size: 13px;
 }
 
 tr:last-child td {
@@ -199,30 +253,21 @@ tr:last-child td {
 tr:hover {
   background-color: #f8fafc;
 }
-/* Container wrapper to keep table contained */
-#budget {
-  width: 100%;
-  overflow-x: auto;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
+
+/* Sticky First Column (Categories / Months) */
+#budget td:first-child,
+#summary td:first-child,
+#summary th:first-child {
+  position: sticky;
+  left: 0;
+  background: #ffffff;
+  z-index: 2;
+  text-align: left;
+  font-weight: 600;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
 }
 
-/* Compact table sizing */
-#budget table {
-  width: 100%;
-  min-width: 0; /* Remove 1200px constraint */
-  table-layout: auto;
-  border: none;
-}
-
-#budget th, 
-#budget td {
-  padding: 6px 8px; /* Reduce padding from 14px */
-  font-size: 13px;
-  white-space: nowrap;
-}
-
-/* Make input fields small and sleek */
+/* Budget Table Specific Inputs */
 #budget input[type="number"] {
   width: 70px !important;
   padding: 4px 6px;
@@ -232,163 +277,36 @@ tr:hover {
   text-align: right;
 }
 
-/* Category column styling */
-#budget td:first-child {
-  position: sticky;
-  left: 0;
-  background: white;
-  z-index: 2;
-  font-weight: 500;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05); /* Slight shadow when scrolling */
-}
-
-/* Container fix: Prevent tables from breaking out of card borders */
-#summary, #budget {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: auto;
-  box-sizing: border-box;
-  border-radius: var(--radius-lg, 8px);
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Base table layout for Monthly Summary */
-#summary table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: auto;
-}
-
-/* Cell padding and alignment */
-#summary th, 
-#summary td {
-  padding: 10px 12px;
-  font-size: 13px;
-  text-align: center;
-  white-space: nowrap;
-}
-
-/* Sticky left column for month names */
-#summary th:first-child,
-#summary td:first-child {
-  text-align: left;
-  font-weight: 600;
-  position: sticky;
-  left: 0;
-  background: #ffffff;
-  z-index: 2;
-}
-/* Action button spacing & mobile layout */
-.action-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px; /* Gives breathing room between buttons */
-  margin-top: 12px;
-}
-
-.action-buttons button {
-  padding: 10px 16px;
-  border-radius: 8px;
-  border: none;
-  font-weight: 600;
-}
-
-/* Mobile fine-tuning */
+/* ====================
+   MOBILE RESPONSIVENESS
+==================== */
 @media screen and (max-width: 768px) {
-  .action-buttons {
-    flex-direction: column; /* Stacks vertically on small screens */
-    gap: 12px;
+  body {
+    padding: 16px 12px;
   }
 
-  .action-buttons button {
-    width: 100%; /* Full width touch targets */
+  .card, .hero-card {
+    padding: 16px;
   }
-}
 
-/* Layout Utilities */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 16px;
-}
-
-.grid-2 {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.form-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-}
-
-.form-row input, 
-.form-row select {
-  flex: 1;
-  min-width: 140px;
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-.table-responsive {
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.divider {
-  margin: 16px 0;
-  border: 0;
-  border-top: 1px solid #eee;
-}
-
-/* Mobile Fine-Tuning */
-@media (max-width: 600px) {
   .form-row input, 
-  .form-row select, 
-  .form-row button {
+  .form-row select {
     width: 100%;
     flex: 100%;
   }
-}
 
-/* ====================
-   MOBILE RESPONSIVENESS
-   ==================== */
-@media screen and (max-width: 768px) {
-  /* Prevent screen overflow and enable touch scrolling on tables */
-  #budget, #summary {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    margin-bottom: 1rem;
-  }
-
-  /* Keep Category / Month columns visible while scrolling horizontally on phone */
-  #budget td:first-child,
-  #summary td:first-child {
-    position: sticky;
-    left: 0;
-    background: #ffffff;
-    z-index: 2;
-    box-shadow: 2px 0 4px rgba(0,0,0,0.08);
-  }
-
-  /* Make action buttons fit nicely on smaller screens */
-  button {
+  /* Force global mobile buttons to stack neatly with padding */
+  .form-row button,
+  .action-buttons button {
     width: 100%;
-    margin-bottom: 8px;
-    padding: 10px;
+    max-width: 100%;
+    padding: 12px;
     font-size: 14px;
   }
 
-  /* Stack input groups inside card forms */
-  .card, .hero-card {
-    padding: 12px;
+  .action-buttons {
+    flex-direction: column;
+    gap: 12px;
   }
 
   .metric-row {
