@@ -199,11 +199,13 @@ async function addCategory() {
     return;
   }
   
-  const confirmed = confirm(
+  const confirmed =
+  await showConfirmDialog(
+    "Add Category",
     `Add category "${categoryName}"?`
   );
-  
-  if (!confirmed) return;
+
+if (!confirmed) return;
   
   await fetch(
     `${BASE_URL}?action=addCategory`
@@ -335,9 +337,11 @@ async function deleteCategory() {
   if (!categoryName) return;
 
   // Confirmation prompt before deletion
-  const confirmDelete = confirm(
-  `Delete category "${categoryName}"?\n\nThis will also remove all related budget entries.\n\nThis action cannot be undone.`
-);
+  const confirmDelete =
+  await showConfirmDialog(
+    "Delete Category",
+    `Delete "${categoryName}"?\nThis action cannot be undone.`
+  );
   if (!confirmDelete) return;
 
   await fetch(
@@ -436,9 +440,11 @@ async function addBudgetItem() {
 
 async function deleteBudgetItem(category) {
   // Confirmation prompt before row deletion
-  const confirmed = confirm(
-  `Delete "${category}" from all months?\n\nThis action cannot be undone.`
-);
+  const confirmed =
+  await showConfirmDialog(
+    "Delete Budget Item",
+    `Delete "${category}" from all months?\nThis action cannot be undone.`
+  );
   if (!confirmed) return;
 
   await fetch(
@@ -1091,8 +1097,10 @@ function loadFundingPlan() {
 
 async function copyJanuaryToWholeYear() {
 
-  const confirmed = confirm(
-  "Copy January budget amounts to all other months?"
+  const confirmed =
+  await showConfirmDialog(
+    "Copy Budget",
+    "Copy January budget amounts to all other months?"
   );
   
   if (!confirmed) return;
@@ -1144,9 +1152,12 @@ async function copyJanuaryToWholeYear() {
 
 async function copyCurrentYearToNextYear() {
 
-  const confirmed = confirm(
-    "Create the next budget year using the latest year's values?"
+  const confirmed =
+  await showConfirmDialog(
+    "Create Budget Year",
+    "Generate next year's budget?"
   );
+
   
   if (!confirmed) return;
 
@@ -1182,7 +1193,11 @@ async function copyCurrentYearToNextYear() {
 
 async function saveBudgetChanges() {
   // Optional safety check when overwriting/saving budget changes
-  const confirmed = confirm("Are you sure you want to save all changes to the budget?");
+  const confirmed =
+  await showConfirmDialog(
+    "Save Budget",
+    "Save all changes to the budget?"
+  );
   if (!confirmed) return;
 
   const inputs = document.querySelectorAll("#budget input[type='number']");
