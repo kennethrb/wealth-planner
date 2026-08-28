@@ -523,6 +523,17 @@ td.col-debt, tr.section-debt td:first-child {
   margin-top: 24px;
 }
 
+.grand-total td {
+
+  border-top: 6px solid #ffffff !important;
+
+  font-weight: 800;
+
+  background-color:
+    rgba(255,255,255,.08);
+
+}
+
 /* ====================
    NET WORTH HERO BANNER
 ==================== */
