@@ -340,7 +340,11 @@ async function deleteCategory() {
   const confirmDelete =
   await showConfirmDialog(
     "Delete Category",
-    `Delete "${categoryName}"?\nThis action cannot be undone.`
+    `Delete "${categoryName}"?
+
+  This will also remove all related budget entries.
+  
+  This action cannot be undone.`
   );
   if (!confirmDelete) return;
 
