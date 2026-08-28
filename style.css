@@ -133,6 +133,7 @@ body {
   flex-direction: column;
   justify-content: flex-start;
   gap: 12px;
+  margin-bottom: 24px;
 }
 
 .card:hover {
