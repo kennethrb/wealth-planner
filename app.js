@@ -1839,11 +1839,7 @@ function loadBudgetVsActual() {
   if (!container) return;
 
   const selectedYear =
-    Number(
-      document.getElementById(
-        "yearSelect"
-      )?.value || 2027
-    );
+  getSelectedYear();
 
   const selectedMonth =
     "Jan";
@@ -1902,6 +1898,45 @@ function loadBudgetVsActual() {
       ])
     ];
 
+  const categoryTypes = {};
+
+  appData.categories.forEach(cat => {
+  
+    categoryTypes[
+      cat.categoryName
+    ] = cat.budgetType;
+  
+  });
+  
+  const sections = [
+    "Income",
+    "Expense",
+    "Savings",
+    "Debt"
+  ];
+
+  let rows = "";
+
+  sections.forEach(section => {
+
+    rows += `
+  
+      <tr class="section-${section.toLowerCase()}">
+  
+        <td colspan="5">
+  
+          <strong>
+            ${section.toUpperCase()}
+          </strong>
+  
+        </td>
+  
+      </tr>
+  
+    `;
+  
+  });
+
   container.innerHTML = `
 
     <div class="table-responsive">
@@ -1922,54 +1957,7 @@ function loadBudgetVsActual() {
 
         </tr>
 
-        ${categories.map(cat => {
-
-          const budget =
-            budgetMap[cat] || 0;
-
-          const actual =
-            actualMap[cat] || 0;
-
-          const remaining =
-            budget - actual;
-
-          return `
-
-            <tr>
-
-              <td>
-                ${cat}
-              </td>
-
-              <td>
-                ${formatCurrency(budget)}
-              </td>
-
-              <td>
-                ${formatCurrency(actual)}
-              </td>
-
-              <td>
-                ${formatCurrency(remaining)}
-              </td>
-
-              <td>
-
-                ${
-                  remaining >= 0
-
-                  ? "✅"
-
-                  : "🔴"
-                }
-
-              </td>
-
-            </tr>
-
-          `;
-
-        }).join("")}
+        ${rows}
 
       </table>
 
