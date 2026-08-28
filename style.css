@@ -54,16 +54,63 @@ html {
   scroll-behavior: smooth;
 }
 
+/* ====================
+   BACK TO TOP BUTTON
+==================== */
 #backToTop {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  display: none;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background-color: var(--surface);
+  color: var(--primary);
+  font-size: 18px;
+  font-weight: 700;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(12px);
+  transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease, background-color 0.2s ease, border-color 0.2s ease;
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(12px);
 }
 
+/* Shown state toggled via JS */
 #backToTop.show {
-  display: block;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Hover & Focus state for Desktop */
+#backToTop:hover {
+  background-color: var(--primary);
+  color: #042f2e;
+  border-color: var(--primary);
+  box-shadow: 0 0 20px var(--primary-glow);
+  transform: translateY(-3px);
+}
+
+#backToTop:active {
+  transform: translateY(0);
+}
+
+/* Mobile View Adjustments */
+@media screen and (max-width: 768px) {
+  #backToTop {
+    bottom: 16px;
+    right: 16px;
+    width: 42px;
+    height: 42px;
+    font-size: 16px;
+  }
 }
 
 .section-nav {
