@@ -103,6 +103,17 @@ html {
   font-weight: 600;
 
 }
+
+.section-nav a:hover {
+
+  background:
+    rgba(16,185,129,.12);
+
+  color:
+    var(--text-main);
+
+}
+
 .section-nav a.active {
 
   background:
@@ -114,16 +125,8 @@ html {
   border:
     1px solid rgba(16,185,129,.25);
 
-}
-
-
-.section-nav a:hover {
-
-  background:
-    rgba(16,185,129,.12);
-
-  color:
-    var(--text-main);
+  box-shadow:
+    0 0 16px rgba(16,185,129,.15);
 
 }
 
