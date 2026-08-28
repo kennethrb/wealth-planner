@@ -103,6 +103,19 @@ html {
   font-weight: 600;
 
 }
+.section-nav a.active {
+
+  background:
+    rgba(16,185,129,.18);
+
+  color:
+    #34d399;
+
+  border:
+    1px solid rgba(16,185,129,.25);
+
+}
+
 
 .section-nav a:hover {
 
@@ -111,6 +124,17 @@ html {
 
   color:
     var(--text-main);
+
+}
+
+#overview,
+#planning,
+#execution,
+#performance,
+#scenarios,
+#goals {
+
+  scroll-margin-top: 120px;
 
 }
 
@@ -830,6 +854,23 @@ td.col-debt, tr.section-debt td:first-child {
   .card h2 {
     margin-bottom: 12px;
   }
+
+   .section-nav {
+
+  gap: 8px;
+
+  padding: 8px;
+
+}
+
+.section-nav a {
+
+  font-size: 13px;
+
+  padding: 8px 12px;
+
+}
+``
 
 }
 
