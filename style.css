@@ -268,6 +268,58 @@ tr:hover {
   font-weight: 600;
 }
 
+/* Layout Utilities */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.form-row input, 
+.form-row select {
+  flex: 1;
+  min-width: 140px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.divider {
+  margin: 16px 0;
+  border: 0;
+  border-top: 1px solid #eee;
+}
+
+/* Mobile Fine-Tuning */
+@media (max-width: 600px) {
+  .form-row input, 
+  .form-row select, 
+  .form-row button {
+    width: 100%;
+    flex: 100%;
+  }
+}
+
 /* ====================
    MOBILE RESPONSIVENESS
    ==================== */
