@@ -1953,6 +1953,9 @@ function loadBudgetVsActual() {
 
     );
 
+  let sectionBudget = 0;
+  let sectionActual = 0;
+
   sectionCategories.forEach(cat => {
 
     const budget =
@@ -1960,9 +1963,22 @@ function loadBudgetVsActual() {
 
     const actual =
       actualMap[cat] || 0;
+    sectionBudget += budget;
+    sectionActual += actual;
 
-    const variance =
-      budget - actual;
+    let variance;
+
+    if (section === "Income") {
+    
+      variance =
+        actual - budget;
+    
+    } else {
+    
+      variance =
+        budget - actual;
+    
+    }
 
     rows += `
 
@@ -2002,7 +2018,68 @@ function loadBudgetVsActual() {
 
   });
 
-});
+    let sectionVariance;
+
+    if (section === "Income") {
+    
+      sectionVariance =
+        sectionActual -
+        sectionBudget;
+    
+    } else {
+    
+      sectionVariance =
+        sectionBudget -
+        sectionActual;
+    
+    }
+
+}
+  rows += `
+
+  <tr>
+
+    <td>
+      <strong>TOTAL</strong>
+    </td>
+
+    <td>
+      <strong>
+        ${formatCurrency(sectionBudget)}
+      </strong>
+    </td>
+
+    <td>
+      <strong>
+        ${formatCurrency(sectionActual)}
+      </strong>
+    </td>
+
+    <td class="${
+      sectionVariance >= 0
+        ? "text-success"
+        : "text-danger"
+    }">
+
+      <strong>
+
+        ${
+          sectionVariance >= 0
+            ? "+"
+            : ""
+        }
+
+        ${formatCurrency(sectionVariance)}
+
+      </strong>
+
+    </td>
+
+  </tr>
+
+`;
+                  
+                  );
 
   container.innerHTML = `
 
