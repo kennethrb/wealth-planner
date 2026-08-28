@@ -99,6 +99,7 @@
       <!-- Responsive Scroll Container -->
       <div id="summary" class="table-responsive"></div>
     </section>
+    
     <!-- Monthly Transaction Section -->
     <section class="card">
 
@@ -107,23 +108,38 @@
       </h2>
     
       <div class="form-row">
-    
+
+      <div class="form-group">
+        <label>Date</label>
         <input
           type="date"
           id="txDate">
+      </div>
     
+      <div class="form-group">
+        <label>Amount</label>
         <input
           type="number"
           id="txAmount"
-          placeholder="Amount">
+          placeholder="0.00">
+      </div>
     
+      <div class="form-group">
+        <label>Details</label>
         <input
           type="text"
           id="txDetails"
-          placeholder="Details">
+          placeholder="Transaction details">
+      </div>
     
-        <select id="txAccount"></select>
+      <div class="form-group">
+        <label>Account</label>
+        <select id="txAccount">
+        </select>
+      </div>
     
+      <div class="form-group">
+        <label>Budget Type</label>
         <select
           id="txBudgetType"
           onchange="loadTransactionPositions()">
@@ -145,19 +161,23 @@
           </option>
     
         </select>
+      </div>
     
-        <select
-          id="txBudgetPosition">
+      <div class="form-group">
+        <label>Budget Position</label>
+        <select id="txBudgetPosition">
         </select>
+      </div>
     
+      <div class="form-group">
+        <label>&nbsp;</label>
         <button
           onclick="addTransaction()">
-    
-          Add Transaction
-    
+          ➕ Add Transaction
         </button>
-    
       </div>
+    
+    </div>
     
       <div
         id="transactionsList"
