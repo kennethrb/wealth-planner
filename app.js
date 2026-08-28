@@ -1064,7 +1064,9 @@ async function loadDashboard() {
 // ====================
 async function loadGoals() {
   const goals = appData.goals;
-  const container = document.getElementById("goals");
+  const container = document.getElementById("financialGoals"); // Updated to match index.html
+
+  if (!container) return;
 
   let html = `<div class="goals-container">`;
 
