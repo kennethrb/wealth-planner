@@ -65,6 +65,74 @@ function showStatus(
 
 }
 
+function showConfirmDialog(
+  title,
+  message
+){
+
+  return new Promise(
+    resolve => {
+
+      const modal =
+        document.getElementById(
+          "confirmModal"
+        );
+
+      const titleElement =
+        document.getElementById(
+          "confirmTitle"
+        );
+
+      const messageElement =
+        document.getElementById(
+          "confirmMessage"
+        );
+
+      const okButton =
+        document.getElementById(
+          "confirmOk"
+        );
+
+      const cancelButton =
+        document.getElementById(
+          "confirmCancel"
+        );
+
+      titleElement.textContent =
+        title;
+
+      messageElement.textContent =
+        message;
+
+      modal.classList.add(
+        "show"
+      );
+
+      okButton.onclick = () => {
+
+        modal.classList.remove(
+          "show"
+        );
+
+        resolve(true);
+
+      };
+
+      cancelButton.onclick = () => {
+
+        modal.classList.remove(
+          "show"
+        );
+
+        resolve(false);
+
+      };
+
+    }
+  );
+
+}
+
 // ====================
 // ACCOUNTS (VISUAL MATCH TO GOALS)
 // ====================
