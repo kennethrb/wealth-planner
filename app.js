@@ -2129,24 +2129,36 @@ function setupScrollSpy() {
 
   if (!sections.length || !navLinks.length) return;
 
+  // Active state update helper
+  const setActiveLink = (id) => {
+    navLinks.forEach((link) => {
+      if (link.getAttribute("href") === `#${id}`) {
+        link.classList.add("active");
+      } else {
+        link.classList.remove("active");
+      }
+    });
+  };
+
+  // 1. Handle Click Events directly for instant link activation
+  navLinks.forEach((link) => {
+    link.addEventListener("click", (e) => {
+      const targetId = link.getAttribute("href").replace("#", "");
+      setActiveLink(targetId);
+    });
+  });
+
+  // 2. IntersectionObserver with expanded rootMargin for accurate scroll tracking
   const observerOptions = {
     root: null,
-    rootMargin: "-20% 0px -70% 0px", // Triggers highlight when element is near viewport top
-    threshold: 0
+    rootMargin: "-10% 0px -40% 0px", // Expanded view zone
+    threshold: 0.1
   };
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
-        const id = entry.target.getAttribute("id");
-
-        navLinks.forEach((link) => {
-          if (link.getAttribute("href") === `#${id}`) {
-            link.classList.add("active");
-          } else {
-            link.classList.remove("active");
-          }
-        });
+        setActiveLink(entry.target.getAttribute("id"));
       }
     });
   }, observerOptions);
