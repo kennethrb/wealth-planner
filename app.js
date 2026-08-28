@@ -15,7 +15,8 @@ let appData = {
   accounts: [],
   budget: [],
   categories: [],
-  goals: []
+  goals: [],
+  transactions: []
 };
 
 function showStatus(
@@ -1272,11 +1273,12 @@ async function saveBudgetChanges() {
 async function loadData() {
 
   const [
-    accounts,
-    budget,
-    categories,
-    goals
-  ] = await Promise.all([
+  accounts,
+  budget,
+  categories,
+  goals,
+  transactions
+] = await Promise.all([
 
     fetch(
       `${BASE_URL}?action=getAccounts`
@@ -1292,6 +1294,10 @@ async function loadData() {
 
     fetch(
       `${BASE_URL}?action=getGoals`
+    ).then(r => r.json()),
+
+    fetch(
+      `${BASE_URL}?action=getTransactions`
     ).then(r => r.json())
 
   ]);
@@ -1300,6 +1306,7 @@ async function loadData() {
   appData.budget = budget;
   appData.categories = categories;
   appData.goals = goals;
+  appData.transactions = transactions;
 
 }
 
