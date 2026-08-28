@@ -128,9 +128,7 @@ async function addCategory() {
   "warning"
 );
 
-return;
-
-    return;
+  return;
 
   }
 
@@ -317,7 +315,6 @@ async function addBudgetItem() {
   "warning"
 );
 
-return;
 
   
     return;
@@ -590,13 +587,15 @@ async function loadSummary() {
 async function loadDashboard() {
 
   const selectedYear =
-    getSelectedYear();
+  getSelectedYear();
 
   const budgetData =
     appData.budget.filter(
       item =>
-        Number(item.year) 
-
+        Number(item.year) ===
+        selectedYear
+    );
+  
   const categoryData =
     appData.categories;
 
@@ -1220,8 +1219,12 @@ async function loadScenarioCategories() {
 
 function getCurrentAmount(category) {
 
+  const selectedYear =
+  getSelectedYear();
+
   const item =
     appData.budget.find(row =>
+      Number(row.year) === selectedYear &&
       row.category === category &&
       row.month === "Jan"
     );
@@ -1264,11 +1267,18 @@ function runScenario() {
       : "";
 
   let income = 0;
-let expense = 0;
-let savings = 0;
-let debt = 0;
+  let expense = 0;
+  let savings = 0;
+  let debt = 0;
 
-appData.budget.forEach(item => {
+const selectedYear =
+  getSelectedYear();
+
+appData.budget
+  .filter(item =>
+    Number(item.year) === selectedYear
+  )
+  .forEach(item => {
 
   if (item.month !== "Jan")
     return;
