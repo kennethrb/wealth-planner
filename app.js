@@ -425,108 +425,61 @@ async function loadBudgetPlanner() {
 }
 
 async function loadSummary() {
-
-  const budgetData =
-  appData.budget;
-
-const categoryData =
-  appData.categories;
+  const budgetData = appData.budget;
+  const categoryData = appData.categories;
 
   const categoryTypes = {};
-
   categoryData.forEach(cat => {
-    categoryTypes[cat.categoryName] =
-      cat.budgetType;
+    categoryTypes[cat.categoryName] = cat.budgetType;
   });
 
   const monthlyTotals = {};
 
   budgetData.forEach(item => {
-
     const month = item.month;
-
     if (!monthlyTotals[month]) {
-
-      monthlyTotals[month] = {
-        Income: 0,
-        Expense: 0,
-        Savings: 0,
-        Debt: 0
-      };
-
+      monthlyTotals[month] = { Income: 0, Expense: 0, Savings: 0, Debt: 0 };
     }
 
-    const type =
-      categoryTypes[item.category];
-
+    const type = categoryTypes[item.category];
     if (type) {
-
-      monthlyTotals[month][type] +=
-        Number(item.plannedAmount);
-
+      monthlyTotals[month][type] += Number(item.plannedAmount);
     }
-
   });
 
   let html = `
-
-    <table border="1" cellpadding="8" cellspacing="0">
-
+    <table>
       <tr>
         <th>Month</th>
-        <th>Income</th>
-        <th>Expense</th>
-        <th>Savings</th>
-        <th>Debt</th>
+        <th class="col-income">Income</th>
+        <th class="col-expense">Expense</th>
+        <th class="col-savings">Savings</th>
+        <th class="col-debt">Debt</th>
         <th>Remaining</th>
       </tr>
-
   `;
 
   Object.keys(monthlyTotals).forEach(month => {
-
-    const income =
-      monthlyTotals[month].Income;
-
-    const expense =
-      monthlyTotals[month].Expense;
-
-    const savings =
-      monthlyTotals[month].Savings;
-
-    const debt =
-      monthlyTotals[month].Debt;
-
-    const remaining =
-      income - expense - savings - debt;
+    const income = monthlyTotals[month].Income;
+    const expense = monthlyTotals[month].Expense;
+    const savings = monthlyTotals[month].Savings;
+    const debt = monthlyTotals[month].Debt;
+    const remaining = income - expense - savings - debt;
 
     html += `
       <tr>
-
         <td>${month}</td>
-
-        <td>₱${income.toLocaleString()}</td>
-
-        <td>₱${expense.toLocaleString()}</td>
-
-        <td>₱${savings.toLocaleString()}</td>
-
-        <td>₱${debt.toLocaleString()}</td>
-
-        <td>
-          ₱${remaining.toLocaleString()}
-        </td>
-
+        <td class="col-income">₱${income.toLocaleString()}</td>
+        <td class="col-expense">₱${expense.toLocaleString()}</td>
+        <td class="col-savings">₱${savings.toLocaleString()}</td>
+        <td class="col-debt">₱${debt.toLocaleString()}</td>
+        <td>₱${remaining.toLocaleString()}</td>
       </tr>
     `;
-
   });
 
   html += `</table>`;
-
-  document.getElementById("summary")
-    .innerHTML = html;
-
+  document.getElementById("summary").innerHTML = html;
 }
 
 async function loadDashboard() {
