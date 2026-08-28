@@ -241,3 +241,68 @@ tr:hover {
   font-weight: 500;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05); /* Slight shadow when scrolling */
 }
+/* Compact styling for Monthly Summary table */
+#summary {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--radius-lg, 8px);
+}
+
+#summary table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#summary th, 
+#summary td {
+  padding: 8px 12px;
+  font-size: 13px;
+  white-space: nowrap;
+  text-align: right;
+}
+
+/* Align the month column to the left */
+#summary th:first-child,
+#summary td:first-child {
+  text-align: left;
+  font-weight: 600;
+}
+
+/* ====================
+   MOBILE RESPONSIVENESS
+   ==================== */
+@media screen and (max-width: 768px) {
+  /* Prevent screen overflow and enable touch scrolling on tables */
+  #budget, #summary {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 1rem;
+  }
+
+  /* Keep Category / Month columns visible while scrolling horizontally on phone */
+  #budget td:first-child,
+  #summary td:first-child {
+    position: sticky;
+    left: 0;
+    background: #ffffff;
+    z-index: 2;
+    box-shadow: 2px 0 4px rgba(0,0,0,0.08);
+  }
+
+  /* Make action buttons fit nicely on smaller screens */
+  button {
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  /* Stack input groups inside card forms */
+  .card, .hero-card {
+    padding: 12px;
+  }
+
+  .metric-row {
+    font-size: 13px;
+  }
+}
