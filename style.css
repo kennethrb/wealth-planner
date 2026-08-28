@@ -745,6 +745,26 @@ td.col-debt, tr.section-debt td:first-child {
 
 }
 
+.section-total td {
+  font-weight: 700;
+}
+
+.total-income td {
+  border-top: 4px solid #26a86d !important;
+}
+
+.total-expense td {
+  border-top: 4px solid #fe1684 !important;
+}
+
+.total-savings td {
+  border-top: 4px solid #3285f3 !important;
+}
+
+.total-debt td {
+  border-top: 4px solid #8e94b8 !important;
+}
+
 /* ==========================
    CONFIRM MODAL
 ========================== */
