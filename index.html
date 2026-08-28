@@ -26,6 +26,22 @@
     
     </header>
 
+    <nav class="section-nav">
+
+        #overviewOverview</a>
+      
+        #planningPlanning</a>
+      
+        #executionTransactions</a>
+      
+        #performancePerformance</a>
+      
+        #scenariosScenarios</a>
+      
+        #goalsGoals</a>
+      
+      </nav>
+
     
     <!-- 📊 FINANCIAL OVERVIEW -->
     <div class="section-header">
@@ -41,7 +57,7 @@
     
     </div>
 
-    <section class="section">
+    <section id="overview" class="section">
       <div id="networth"></div>
     </section>
 
@@ -80,8 +96,8 @@
     </div>
 
     <!-- Category Management -->
-    <section class="card">
-      <h2>🏷️ Manage Categories</h2>
+    <section id="planning" class="card">
+    <h2>🏷️ Manage Categories</h2>
       <div class="form-row">
         <input type="text" id="categoryName" placeholder="Category Name">
         <select id="budgetType">
@@ -164,11 +180,8 @@
     </div>
 
     <!-- Monthly Transaction Section -->
-    <section class="card">
-
-      <h2>
-        💳 Transaction Tracker
-      </h2>
+    <section id="execution" class="card">
+    <h2>💳 Transaction Tracker</h2>
     
       <div class="form-row">
 
@@ -261,14 +274,12 @@
       Compare planned budgets
       against actual spending.
     </p>
+    </div>
 
 
     <!-- Budget vs Actual -->
-    <section class="card">
-
-      <h2>
-        📊 Budget vs Actual
-      </h2>
+    <section id="performance" class="card">
+    <h2>📊 Budget vs Actual</h2>
     
       <div
         id="budgetVsActual">
@@ -291,7 +302,7 @@
     </div>
 
     <!-- Scenario Simulator -->
-    <section class="card">
+    <section id="scenarios" class="card">
       <h2>🔮 Scenario Simulator</h2>
       <div class="form-row">
         <select id="scenarioCategory"></select>
@@ -316,7 +327,7 @@
     </div>
 
     <!-- Accounts & Goals Grid -->
-    <section class="grid-2">
+    <section id="goals" class="grid-2">
       <div class="card">
         <div class="card-title">🏦 Accounts</div>
         <div id="accounts"></div>
