@@ -199,3 +199,45 @@ tr:last-child td {
 tr:hover {
   background-color: #f8fafc;
 }
+/* Container wrapper to keep table contained */
+#budget {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+}
+
+/* Compact table sizing */
+#budget table {
+  width: 100%;
+  min-width: 0; /* Remove 1200px constraint */
+  table-layout: auto;
+  border: none;
+}
+
+#budget th, 
+#budget td {
+  padding: 6px 8px; /* Reduce padding from 14px */
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* Make input fields small and sleek */
+#budget input[type="number"] {
+  width: 70px !important;
+  padding: 4px 6px;
+  font-size: 13px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  text-align: right;
+}
+
+/* Category column styling */
+#budget td:first-child {
+  position: sticky;
+  left: 0;
+  background: white;
+  z-index: 2;
+  font-weight: 500;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05); /* Slight shadow when scrolling */
+}
