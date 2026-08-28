@@ -407,12 +407,20 @@ async function loadBudgetPlanner() {
 
             ${category}
             
-            <button
-              class="delete-btn"
-              onclick="deleteBudgetItem('${category}')"
-            >
-              🗑
-            </button>
+            html += `
+              <tr style="height: 38px;">
+                <td style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                  <span>${category}</span>
+                  <span 
+                    onclick="deleteBudgetItem('${category}')" 
+                    style="cursor: pointer; opacity: 0.5; font-size: 12px;"
+                    title="Delete row"
+                    onmouseover="this.style.opacity=1" 
+                    onmouseout="this.style.opacity=0.5">
+                    ✕
+                  </span>
+                </td>
+            `;
             
             </td>
         `;
