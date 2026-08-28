@@ -330,13 +330,19 @@ function loadTransactions() {
             <td>
               ${tx.Details}
             </td>
-
+            
             <td>
+            
               <button
                 class="btn-delete-row"
-                onclick="deleteTransaction(${tx.rowNumber})">
-                ✕          
+                onclick="deleteTransactionRecord(
+                  ${tx.rowNumber}
+                )">
+            
+                ✕
+            
               </button>
+            
             </td>
 
           </tr>
@@ -348,6 +354,47 @@ function loadTransactions() {
     </div>
 
   `;
+
+}
+
+async function deleteTransactionRecord(
+  rowNumber
+) {
+
+  const confirmed =
+    await showConfirmDialog(
+      "Delete Transaction",
+      "Delete this transaction?"
+    );
+
+  if (!confirmed) return;
+
+  await fetch(
+
+    `${BASE_URL}?action=deleteTransaction`
+
+    + `&rowNumber=${rowNumber}`
+
+  );
+
+  await loadData();
+
+  loadTransactions();
+
+  loadBudgetVsActual();
+
+  loadSummary();
+
+  loadDashboard();
+
+  loadProjection();
+
+  loadFundingPlan();
+
+  showStatus(
+    "🗑 Transaction deleted",
+    "success"
+  );
 
 }
 
