@@ -12,6 +12,13 @@
   --text-main: #0f172a;
   --text-muted: #64748b;
   --border: #e2e8f0;
+
+  /* Custom Section Colors */
+  --color-income: #26A86D;
+  --color-expense: #FE1684;
+  --color-savings: #3285F3;
+  --color-debt: #8E94B8;
+
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
   --shadow-md: 0 4px 12px -2px rgba(0,0,0,0.08);
   --shadow-lg: 0 12px 28px -4px rgba(0,0,0,0.12);
@@ -183,11 +190,11 @@ button:active {
   transform: translateY(0);
 }
 
-.delete-btn {
+.delete-btn, .btn-danger {
   background-color: #ef4444;
 }
 
-.delete-btn:hover {
+.delete-btn:hover, .btn-danger:hover {
   background-color: #dc2626;
 }
 
@@ -278,6 +285,62 @@ tr:hover {
 }
 
 /* ====================
+   TABLE SECTION & COLUMN COLORS
+==================== */
+
+/* Income (#26A86D) */
+tr.section-income,
+th.col-income {
+  background-color: rgba(38, 168, 109, 0.15) !important;
+  color: #26A86D !important;
+}
+td.col-income,
+tr.section-income td:first-child {
+  background-color: rgba(38, 168, 109, 0.08) !important;
+  color: #26A86D !important;
+  font-weight: 600;
+}
+
+/* Expense (#FE1684) */
+tr.section-expense,
+th.col-expense {
+  background-color: rgba(254, 22, 132, 0.15) !important;
+  color: #FE1684 !important;
+}
+td.col-expense,
+tr.section-expense td:first-child {
+  background-color: rgba(254, 22, 132, 0.08) !important;
+  color: #FE1684 !important;
+  font-weight: 600;
+}
+
+/* Savings (#3285F3) */
+tr.section-savings,
+th.col-savings {
+  background-color: rgba(50, 133, 243, 0.15) !important;
+  color: #3285F3 !important;
+}
+td.col-savings,
+tr.section-savings td:first-child {
+  background-color: rgba(50, 133, 243, 0.08) !important;
+  color: #3285F3 !important;
+  font-weight: 600;
+}
+
+/* Debt (#8E94B8) */
+tr.section-debt,
+th.col-debt {
+  background-color: rgba(142, 148, 184, 0.15) !important;
+  color: #8E94B8 !important;
+}
+td.col-debt,
+tr.section-debt td:first-child {
+  background-color: rgba(142, 148, 184, 0.08) !important;
+  color: #8E94B8 !important;
+  font-weight: 600;
+}
+
+/* ====================
    MOBILE RESPONSIVENESS
 ==================== */
 @media screen and (max-width: 768px) {
@@ -295,7 +358,6 @@ tr:hover {
     flex: 100%;
   }
 
-  /* Force global mobile buttons to stack neatly with padding */
   .form-row button,
   .action-buttons button {
     width: 100%;
