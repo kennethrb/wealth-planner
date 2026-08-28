@@ -71,7 +71,7 @@ function getSelectedYear() {
 }
 
 function getSelectedMonth() {
-  return document.getElementById("budgetMonth")?.value || "Jan";
+  return document.getElementById("actualMonth")?.value || "Jan";
 }
 
 function loadTransactionAccounts() {
@@ -820,17 +820,19 @@ function loadBudgetVsActual() {
       if (cat) budgetMap[cat] = Number(row.plannedAmount) || 0;
     });
 
-  // 2. Map Actual Transactions
+  // 2. Map Actual Transactions Data
   const actualMap = {};
   (appData.transactions || []).forEach(tx => {
+    // Search dynamically across possible case variations for object properties
     const rawDate = tx.Date || tx.date || tx.DATE;
     if (!rawDate) return;
 
+    // Parse date safely
     let txYear, txMonthIndex;
     if (typeof rawDate === "string" && rawDate.includes("-")) {
       const parts = rawDate.split("T")[0].split("-");
       txYear = Number(parts[0]);
-      txMonthIndex = Number(parts[1]) - 1;
+      txMonthIndex = Number(parts[1]) - 1; // 0-indexed month
     } else {
       const txDate = new Date(rawDate);
       if (isNaN(txDate.getTime())) return;
@@ -840,13 +842,23 @@ function loadBudgetVsActual() {
 
     if (txYear !== selectedYear || txMonthIndex !== targetMonthIndex) return;
 
-    // Standardize category key extraction & trimming
-    const rawCategory = tx["Budget Position"] || tx["budgetPosition"] || tx.Category || tx.category || tx["Budget Type"] || tx.budgetType;
-    const category = (rawCategory || "").trim();
+    // Grab Category Name safely across all API field variants
+    const category = 
+      tx["Budget Position"] || 
+      tx["budgetPosition"] || 
+      tx["BudgetPosition"] || 
+      tx["Category"] || 
+      tx["category"];
+
     if (!category) return;
 
     const rawAmount = tx.Amount || tx.amount || tx.AMOUNT || 0;
-    actualMap[category] = (actualMap[category] || 0) + Math.abs(Number(rawAmount) || 0);
+    const amount = Math.abs(Number(rawAmount) || 0);
+
+    if (!actualMap[category]) {
+      actualMap[category] = 0;
+    }
+    actualMap[category] += amount;
   });
 
   const categories = [...new Set([...Object.keys(budgetMap), ...Object.keys(actualMap)])];
