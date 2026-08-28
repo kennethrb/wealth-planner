@@ -318,37 +318,25 @@ async function deleteBudgetItem(
 
 }
 
-
-
 // ====================
 // BUDGET PLANNER
 // ====================
 
 async function loadBudgetPlanner() {
-
-  const budgetData =
-  appData.budget;
-
-  const categoryData =
-  appData.categories;
+  const budgetData = appData.budget;
+  const categoryData = appData.categories;
 
   const months = [];
   const categories = {};
   const categoryTypes = {};
 
   // Store category types
-
   categoryData.forEach(cat => {
-
-    categoryTypes[cat.categoryName] =
-      cat.budgetType;
-
+    categoryTypes[cat.categoryName] = cat.budgetType;
   });
 
   // Build planner structure
-
   budgetData.forEach(item => {
-
     if (!months.includes(item.month)) {
       months.push(item.month);
     }
@@ -357,17 +345,13 @@ async function loadBudgetPlanner() {
       categories[item.category] = {};
     }
 
-    categories[item.category][item.month] =
-      Number(item.plannedAmount);
-
+    categories[item.category][item.month] = Number(item.plannedAmount);
   });
 
-  const container =
-    document.getElementById("budget");
+  const container = document.getElementById("budget");
 
   let html = `
     <table border="1" cellpadding="8" cellspacing="0">
-
       <tr>
         <th>Category</th>
   `;
@@ -378,15 +362,9 @@ async function loadBudgetPlanner() {
 
   html += `</tr>`;
 
-  const sections = [
-    "Income",
-    "Expense",
-    "Savings",
-    "Debt"
-  ];
+  const sections = ["Income", "Expense", "Savings", "Debt"];
 
   sections.forEach(section => {
-
     html += `
       <tr style="background:#dff0d8;">
         <td colspan="${months.length + 1}">
@@ -396,91 +374,52 @@ async function loadBudgetPlanner() {
     `;
 
     Object.keys(categories).forEach(category => {
-
-      if (
-        categoryTypes[category] === section
-      ) {
-
+      if (categoryTypes[category] === section) {
         html += `
-          <tr>
-            <td>
-
-            ${category}
-            
-            html += `
-              <tr style="height: 38px;">
-                <td style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                  <span>${category}</span>
-                  <span 
-                    onclick="deleteBudgetItem('${category}')" 
-                    style="cursor: pointer; opacity: 0.5; font-size: 12px;"
-                    title="Delete row"
-                    onmouseover="this.style.opacity=1" 
-                    onmouseout="this.style.opacity=0.5">
-                    ✕
-                  </span>
-                </td>
-            `;
-            
+          <tr style="height: 38px;">
+            <td style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+              <span>${category}</span>
+              <span 
+                onclick="deleteBudgetItem('${category}')" 
+                style="cursor: pointer; opacity: 0.5; font-size: 12px;"
+                title="Delete row"
+                onmouseover="this.style.opacity=1" 
+                onmouseout="this.style.opacity=0.5">
+                ✕
+              </span>
             </td>
         `;
 
         months.forEach(month => {
-
-          const amount =
-            categories[category][month] || "";
+          const amount = categories[category][month] || "";
 
           html += `
-          <td>
-          
-          <input
-            type="number"
-            value="${amount}"
-            id="${category}|${month}"
-            style="
-              width:90px;
-              text-align:right;
-            "
-          >
-          
-          </td>
+            <td>
+              <input
+                type="number"
+                value="${amount}"
+                id="${category}|${month}"
+                style="width:90px; text-align:right;"
+              >
+            </td>
           `;
-
         });
 
         html += `</tr>`;
-
       }
-
     });
-
   });
 
   html += `
-  </table>
-  
-  <br>
-  
-  <button onclick="saveBudgetChanges()">
-  💾 Save Changes
-  </button>
-  
-  <button onclick="copyJanuaryToWholeYear()">
-    📋 Copy Jan → Whole Year
-  </button>
-
-  <button onclick="copyCurrentYearToNextYear()">
-  📅 Copy 2027 → 2028
-  </button>
-
-  
-  <span id="saveStatus"
-        style="margin-left:10px;">
-  </span>
+    </table>
+    <br>
+    <button onclick="saveBudgetChanges()">💾 Save Changes</button>
+    <button onclick="copyJanuaryToWholeYear()">📋 Copy Jan → Whole Year</button>
+    <button onclick="copyCurrentYearToNextYear()">📅 Copy 2027 → 2028</button>
+    <span id="saveStatus" style="margin-left:10px;"></span>
   `;
 
   container.innerHTML = html;
-
 }
 
 async function loadSummary() {
