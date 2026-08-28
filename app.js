@@ -2084,8 +2084,6 @@ rows += `
   `;
 }
 
-
-
 // ====================
 // LOAD APP
 // ====================
@@ -2101,21 +2099,57 @@ async function initializeApp() {
   loadBudgetVsActual();
 
   await Promise.all([
-  loadNetWorth(),
-  loadProjection(),
-  loadDashboard(),
-  loadGoals(),
-  loadAccounts(),
-  loadBudgetPlanner(),
-  loadSummary(),
-  loadFundingPlan()
-]);
+    loadNetWorth(),
+    loadProjection(),
+    loadDashboard(),
+    loadGoals(),
+    loadAccounts(),
+    loadBudgetPlanner(),
+    loadSummary(),
+    loadFundingPlan()
+  ]);
 
   loadCategoryDropdown();
 
   loadScenarioCategories();
 
+  // Highlight active navigation section on scroll
+  setupScrollSpy();
 
 }
 
 initializeApp();
+
+// ====================
+// SCROLL SPY NAVIGATION
+// ====================
+function setupScrollSpy() {
+  const sections = document.querySelectorAll("section[id], div[id]");
+  const navLinks = document.querySelectorAll(".section-nav a");
+
+  if (!sections.length || !navLinks.length) return;
+
+  const observerOptions = {
+    root: null,
+    rootMargin: "-20% 0px -70% 0px", // Triggers highlight when element is near viewport top
+    threshold: 0
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        const id = entry.target.getAttribute("id");
+
+        navLinks.forEach((link) => {
+          if (link.getAttribute("href") === `#${id}`) {
+            link.classList.add("active");
+          } else {
+            link.classList.remove("active");
+          }
+        });
+      }
+    });
+  }, observerOptions);
+
+  sections.forEach((section) => observer.observe(section));
+}
