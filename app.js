@@ -2129,7 +2129,9 @@ function setupScrollSpy() {
 
   if (!sections.length || !navLinks.length) return;
 
-  // Active state update helper
+  let isClicking = false;
+  let clickTimeout = null;
+
   const setActiveLink = (id) => {
     navLinks.forEach((link) => {
       if (link.getAttribute("href") === `#${id}`) {
@@ -2140,22 +2142,34 @@ function setupScrollSpy() {
     });
   };
 
-  // 1. Handle Click Events directly for instant link activation
+  // Handle Click Events
   navLinks.forEach((link) => {
     link.addEventListener("click", (e) => {
       const targetId = link.getAttribute("href").replace("#", "");
+      
+      // Lock the observer temporarily
+      isClicking = true;
       setActiveLink(targetId);
+
+      // Release lock after smooth scroll completes (approx 800ms)
+      clearTimeout(clickTimeout);
+      clickTimeout = setTimeout(() => {
+        isClicking = false;
+      }, 800);
     });
   });
 
-  // 2. IntersectionObserver with expanded rootMargin for accurate scroll tracking
+  // IntersectionObserver for manual scrolling
   const observerOptions = {
     root: null,
-    rootMargin: "-10% 0px -40% 0px", // Expanded view zone
+    rootMargin: "-20% 0px -60% 0px",
     threshold: 0.1
   };
 
   const observer = new IntersectionObserver((entries) => {
+    // Skip observer state updates if the user just clicked a nav link
+    if (isClicking) return;
+
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         setActiveLink(entry.target.getAttribute("id"));
