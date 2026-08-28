@@ -330,28 +330,24 @@ async function loadBudgetPlanner() {
   const categories = {};
   const categoryTypes = {};
 
-  // Store category types
   categoryData.forEach(cat => {
     categoryTypes[cat.categoryName] = cat.budgetType;
   });
 
-  // Build planner structure
   budgetData.forEach(item => {
     if (!months.includes(item.month)) {
       months.push(item.month);
     }
-
     if (!categories[item.category]) {
       categories[item.category] = {};
     }
-
     categories[item.category][item.month] = Number(item.plannedAmount);
   });
 
   const container = document.getElementById("budget");
 
   let html = `
-    <table border="1" cellpadding="8" cellspacing="0">
+    <table>
       <tr>
         <th>Category</th>
   `;
@@ -392,14 +388,12 @@ async function loadBudgetPlanner() {
 
         months.forEach(month => {
           const amount = categories[category][month] || "";
-
           html += `
             <td>
               <input
                 type="number"
                 value="${amount}"
                 id="${category}|${month}"
-                style="width:90px; text-align:right;"
               >
             </td>
           `;
@@ -412,10 +406,11 @@ async function loadBudgetPlanner() {
 
   html += `
     </table>
-    <br>
-    <button onclick="saveBudgetChanges()">💾 Save Changes</button>
-    <button onclick="copyJanuaryToWholeYear()">📋 Copy Jan → Whole Year</button>
-    <button onclick="copyCurrentYearToNextYear()">📅 Copy 2027 → 2028</button>
+    <div class="action-buttons">
+      <button onclick="saveBudgetChanges()">💾 Save Changes</button>
+      <button onclick="copyJanuaryToWholeYear()">📋 Copy Jan → Whole Year</button>
+      <button onclick="copyCurrentYearToNextYear()">📅 Copy 2027 → 2028</button>
+    </div>
     <span id="saveStatus" style="margin-left:10px;"></span>
   `;
 
