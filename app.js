@@ -1838,7 +1838,13 @@ function loadBudgetVsActual() {
   const selectedYear = Number(getSelectedYear());
   const selectedMonth = typeof getSelectedMonth === "function" ? getSelectedMonth() : "Jan"; 
 
-  // 1. Map Budget Data for Selected Year & Month
+  const monthMap = {
+    Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
+    Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11
+  };
+  const targetMonthIndex = monthMap[selectedMonth] ?? 0;
+
+  // 1. Map Budget Data
   const budgetMap = {};
   (appData.budget || [])
     .filter(row => Number(row.year) === selectedYear && row.month === selectedMonth)
@@ -1846,31 +1852,48 @@ function loadBudgetVsActual() {
       budgetMap[row.category] = Number(row.plannedAmount) || 0;
     });
 
-  // 2. Map Actual Transactions Data (Case-insensitive key matching for Date and Category)
+  // 2. Map Actual Transactions Data
   const actualMap = {};
-  (appData.transactions || [])
-    .filter(tx => {
-      const rawDate = tx.Date || tx.date;
-      if (!rawDate) return false;
-      
+  (appData.transactions || []).forEach(tx => {
+    // Search dynamically across possible case variations for object properties
+    const rawDate = tx.Date || tx.date || tx.DATE;
+    if (!rawDate) return;
+
+    // Handle "YYYY-MM-DD" safely without timezone offset shift
+    let txYear, txMonthIndex;
+    if (typeof rawDate === "string" && rawDate.includes("-")) {
+      const parts = rawDate.split("T")[0].split("-");
+      txYear = Number(parts[0]);
+      txMonthIndex = Number(parts[1]) - 1; // 0-indexed month
+    } else {
       const txDate = new Date(rawDate);
-      if (isNaN(txDate.getTime())) return false;
+      if (isNaN(txDate.getTime())) return;
+      txYear = txDate.getFullYear();
+      txMonthIndex = txDate.getMonth();
+    }
 
-      const txYear = txDate.getFullYear();
-      const txMonth = txDate.toLocaleString("en-US", { month: "short" });
-      return txYear === selectedYear && txMonth === selectedMonth;
-    })
-    .forEach(tx => {
-      const category = tx["Budget Position"] || tx.budgetPosition || tx.Category || tx.category;
-      if (!category) return;
+    if (txYear !== selectedYear || txMonthIndex !== targetMonthIndex) return;
 
-      if (!actualMap[category]) {
-        actualMap[category] = 0;
-      }
-      actualMap[category] += Math.abs(Number(tx.Amount || tx.amount) || 0);
-    });
+    // Grab Category Name safely from standard Google Sheet fields
+    const category = 
+      tx["Budget Position"] || 
+      tx["budgetPosition"] || 
+      tx["BudgetPosition"] || 
+      tx.Category || 
+      tx.category;
 
-  // 3. Combine unique categories from budget and actuals
+    if (!category) return;
+
+    const rawAmount = tx.Amount || tx.amount || tx.AMOUNT || 0;
+    const amount = Math.abs(Number(rawAmount) || 0);
+
+    if (!actualMap[category]) {
+      actualMap[category] = 0;
+    }
+    actualMap[category] += amount;
+  });
+
+  // 3. Combine categories
   const categories = [
     ...new Set([
       ...Object.keys(budgetMap),
@@ -1878,10 +1901,10 @@ function loadBudgetVsActual() {
     ])
   ];
 
-  // 4. Build Category Type Map (Supports categoryName or name)
+  // 4. Build Category Type Map
   const categoryTypes = {};
   (appData.categories || []).forEach(cat => {
-    const catName = cat.categoryName || cat.name;
+    const catName = cat.categoryName || cat.category || cat.name;
     if (catName) {
       categoryTypes[catName] = cat.budgetType;
     }
