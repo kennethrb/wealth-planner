@@ -267,7 +267,9 @@ async function deleteCategory() {
   if (!categoryName) return;
 
   // Confirmation prompt before deletion
-  const confirmDelete = confirm(`Are you sure you want to delete the category "${categoryName}"? This cannot be undone.`);
+  const confirmDelete = confirm(
+  `Delete category "${categoryName}"?\n\nThis will also remove all related budget entries.\n\nThis action cannot be undone.`
+);
   if (!confirmDelete) return;
 
   await fetch(
@@ -366,7 +368,9 @@ async function addBudgetItem() {
 
 async function deleteBudgetItem(category) {
   // Confirmation prompt before row deletion
-  const confirmed = confirm(`Are you sure you want to delete all budget entries for "${category}"?`);
+  const confirmed = confirm(
+  `Delete "${category}" from all months?\n\nThis action cannot be undone.`
+);
   if (!confirmed) return;
 
   await fetch(
