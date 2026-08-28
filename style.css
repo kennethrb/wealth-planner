@@ -449,6 +449,45 @@ tr.section-debt td:first-child {
   font-weight: 600;
 }
 
+/* Goal Item Internal Styling */
+.goal-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.goal-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.margin-top {
+  margin-top: 24px;
+}
+
+/* Funding Plan Rows */
+.funding-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--border);
+  font-size: 14px;
+}
+
+.funding-row:last-child {
+  border-bottom: none;
+}
+
 /* ====================
    MOBILE RESPONSIVENESS
 ==================== */
