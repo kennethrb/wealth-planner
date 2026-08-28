@@ -1939,9 +1939,17 @@ function loadBudgetVsActual() {
 
   const sectionCategories =
 
-    categories.filter(cat =>
+  categories
+    .filter(cat =>
 
       categoryTypes[cat] === section
+
+    )
+    .sort((a, b) =>
+
+      (budgetMap[b] || 0) -
+
+      (budgetMap[a] || 0)
 
     );
 
