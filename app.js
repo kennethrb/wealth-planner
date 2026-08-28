@@ -2086,41 +2086,6 @@ rows += `
   `;
 }
 
-// ====================
-// LOAD APP
-// ====================
-async function initializeApp() {
-
-  await loadData();
-
-  loadYearDropdown();
-  
-  loadTransactionAccounts();
-  loadTransactionPositions();
-  loadTransactions();
-  loadBudgetVsActual();
-
-  await Promise.all([
-    loadNetWorth(),
-    loadProjection(),
-    loadDashboard(),
-    loadGoals(),
-    loadAccounts(),
-    loadBudgetPlanner(),
-    loadSummary(),
-    loadFundingPlan()
-  ]);
-
-  loadCategoryDropdown();
-
-  loadScenarioCategories();
-
-  // Highlight active navigation section on scroll
-  setupScrollSpy();
-
-}
-
-initializeApp();
 
 // ====================
 // SCROLL SPY NAVIGATION
@@ -2224,3 +2189,40 @@ backToTop.addEventListener(
 
   }
 );
+
+
+// ====================
+// LOAD APP
+// ====================
+async function initializeApp() {
+
+  await loadData();
+
+  loadYearDropdown();
+  
+  loadTransactionAccounts();
+  loadTransactionPositions();
+  loadTransactions();
+  loadBudgetVsActual();
+
+  await Promise.all([
+    loadNetWorth(),
+    loadProjection(),
+    loadDashboard(),
+    loadGoals(),
+    loadAccounts(),
+    loadBudgetPlanner(),
+    loadSummary(),
+    loadFundingPlan()
+  ]);
+
+  loadCategoryDropdown();
+
+  loadScenarioCategories();
+
+  // Highlight active navigation section on scroll
+  setupScrollSpy();
+
+}
+
+initializeApp();
