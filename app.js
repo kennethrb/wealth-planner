@@ -265,6 +265,8 @@ async function addTransaction() {
   await loadData();
 
   loadTransactions();
+
+  loadBudgetVsActual();
   
   showStatus(
     "✅ Transaction Added"
@@ -1827,6 +1829,156 @@ async function changeBudgetYear() {
 
 }
 
+function loadBudgetVsActual() {
+
+  const container =
+    document.getElementById(
+      "budgetVsActual"
+    );
+
+  if (!container) return;
+
+  const selectedYear =
+    Number(
+      document.getElementById(
+        "yearSelect"
+      )?.value || 2027
+    );
+
+  const selectedMonth =
+    "Jan";
+
+  const budgetMap = {};
+
+  appData.budget
+    .filter(row =>
+
+      Number(row.year) === selectedYear &&
+
+      row.month === selectedMonth
+
+    )
+    .forEach(row => {
+
+      budgetMap[
+        row.category
+      ] = Number(
+        row.plannedAmount
+      );
+
+    });
+
+  const actualMap = {};
+
+  appData.transactions
+    .forEach(tx => {
+
+      const category =
+        tx["Budget Position"];
+
+      if (!actualMap[category]) {
+
+        actualMap[category] = 0;
+
+      }
+
+      actualMap[category] +=
+        Math.abs(
+          Number(tx.Amount)
+        );
+
+    });
+
+  const categories =
+
+    [
+      ...new Set([
+        ...Object.keys(
+          budgetMap
+        ),
+        ...Object.keys(
+          actualMap
+        )
+      ])
+    ];
+
+  container.innerHTML = `
+
+    <div class="table-responsive">
+
+      <table>
+
+        <tr>
+
+          <th>Category</th>
+
+          <th>Budget</th>
+
+          <th>Actual</th>
+
+          <th>Remaining</th>
+
+          <th>Status</th>
+
+        </tr>
+
+        ${categories.map(cat => {
+
+          const budget =
+            budgetMap[cat] || 0;
+
+          const actual =
+            actualMap[cat] || 0;
+
+          const remaining =
+            budget - actual;
+
+          return `
+
+            <tr>
+
+              <td>
+                ${cat}
+              </td>
+
+              <td>
+                ${formatCurrency(budget)}
+              </td>
+
+              <td>
+                ${formatCurrency(actual)}
+              </td>
+
+              <td>
+                ${formatCurrency(remaining)}
+              </td>
+
+              <td>
+
+                ${
+                  remaining >= 0
+
+                  ? "✅"
+
+                  : "🔴"
+                }
+
+              </td>
+
+            </tr>
+
+          `;
+
+        }).join("")}
+
+      </table>
+
+    </div>
+
+  `;
+
+}
+
 
 
 // ====================
@@ -1838,6 +1990,7 @@ async function initializeApp() {
   loadTransactionAccounts();
   loadTransactionPositions();
   loadTransactions();
+  loadBudgetVsActual();
   loadYearDropdown();
 
   await Promise.all([
