@@ -2088,6 +2088,66 @@ rows += `
 
 
 // ====================
+// LOAD APP
+// ====================
+async function initializeApp() {
+
+  await loadData();
+
+  loadYearDropdown();
+  
+  loadTransactionAccounts();
+  loadTransactionPositions();
+  loadTransactions();
+  loadBudgetVsActual();
+
+  await Promise.all([
+    loadNetWorth(),
+    loadProjection(),
+    loadDashboard(),
+    loadGoals(),
+    loadAccounts(),
+    loadBudgetPlanner(),
+    loadSummary(),
+    loadFundingPlan()
+  ]);
+
+  loadCategoryDropdown();
+
+  loadScenarioCategories();
+
+  // Highlight active navigation section on scroll
+  setupScrollSpy();
+
+}
+
+initializeApp();
+
+// ====================
+// BACK TO TOP BUTTON
+// ====================
+const backToTop = document.getElementById("backToTop");[cite: 18]
+
+if (backToTop) {
+  window.addEventListener("scroll", () => {
+    if (window.scrollY > 500) {
+      backToTop.classList.add("show");
+    } else {
+      backToTop.classList.remove("show");
+    }
+  });
+
+  backToTop.addEventListener("click", () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  });
+}
+
+
+
+// ====================
 // SCROLL SPY NAVIGATION
 // ====================
 function setupScrollSpy() {
@@ -2146,83 +2206,3 @@ function setupScrollSpy() {
 
   sections.forEach((section) => observer.observe(section));
 }
-
-const backToTop =
-  document.getElementById(
-    "backToTop"
-  );
-
-window.addEventListener(
-  "scroll",
-  () => {
-
-    if (
-      window.scrollY > 500
-    ) {
-
-      backToTop.classList.add(
-        "show"
-      );
-
-    } else {
-
-      backToTop.classList.remove(
-        "show"
-      );
-
-    }
-
-  }
-);
-
-backToTop.addEventListener(
-  "click",
-  () => {
-
-    window.scrollTo({
-
-      top: 0,
-
-      behavior: "smooth"
-
-    });
-
-  }
-);
-
-
-// ====================
-// LOAD APP
-// ====================
-async function initializeApp() {
-
-  await loadData();
-
-  loadYearDropdown();
-  
-  loadTransactionAccounts();
-  loadTransactionPositions();
-  loadTransactions();
-  loadBudgetVsActual();
-
-  await Promise.all([
-    loadNetWorth(),
-    loadProjection(),
-    loadDashboard(),
-    loadGoals(),
-    loadAccounts(),
-    loadBudgetPlanner(),
-    loadSummary(),
-    loadFundingPlan()
-  ]);
-
-  loadCategoryDropdown();
-
-  loadScenarioCategories();
-
-  // Highlight active navigation section on scroll
-  setupScrollSpy();
-
-}
-
-initializeApp();
