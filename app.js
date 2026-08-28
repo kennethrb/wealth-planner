@@ -811,13 +811,16 @@ function loadBudgetVsActual() {
   };
   const targetMonthIndex = monthMap[selectedMonth] ?? 0;
 
+  // 1. Map Planned Budgets
   const budgetMap = {};
   (appData.budget || [])
     .filter(row => Number(row.year) === selectedYear && row.month === selectedMonth)
     .forEach(row => {
-      budgetMap[row.category] = Number(row.plannedAmount) || 0;
+      const cat = (row.category || "").trim();
+      if (cat) budgetMap[cat] = Number(row.plannedAmount) || 0;
     });
 
+  // 2. Map Actual Transactions
   const actualMap = {};
   (appData.transactions || []).forEach(tx => {
     const rawDate = tx.Date || tx.date || tx.DATE;
@@ -837,7 +840,9 @@ function loadBudgetVsActual() {
 
     if (txYear !== selectedYear || txMonthIndex !== targetMonthIndex) return;
 
-    const category = tx["Budget Position"] || tx["budgetPosition"] || tx.Category || tx.category;
+    // Standardize category key extraction & trimming
+    const rawCategory = tx["Budget Position"] || tx["budgetPosition"] || tx.Category || tx.category || tx["Budget Type"] || tx.budgetType;
+    const category = (rawCategory || "").trim();
     if (!category) return;
 
     const rawAmount = tx.Amount || tx.amount || tx.AMOUNT || 0;
@@ -845,21 +850,29 @@ function loadBudgetVsActual() {
   });
 
   const categories = [...new Set([...Object.keys(budgetMap), ...Object.keys(actualMap)])];
+  
+  // 3. Map Category Types (Normalize Casing & Whitespace)
   const categoryTypes = {};
-
   (appData.categories || []).forEach(cat => {
-    const catName = cat.categoryName || cat.category || cat.name;
-    if (catName) categoryTypes[catName] = cat.budgetType;
+    const catName = (cat.categoryName || cat.category || cat.name || "").trim();
+    const bType = (cat.budgetType || cat.type || "").trim();
+    if (catName) {
+      // Normalize to Title Case (e.g., "expense" -> "Expense")
+      categoryTypes[catName] = bType.charAt(0).toUpperCase() + bType.slice(1).toLowerCase();
+    }
   });
 
-  const sections = ["Income", "Expense", "Savings", "Debt"];
+  const sections = ["Income", "Expense", "Savings", "Debt", "Other"];
   let rows = "";
   let grandBudget = 0;
   let grandActual = 0;
 
   sections.forEach(section => {
     const sectionCategories = categories
-      .filter(cat => categoryTypes[cat] === section)
+      .filter(cat => {
+        const type = categoryTypes[cat] || "Other";
+        return type === section;
+      })
       .sort((a, b) => (budgetMap[b] || 0) - (budgetMap[a] || 0));
 
     if (sectionCategories.length === 0) return;
