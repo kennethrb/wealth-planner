@@ -265,7 +265,9 @@ async function addTransaction() {
   await loadData();
 
   loadTransactions();
-
+  
+  loadRunningBalance();
+  
   showStatus(
     "✅ Transaction Added"
   );
@@ -1827,6 +1829,146 @@ async function changeBudgetYear() {
 
 }
 
+function loadRunningBalance() {
+
+  const container =
+    document.getElementById(
+      "runningBalance"
+    );
+
+  if (!container) return;
+
+  const accounts = {};
+
+  appData.transactions.forEach(tx => {
+
+    const account =
+      tx.Account;
+
+    if (!accounts[account]) {
+
+      accounts[account] = {
+        income: 0,
+        expense: 0,
+        savings: 0,
+        debt: 0
+      };
+
+    }
+
+    const amount =
+      Number(tx.Amount);
+
+    const type =
+      tx["Budget Type"];
+
+    if (type === "Income") {
+
+      accounts[account]
+        .income += amount;
+
+    }
+
+    if (type === "Expense") {
+
+      accounts[account]
+        .expense += amount;
+
+    }
+
+    if (type === "Savings") {
+
+      accounts[account]
+        .savings += amount;
+
+    }
+
+    if (type === "Debt") {
+
+      accounts[account]
+        .debt += amount;
+
+    }
+
+  });
+
+  let html = "";
+
+  Object.entries(accounts)
+    .forEach(([account,data]) => {
+
+      const balance =
+
+        data.income +
+
+        data.expense +
+
+        data.savings +
+
+        data.debt;
+
+      html += `
+
+        <div class="goal-item">
+
+          <div class="item-header">
+
+            <span>
+              ${account}
+            </span>
+
+            <span>
+              ${formatCurrency(balance)}
+            </span>
+
+          </div>
+
+          <div class="goal-details">
+
+            <span>
+              Income:
+              ${formatCurrency(
+                data.income
+              )}
+            </span>
+
+            <span>
+              Expenses:
+              ${formatCurrency(
+                data.expense
+              )}
+            </span>
+
+          </div>
+
+          <div class="goal-details">
+
+            <span>
+              Savings:
+              ${formatCurrency(
+                data.savings
+              )}
+            </span>
+
+            <span>
+              Debt:
+              ${formatCurrency(
+                data.debt
+              )}
+            </span>
+
+          </div>
+
+        </div>
+
+      `;
+
+    });
+
+  container.innerHTML = html;
+
+}
+
 
 // ====================
 // LOAD APP
@@ -1853,6 +1995,8 @@ async function initializeApp() {
   loadCategoryDropdown();
 
   loadScenarioCategories();
+
+  loadRunningBalance();
 
 }
 
