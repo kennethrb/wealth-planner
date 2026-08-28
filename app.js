@@ -628,65 +628,41 @@ async function loadGoals() {
   container.innerHTML = html;
 }
 
+// ====================
+// NET WORTH HERO BANNER (DYNAMIC)
+// ====================
 async function loadNetWorth() {
-
-  const accounts =
-  appData.accounts;
+  const accounts = appData.accounts;
 
   let assets = 0;
   let liabilities = 0;
 
   accounts.forEach(account => {
+    const balance = Number(account.currentBalance || account.balance || 0);
 
-    const balance =
-      Number(account.currentBalance);
-
-    if (
-      account.netWorthType === "Asset"
-    ) {
-
+    if (account.netWorthType === "Asset") {
       assets += balance;
-
     }
 
-    if (
-      account.netWorthType === "Liability"
-    ) {
-
+    if (account.netWorthType === "Liability") {
       liabilities += balance;
-
     }
-
   });
 
-  const netWorth =
-    assets - liabilities;
+  const netWorth = assets - liabilities;
+  const isNegative = netWorth < 0;
 
-  document.getElementById("networth")
-    .innerHTML = `
-
-      <div class="hero-card">
-
-        <h2>💎 Net Worth</h2>
+  document.getElementById("networth").innerHTML = `
+    <div class="networth-banner ${isNegative ? 'negative' : 'positive'}">
+      <h2>💎 Net Worth</h2>
+      <div class="big-amount">${formatCurrency(netWorth)}</div>
       
-        <h1>
-          ₱${Math.round(netWorth).toLocaleString()}
-        </h1>
-        
-        <p>
-          Assets:
-          ₱${Math.round(assets).toLocaleString()}
-        </p>
-        
-        <p>
-          Liabilities:
-          ₱${Math.round(liabilities).toLocaleString()}
-        </p>
-      
+      <div class="networth-details">
+        <span>Assets: <strong>${formatCurrency(assets)}</strong></span>
+        <span>Liabilities: <strong>${formatCurrency(liabilities)}</strong></span>
       </div>
-
-    `;
-
+    </div>
+  `;
 }
 
 async function loadProjection() {
