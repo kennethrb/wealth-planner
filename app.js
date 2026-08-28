@@ -1836,7 +1836,6 @@ function loadBudgetVsActual() {
   if (!container) return;
 
   const selectedYear = Number(getSelectedYear());
-  // Dynamically grab selected month, fallback to current/selected month
   const selectedMonth = typeof getSelectedMonth === "function" ? getSelectedMonth() : "Jan"; 
 
   // 1. Map Budget Data for Selected Year & Month
@@ -1847,24 +1846,28 @@ function loadBudgetVsActual() {
       budgetMap[row.category] = Number(row.plannedAmount) || 0;
     });
 
-  // 2. Map Actual Transactions Data filtered by Year & Month
+  // 2. Map Actual Transactions Data (Case-insensitive key matching for Date and Category)
   const actualMap = {};
   (appData.transactions || [])
     .filter(tx => {
-      if (!tx.Date) return true; // Fallback if Date isn't present
-      const txDate = new Date(tx.Date);
+      const rawDate = tx.Date || tx.date;
+      if (!rawDate) return false;
+      
+      const txDate = new Date(rawDate);
+      if (isNaN(txDate.getTime())) return false;
+
       const txYear = txDate.getFullYear();
       const txMonth = txDate.toLocaleString("en-US", { month: "short" });
       return txYear === selectedYear && txMonth === selectedMonth;
     })
     .forEach(tx => {
-      const category = tx["Budget Position"] || tx.Category;
+      const category = tx["Budget Position"] || tx.budgetPosition || tx.Category || tx.category;
       if (!category) return;
 
       if (!actualMap[category]) {
         actualMap[category] = 0;
       }
-      actualMap[category] += Math.abs(Number(tx.Amount) || 0);
+      actualMap[category] += Math.abs(Number(tx.Amount || tx.amount) || 0);
     });
 
   // 3. Combine unique categories from budget and actuals
@@ -1875,10 +1878,13 @@ function loadBudgetVsActual() {
     ])
   ];
 
-  // 4. Build Category Type Map
+  // 4. Build Category Type Map (Supports categoryName or name)
   const categoryTypes = {};
   (appData.categories || []).forEach(cat => {
-    categoryTypes[cat.categoryName] = cat.budgetType;
+    const catName = cat.categoryName || cat.name;
+    if (catName) {
+      categoryTypes[catName] = cat.budgetType;
+    }
   });
 
   const sections = ["Income", "Expense", "Savings", "Debt"];
@@ -1890,7 +1896,6 @@ function loadBudgetVsActual() {
       .filter(cat => categoryTypes[cat] === section)
       .sort((a, b) => (budgetMap[b] || 0) - (budgetMap[a] || 0));
 
-    // Skip empty sections if no budget or actuals exist
     if (sectionCategories.length === 0) return;
 
     rows += `
@@ -1911,7 +1916,6 @@ function loadBudgetVsActual() {
       sectionBudget += budget;
       sectionActual += actual;
 
-      // Positive variance = Good (Over-income or Under-expense/debt/savings)
       const variance = section === "Income" ? actual - budget : budget - actual;
 
       rows += `
@@ -1928,7 +1932,6 @@ function loadBudgetVsActual() {
 
     const sectionVariance = section === "Income" ? sectionActual - sectionBudget : sectionBudget - sectionActual;
 
-    // Section Total Row
     rows += `
       <tr class="section-total total-${section.toLowerCase()}">
         <td><strong>TOTAL ${section.toUpperCase()}</strong></td>
