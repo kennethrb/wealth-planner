@@ -1153,81 +1153,53 @@ async function copyCurrentYearToNextYear() {
 
 
 async function saveBudgetChanges() {
+  const inputs = document.querySelectorAll("#budget input[type='number']");
+  const budgetItems = [];
 
-  const inputs =
-  document.querySelectorAll(
-    "#budget input[type='number']"
-  );
+  inputs.forEach(input => {
+    const [category, month] = input.id.split("|");
+    budgetItems.push({
+      year: 2027,
+      month: month,
+      category: category,
+      amount: input.value
+    });
+  });
 
+  try {
+    const response = await fetch(BASE_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8" // Avoids CORS preflight options check issue in Apps Script
+      },
+      body: JSON.stringify({
+        action: "saveAllBudgets",
+        budgetItems: budgetItems
+      })
+    });
 
-  let saveCount = 0;
+    const result = await response.json();
 
-  for (const input of inputs) {
+    if (result.success) {
+      await loadData();
+      await Promise.all([
+        loadBudgetPlanner(),
+        loadSummary(),
+        loadDashboard(),
+        loadProjection(),
+        loadGoals(),
+        loadNetWorth(),
+        loadFundingPlan()
+      ]);
 
-    const [category, month] =
-      input.id.split("|");
-
-    const amount =
-      input.value;
-
-    const url =
-      `${BASE_URL}?action=saveBudget`
-      + `&year=2027`
-      + `&month=${month}`
-      + `&category=${encodeURIComponent(category)}`
-      + `&amount=${amount}`;
-
-    try {
-
-      const response =
-        await fetch(url);
-      
-      const result =
-        await response.text();
-      
-      console.log(
-        "SAVE RESULT:",
-        result
-      );
-      
-      saveCount++;
-
-    } catch(error) {
-
-      console.error(error);
-
+      showStatus(`✅ ${budgetItems.length} items saved successfully at ${new Date().toLocaleTimeString()}`);
+    } else {
+      showStatus("❌ Failed to save budget changes.");
     }
-
+  } catch (error) {
+    console.error("Save error:", error);
+    showStatus("❌ Error saving budget changes.");
   }
-
-  await loadData();
-
-await Promise.all([
-  loadBudgetPlanner(),
-  loadSummary(),
-  loadDashboard(),
-  loadProjection(),
-  loadGoals(),
-  loadNetWorth(),
-  loadFundingPlan()
-]);
-
-  const status =
-    document.getElementById(
-      "globalStatus"
-    );
-
-  if (status) {
-
-    showStatus(
-  `✅ ${saveCount} budget items saved at ${new Date().toLocaleTimeString()}`
-);
-
-    status.style.color = "green";
-    status.style.fontWeight = "bold";
-
-  }
-
 }
 
 async function loadData() {
