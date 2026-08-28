@@ -81,8 +81,16 @@
     <!-- Budget Planner Section -->
     <section class="card">
       <h2>📅 Budget Planner</h2>
-      <!-- Responsive Scroll Container -->
-      <div id="budget" class="table-responsive"></div>
+      <div class="form-row">
+        <select
+          id="budgetYear"
+          onchange="loadBudgetPlanner()">
+        </select>
+      </div>
+    
+      <div id="budget"
+           class="table-responsive"></div>
+    
     </section>
 
     <!-- Monthly Summary Section -->
