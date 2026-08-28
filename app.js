@@ -189,6 +189,33 @@ async function loadCategoryDropdown() {
 
 }
 
+function loadYearDropdown() {
+
+  const dropdown =
+    document.getElementById(
+      "budgetYear"
+    );
+
+  if (!dropdown) return;
+
+  const years =
+    [...new Set(
+      appData.budget.map(
+        item => item.year
+      )
+    )];
+
+  years.sort();
+
+  dropdown.innerHTML = years
+    .map(year =>
+      `<option value="${year}">
+        ${year}
+      </option>`
+    )
+    .join("");
+}
+
 // ====================
 // CATEGORIES
 // ====================
@@ -311,7 +338,24 @@ async function deleteBudgetItem(category) {
 // ====================
 
 async function loadBudgetPlanner() {
-  const budgetData = appData.budget;
+  const selectedYear =
+    Number(
+      document.getElementById(
+        "budgetYear"
+      )?.value
+    ) ||
+    Math.min(
+      ...appData.budget.map(
+        item => item.year
+      )
+    );
+  
+  const budgetData =
+    appData.budget.filter(
+      item =>
+        Number(item.year) ===
+        selectedYear
+    );
   const categoryData = appData.categories;
 
   const months = [];
@@ -959,8 +1003,15 @@ async function saveBudgetChanges() {
 
   inputs.forEach(input => {
     const [category, month] = input.id.split("|");
+    const selectedYear =
+      Number(
+        document.getElementById(
+          "budgetYear"
+        ).value
+      );
+    
     budgetItems.push({
-      year: 2027,
+      year: selectedYear,
       month: month,
       category: category,
       amount: input.value
@@ -1333,6 +1384,7 @@ if (
 async function initializeApp() {
 
   await loadData();
+  loadYearDropdown();
 
   await Promise.all([
   loadNetWorth(),
