@@ -133,6 +133,13 @@ body {
   flex-direction: column;
   justify-content: flex-start;
   gap: 12px;
+}
+
+.card h2 {
+  margin-bottom: 16px;
+}
+
+main > section {
   margin-bottom: 24px;
 }
 
