@@ -885,7 +885,7 @@ function loadBudgetVsActual() {
         const type = categoryTypes[cat] || "Other";
         return type === section;
       })
-      .sort((a, b) => (budgetMap[b] || 0) - (budgetMap[a] || 0));
+      .sort((a, b) => (actualMap[b] || 0) - (actualMap[a] || 0));
 
     if (sectionCategories.length === 0) return;
 
