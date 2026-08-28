@@ -122,24 +122,26 @@ async function addCategory() {
     !categoryName ||
     !group
   ) {
-
+  
     showStatus(
-  "⚠ Please complete all fields.",
-  "warning"
-);
-
-  return;
-
+      "⚠ Please complete all fields.",
+      "warning"
+    );
+  
+    return;
   }
-
+  
+  const confirmed = confirm(
+    `Add category "${categoryName}"?`
+  );
+  
+  if (!confirmed) return;
+  
   await fetch(
-
     `${BASE_URL}?action=addCategory`
-
     + `&categoryName=${encodeURIComponent(categoryName)}`
     + `&budgetType=${encodeURIComponent(budgetType)}`
     + `&group=${encodeURIComponent(group)}`
-
   );
 
   await loadData();
@@ -285,6 +287,8 @@ async function deleteCategory() {
 
 async function addBudgetItem() {
 
+  
+
   const year =
     document.getElementById(
       "newYear"
@@ -314,12 +318,16 @@ async function addBudgetItem() {
   "⚠ Amount must be greater than zero",
   "warning"
 );
-
-
   
     return;
   
   }
+
+  const confirmed = confirm(
+    `Add budget item "${category}" for ${month} ${year}?`
+  );
+  
+  if (!confirmed) return;
 
   await fetch(
 
@@ -1011,6 +1019,12 @@ function loadFundingPlan() {
 
 async function copyJanuaryToWholeYear() {
 
+  const confirmed = confirm(
+  "Copy January budget amounts to all other months?"
+  );
+  
+  if (!confirmed) return;
+
   await fetch(
   `${BASE_URL}?action=copyJanuaryToWholeYear`
   );
@@ -1057,6 +1071,12 @@ async function copyJanuaryToWholeYear() {
 }
 
 async function copyCurrentYearToNextYear() {
+
+  const confirmed = confirm(
+    "Create the next budget year using the latest year's values?"
+  );
+  
+  if (!confirmed) return;
 
   const response =
     await fetch(
