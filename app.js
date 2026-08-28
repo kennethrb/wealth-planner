@@ -363,8 +363,11 @@ async function loadBudgetPlanner() {
   const sections = ["Income", "Expense", "Savings", "Debt"];
 
   sections.forEach(section => {
+    // Dynamic CSS class mapping for custom section colors
+    const sectionClass = `section-${section.toLowerCase()}`;
+
     html += `
-      <tr style="background:#dff0d8;">
+      <tr class="${sectionClass}">
         <td colspan="${months.length + 1}">
           <strong>${section.toUpperCase()}</strong>
         </td>
