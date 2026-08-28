@@ -134,6 +134,207 @@ function showConfirmDialog(
 
 }
 
+function loadTransactionAccounts() {
+
+  const dropdown =
+    document.getElementById(
+      "txAccount"
+    );
+
+  if (!dropdown) return;
+
+  dropdown.innerHTML = "";
+
+  appData.accounts.forEach(
+    account => {
+
+      const name =
+        account.accountName;
+
+      dropdown.innerHTML += `
+        <option value="${name}">
+          ${name}
+        </option>
+      `;
+
+    }
+  );
+
+}
+
+function loadTransactionPositions() {
+
+  const type =
+    document.getElementById(
+      "txBudgetType"
+    ).value;
+
+  const dropdown =
+    document.getElementById(
+      "txBudgetPosition"
+    );
+
+  if (!dropdown) return;
+
+  dropdown.innerHTML = "";
+
+  appData.categories
+    .filter(
+      c =>
+        c.budgetType === type
+    )
+    .forEach(cat => {
+
+      dropdown.innerHTML += `
+        <option
+          value="${cat.categoryName}">
+          ${cat.categoryName}
+        </option>
+      `;
+
+    });
+
+}
+
+async function addTransaction() {
+
+  const date =
+    document.getElementById(
+      "txDate"
+    ).value;
+
+  const amount =
+    document.getElementById(
+      "txAmount"
+    ).value;
+
+  const details =
+    document.getElementById(
+      "txDetails"
+    ).value;
+
+  const account =
+    document.getElementById(
+      "txAccount"
+    ).value;
+
+  const budgetType =
+    document.getElementById(
+      "txBudgetType"
+    ).value;
+
+  const budgetPosition =
+    document.getElementById(
+      "txBudgetPosition"
+    ).value;
+
+  if (
+    !date ||
+    !amount ||
+    !account
+  ) {
+
+    showStatus(
+      "⚠ Please complete all fields."
+    );
+
+    return;
+
+  }
+
+  const confirmed =
+    confirm(
+      "Add transaction?"
+    );
+
+  if (!confirmed) return;
+
+  await fetch(
+
+    `${BASE_URL}?action=addTransaction`
+
+    + `&date=${encodeURIComponent(date)}`
+    + `&amount=${amount}`
+    + `&details=${encodeURIComponent(details)}`
+    + `&account=${encodeURIComponent(account)}`
+    + `&budgetType=${encodeURIComponent(budgetType)}`
+    + `&budgetPosition=${encodeURIComponent(budgetPosition)}`
+
+  );
+
+  await loadData();
+
+  loadTransactions();
+
+  showStatus(
+    "✅ Transaction Added"
+  );
+
+}
+
+function loadTransactions() {
+
+  const container =
+    document.getElementById(
+      "transactionsList"
+    );
+
+  if (!container) return;
+
+  const recent =
+    [...appData.transactions]
+      .reverse()
+      .slice(0, 20);
+
+  container.innerHTML = `
+
+    <table>
+
+      <tr>
+
+        <th>Date</th>
+        <th>Amount</th>
+        <th>Account</th>
+        <th>Type</th>
+        <th>Position</th>
+
+      </tr>
+
+      ${recent.map(tx => `
+
+        <tr>
+
+          <td>
+            ${new Date(tx.Date)
+              .toLocaleDateString()}
+          </td>
+
+          <td>
+            ${formatCurrency(tx.Amount)}
+          </td>
+
+          <td>
+            ${tx.Account}
+          </td>
+
+          <td>
+            ${tx["Budget Type"]}
+          </td>
+
+          <td>
+            ${tx["Budget Position"]}
+          </td>
+
+        </tr>
+
+      `).join("")}
+
+    </table>
+
+  `;
+
+}
+
 // ====================
 // ACCOUNTS (VISUAL MATCH TO GOALS)
 // ====================
@@ -1629,6 +1830,9 @@ async function changeBudgetYear() {
 async function initializeApp() {
 
   await loadData();
+  loadTransactionAccounts();
+  loadTransactionPositions();
+  loadTransactions();
   loadYearDropdown();
 
   await Promise.all([
