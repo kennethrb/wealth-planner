@@ -1,31 +1,37 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 /* ====================
-   VARIABLES & BASE
+   VARIABLES & BASE (PREMIUM DARK THEME)
 ==================== */
 :root {
   --primary: #10b981;
   --primary-hover: #059669;
-  --primary-light: #ecfdf5;
-  --bg-main: #f8fafc;
-  --surface: #ffffff;
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --border: #e2e8f0;
+  --primary-light: rgba(16, 185, 129, 0.12);
+  --primary-glow: rgba(16, 185, 129, 0.2);
+  
+  --bg-main: #0b0f17;
+  --surface: #151d2a;
+  --surface-hover: #1e293b;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-light: rgba(255, 255, 255, 0.04);
+  
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
 
   /* Custom Section Colors */
-  --color-income: #26A86D;
-  --color-expense: #FE1684;
-  --color-savings: #3285F3;
-  --color-debt: #8E94B8;
+  --color-income: #26a86d;
+  --color-expense: #fe1684;
+  --color-savings: #3285f3;
+  --color-debt: #8e94b8;
 
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
-  --shadow-md: 0 4px 12px -2px rgba(0,0,0,0.08);
-  --shadow-lg: 0 12px 28px -4px rgba(0,0,0,0.12);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.4);
+  
   --radius-lg: 16px;
   --radius-md: 10px;
   --radius-sm: 6px;
-  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
@@ -44,6 +50,22 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Custom Scrollbar for Webkit */
+::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
 /* ====================
    LAYOUT & GRID SYSTEM
 ==================== */
@@ -52,7 +74,6 @@ body {
   margin: 0 auto;
 }
 
-/* Top Dashboard Cards Grid */
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -89,8 +110,8 @@ body {
 
 .hero-header h1 {
   font-size: 32px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 800;
+  letter-spacing: -0.03em;
   color: var(--text-main);
   margin-bottom: 4px;
 }
@@ -105,24 +126,24 @@ body {
   border-radius: var(--radius-lg);
   padding: 24px;
   border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(12px);
   transition: var(--transition);
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* FIX: Prevents items from stretching to the bottom */
-  gap: 12px;                  /* FIX: Keeps consistent spacing between title and content */
+  justify-content: flex-start;
+  gap: 12px;
 }
 
 .card:hover {
-  box-shadow: var(--shadow-md);
-  border-color: #cbd5e1;
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .card-title {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
   color: var(--text-muted);
   margin-bottom: 12px;
 }
@@ -139,8 +160,8 @@ body {
   justify-content: space-between;
   align-items: center;
   font-size: 14px;
-  padding: 4px 0;
-  border-bottom: 1px dashed #f1f5f9;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--border);
 }
 
 .metric-row:last-child {
@@ -158,14 +179,15 @@ body {
 }
 
 .metric-big {
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
   margin: 8px 0 16px 0;
+  font-variant-numeric: tabular-nums;
 }
 
-.text-danger { color: #ef4444 !important; }
-.text-success { color: #10b981 !important; }
+.text-danger { color: #f87171 !important; }
+.text-success { color: #34d399 !important; }
 
 /* Status Badges */
 .badge {
@@ -179,13 +201,13 @@ body {
 }
 
 .badge-success {
-  background-color: #d1fae5;
-  color: #047857;
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #34d399;
 }
 
 .badge-warning {
-  background-color: #fef3c7;
-  color: #b45309;
+  background-color: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
 }
 
 /* ====================
@@ -215,10 +237,11 @@ body {
 }
 
 .form-group label {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 input[type="text"],
@@ -231,14 +254,20 @@ select {
   font-size: 14px;
   font-family: inherit;
   color: var(--text-main);
-  background-color: #fff;
+  background-color: rgba(255, 255, 255, 0.03);
   transition: var(--transition);
   outline: none;
 }
 
 input:focus, select:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+  background-color: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+select option {
+  background-color: var(--surface);
+  color: var(--text-main);
 }
 
 /* ====================
@@ -246,7 +275,7 @@ input:focus, select:focus {
 ==================== */
 button, .btn {
   background-color: var(--primary);
-  color: white;
+  color: #042f2e;
   border: none;
   border-radius: var(--radius-md);
   padding: 10px 18px;
@@ -263,7 +292,7 @@ button, .btn {
 }
 
 button:hover, .btn:hover {
-  background-color: var(--primary-hover);
+  background-color: #34d399;
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }
@@ -273,23 +302,25 @@ button:active, .btn:active {
 }
 
 .btn-secondary {
-  background-color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.05);
   color: var(--text-main);
   border: 1px solid var(--border);
 }
 
 .btn-secondary:hover {
-  background-color: #f8fafc;
-  border-color: #cbd5e1;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .btn-danger {
-  background-color: #ef4444;
-  color: white;
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 .btn-danger:hover {
-  background-color: #dc2626;
+  background-color: #ef4444;
+  color: #ffffff;
 }
 
 .action-buttons {
@@ -322,12 +353,12 @@ table {
 }
 
 th {
-  background-color: #f8fafc;
+  background-color: rgba(255, 255, 255, 0.02);
   color: var(--text-muted);
   font-weight: 600;
-  font-size: 12px;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   border-bottom: 1px solid var(--border);
 }
 
@@ -340,7 +371,6 @@ td, th {
   font-variant-numeric: tabular-nums;
 }
 
-/* Align text descriptions to left */
 td:first-child, th:first-child {
   text-align: left;
 }
@@ -350,7 +380,7 @@ tr:last-child td {
 }
 
 tr:hover {
-  background-color: #f8fafc;
+  background-color: rgba(255, 255, 255, 0.02);
 }
 
 /* Sticky First Column */
@@ -359,27 +389,27 @@ tr:hover {
 #summary th:first-child {
   position: sticky;
   left: 0;
-  background: #ffffff;
+  background: var(--surface);
   z-index: 2;
   font-weight: 600;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.03);
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
 }
 
 /* Table Input Fields */
 #budget input[type="number"] {
-  width: 85px !important;
+  width: 90px !important;
   padding: 6px 8px;
   font-size: 13px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   text-align: right;
   font-variant-numeric: tabular-nums;
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
-/* Inline Row Delete Button */
 .btn-delete-row {
   background: transparent;
-  color: #94a3b8;
+  color: var(--text-muted);
   border: none;
   padding: 4px 8px;
   box-shadow: none;
@@ -388,8 +418,8 @@ tr:hover {
 }
 
 .btn-delete-row:hover {
-  background-color: #fee2e2;
-  color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #f87171;
   transform: none;
   box-shadow: none;
 }
@@ -397,109 +427,92 @@ tr:hover {
 /* ====================
    TABLE SECTION & COLUMN COLORS
 ==================== */
-
-/* Income (#26A86D) */
-tr.section-income,
-th.col-income {
-  background-color: rgba(38, 168, 109, 0.12) !important;
-  color: #26A86D !important;
+tr.section-income, th.col-income {
+  background-color: rgba(38, 168, 109, 0.15) !important;
+  color: #34d399 !important;
 }
-td.col-income,
-tr.section-income td:first-child {
+td.col-income, tr.section-income td:first-child {
   background-color: rgba(38, 168, 109, 0.05) !important;
-  color: #26A86D !important;
+  color: #34d399 !important;
   font-weight: 600;
 }
 
-/* Expense (#FE1684) */
-tr.section-expense,
-th.col-expense {
-  background-color: rgba(254, 22, 132, 0.12) !important;
-  color: #FE1684 !important;
+tr.section-expense, th.col-expense {
+  background-color: rgba(254, 22, 132, 0.15) !important;
+  color: #f472b6 !important;
 }
-td.col-expense,
-tr.section-expense td:first-child {
+td.col-expense, tr.section-expense td:first-child {
   background-color: rgba(254, 22, 132, 0.05) !important;
-  color: #FE1684 !important;
+  color: #f472b6 !important;
   font-weight: 600;
 }
 
-/* Savings (#3285F3) */
-tr.section-savings,
-th.col-savings {
-  background-color: rgba(50, 133, 243, 0.12) !important;
-  color: #3285F3 !important;
+tr.section-savings, th.col-savings {
+  background-color: rgba(50, 133, 243, 0.15) !important;
+  color: #60a5fa !important;
 }
-td.col-savings,
-tr.section-savings td:first-child {
+td.col-savings, tr.section-savings td:first-child {
   background-color: rgba(50, 133, 243, 0.05) !important;
-  color: #3285F3 !important;
+  color: #60a5fa !important;
   font-weight: 600;
 }
 
-/* Debt (#8E94B8) */
-tr.section-debt,
-th.col-debt {
-  background-color: rgba(142, 148, 184, 0.12) !important;
-  color: #8E94B8 !important;
+tr.section-debt, th.col-debt {
+  background-color: rgba(142, 148, 184, 0.15) !important;
+  color: #a7f3d0 !important;
 }
-td.col-debt,
-tr.section-debt td:first-child {
+td.col-debt, tr.section-debt td:first-child {
   background-color: rgba(142, 148, 184, 0.05) !important;
-  color: #8E94B8 !important;
+  color: #94a3b8 !important;
   font-weight: 600;
 }
 
-/* Goal Item Internal Styling */
+/* ====================
+   GOALS & PROGRESS BARS
+==================== */
 .goal-item {
+  border-bottom: 1px dashed var(--border);
+  padding: 12px 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
-.item-header {
+.goal-item:last-child {
+  border-bottom: none;
+}
+
+.item-header, .goal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-weight: 600;
 }
 
 .goal-details {
   display: flex;
   justify-content: space-between;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-muted);
-  margin-top: 4px;
+}
+
+.progress-bar-bg {
+  height: 6px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  border-radius: 999px;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .margin-top {
   margin-top: 24px;
-}
-
-/* Funding Plan Rows */
-.funding-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px dashed var(--border);
-  font-size: 14px;
-}
-
-.funding-row:last-child {
-  border-bottom: none;
-}
-
-/* ==========================================
-   ACCOUNTS, GOALS & FUNDING BREAKDOWN FIXES
-   ========================================== */
-
-/* 1. Remove nested card border ("Square inside Square") */
-.card .card {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
 }
 
 /* ====================
@@ -513,87 +526,93 @@ tr.section-debt td:first-child {
   transition: var(--transition);
 }
 
-/* Positive Net Worth Banner */
 .networth-banner.positive {
-  background-color: var(--primary-light, #ecfdf5);
-  border-color: rgba(16, 185, 129, 0.25);
+  background-color: var(--primary-light);
+  border-color: rgba(16, 185, 129, 0.3);
 }
 
-/* Negative Net Worth Banner */
 .networth-banner.negative {
-  background-color: #fef2f2;
-  border-color: rgba(239, 68, 68, 0.25);
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
 }
 
 .networth-banner h2 {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
   color: var(--text-muted);
   margin-bottom: 6px;
 }
 
 .networth-banner .big-amount {
   font-size: 36px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 800;
+  letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
   margin-bottom: 12px;
 }
 
 .networth-banner.positive .big-amount {
-  color: var(--primary-hover, #059669);
+  color: #34d399;
 }
 
 .networth-banner.negative .big-amount {
-  color: #dc2626;
+  color: #f87171;
 }
 
-/* Assets & Liabilities Row */
 .networth-details {
   display: flex;
   gap: 24px;
   font-size: 13px;
   font-weight: 500;
   color: var(--text-muted);
-  border-top: 1px dashed rgba(0, 0, 0, 0.08);
-  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+  padding-top: 12px;
 }
 
 .networth-details strong {
   color: var(--text-main);
 }
 
-/* 2. Highlighted Cash to Withdraw Banner */
+/* ====================
+   FUNDING BREAKDOWN & CARDS FIX
+==================== */
+.card .card {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
 .cash-withdraw-banner {
-  background-color: var(--primary-light, #ecfdf5);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  border-radius: var(--radius-md, 10px);
+  background-color: var(--primary-light);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: var(--radius-md);
   padding: 16px;
   margin-bottom: 16px;
 }
 
 .cash-withdraw-banner h3 {
-  font-size: 12px;
+  font-size: 11px;
   text-transform: uppercase;
-  color: var(--text-muted, #64748b);
-  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
   margin-bottom: 4px;
 }
 
 .cash-withdraw-banner .big-amount {
   font-size: 28px;
-  font-weight: 700;
-  color: var(--primary-hover, #059669);
+  font-weight: 800;
+  color: #34d399;
   font-variant-numeric: tabular-nums;
 }
 
-/* 3. Clean Row Layout for Accounts and Funding Items */
 .funding-list, .account-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
 .funding-row, .account-row {
@@ -601,8 +620,8 @@ tr.section-debt td:first-child {
   justify-content: space-between;
   align-items: center;
   font-size: 14px;
-  padding: 6px 0;
-  border-bottom: 1px dashed var(--border, #e2e8f0);
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--border);
 }
 
 .funding-row:last-child, .account-row:last-child {
@@ -610,38 +629,13 @@ tr.section-debt td:first-child {
 }
 
 .funding-row .label, .account-row .label {
-  color: var(--text-main, #0f172a);
+  color: var(--text-main);
 }
 
 .funding-row .amount, .account-row .amount {
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  color: var(--text-main, #0f172a);
-}
-
-/* 4. Financial Goals Row Layout */
-.goal-item {
-  border-bottom: 1px dashed var(--border, #e2e8f0);
-  padding: 10px 0;
-}
-
-.goal-item:last-child {
-  border-bottom: none;
-}
-
-.goal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.goal-details {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: var(--text-muted, #64748b);
+  color: var(--text-main);
 }
 
 /* ====================
