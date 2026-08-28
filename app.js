@@ -46,8 +46,8 @@ function loadAccounts() {
 
   container.innerHTML = appData.accounts.map(account => `
     <div class="account-row">
-      <span class="label">${account.name}</span>
-      <span class="amount">${formatCurrency(account.balance)}</span>
+      <span class="label">${account.name || account.accountName}</span>
+      <span class="amount">${formatCurrency(account.currentBalance || account.balance)}</span>
     </div>
   `).join('');
 }
@@ -803,40 +803,63 @@ async function loadProjection() {
 
 }
 
+// ====================
+// FUNDING BREAKDOWN (UPDATED DYNAMICALLY)
+// ====================
 function loadFundingPlan() {
   const container = document.getElementById("fundingPlanList");
   const cashContainer = document.getElementById("cashToWithdraw");
-  if (!container) return;
+  if (!container || !appData.budget || !appData.categories) return;
 
-  // Calculate or retrieve dynamic values
-  const employment = appData.budget?.employment || 0;
-  const online = appData.budget?.online || 0;
-  const emergency = appData.budget?.emergency || 0;
-  const investments = appData.budget?.investments || 0;
-  const cashToWithdraw = appData.budget?.cashToWithdraw || 0;
+  // Map category types for lookups
+  const categoryTypes = {};
+  appData.categories.forEach(cat => {
+    categoryTypes[cat.categoryName] = cat.budgetType;
+  });
+
+  // Calculate dynamic totals for January (or baseline month)
+  let totalIncome = 0;
+  let totalExpense = 0;
+  let totalSavings = 0;
+  let totalDebt = 0;
+
+  appData.budget.forEach(item => {
+    if (item.month !== "Jan") return;
+
+    const type = categoryTypes[item.category];
+    const amount = Number(item.plannedAmount) || 0;
+
+    if (type === "Income") totalIncome += amount;
+    if (type === "Expense") totalExpense += amount;
+    if (type === "Savings") totalSavings += amount;
+    if (type === "Debt") totalDebt += amount;
+  });
+
+  // Cash to Withdraw = Total monthly expenses + debt requirements
+  const cashToWithdraw = totalExpense + totalDebt;
 
   // Update big banner amount dynamically
   if (cashContainer) {
     cashContainer.textContent = formatCurrency(cashToWithdraw);
   }
 
-  // Render dynamic list rows
+  // Render dynamic category breakdown rows
   container.innerHTML = `
     <div class="funding-row">
-      <span class="label">Employment</span>
-      <span class="amount">${formatCurrency(employment)}</span>
+      <span class="label">Total Monthly Income</span>
+      <span class="amount">${formatCurrency(totalIncome)}</span>
     </div>
     <div class="funding-row">
-      <span class="label">Online</span>
-      <span class="amount">${formatCurrency(online)}</span>
+      <span class="label">Total Expenses</span>
+      <span class="amount">${formatCurrency(totalExpense)}</span>
     </div>
     <div class="funding-row">
-      <span class="label">Emergency</span>
-      <span class="amount">${formatCurrency(emergency)}</span>
+      <span class="label">Total Savings</span>
+      <span class="amount">${formatCurrency(totalSavings)}</span>
     </div>
     <div class="funding-row">
-      <span class="label">Investments</span>
-      <span class="amount">${formatCurrency(investments)}</span>
+      <span class="label">Total Debt Payments</span>
+      <span class="amount">${formatCurrency(totalDebt)}</span>
     </div>
   `;
 }
