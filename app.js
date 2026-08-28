@@ -19,388 +19,168 @@ let appData = {
   transactions: []
 };
 
-function showStatus(
-  message,
-  type = "success"
-) {
-
-  const status =
-    document.getElementById(
-      "globalStatus"
-    );
-
+function showStatus(message, type = "success") {
+  const status = document.getElementById("globalStatus");
   if (!status) return;
 
-  status.className =
-    `status-banner ${type}`;
+  status.className = `status-banner ${type}`;
+  status.innerHTML = message;
+  status.style.display = "block";
 
-  status.innerHTML =
-    message;
-
-  status.style.display =
-    "block";
-
-  clearTimeout(
-    status.timeoutId
-  );
-
-  status.timeoutId =
+  clearTimeout(status.timeoutId);
+  status.timeoutId = setTimeout(() => {
+    status.classList.add("hide");
     setTimeout(() => {
-
-      status.classList.add(
-        "hide"
-      );
-
-      setTimeout(() => {
-
-        status.style.display =
-          "none";
-
-        status.classList.remove(
-          "hide"
-        );
-
-      }, 300);
-
-    }, 4000);
-
+      status.style.display = "none";
+      status.classList.remove("hide");
+    }, 300);
+  }, 4000);
 }
 
-function showConfirmDialog(
-  title,
-  message
-){
+function showConfirmDialog(title, message) {
+  return new Promise(resolve => {
+    const modal = document.getElementById("confirmModal");
+    const titleElement = document.getElementById("confirmTitle");
+    const messageElement = document.getElementById("confirmMessage");
+    const okButton = document.getElementById("confirmOk");
+    const cancelButton = document.getElementById("confirmCancel");
 
-  return new Promise(
-    resolve => {
-
-      const modal =
-        document.getElementById(
-          "confirmModal"
-        );
-
-      const titleElement =
-        document.getElementById(
-          "confirmTitle"
-        );
-
-      const messageElement =
-        document.getElementById(
-          "confirmMessage"
-        );
-
-      const okButton =
-        document.getElementById(
-          "confirmOk"
-        );
-
-      const cancelButton =
-        document.getElementById(
-          "confirmCancel"
-        );
-
-      titleElement.textContent =
-        title;
-
-      messageElement.textContent =
-        message;
-
-      modal.classList.add(
-        "show"
-      );
-
-      okButton.onclick = () => {
-
-        modal.classList.remove(
-          "show"
-        );
-
-        resolve(true);
-
-      };
-
-      cancelButton.onclick = () => {
-
-        modal.classList.remove(
-          "show"
-        );
-
-        resolve(false);
-
-      };
-
+    if (!modal) {
+      resolve(confirm(`${title}\n\n${message}`));
+      return;
     }
-  );
 
+    titleElement.textContent = title;
+    messageElement.textContent = message;
+    modal.classList.add("show");
+
+    okButton.onclick = () => {
+      modal.classList.remove("show");
+      resolve(true);
+    };
+
+    cancelButton.onclick = () => {
+      modal.classList.remove("show");
+      resolve(false);
+    };
+  });
+}
+
+function getSelectedYear() {
+  return Number(document.getElementById("budgetYear")?.value) || new Date().getFullYear();
+}
+
+function getSelectedMonth() {
+  return document.getElementById("budgetMonth")?.value || "Jan";
 }
 
 function loadTransactionAccounts() {
-
-  const dropdown =
-    document.getElementById(
-      "txAccount"
-    );
-
+  const dropdown = document.getElementById("txAccount");
   if (!dropdown) return;
 
   dropdown.innerHTML = "";
-
-  appData.accounts.forEach(
-    account => {
-
-      const name =
-        account.accountName;
-
-      dropdown.innerHTML += `
-        <option value="${name}">
-          ${name}
-        </option>
-      `;
-
-    }
-  );
-
+  appData.accounts.forEach(account => {
+    const name = account.accountName || account.name;
+    dropdown.innerHTML += `<option value="${name}">${name}</option>`;
+  });
 }
 
 function loadTransactionPositions() {
-
-  const type =
-    document.getElementById(
-      "txBudgetType"
-    ).value;
-
-  const dropdown =
-    document.getElementById(
-      "txBudgetPosition"
-    );
-
+  const type = document.getElementById("txBudgetType")?.value;
+  const dropdown = document.getElementById("txBudgetPosition");
   if (!dropdown) return;
 
   dropdown.innerHTML = "";
-
   appData.categories
-    .filter(
-      c =>
-        c.budgetType === type
-    )
+    .filter(c => c.budgetType === type)
     .forEach(cat => {
-
-      dropdown.innerHTML += `
-        <option
-          value="${cat.categoryName}">
-          ${cat.categoryName}
-        </option>
-      `;
-
+      dropdown.innerHTML += `<option value="${cat.categoryName}">${cat.categoryName}</option>`;
     });
-
 }
 
 async function addTransaction() {
+  const date = document.getElementById("txDate")?.value;
+  const amount = document.getElementById("txAmount")?.value;
+  const details = document.getElementById("txDetails")?.value;
+  const account = document.getElementById("txAccount")?.value;
+  const budgetType = document.getElementById("txBudgetType")?.value;
+  const budgetPosition = document.getElementById("txBudgetPosition")?.value;
 
-  const date =
-    document.getElementById(
-      "txDate"
-    ).value;
-
-  const amount =
-    document.getElementById(
-      "txAmount"
-    ).value;
-
-  const details =
-    document.getElementById(
-      "txDetails"
-    ).value;
-
-  const account =
-    document.getElementById(
-      "txAccount"
-    ).value;
-
-  const budgetType =
-    document.getElementById(
-      "txBudgetType"
-    ).value;
-
-  const budgetPosition =
-    document.getElementById(
-      "txBudgetPosition"
-    ).value;
-
-  if (
-    !date ||
-    !amount ||
-    !account
-  ) {
-
-    showStatus(
-      "⚠ Please complete all fields."
-    );
-
+  if (!date || !amount || !account) {
+    showStatus("⚠ Please complete all required fields.", "warning");
     return;
-
   }
 
-  const confirmed =
-    confirm(
-      "Add transaction?"
-    );
-
+  const confirmed = await showConfirmDialog("Add Transaction", "Do you want to add this transaction?");
   if (!confirmed) return;
 
   await fetch(
-
     `${BASE_URL}?action=addTransaction`
-
     + `&date=${encodeURIComponent(date)}`
     + `&amount=${amount}`
     + `&details=${encodeURIComponent(details)}`
     + `&account=${encodeURIComponent(account)}`
     + `&budgetType=${encodeURIComponent(budgetType)}`
     + `&budgetPosition=${encodeURIComponent(budgetPosition)}`
-
   );
 
   await loadData();
-
   loadTransactions();
-
   loadBudgetVsActual();
-  
-  showStatus(
-    "✅ Transaction Added"
-  );
-
+  showStatus("✅ Transaction Added", "success");
 }
 
 function loadTransactions() {
-
-  const container =
-    document.getElementById(
-      "transactionsList"
-    );
-
+  const container = document.getElementById("transactionsList");
   if (!container) return;
 
-  const recent =
-    [...appData.transactions]
-      .reverse()
-      .slice(0, 20);
+  const recent = [...appData.transactions].reverse().slice(0, 20);
 
   container.innerHTML = `
-
     <div class="table-responsive">
-
       <table>
-
         <tr>
-
           <th>Date</th>
           <th>Amount</th>
           <th>Account</th>
           <th>Position</th>
           <th>Details</th>
           <th></th>
-        
         </tr>
-
-
         ${recent.map(tx => `
-
           <tr>
-
+            <td>${new Date(tx.Date || tx.date).toLocaleDateString()}</td>
+            <td>${formatCurrency(tx.Amount || tx.amount)}</td>
+            <td>${tx.Account || tx.account}</td>
+            <td>${tx["Budget Position"] || tx.budgetPosition || tx.category || ""}</td>
+            <td>${tx.Details || tx.details || ""}</td>
             <td>
-              ${new Date(tx.Date)
-                .toLocaleDateString()}
+              <button class="btn-delete-row" onclick="deleteTransactionRecord(${tx.rowNumber})">✕</button>
             </td>
-
-            <td>
-              ${formatCurrency(tx.Amount)}
-            </td>
-
-            <td>
-              ${tx.Account}
-            </td>
-
-            <td>
-              ${tx["Budget Position"]}
-            </td>
-
-            <td>
-              ${tx.Details}
-            </td>
-            
-            <td>
-            
-              <button
-                class="btn-delete-row"
-                onclick="deleteTransactionRecord(
-                  ${tx.rowNumber}
-                )">
-            
-                ✕
-            
-              </button>
-            
-            </td>
-
           </tr>
-
         `).join("")}
-
       </table>
-
     </div>
-
   `;
-
 }
 
-async function deleteTransactionRecord(
-  rowNumber
-) {
-
-  const confirmed =
-    await showConfirmDialog(
-      "Delete Transaction",
-      "Delete this transaction?"
-    );
-
+async function deleteTransactionRecord(rowNumber) {
+  const confirmed = await showConfirmDialog("Delete Transaction", "Delete this transaction?");
   if (!confirmed) return;
 
-  await fetch(
-
-    `${BASE_URL}?action=deleteTransaction`
-
-    + `&rowNumber=${rowNumber}`
-
-  );
+  await fetch(`${BASE_URL}?action=deleteTransaction&rowNumber=${rowNumber}`);
 
   await loadData();
-
   loadTransactions();
-
   loadBudgetVsActual();
-
   loadSummary();
-
   loadDashboard();
-
   loadProjection();
-
   loadFundingPlan();
 
-  showStatus(
-    "🗑 Transaction deleted",
-    "success"
-  );
-
+  showStatus("🗑 Transaction deleted", "success");
 }
 
-// ====================
-// ACCOUNTS (VISUAL MATCH TO GOALS)
-// ====================
 function loadAccounts() {
   const container = document.getElementById("accounts");
   if (!container) return;
@@ -435,43 +215,18 @@ function loadAccounts() {
 }
 
 async function addCategory() {
+  const categoryName = document.getElementById("categoryName")?.value;
+  const budgetType = document.getElementById("budgetType")?.value;
+  const group = document.getElementById("categoryGroup")?.value;
 
-  const categoryName =
-    document.getElementById(
-      "categoryName"
-    ).value;
-
-  const budgetType =
-    document.getElementById(
-      "budgetType"
-    ).value;
-
-  const group =
-    document.getElementById(
-      "categoryGroup"
-    ).value;
-
-  if (
-    !categoryName ||
-    !group
-  ) {
-  
-    showStatus(
-      "⚠ Please complete all fields.",
-      "warning"
-    );
-  
+  if (!categoryName || !group) {
+    showStatus("⚠ Please complete all fields.", "warning");
     return;
   }
-  
-  const confirmed =
-  await showConfirmDialog(
-    "Add Category",
-    `Add category "${categoryName}"?`
-  );
 
-if (!confirmed) return;
-  
+  const confirmed = await showConfirmDialog("Add Category", `Add category "${categoryName}"?`);
+  if (!confirmed) return;
+
   await fetch(
     `${BASE_URL}?action=addCategory`
     + `&categoryName=${encodeURIComponent(categoryName)}`
@@ -480,332 +235,127 @@ if (!confirmed) return;
   );
 
   await loadData();
-
   await loadCategoryDropdown();
   await loadScenarioCategories();
 
-  showStatus(
-  `✅ Category ${categoryName} added successfully`,
-  "success"
-);
+  showStatus(`✅ Category ${categoryName} added successfully`, "success");
 
-  document.getElementById(
-    "categoryName"
-  ).value = "";
-
-  document.getElementById(
-    "categoryGroup"
-  ).value = "";
-
-  document.getElementById(
-    "budgetType"
-  ).selectedIndex = 0;
-
+  document.getElementById("categoryName").value = "";
+  document.getElementById("categoryGroup").value = "";
+  document.getElementById("budgetType").selectedIndex = 0;
 }
 
 async function loadCategoryDropdown() {
+  const addSelect = document.getElementById("newCategory");
+  const deleteSelect = document.getElementById("deleteCategorySelect");
 
-  const response =
-    await fetch(
-      `${BASE_URL}?action=getCategories`
-    );
+  if (addSelect) addSelect.innerHTML = "";
+  if (deleteSelect) deleteSelect.innerHTML = "";
 
-  const categories =
-    await response.json();
-
-  const addSelect =
-    document.getElementById(
-      "newCategory"
-    );
-
-  const deleteSelect =
-    document.getElementById(
-      "deleteCategorySelect"
-    );
-
-  if (addSelect)
-    addSelect.innerHTML = "";
-
-  if (deleteSelect)
-    deleteSelect.innerHTML = "";
-
-  categories.forEach(cat => {
-
-    if (addSelect) {
-
-      addSelect.innerHTML += `
-        <option value="${cat.categoryName}">
-          ${cat.categoryName}
-        </option>
-      `;
-
-    }
-
-    if (deleteSelect) {
-
-      deleteSelect.innerHTML += `
-        <option value="${cat.categoryName}">
-          ${cat.categoryName}
-        </option>
-      `;
-
-    }
-
+  appData.categories.forEach(cat => {
+    if (addSelect) addSelect.innerHTML += `<option value="${cat.categoryName}">${cat.categoryName}</option>`;
+    if (deleteSelect) deleteSelect.innerHTML += `<option value="${cat.categoryName}">${cat.categoryName}</option>`;
   });
-
 }
 
 function loadYearDropdown() {
-
-  const dropdown =
-    document.getElementById(
-      "budgetYear"
-    );
-
+  const dropdown = document.getElementById("budgetYear");
   if (!dropdown) return;
 
-  const years =
-    [...new Set(
-      appData.budget.map(
-        item => item.year
-      )
-    )];
-
+  const years = [...new Set(appData.budget.map(item => item.year))].filter(Boolean);
   years.sort();
 
-  dropdown.innerHTML = years
-    .map(year =>
-      `<option value="${year}">
-        ${year}
-      </option>`
-    )
-    .join("");
+  dropdown.innerHTML = years.map(year => `<option value="${year}">${year}</option>`).join("");
 }
-
-function getSelectedYear() {
-
-  return Number(
-    document.getElementById(
-      "budgetYear"
-    )?.value
-  );
-
-}
-
-// ====================
-// CATEGORIES
-// ====================
 
 async function deleteCategory() {
-  const categoryName = document.getElementById("deleteCategorySelect").value;
-
+  const categoryName = document.getElementById("deleteCategorySelect")?.value;
   if (!categoryName) return;
 
-  // Confirmation prompt before deletion
-  const confirmDelete =
-  await showConfirmDialog(
-    "Delete Category",
-    `Delete "${categoryName}"?
-
-  This will also remove all related budget entries.
-  
-  This action cannot be undone.`
-  );
+  const confirmDelete = await showConfirmDialog("Delete Category", `Delete "${categoryName}"?\nThis will remove related budget entries.`);
   if (!confirmDelete) return;
 
-  await fetch(
-    `${BASE_URL}?action=deleteCategory` +
-    `&categoryName=${encodeURIComponent(categoryName)}`
-  );
+  await fetch(`${BASE_URL}?action=deleteCategory&categoryName=${encodeURIComponent(categoryName)}`);
 
   await loadData();
   await loadCategoryDropdown();
   await loadScenarioCategories();
 
-  showStatus(
-  `🗑 Category ${categoryName} deleted`,
-  "success"
-);
+  showStatus(`🗑 Category ${categoryName} deleted`, "success");
 }
 
 async function addBudgetItem() {
+  const year = document.getElementById("newYear")?.value;
+  const month = document.getElementById("newMonth")?.value;
+  const category = document.getElementById("newCategory")?.value;
+  const amount = document.getElementById("newAmount")?.value;
 
-  
-
-  const year =
-    document.getElementById(
-      "newYear"
-    ).value;
-
-  const month =
-    document.getElementById(
-      "newMonth"
-    ).value;
-
-  const category =
-    document.getElementById(
-      "newCategory"
-    ).value;
-
-  const amount =
-    document.getElementById(
-      "newAmount"
-    ).value;
-
-  if (
-  !amount ||
-  Number(amount) <= 0
-  ) {
-  
-    showStatus(
-  "⚠ Amount must be greater than zero",
-  "warning"
-);
-  
+  if (!amount || Number(amount) <= 0) {
+    showStatus("⚠ Amount must be greater than zero", "warning");
     return;
-  
   }
 
-  const confirmed = confirm(
-    `Add budget item "${category}" for ${month} ${year}?`
-  );
-  
+  const confirmed = await showConfirmDialog("Add Budget Item", `Add budget item "${category}" for ${month} ${year}?`);
   if (!confirmed) return;
 
   await fetch(
-
     `${BASE_URL}?action=addBudgetItem`
-
-    + `&year=${year}`
-    + `&month=${month}`
+    + `&year=${year}&month=${month}`
     + `&category=${encodeURIComponent(category)}`
     + `&amount=${amount}`
-
   );
 
   await loadData();
-
-  await Promise.all([
-    loadBudgetPlanner(),
-    loadSummary(),
-    loadDashboard()
-  ]);
-
-  const status =
-    document.getElementById(
-      "globalStatus"
-    );
-
-  showStatus(
-  "✅ Budget Item Added",
-  "success"
-);
-
+  await Promise.all([loadBudgetPlanner(), loadSummary(), loadDashboard()]);
+  showStatus("✅ Budget Item Added", "success");
 }
-
-// ====================
-// BUDGET PLANNER
-// ====================
 
 async function deleteBudgetItem(category) {
-  // Confirmation prompt before row deletion
-  const confirmed =
-  await showConfirmDialog(
-    "Delete Budget Item",
-    `Delete "${category}" from all months?\nThis action cannot be undone.`
-  );
+  const confirmed = await showConfirmDialog("Delete Budget Item", `Delete "${category}" from all months?`);
   if (!confirmed) return;
 
-  await fetch(
-    `${BASE_URL}?action=deleteBudgetItem` +
-    `&category=${encodeURIComponent(category)}`
-  );
+  await fetch(`${BASE_URL}?action=deleteBudgetItem&category=${encodeURIComponent(category)}`);
 
   await loadData();
-
-  await Promise.all([
-    loadBudgetPlanner(),
-    loadSummary(),
-    loadDashboard(),
-    loadProjection()
-  ]);
-
-  showStatus(
-  `🗑 Deleted ${category}`,
-  "success"
-);
+  await Promise.all([loadBudgetPlanner(), loadSummary(), loadDashboard(), loadProjection()]);
+  showStatus(`🗑 Deleted ${category}`, "success");
 }
 
-// ====================
-// BUDGET PLANNER
-// ====================
-
 async function loadBudgetPlanner() {
-  const selectedYear =
-    Number(
-      document.getElementById(
-        "budgetYear"
-      )?.value
-    ) ||
-    Math.min(
-      ...appData.budget.map(
-        item => item.year
-      )
-    );
-  
-  const budgetData =
-    appData.budget.filter(
-      item =>
-        Number(item.year) ===
-        selectedYear
-    );
-  const categoryData = appData.categories;
+  const selectedYear = getSelectedYear();
+  const budgetData = appData.budget.filter(item => Number(item.year) === selectedYear);
 
-  const months = [];
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const categories = {};
   const categoryTypes = {};
 
-  categoryData.forEach(cat => {
+  appData.categories.forEach(cat => {
     categoryTypes[cat.categoryName] = cat.budgetType;
   });
 
   budgetData.forEach(item => {
-    if (!months.includes(item.month)) {
-      months.push(item.month);
-    }
-    if (!categories[item.category]) {
-      categories[item.category] = {};
-    }
+    if (!categories[item.category]) categories[item.category] = {};
     categories[item.category][item.month] = Number(item.plannedAmount);
   });
 
   const container = document.getElementById("budget");
+  if (!container) return;
 
-  // Wrap ONLY the table inside the scrollable container
   let html = `
     <div class="table-responsive">
       <table>
         <tr>
           <th>Category</th>
+          ${months.map(m => `<th>${m}</th>`).join('')}
+        </tr>
   `;
-
-  months.forEach(month => {
-    html += `<th>${month}</th>`;
-  });
-
-  html += `</tr>`;
 
   const sections = ["Income", "Expense", "Savings", "Debt"];
 
   sections.forEach(section => {
-    // Dynamic CSS class mapping for custom section colors
-    const sectionClass = `section-${section.toLowerCase()}`;
-
     html += `
-      <tr class="${sectionClass}">
-        <td colspan="${months.length + 1}">
-          <strong>${section.toUpperCase()}</strong>
-        </td>
+      <tr class="section-${section.toLowerCase()}">
+        <td colspan="${months.length + 1}"><strong>${section.toUpperCase()}</strong></td>
       </tr>
     `;
 
@@ -815,28 +365,13 @@ async function loadBudgetPlanner() {
           <tr style="height: 38px;">
             <td style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
               <span>${category}</span>
-              <span 
-                onclick="deleteBudgetItem('${category}')" 
-                style="cursor: pointer; opacity: 0.5; font-size: 12px;"
-                title="Delete row"
-                onmouseover="this.style.opacity=1" 
-                onmouseout="this.style.opacity=0.5">
-                ✕
-              </span>
+              <span onclick="deleteBudgetItem('${category}')" style="cursor: pointer; opacity: 0.5; font-size: 12px;" title="Delete row">✕</span>
             </td>
         `;
 
         months.forEach(month => {
           const amount = categories[category][month] || "";
-          html += `
-            <td>
-              <input
-                type="number"
-                value="${amount}"
-                id="${category}|${month}"
-              >
-            </td>
-          `;
+          html += `<td><input type="number" value="${amount}" id="${category}|${month}"></td>`;
         });
 
         html += `</tr>`;
@@ -844,20 +379,10 @@ async function loadBudgetPlanner() {
     });
   });
 
-  // Close table and table-responsive wrapper before action buttons
-  const years =
-    [...new Set(
-      appData.budget.map(
-        item => Number(item.year)
-      )
-    )];
-  
-  const currentYear =
-    Math.max(...years);
-  
-  const nextYear =
-    currentYear + 1;
-  
+  const years = [...new Set(appData.budget.map(item => Number(item.year)))].filter(Boolean);
+  const currentYear = years.length ? Math.max(...years) : new Date().getFullYear();
+  const nextYear = currentYear + 1;
+
   html += `
       </table>
     </div>
@@ -866,27 +391,17 @@ async function loadBudgetPlanner() {
       <button onclick="copyJanuaryToWholeYear()">📋 Copy Jan → Whole Year</button>
       <button onclick="copyCurrentYearToNextYear()">📅 Copy ${currentYear} → ${nextYear}</button>
     </div>
-    <span id="saveStatus" style="display: block; text-align: center; margin-top: 8px;"></span>
   `;
 
   container.innerHTML = html;
 }
 
 async function loadSummary() {
-
-  const selectedYear =
-    getSelectedYear();
-
-  const budgetData =
-    appData.budget.filter(
-      item =>
-        Number(item.year) ===
-        selectedYear
-    );
-  const categoryData = appData.categories;
+  const selectedYear = getSelectedYear();
+  const budgetData = appData.budget.filter(item => Number(item.year) === selectedYear);
 
   const categoryTypes = {};
-  categoryData.forEach(cat => {
+  appData.categories.forEach(cat => {
     categoryTypes[cat.categoryName] = cat.budgetType;
   });
 
@@ -917,20 +432,17 @@ async function loadSummary() {
   `;
 
   Object.keys(monthlyTotals).forEach(month => {
-    const income = monthlyTotals[month].Income;
-    const expense = monthlyTotals[month].Expense;
-    const savings = monthlyTotals[month].Savings;
-    const debt = monthlyTotals[month].Debt;
-    const remaining = income - expense - savings - debt;
+    const { Income, Expense, Savings, Debt } = monthlyTotals[month];
+    const remaining = Income - Expense - Savings - Debt;
 
     html += `
       <tr>
         <td>${month}</td>
-        <td class="col-income">₱${income.toLocaleString()}</td>
-        <td class="col-expense">₱${expense.toLocaleString()}</td>
-        <td class="col-savings">₱${savings.toLocaleString()}</td>
-        <td class="col-debt">₱${debt.toLocaleString()}</td>
-        <td>₱${remaining.toLocaleString()}</td>
+        <td class="col-income">${formatCurrency(Income)}</td>
+        <td class="col-expense">${formatCurrency(Expense)}</td>
+        <td class="col-savings">${formatCurrency(Savings)}</td>
+        <td class="col-debt">${formatCurrency(Debt)}</td>
+        <td>${formatCurrency(remaining)}</td>
       </tr>
     `;
   });
@@ -940,162 +452,74 @@ async function loadSummary() {
 }
 
 async function loadDashboard() {
-
-  const selectedYear =
-  getSelectedYear();
-
-  const budgetData =
-    appData.budget.filter(
-      item =>
-        Number(item.year) ===
-        selectedYear
-    );
-  
-  const categoryData =
-    appData.categories;
+  const selectedYear = getSelectedYear();
+  const budgetData = appData.budget.filter(item => Number(item.year) === selectedYear);
 
   const categoryTypes = {};
-
-  categoryData.forEach(cat => {
-    categoryTypes[cat.categoryName] =
-      cat.budgetType;
+  appData.categories.forEach(cat => {
+    categoryTypes[cat.categoryName] = cat.budgetType;
   });
 
-  let income = 0;
-  let expense = 0;
-  let savings = 0;
-  let debt = 0;
+  let income = 0, expense = 0, savings = 0, debt = 0;
 
   budgetData.forEach(item => {
+    if (item.month !== "Jan") return;
+    const type = categoryTypes[item.category];
+    const amount = Number(item.plannedAmount);
 
-    if (item.month !== "Jan")
-      return;
-
-    const type =
-      categoryTypes[item.category];
-
-    const amount =
-      Number(item.plannedAmount);
-
-    if (type === "Income")
-      income += amount;
-
-    if (type === "Expense")
-      expense += amount;
-
-    if (type === "Savings")
-      savings += amount;
-
-    if (type === "Debt")
-      debt += amount;
-
+    if (type === "Income") income += amount;
+    if (type === "Expense") expense += amount;
+    if (type === "Savings") savings += amount;
+    if (type === "Debt") debt += amount;
   });
 
-  const remaining =
-    income - expense - savings - debt;
+  const remaining = income - expense - savings - debt;
+  const annualSurplus = remaining * 12;
+  const savingsRate = income > 0 ? ((savings / income) * 100).toFixed(1) : "0.0";
+  const debtRate = income > 0 ? ((debt / income) * 100).toFixed(1) : "0.0";
 
-  const annualSurplus =
-    remaining * 12;
-
-  const savingsRate =
-    ((savings / income) * 100)
-      .toFixed(1);
-
-  const debtRate =
-    ((debt / income) * 100)
-      .toFixed(1);
-
-  document.getElementById(
-    "dashboard"
-  ).innerHTML = `
-
+  document.getElementById("dashboard").innerHTML = `
     <div class="card">
-
-      <h2>
-        💰 Financial Health
-      </h2>
-
-      <div class="metric-row">
-        <span>Monthly Surplus</span>
-        <strong>
-          ₱${Math.round(remaining).toLocaleString()}
-        </strong>
-      </div>
-
-      <div class="metric-row">
-        <span>Annual Surplus</span>
-        <strong>
-          ₱${Math.round(annualSurplus).toLocaleString()}
-        </strong>
-      </div>
-
-      <div class="metric-row">
-        <span>Savings Rate</span>
-        <strong>
-          ${savingsRate}%
-        </strong>
-      </div>
-
-      <div class="metric-row">
-        <span>Debt Rate</span>
-        <strong>
-          ${debtRate}%
-        </strong>
-      </div>
-
-      <div class="metric-row">
-        <span>Status</span>
-        <strong>
-          ${
-            remaining > 0
-            ? "✅ Positive Cash Flow"
-            : "❌ Negative Cash Flow"
-          }
-        </strong>
-      </div>
-
+      <h2>💰 Financial Health</h2>
+      <div class="metric-row"><span>Monthly Surplus</span><strong>${formatCurrency(remaining)}</strong></div>
+      <div class="metric-row"><span>Annual Surplus</span><strong>${formatCurrency(annualSurplus)}</strong></div>
+      <div class="metric-row"><span>Savings Rate</span><strong>${savingsRate}%</strong></div>
+      <div class="metric-row"><span>Debt Rate</span><strong>${debtRate}%</strong></div>
+      <div class="metric-row"><span>Status</span><strong>${remaining > 0 ? "✅ Positive Cash Flow" : "❌ Negative Cash Flow"}</strong></div>
     </div>
-
   `;
 }
 
-// ====================
-// GOALS (UPDATED)
-// ====================
 async function loadGoals() {
-  const goals = appData.goals;
-  const container = document.getElementById("financialGoals"); // Updated to match index.html
-
+  const container = document.getElementById("financialGoals");
   if (!container) return;
 
   let html = `<div class="goals-container">`;
 
-  goals.forEach(goal => {
-    const progress = ((goal.current / goal.target) * 100).toFixed(1);
-    const remainingAmount = goal.target - goal.current;
-    const monthsRemaining = Math.ceil(remainingAmount / goal.monthlyContribution);
+  appData.goals.forEach(goal => {
+    const current = Number(goal.current || 0);
+    const target = Number(goal.target || 1);
+    const monthlyContribution = Number(goal.monthlyContribution || 1);
+    const progress = ((current / target) * 100).toFixed(1);
+    const remainingAmount = target - current;
+    const monthsRemaining = Math.ceil(remainingAmount / monthlyContribution);
 
     const completionDate = new Date();
     completionDate.setMonth(completionDate.getMonth() + monthsRemaining);
 
-    const forecast = completionDate.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short"
-    });
+    const forecast = completionDate.toLocaleDateString("en-US", { year: "numeric", month: "short" });
 
     html += `
       <div class="goal-item">
         <div class="item-header">
           <span class="item-title">🎯 ${goal.goal}</span>
-          <span class="item-value">₱${Number(goal.current).toLocaleString()}</span>
+          <span class="item-value">${formatCurrency(current)}</span>
         </div>
-        
         <div class="progress-bar-bg">
           <div class="progress-bar-fill" style="width: ${Math.min(progress, 100)}%;"></div>
         </div>
-
         <div class="goal-details">
-          <span>Target: ₱${Number(goal.target).toLocaleString()} (${progress}%)</span>
+          <span>Target: ${formatCurrency(target)} (${progress}%)</span>
           <span>Est: <strong>${forecast}</strong> (${monthsRemaining} mos)</span>
         </div>
       </div>
@@ -1106,25 +530,13 @@ async function loadGoals() {
   container.innerHTML = html;
 }
 
-// ====================
-// NET WORTH HERO BANNER (DYNAMIC)
-// ====================
 async function loadNetWorth() {
-  const accounts = appData.accounts;
+  let assets = 0, liabilities = 0;
 
-  let assets = 0;
-  let liabilities = 0;
-
-  accounts.forEach(account => {
+  appData.accounts.forEach(account => {
     const balance = Number(account.currentBalance || account.balance || 0);
-
-    if (account.netWorthType === "Asset") {
-      assets += balance;
-    }
-
-    if (account.netWorthType === "Liability") {
-      liabilities += balance;
-    }
+    if (account.netWorthType === "Asset") assets += balance;
+    if (account.netWorthType === "Liability") liabilities += balance;
   });
 
   const netWorth = assets - liabilities;
@@ -1134,7 +546,6 @@ async function loadNetWorth() {
     <div class="networth-banner ${isNegative ? 'negative' : 'positive'}">
       <h2>💎 Net Worth</h2>
       <div class="big-amount">${formatCurrency(netWorth)}</div>
-      
       <div class="networth-details">
         <span>Assets: <strong>${formatCurrency(assets)}</strong></span>
         <span>Liabilities: <strong>${formatCurrency(liabilities)}</strong></span>
@@ -1144,345 +555,130 @@ async function loadNetWorth() {
 }
 
 async function loadProjection() {
-
-  const accounts =
-  appData.accounts;
-
-  const selectedYear =
-  getSelectedYear();
-
-  const budgetData =
-    appData.budget.filter(
-      item =>
-        Number(item.year) ===
-        selectedYear
-    );
-  
-  const categories =
-    appData.categories;
+  const selectedYear = getSelectedYear();
+  const budgetData = appData.budget.filter(item => Number(item.year) === selectedYear);
 
   const categoryTypes = {};
-
-  categories.forEach(cat => {
-
-    categoryTypes[cat.categoryName] =
-      cat.budgetType;
-
+  appData.categories.forEach(cat => {
+    categoryTypes[cat.categoryName] = cat.budgetType;
   });
 
-  let assets = 0;
-  let liabilities = 0;
-
-  accounts.forEach(account => {
-
-    const balance =
-      Number(account.currentBalance);
-
-    if (
-      account.netWorthType === "Asset"
-    ) {
-      assets += balance;
-    }
-
-    if (
-      account.netWorthType === "Liability"
-    ) {
-      liabilities += balance;
-    }
-
+  let assets = 0, liabilities = 0;
+  appData.accounts.forEach(account => {
+    const balance = Number(account.currentBalance || account.balance || 0);
+    if (account.netWorthType === "Asset") assets += balance;
+    if (account.netWorthType === "Liability") liabilities += balance;
   });
 
-  let income = 0;
-  let expense = 0;
-  let savings = 0;
-  let debt = 0;
-
+  let income = 0, expense = 0, savings = 0, debt = 0;
   budgetData.forEach(item => {
-
     if (item.month !== "Jan") return;
+    const amount = Number(item.plannedAmount);
+    const type = categoryTypes[item.category];
 
-    const amount =
-      Number(item.plannedAmount);
-
-    const type =
-      categoryTypes[item.category];
-
-    if (type === "Income")
-      income += amount;
-
-    if (type === "Expense")
-      expense += amount;
-
-    if (type === "Savings")
-      savings += amount;
-
-    if (type === "Debt")
-      debt += amount;
-
+    if (type === "Income") income += amount;
+    if (type === "Expense") expense += amount;
+    if (type === "Savings") savings += amount;
+    if (type === "Debt") debt += amount;
   });
 
-  const monthlySurplus =
-    income - expense - savings - debt;
+  const monthlySurplus = income - expense - savings - debt;
+  const annualSurplus = monthlySurplus * 12;
+  const projectedAssets = assets + annualSurplus;
+  const projectedNetWorth = projectedAssets - liabilities;
 
-  const annualSurplus =
-    monthlySurplus * 12;
-
-  const projectedAssets =
-    assets + annualSurplus;
-
-  const projectedNetWorth =
-    projectedAssets - liabilities;
-
-  document.getElementById(
-  "projection"
-).innerHTML = `
-
-<div class="card">
-
-  <h2>
-    📈 Wealth Projection
-  </h2>
-
-  <div class="metric-row">
-    <span>Current Assets</span>
-    <strong>
-      ₱${Math.round(assets).toLocaleString()}
-    </strong>
-  </div>
-
-  <div class="metric-row">
-    <span>Current Net Worth</span>
-    <strong>
-      ₱${Math.round(
-        assets - liabilities
-      ).toLocaleString()}
-    </strong>
-  </div>
-
-  <hr>
-
-  <div class="metric-row">
-    <span>Projected Assets</span>
-    <strong>
-      ₱${Math.round(
-        projectedAssets
-      ).toLocaleString()}
-    </strong>
-  </div>
-
-  <div class="metric-row">
-    <span>Projected Net Worth</span>
-    <strong>
-      ₱${Math.round(
-        projectedNetWorth
-      ).toLocaleString()}
-    </strong>
-  </div>
-
-</div>
-
-`;
-
+  document.getElementById("projection").innerHTML = `
+    <div class="card">
+      <h2>📈 Wealth Projection</h2>
+      <div class="metric-row"><span>Current Assets</span><strong>${formatCurrency(assets)}</strong></div>
+      <div class="metric-row"><span>Current Net Worth</span><strong>${formatCurrency(assets - liabilities)}</strong></div>
+      <hr>
+      <div class="metric-row"><span>Projected Assets</span><strong>${formatCurrency(projectedAssets)}</strong></div>
+      <div class="metric-row"><span>Projected Net Worth</span><strong>${formatCurrency(projectedNetWorth)}</strong></div>
+    </div>
+  `;
 }
 
-// ====================
-// FUNDING BREAKDOWN (GROUP TYPE = CASH)
-// ====================
 function loadFundingPlan() {
-  const selectedYear =
-  getSelectedYear();
+  const selectedYear = getSelectedYear();
   const container = document.getElementById("fundingPlanList");
   const cashContainer = document.getElementById("cashToWithdraw");
   if (!container || !appData.budget || !appData.categories) return;
 
-  // Create lookup maps for category properties
   const categoryTypes = {};
   const categoryGroups = {};
 
   appData.categories.forEach(cat => {
     categoryTypes[cat.categoryName] = cat.budgetType;
-    categoryGroups[cat.categoryName] = cat.group; // Map category group
+    categoryGroups[cat.categoryName] = cat.group;
   });
 
-  let totalIncome = 0;
-  let totalExpense = 0;
-  let totalSavings = 0;
-  let totalDebt = 0;
-  let cashToWithdraw = 0;
+  let totalIncome = 0, totalExpense = 0, totalSavings = 0, totalDebt = 0, cashToWithdraw = 0;
 
-  // Calculate totals for January (or baseline month)
   appData.budget
-    .filter(
-      item =>
-        Number(item.year) ===
-        selectedYear
-    )
+    .filter(item => Number(item.year) === selectedYear)
     .forEach(item => {
-    if (item.month !== "Jan") return;
+      if (item.month !== "Jan") return;
 
-    const type = categoryTypes[item.category];
-    const group = categoryGroups[item.category];
-    const amount = Number(item.plannedAmount) || 0;
+      const type = categoryTypes[item.category];
+      const group = categoryGroups[item.category];
+      const amount = Number(item.plannedAmount) || 0;
 
-    if (type === "Income") totalIncome += amount;
-    if (type === "Expense") totalExpense += amount;
-    if (type === "Savings") totalSavings += amount;
-    if (type === "Debt") totalDebt += amount;
+      if (type === "Income") totalIncome += amount;
+      if (type === "Expense") totalExpense += amount;
+      if (type === "Savings") totalSavings += amount;
+      if (type === "Debt") totalDebt += amount;
 
-    // Sum items where Group is explicitly "Cash"
-    if (group === "Cash") {
-      cashToWithdraw += amount;
-    }
-  });
+      if (group === "Cash") cashToWithdraw += amount;
+    });
 
-  // Update banner display with total Cash required
-  if (cashContainer) {
-    cashContainer.textContent = formatCurrency(cashToWithdraw);
-  }
+  if (cashContainer) cashContainer.textContent = formatCurrency(cashToWithdraw);
 
-  // Render rows
   container.innerHTML = `
-    <div class="funding-row">
-      <span class="label">Total Monthly Income</span>
-      <span class="amount">${formatCurrency(totalIncome)}</span>
-    </div>
-    <div class="funding-row">
-      <span class="label">Total Expenses</span>
-      <span class="amount">${formatCurrency(totalExpense)}</span>
-    </div>
-    <div class="funding-row">
-      <span class="label">Total Savings</span>
-      <span class="amount">${formatCurrency(totalSavings)}</span>
-    </div>
-    <div class="funding-row">
-      <span class="label">Total Debt Payments</span>
-      <span class="amount">${formatCurrency(totalDebt)}</span>
-    </div>
-    <div class="funding-row highlight">
-      <span class="label">Cash Requirements</span>
-      <span class="amount">${formatCurrency(cashToWithdraw)}</span>
-    </div>
+    <div class="funding-row"><span class="label">Total Monthly Income</span><span class="amount">${formatCurrency(totalIncome)}</span></div>
+    <div class="funding-row"><span class="label">Total Expenses</span><span class="amount">${formatCurrency(totalExpense)}</span></div>
+    <div class="funding-row"><span class="label">Total Savings</span><span class="amount">${formatCurrency(totalSavings)}</span></div>
+    <div class="funding-row"><span class="label">Total Debt Payments</span><span class="amount">${formatCurrency(totalDebt)}</span></div>
+    <div class="funding-row highlight"><span class="label">Cash Requirements</span><span class="amount">${formatCurrency(cashToWithdraw)}</span></div>
   `;
 }
 
-
 async function copyJanuaryToWholeYear() {
-
-  const confirmed =
-  await showConfirmDialog(
-    "Copy Budget",
-    "Copy January budget amounts to all other months?"
-  );
-  
+  const confirmed = await showConfirmDialog("Copy Budget", "Copy January budget amounts to all other months?");
   if (!confirmed) return;
 
-  await fetch(
-  `${BASE_URL}?action=copyJanuaryToWholeYear`
-  );
-  
-  await new Promise(
-    resolve => setTimeout(resolve, 2000)
-  );
-
+  await fetch(`${BASE_URL}?action=copyJanuaryToWholeYear`);
   await loadData();
+  await refreshUI();
 
-  console.log(
-  "Budget rows:",
-  appData.budget.length
-  );
-  
-  console.log(
-    appData.budget.slice(0, 10)
-  );
-
-  await loadData();
-
-  await loadBudgetPlanner();
-  await loadSummary();
-  await loadDashboard();
-  await loadProjection();
-  await loadGoals();
-  await loadNetWorth();
-  await loadFundingPlan();
-
-  const status =
-    document.getElementById(
-      "globalStatus"
-    );
-
-  if (status) {
-
-    showStatus(
-  "✅ January copied to all months",
-  "success"
-);
-
-  }
-
+  showStatus("✅ January copied to all months", "success");
 }
 
 async function copyCurrentYearToNextYear() {
-
-  const confirmed =
-  await showConfirmDialog(
-    "Create Budget Year",
-    "Generate next year's budget?"
-  );
-
-  
+  const confirmed = await showConfirmDialog("Create Budget Year", "Generate next year's budget?");
   if (!confirmed) return;
 
-  const response =
-    await fetch(
-      `${BASE_URL}?action=copyCurrentYearToNextYear`
-    );
-
-  const result =
-    await response.json();
+  const response = await fetch(`${BASE_URL}?action=copyCurrentYearToNextYear`);
+  const result = await response.json();
 
   await loadData();
-
   if (result.success) {
-
-    showStatus(
-      `✅ ${result.nextYear} budget created`,
-      "success"
-    );
-
+    showStatus(`✅ ${result.nextYear} budget created`, "success");
   } else {
-
-    showStatus(
-      result.message ||
-      "❌ Failed to create next year budget",
-      "error"
-    );
-
+    showStatus(result.message || "❌ Failed to create next year budget", "error");
   }
-
 }
 
-
 async function saveBudgetChanges() {
-  // Optional safety check when overwriting/saving budget changes
-  const confirmed =
-  await showConfirmDialog(
-    "Save Budget",
-    "Save all changes to the budget?"
-  );
+  const confirmed = await showConfirmDialog("Save Budget", "Save all changes to the budget?");
   if (!confirmed) return;
 
   const inputs = document.querySelectorAll("#budget input[type='number']");
   const budgetItems = [];
+  const selectedYear = getSelectedYear();
 
   inputs.forEach(input => {
     const [category, month] = input.id.split("|");
-    const selectedYear =
-      Number(
-        document.getElementById(
-          "budgetYear"
-        ).value
-      );
-    
     budgetItems.push({
       year: selectedYear,
       month: month,
@@ -1494,400 +690,112 @@ async function saveBudgetChanges() {
   try {
     const response = await fetch(BASE_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8"
-      },
-      body: JSON.stringify({
-        action: "saveAllBudgets",
-        budgetItems: budgetItems
-      })
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "saveAllBudgets", budgetItems: budgetItems })
     });
 
     const result = await response.json();
 
     if (result.success) {
       await loadData();
-      await Promise.all([
-        loadBudgetPlanner(),
-        loadSummary(),
-        loadDashboard(),
-        loadProjection(),
-        loadGoals(),
-        loadNetWorth(),
-        loadFundingPlan()
-      ]);
-
-      showStatus(
-  `✅ ${budgetItems.length} items saved successfully at ${new Date().toLocaleTimeString()}`,
-  "success"
-);
+      await refreshUI();
+      showStatus(`✅ Saved ${budgetItems.length} items successfully`, "success");
     } else {
-      showStatus(
-  "❌ Failed to save budget changes.",
-  "error"
-);
+      showStatus("❌ Failed to save budget changes.", "error");
     }
   } catch (error) {
     console.error("Save error:", error);
-    showStatus(
-  "❌ Error saving budget changes.",
-  "error"
-);
+    showStatus("❌ Error saving budget changes.", "error");
   }
 }
 
+// Single aggregated API call to prevent fetch bottlenecks
 async function loadData() {
+  try {
+    const response = await fetch(`${BASE_URL}?action=getAllData`);
+    const result = await response.json();
 
-  const [
-  accounts,
-  budget,
-  categories,
-  goals,
-  transactions
-] = await Promise.all([
-
-    fetch(
-      `${BASE_URL}?action=getAccounts`
-    ).then(r => r.json()),
-
-    fetch(
-      `${BASE_URL}?action=getBudgetPlan`
-    ).then(r => r.json()),
-
-    fetch(
-      `${BASE_URL}?action=getCategories`
-    ).then(r => r.json()),
-
-    fetch(
-      `${BASE_URL}?action=getGoals`
-    ).then(r => r.json()),
-
-    fetch(
-      `${BASE_URL}?action=getTransactions`
-    ).then(r => r.json())
-
-  ]);
-
-  appData.accounts = accounts;
-  appData.budget = budget;
-  appData.categories = categories;
-  appData.goals = goals;
-  appData.transactions = transactions;
-
+    appData.accounts = result.accounts || [];
+    appData.budget = result.budget || [];
+    appData.categories = result.categories || [];
+    appData.goals = result.goals || [];
+    appData.transactions = result.transactions || [];
+  } catch (error) {
+    console.error("Failed to load application data:", error);
+  }
 }
 
 async function loadScenarioCategories() {
-
-  const dropdown =
-    document.getElementById(
-      "scenarioCategory"
-    );
-
+  const dropdown = document.getElementById("scenarioCategory");
   if (!dropdown) return;
 
   dropdown.innerHTML = "";
-
   appData.categories.forEach(cat => {
-
-    dropdown.innerHTML += `
-      <option
-        value="${cat.categoryName}"
-      >
-        ${cat.categoryName}
-      </option>
-    `;
-
+    dropdown.innerHTML += `<option value="${cat.categoryName}">${cat.categoryName}</option>`;
   });
-
 }
 
 function getCurrentAmount(category) {
-
-  const selectedYear =
-  getSelectedYear();
-
-  const item =
-    appData.budget.find(row =>
-      Number(row.year) === selectedYear &&
-      row.category === category &&
-      row.month === "Jan"
-    );
-
-  return item
-    ? Number(item.plannedAmount)
-    : 0;
-
+  const selectedYear = getSelectedYear();
+  const item = appData.budget.find(row =>
+    Number(row.year) === selectedYear && row.category === category && row.month === "Jan"
+  );
+  return item ? Number(item.plannedAmount) : 0;
 }
 
 function runScenario() {
+  const category = document.getElementById("scenarioCategory")?.value;
+  const scenarioAmount = Number(document.getElementById("scenarioAmount")?.value || 0);
+  const currentAmount = getCurrentAmount(category);
+  const difference = scenarioAmount - currentAmount;
 
-  const category =
-    document.getElementById(
-      "scenarioCategory"
-    ).value;
+  const categoryInfo = appData.categories.find(c => c.categoryName === category);
+  const budgetType = categoryInfo ? categoryInfo.budgetType : "";
 
-  const scenarioAmount =
-    Number(
-      document.getElementById(
-        "scenarioAmount"
-      ).value
-    );
+  let income = 0, expense = 0, savings = 0, debt = 0;
+  const selectedYear = getSelectedYear();
 
-  const currentAmount =
-    getCurrentAmount(category);
+  appData.budget
+    .filter(item => Number(item.year) === selectedYear && item.month === "Jan")
+    .forEach(item => {
+      const cat = appData.categories.find(c => c.categoryName === item.category);
+      if (!cat) return;
 
-  const difference =
-    scenarioAmount - currentAmount;
+      const amount = Number(item.plannedAmount);
+      if (cat.budgetType === "Income") income += amount;
+      if (cat.budgetType === "Expense") expense += amount;
+      if (cat.budgetType === "Savings") savings += amount;
+      if (cat.budgetType === "Debt") debt += amount;
+    });
 
-  const categoryInfo =
-  appData.categories.find(
-    c =>
-      c.categoryName === category
-  );
+  const currentSurplus = income - expense - savings - debt;
+  let scenarioSurplus = currentSurplus;
 
-  const budgetType =
-    categoryInfo
-      ? categoryInfo.budgetType
-      : "";
+  if (budgetType === "Income") scenarioSurplus += difference;
+  if (budgetType === "Expense" || budgetType === "Savings" || budgetType === "Debt") scenarioSurplus -= difference;
 
-  let income = 0;
-  let expense = 0;
-  let savings = 0;
-  let debt = 0;
+  const annualDifference = (scenarioSurplus - currentSurplus) * 12;
+  const targetContainer = document.getElementById("scenarioResults") || document.getElementById("scenarioResult");
 
-const selectedYear =
-  getSelectedYear();
+  if (!targetContainer) return;
 
-appData.budget
-  .filter(item =>
-    Number(item.year) === selectedYear
-  )
-  .forEach(item => {
-
-  if (item.month !== "Jan")
-    return;
-
-  const cat =
-    appData.categories.find(
-      c =>
-        c.categoryName === item.category
-    );
-
-  if (!cat) return;
-
-  const amount =
-    Number(item.plannedAmount);
-
-  if (
-    cat.budgetType === "Income"
-  )
-    income += amount;
-
-  if (
-    cat.budgetType === "Expense"
-  )
-    expense += amount;
-
-  if (
-    cat.budgetType === "Savings"
-  )
-    savings += amount;
-
-  if (
-    cat.budgetType === "Debt"
-  )
-    debt += amount;
-
-});
-
-  const currentSurplus =
-  income -
-  expense -
-  savings -
-  debt;
-
-  let scenarioSurplus =
-  currentSurplus;
-
-if (budgetType === "Income") {
-
-  scenarioSurplus +=
-    difference;
-
-}
-
-if (
-  budgetType === "Expense"
-) {
-
-  scenarioSurplus -=
-    difference;
-
-}
-
-if (
-  budgetType === "Savings"
-) {
-
-  scenarioSurplus -=
-    difference;
-
-}
-
-if (
-  budgetType === "Debt"
-) {
-
-  scenarioSurplus -=
-    difference;
-
-}
-
-  const annualDifference =
-  (scenarioSurplus - currentSurplus) * 12;
-
-  const assets =
-  appData.accounts
-    .filter(
-      a =>
-        a.netWorthType === "Asset"
-    )
-    .reduce(
-      (sum, a) =>
-        sum +
-        Number(a.currentBalance),
-      0
-    );
-
-  const liabilities =
-    appData.accounts
-      .filter(
-        a =>
-          a.netWorthType === "Liability"
-      )
-      .reduce(
-        (sum, a) =>
-          sum +
-          Number(a.currentBalance),
-        0
-      );
-
-  const currentProjectedNetWorth =
-  assets +
-  (currentSurplus * 12) -
-  liabilities;
-
-  const scenarioProjectedNetWorth =
-    assets +
-    (scenarioSurplus * 12) -
-    liabilities;
-  
-  const netWorthDifference =
-    scenarioProjectedNetWorth -
-    currentProjectedNetWorth;
-
-  document.getElementById(
-    "scenarioResult"
-  ).innerHTML = `
-
+  targetContainer.innerHTML = `
     <div class="card">
-
-      <h3>
-        Scenario Result
-      </h3>
-
-      <p>
-        Category:
-        <strong>
-          ${category}
-        </strong>
-      </p>
-
-      <p>
-        Current Amount:
-        <strong>
-          ₱${currentAmount.toLocaleString()}
-        </strong>
-      </p>
-
-      <p>
-        Scenario Amount:
-        <strong>
-          ₱${scenarioAmount.toLocaleString()}
-        </strong>
-      </p>
-
-      <p>
-  Difference:
-  <strong>
-    ₱${difference.toLocaleString()}
-  </strong>
-      </p>
-      
+      <h3>Scenario Result</h3>
+      <p>Category: <strong>${category}</strong></p>
+      <p>Current Amount: <strong>${formatCurrency(currentAmount)}</strong></p>
+      <p>Scenario Amount: <strong>${formatCurrency(scenarioAmount)}</strong></p>
+      <p>Difference: <strong>${formatCurrency(difference)}</strong></p>
       <hr>
-      
-      <p>
-        Current Monthly Surplus:
-        <strong>
-          ₱${currentSurplus.toLocaleString()}
-        </strong>
-      </p>
-      
-      <p>
-        Scenario Monthly Surplus:
-        <strong>
-          ₱${scenarioSurplus.toLocaleString()}
-        </strong>
-      </p>
-
-      <p>
-        Annual Impact:
-        <strong>
-          ₱${annualDifference.toLocaleString()}
-        </strong>
-      </p>
-
-      <hr>
-
-      <p>
-        Current Projected Net Worth:
-        <strong>
-          ₱${currentProjectedNetWorth.toLocaleString()}
-        </strong>
-      </p>
-      
-      <p>
-        Scenario Projected Net Worth:
-        <strong>
-          ₱${scenarioProjectedNetWorth.toLocaleString()}
-        </strong>
-      </p>
-      
-      <p>
-        Net Worth Impact:
-        <strong>
-          ₱${netWorthDifference.toLocaleString()}
-        </strong>
-      </p>
-
+      <p>Current Monthly Surplus: <strong>${formatCurrency(currentSurplus)}</strong></p>
+      <p>Scenario Monthly Surplus: <strong>${formatCurrency(scenarioSurplus)}</strong></p>
+      <p>Annual Impact: <strong>${formatCurrency(annualDifference)}</strong></p>
     </div>
-
   `;
-
 }
 
 async function changeBudgetYear() {
-
-  await Promise.all([
-    loadBudgetPlanner(),
-    loadSummary(),
-    loadDashboard(),
-    loadProjection(),
-    loadFundingPlan()
-  ]);
-
-  loadBudgetVsActual();
-
+  await refreshUI();
 }
 
 function loadBudgetVsActual() {
@@ -1895,7 +803,7 @@ function loadBudgetVsActual() {
   if (!container) return;
 
   const selectedYear = Number(getSelectedYear());
-  const selectedMonth = typeof getSelectedMonth === "function" ? getSelectedMonth() : "Jan"; 
+  const selectedMonth = getSelectedMonth();
 
   const monthMap = {
     Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
@@ -1903,7 +811,6 @@ function loadBudgetVsActual() {
   };
   const targetMonthIndex = monthMap[selectedMonth] ?? 0;
 
-  // 1. Map Budget Data
   const budgetMap = {};
   (appData.budget || [])
     .filter(row => Number(row.year) === selectedYear && row.month === selectedMonth)
@@ -1911,19 +818,16 @@ function loadBudgetVsActual() {
       budgetMap[row.category] = Number(row.plannedAmount) || 0;
     });
 
-  // 2. Map Actual Transactions Data
   const actualMap = {};
   (appData.transactions || []).forEach(tx => {
-    // Search dynamically across possible case variations for object properties
     const rawDate = tx.Date || tx.date || tx.DATE;
     if (!rawDate) return;
 
-    // Handle "YYYY-MM-DD" safely without timezone offset shift
     let txYear, txMonthIndex;
     if (typeof rawDate === "string" && rawDate.includes("-")) {
       const parts = rawDate.split("T")[0].split("-");
       txYear = Number(parts[0]);
-      txMonthIndex = Number(parts[1]) - 1; // 0-indexed month
+      txMonthIndex = Number(parts[1]) - 1;
     } else {
       const txDate = new Date(rawDate);
       if (isNaN(txDate.getTime())) return;
@@ -1933,40 +837,19 @@ function loadBudgetVsActual() {
 
     if (txYear !== selectedYear || txMonthIndex !== targetMonthIndex) return;
 
-    // Grab Category Name safely from standard Google Sheet fields
-    const category = 
-      tx["Budget Position"] || 
-      tx["budgetPosition"] || 
-      tx["BudgetPosition"] || 
-      tx.Category || 
-      tx.category;
-
+    const category = tx["Budget Position"] || tx["budgetPosition"] || tx.Category || tx.category;
     if (!category) return;
 
     const rawAmount = tx.Amount || tx.amount || tx.AMOUNT || 0;
-    const amount = Math.abs(Number(rawAmount) || 0);
-
-    if (!actualMap[category]) {
-      actualMap[category] = 0;
-    }
-    actualMap[category] += amount;
+    actualMap[category] = (actualMap[category] || 0) + Math.abs(Number(rawAmount) || 0);
   });
 
-  // 3. Combine categories
-  const categories = [
-    ...new Set([
-      ...Object.keys(budgetMap),
-      ...Object.keys(actualMap)
-    ])
-  ];
-
-  // 4. Build Category Type Map
+  const categories = [...new Set([...Object.keys(budgetMap), ...Object.keys(actualMap)])];
   const categoryTypes = {};
+
   (appData.categories || []).forEach(cat => {
     const catName = cat.categoryName || cat.category || cat.name;
-    if (catName) {
-      categoryTypes[catName] = cat.budgetType;
-    }
+    if (catName) categoryTypes[catName] = cat.budgetType;
   });
 
   const sections = ["Income", "Expense", "Savings", "Debt"];
@@ -1974,7 +857,6 @@ function loadBudgetVsActual() {
   let grandBudget = 0;
   let grandActual = 0;
 
-  // 5. Build Section Rows
   sections.forEach(section => {
     const sectionCategories = categories
       .filter(cat => categoryTypes[cat] === section)
@@ -1984,9 +866,7 @@ function loadBudgetVsActual() {
 
     rows += `
       <tr class="table-secondary section-${section.toLowerCase()}">
-        <td colspan="4">
-          <strong>${section.toUpperCase()}</strong>
-        </td>
+        <td colspan="4"><strong>${section.toUpperCase()}</strong></td>
       </tr>
     `;
 
@@ -1999,10 +879,8 @@ function loadBudgetVsActual() {
 
       sectionBudget += budget;
       sectionActual += actual;
-
       grandBudget += budget;
       grandActual += actual;
-
 
       const variance = section === "Income" ? actual - budget : budget - actual;
 
@@ -2032,41 +910,19 @@ function loadBudgetVsActual() {
     `;
   });
 
-  const grandVariance =
-  grandBudget - grandActual;
+  const grandVariance = grandBudget - grandActual;
 
-rows += `
+  rows += `
+    <tr class="grand-total">
+      <td><strong>GRAND TOTAL</strong></td>
+      <td><strong>${formatCurrency(grandBudget)}</strong></td>
+      <td><strong>${formatCurrency(grandActual)}</strong></td>
+      <td class="${grandVariance >= 0 ? "text-success" : "text-danger"}">
+        <strong>${grandVariance >= 0 ? "+" : ""}${formatCurrency(grandVariance)}</strong>
+      </td>
+    </tr>
+  `;
 
-  <tr class="grand-total">
-
-    <td><strong>GRAND TOTAL</strong></td>
-
-    <td><strong>${formatCurrency(grandBudget)}</strong></td>
-
-    <td><strong>${formatCurrency(grandActual)}</strong></td>
-
-    <td class="${
-      grandVariance >= 0
-        ? "text-success"
-        : "text-danger"
-    }">
-
-      <strong>
-        ${
-          grandVariance >= 0
-            ? "+"
-            : ""
-        }
-        ${formatCurrency(grandVariance)}
-      </strong>
-
-    </td>
-
-  </tr>
-
-`;
-
-  // 6. Inject HTML Table
   container.innerHTML = `
     <div class="table-responsive">
       <table class="table table-hover align-middle">
@@ -2086,20 +942,14 @@ rows += `
   `;
 }
 
-
-// ====================
-// LOAD APP
-// ====================
-async function initializeApp() {
-
-  await loadData();
-
+async function refreshUI() {
   loadYearDropdown();
-  
+  loadCategoryDropdown();
   loadTransactionAccounts();
   loadTransactionPositions();
   loadTransactions();
   loadBudgetVsActual();
+  loadScenarioCategories();
 
   await Promise.all([
     loadNetWorth(),
@@ -2111,23 +961,18 @@ async function initializeApp() {
     loadSummary(),
     loadFundingPlan()
   ]);
+}
 
-  loadCategoryDropdown();
-
-  loadScenarioCategories();
-
-  // Highlight active navigation section on scroll
+async function initializeApp() {
+  await loadData();
+  await refreshUI();
   setupScrollSpy();
-
 }
 
 initializeApp();
 
-// ====================
-// BACK TO TOP BUTTON
-// ====================
+// Back to Top Button Listener
 const backToTop = document.getElementById("backToTop");
-
 if (backToTop) {
   window.addEventListener("scroll", () => {
     if (window.scrollY > 500) {
@@ -2138,18 +983,11 @@ if (backToTop) {
   });
 
   backToTop.addEventListener("click", () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   });
 }
 
-
-
-// ====================
-// SCROLL SPY NAVIGATION
-// ====================
+// ScrollSpy Navigation
 function setupScrollSpy() {
   const sections = document.querySelectorAll("section[id], div[id]");
   const navLinks = document.querySelectorAll(".section-nav a");
@@ -2169,16 +1007,12 @@ function setupScrollSpy() {
     });
   };
 
-  // Handle Click Events
   navLinks.forEach((link) => {
-    link.addEventListener("click", (e) => {
+    link.addEventListener("click", () => {
       const targetId = link.getAttribute("href").replace("#", "");
-      
-      // Lock the observer temporarily
       isClicking = true;
       setActiveLink(targetId);
 
-      // Release lock after smooth scroll completes (approx 800ms)
       clearTimeout(clickTimeout);
       clickTimeout = setTimeout(() => {
         isClicking = false;
@@ -2186,7 +1020,6 @@ function setupScrollSpy() {
     });
   });
 
-  // IntersectionObserver for manual scrolling
   const observerOptions = {
     root: null,
     rootMargin: "-20% 0px -60% 0px",
@@ -2194,9 +1027,7 @@ function setupScrollSpy() {
   };
 
   const observer = new IntersectionObserver((entries) => {
-    // Skip observer state updates if the user just clicked a nav link
     if (isClicking) return;
-
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         setActiveLink(entry.target.getAttribute("id"));
