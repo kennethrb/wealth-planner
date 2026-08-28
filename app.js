@@ -2126,7 +2126,7 @@ initializeApp();
 // ====================
 // BACK TO TOP BUTTON
 // ====================
-const backToTop = document.getElementById("backToTop");[cite: 18]
+const backToTop = document.getElementById("backToTop");
 
 if (backToTop) {
   window.addEventListener("scroll", () => {
