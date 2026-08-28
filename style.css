@@ -241,31 +241,68 @@ tr:hover {
   font-weight: 500;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05); /* Slight shadow when scrolling */
 }
-/* Compact styling for Monthly Summary table */
-#summary {
+
+/* Container fix: Prevent tables from breaking out of card borders */
+#summary, #budget {
   width: 100%;
+  max-width: 100%;
   overflow-x: auto;
+  box-sizing: border-box;
   border-radius: var(--radius-lg, 8px);
+  -webkit-overflow-scrolling: touch;
 }
 
+/* Base table layout for Monthly Summary */
 #summary table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: auto;
 }
 
+/* Cell padding and alignment */
 #summary th, 
 #summary td {
-  padding: 8px 12px;
+  padding: 10px 12px;
   font-size: 13px;
+  text-align: center;
   white-space: nowrap;
-  text-align: right;
 }
 
-/* Align the month column to the left */
+/* Sticky left column for month names */
 #summary th:first-child,
 #summary td:first-child {
   text-align: left;
   font-weight: 600;
+  position: sticky;
+  left: 0;
+  background: #ffffff;
+  z-index: 2;
+}
+/* Action button spacing & mobile layout */
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px; /* Gives breathing room between buttons */
+  margin-top: 12px;
+}
+
+.action-buttons button {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+}
+
+/* Mobile fine-tuning */
+@media screen and (max-width: 768px) {
+  .action-buttons {
+    flex-direction: column; /* Stacks vertically on small screens */
+    gap: 12px;
+  }
+
+  .action-buttons button {
+    width: 100%; /* Full width touch targets */
+  }
 }
 
 /* Layout Utilities */
