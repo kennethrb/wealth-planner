@@ -1930,7 +1930,7 @@ function loadBudgetVsActual() {
 
     // Section Total Row
     rows += `
-      <tr class="table-light">
+      <tr class="section-total total-${section.toLowerCase()}">
         <td><strong>TOTAL ${section.toUpperCase()}</strong></td>
         <td><strong>${formatCurrency(sectionBudget)}</strong></td>
         <td><strong>${formatCurrency(sectionActual)}</strong></td>
