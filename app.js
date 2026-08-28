@@ -1827,6 +1827,8 @@ async function changeBudgetYear() {
     loadFundingPlan()
   ]);
 
+  loadBudgetVsActual();
+
 }
 
 function loadBudgetVsActual() {
@@ -2030,11 +2032,13 @@ function loadBudgetVsActual() {
 async function initializeApp() {
 
   await loadData();
+
+  loadYearDropdown();
+  
   loadTransactionAccounts();
   loadTransactionPositions();
   loadTransactions();
   loadBudgetVsActual();
-  loadYearDropdown();
 
   await Promise.all([
   loadNetWorth(),
