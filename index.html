@@ -99,6 +99,73 @@
       <!-- Responsive Scroll Container -->
       <div id="summary" class="table-responsive"></div>
     </section>
+    <!-- Monthly Transaction Section -->
+    <section class="card">
+
+      <h2>
+        💳 Transaction Tracker
+      </h2>
+    
+      <div class="form-row">
+    
+        <input
+          type="date"
+          id="txDate">
+    
+        <input
+          type="number"
+          id="txAmount"
+          placeholder="Amount">
+    
+        <input
+          type="text"
+          id="txDetails"
+          placeholder="Details">
+    
+        <select id="txAccount"></select>
+    
+        <select
+          id="txBudgetType"
+          onchange="loadTransactionPositions()">
+    
+          <option value="Income">
+            Income
+          </option>
+    
+          <option value="Expense">
+            Expense
+          </option>
+    
+          <option value="Savings">
+            Savings
+          </option>
+    
+          <option value="Debt">
+            Debt
+          </option>
+    
+        </select>
+    
+        <select
+          id="txBudgetPosition">
+        </select>
+    
+        <button
+          onclick="addTransaction()">
+    
+          Add Transaction
+    
+        </button>
+    
+      </div>
+    
+      <div
+        id="transactionsList"
+        class="margin-top">
+    
+      </div>
+    
+    </section>
 
     <!-- Scenario Simulator -->
     <section class="card">
