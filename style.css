@@ -4,24 +4,17 @@
    VARIABLES & BASE
 ==================== */
 :root {
-  /* Core Color Palette */
-  --primary: #198754;         /* Header Green */
-  --primary-hover: #157347;
-  --bg-main: #F7F8FC;         /* Background */
-  --surface: #FFFFFF;         /* White Card */
-  --border: #E5E7EB;          /* Border Gray */
-  --text-main: #1E293B;       /* Text Dark */
+  --primary: #10b981;
+  --primary-hover: #059669;
+  --primary-light: #ecfdf5;
+  --bg-main: #f8fafc;
+  --surface: #ffffff;
+  --text-main: #0f172a;
   --text-muted: #64748b;
-
-  /* Specific Section Colors */
-  --color-income: #22C55E;   /* Income */
-  --color-expense: #EF4444;  /* Expense */
-  --color-savings: #3B82F6;  /* Savings */
-  --color-debt: #F59E0B;     /* Debt */
-
-  /* Layout & Shadows */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.08);
+  --border: #e2e8f0;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 12px -2px rgba(0,0,0,0.08);
+  --shadow-lg: 0 12px 28px -4px rgba(0,0,0,0.12);
   --radius-lg: 16px;
   --radius-md: 10px;
   --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -55,6 +48,19 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 20px;
   margin-bottom: 32px;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.divider {
+  margin: 16px 0;
+  border: 0;
+  border-top: 1px solid var(--border);
 }
 
 /* ====================
@@ -94,12 +100,12 @@ body {
 }
 
 .hero-card {
-  background: linear-gradient(135deg, #157347 0%, var(--primary) 100%);
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
   color: white;
   border-radius: var(--radius-lg);
   padding: 32px;
   text-align: center;
-  box-shadow: 0 10px 25px -5px rgba(25, 135, 84, 0.3);
+  box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.3);
 }
 
 .hero-card h2 {
@@ -115,6 +121,36 @@ body {
   font-weight: 700;
   letter-spacing: -0.03em;
   margin: 0 0 8px 0;
+}
+
+/* ====================
+   FORMS & INPUTS
+==================== */
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.form-row input, 
+.form-row select {
+  flex: 1;
+  min-width: 140px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text-main);
+  background-color: #fff;
+  transition: var(--transition);
+  outline: none;
+}
+
+input:focus, select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }
 
 /* ====================
@@ -143,36 +179,42 @@ button:hover {
   box-shadow: var(--shadow-md);
 }
 
+button:active {
+  transform: translateY(0);
+}
+
+.delete-btn {
+  background-color: #ef4444;
+}
+
+.delete-btn:hover {
+  background-color: #dc2626;
+}
+
 .action-buttons {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-wrap: wrap;
   justify-content: center;
+  align-items: center;
   gap: 12px;
   margin-top: 16px;
+  margin-bottom: 8px;
   width: 100%;
 }
 
 .action-buttons button {
-  width: 100%;
-}
-
-@media screen and (min-width: 769px) {
-  .action-buttons {
-    flex-direction: row;
-  }
-  .action-buttons button {
-    width: auto;
-  }
+  padding: 10px 16px;
+  font-weight: 600;
 }
 
 /* ====================
-   TABLE BASE STYLES
+   TABLES & RESPONSIVE SCROLL
 ==================== */
-.table-responsive, #summary {
+.table-responsive, #summary, #budget {
   width: 100%;
   max-width: 100%;
   overflow-x: auto;
+  box-sizing: border-box;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
   background: var(--surface);
@@ -183,6 +225,7 @@ button:hover {
 table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: auto;
 }
 
 th {
@@ -201,84 +244,72 @@ td, th {
   white-space: nowrap;
   border-bottom: 1px solid var(--border);
   font-size: 13px;
-  color: var(--text-main);
 }
 
-/* Sticky First Column */
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover {
+  background-color: #f8fafc;
+}
+
+/* Sticky First Column (Categories / Months) */
 #budget td:first-child,
 #summary td:first-child,
 #summary th:first-child {
   position: sticky;
   left: 0;
-  background: var(--surface);
+  background: #ffffff;
   z-index: 2;
   text-align: left;
   font-weight: 600;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
 }
 
+/* Budget Table Specific Inputs */
 #budget input[type="number"] {
-  width: 75px !important;
+  width: 70px !important;
   padding: 4px 6px;
   font-size: 13px;
   border-radius: 6px;
   border: 1px solid var(--border);
   text-align: right;
-  color: var(--text-main);
 }
 
 /* ====================
-   TABLE SECTION SPECIFIC COLORS
+   MOBILE RESPONSIVENESS
 ==================== */
+@media screen and (max-width: 768px) {
+  body {
+    padding: 16px 12px;
+  }
 
-/* Income Sections */
-tr.section-income,
-th.col-income {
-  background-color: rgba(34, 197, 94, 0.12) !important;
-  color: #15803d !important;
-}
-td.col-income,
-tr.section-income td:first-child {
-  background-color: rgba(34, 197, 94, 0.08) !important;
-  color: #15803d !important;
-  font-weight: 600;
-}
+  .card, .hero-card {
+    padding: 16px;
+  }
 
-/* Expense Sections */
-tr.section-expense,
-th.col-expense {
-  background-color: rgba(239, 68, 68, 0.12) !important;
-  color: #b91c1c !important;
-}
-td.col-expense,
-tr.section-expense td:first-child {
-  background-color: rgba(239, 68, 68, 0.08) !important;
-  color: #b91c1c !important;
-  font-weight: 600;
-}
+  .form-row input, 
+  .form-row select {
+    width: 100%;
+    flex: 100%;
+  }
 
-/* Savings Sections */
-tr.section-savings,
-th.col-savings {
-  background-color: rgba(59, 130, 246, 0.12) !important;
-  color: #1d4ed8 !important;
-}
-td.col-savings,
-tr.section-savings td:first-child {
-  background-color: rgba(59, 130, 246, 0.08) !important;
-  color: #1d4ed8 !important;
-  font-weight: 600;
-}
+  /* Force global mobile buttons to stack neatly with padding */
+  .form-row button,
+  .action-buttons button {
+    width: 100%;
+    max-width: 100%;
+    padding: 12px;
+    font-size: 14px;
+  }
 
-/* Debt Sections */
-tr.section-debt,
-th.col-debt {
-  background-color: rgba(245, 158, 11, 0.12) !important;
-  color: #b45309 !important;
-}
-td.col-debt,
-tr.section-debt td:first-child {
-  background-color: rgba(245, 158, 11, 0.08) !important;
-  color: #b45309 !important;
-  font-weight: 600;
+  .action-buttons {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .metric-row {
+    font-size: 13px;
+  }
 }
