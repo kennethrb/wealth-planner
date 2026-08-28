@@ -38,24 +38,39 @@ function showStatus(message) {
 }
 
 // ====================
-// ACCOUNTS (FIXED)
+// ACCOUNTS (VISUAL MATCH TO GOALS)
 // ====================
 function loadAccounts() {
-  const container = document.getElementById("accountsList");
+  const container = document.getElementById("accounts");
   if (!container) return;
 
-  // Handle empty or missing accounts data gracefully
   if (!appData.accounts || appData.accounts.length === 0) {
-    container.innerHTML = `<div class="account-row"><span class="label">No accounts found</span></div>`;
+    container.innerHTML = `<div class="goal-item"><span class="label">No accounts found</span></div>`;
     return;
   }
 
-  container.innerHTML = appData.accounts.map(account => `
-    <div class="account-row">
-      <span class="label">${account.name || account.accountName || 'Unnamed Account'}</span>
-      <span class="amount">${formatCurrency(account.currentBalance || account.balance || 0)}</span>
+  container.innerHTML = `
+    <div class="goals-container">
+      ${appData.accounts.map(account => {
+        const name = account.name || account.accountName || 'Unnamed Account';
+        const balance = Number(account.currentBalance || account.balance || 0);
+        const type = account.netWorthType || 'Asset';
+
+        return `
+          <div class="goal-item">
+            <div class="item-header">
+              <span class="item-title">💳 ${name}</span>
+              <span class="item-value">${formatCurrency(balance)}</span>
+            </div>
+            <div class="goal-details">
+              <span>Type: <strong>${type}</strong></span>
+              <span>Status: <strong class="${type === 'Asset' ? 'text-success' : 'text-danger'}">Active</strong></span>
+            </div>
+          </div>
+        `;
+      }).join('')}
     </div>
-  `).join('');
+  `;
 }
 
 async function addCategory() {
