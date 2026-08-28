@@ -1832,281 +1832,133 @@ async function changeBudgetYear() {
 }
 
 function loadBudgetVsActual() {
-
-  const container =
-    document.getElementById(
-      "budgetVsActual"
-    );
-
+  const container = document.getElementById("budgetVsActual");
   if (!container) return;
 
-  const selectedYear =
-  getSelectedYear();
+  const selectedYear = Number(getSelectedYear());
+  // Dynamically grab selected month, fallback to current/selected month
+  const selectedMonth = typeof getSelectedMonth === "function" ? getSelectedMonth() : "Jan"; 
 
-  const selectedMonth =
-    "Jan";
-
+  // 1. Map Budget Data for Selected Year & Month
   const budgetMap = {};
-
-  appData.budget
-    .filter(row =>
-
-      Number(row.year) === selectedYear &&
-
-      row.month === selectedMonth
-
-    )
+  (appData.budget || [])
+    .filter(row => Number(row.year) === selectedYear && row.month === selectedMonth)
     .forEach(row => {
-
-      budgetMap[
-        row.category
-      ] = Number(
-        row.plannedAmount
-      );
-
+      budgetMap[row.category] = Number(row.plannedAmount) || 0;
     });
 
+  // 2. Map Actual Transactions Data filtered by Year & Month
   const actualMap = {};
-
-  appData.transactions
+  (appData.transactions || [])
+    .filter(tx => {
+      if (!tx.Date) return true; // Fallback if Date isn't present
+      const txDate = new Date(tx.Date);
+      const txYear = txDate.getFullYear();
+      const txMonth = txDate.toLocaleString("en-US", { month: "short" });
+      return txYear === selectedYear && txMonth === selectedMonth;
+    })
     .forEach(tx => {
-
-      const category =
-        tx["Budget Position"];
+      const category = tx["Budget Position"] || tx.Category;
+      if (!category) return;
 
       if (!actualMap[category]) {
-
         actualMap[category] = 0;
-
       }
-
-      actualMap[category] +=
-        Math.abs(
-          Number(tx.Amount)
-        );
-
+      actualMap[category] += Math.abs(Number(tx.Amount) || 0);
     });
 
-  const categories =
-
-    [
-      ...new Set([
-        ...Object.keys(
-          budgetMap
-        ),
-        ...Object.keys(
-          actualMap
-        )
-      ])
-    ];
-
-  const categoryTypes = {};
-
-  appData.categories.forEach(cat => {
-  
-    categoryTypes[
-      cat.categoryName
-    ] = cat.budgetType;
-  
-  });
-  
-  const sections = [
-    "Income",
-    "Expense",
-    "Savings",
-    "Debt"
+  // 3. Combine unique categories from budget and actuals
+  const categories = [
+    ...new Set([
+      ...Object.keys(budgetMap),
+      ...Object.keys(actualMap)
+    ])
   ];
 
-  let rows = "";
-
-  sections.forEach(section => {
-
-  rows += `
-
-    <tr class="section-${section.toLowerCase()}">
-
-      <td colspan="5">
-
-        <strong>
-          ${section.toUpperCase()}
-        </strong>
-
-      </td>
-
-    </tr>
-
-  `;
-
-  const sectionCategories =
-
-  categories
-    .filter(cat =>
-
-      categoryTypes[cat] === section
-
-    )
-    .sort((a, b) =>
-
-      (budgetMap[b] || 0) -
-
-      (budgetMap[a] || 0)
-
-    );
-
-  let sectionBudget = 0;
-  let sectionActual = 0;
-
-  sectionCategories.forEach(cat => {
-
-    const budget =
-      budgetMap[cat] || 0;
-
-    const actual =
-      actualMap[cat] || 0;
-    sectionBudget += budget;
-    sectionActual += actual;
-
-    let variance;
-
-    if (section === "Income") {
-    
-      variance =
-        actual - budget;
-    
-    } else {
-    
-      variance =
-        budget - actual;
-    
-    }
-
-    rows += `
-
-  <tr>
-
-    <td>
-      ${cat}
-    </td>
-
-    <td>
-      ${formatCurrency(budget)}
-    </td>
-
-    <td>
-      ${formatCurrency(actual)}
-    </td>
-
-    <td class="${
-      variance >= 0
-        ? "text-success"
-        : "text-danger"
-    }">
-
-      ${
-        variance >= 0
-          ? "+"
-          : ""
-      }
-
-      ${formatCurrency(variance)}
-
-    </td>
-
-  </tr>
-
-`;
-
+  // 4. Build Category Type Map
+  const categoryTypes = {};
+  (appData.categories || []).forEach(cat => {
+    categoryTypes[cat.categoryName] = cat.budgetType;
   });
 
-    let sectionVariance;
+  const sections = ["Income", "Expense", "Savings", "Debt"];
+  let rows = "";
 
-    if (section === "Income") {
-    
-      sectionVariance =
-        sectionActual -
-        sectionBudget;
-    
-    } else {
-    
-      sectionVariance =
-        sectionBudget -
-        sectionActual;
-    
-    }
+  // 5. Build Section Rows
+  sections.forEach(section => {
+    const sectionCategories = categories
+      .filter(cat => categoryTypes[cat] === section)
+      .sort((a, b) => (budgetMap[b] || 0) - (budgetMap[a] || 0));
 
-}
-  rows += `
+    // Skip empty sections if no budget or actuals exist
+    if (sectionCategories.length === 0) return;
 
-  <tr>
+    rows += `
+      <tr class="table-secondary section-${section.toLowerCase()}">
+        <td colspan="4">
+          <strong>${section.toUpperCase()}</strong>
+        </td>
+      </tr>
+    `;
 
-    <td>
-      <strong>TOTAL</strong>
-    </td>
+    let sectionBudget = 0;
+    let sectionActual = 0;
 
-    <td>
-      <strong>
-        ${formatCurrency(sectionBudget)}
-      </strong>
-    </td>
+    sectionCategories.forEach(cat => {
+      const budget = budgetMap[cat] || 0;
+      const actual = actualMap[cat] || 0;
 
-    <td>
-      <strong>
-        ${formatCurrency(sectionActual)}
-      </strong>
-    </td>
+      sectionBudget += budget;
+      sectionActual += actual;
 
-    <td class="${
-      sectionVariance >= 0
-        ? "text-success"
-        : "text-danger"
-    }">
+      // Positive variance = Good (Over-income or Under-expense/debt/savings)
+      const variance = section === "Income" ? actual - budget : budget - actual;
 
-      <strong>
-
-        ${
-          sectionVariance >= 0
-            ? "+"
-            : ""
-        }
-
-        ${formatCurrency(sectionVariance)}
-
-      </strong>
-
-    </td>
-
-  </tr>
-
-`;
-                  
-                  );
-
-  container.innerHTML = `
-
-    <div class="table-responsive">
-
-      <table>
-
+      rows += `
         <tr>
-
-          <th>Category</th>
-
-          <th>Budget</th>
-
-          <th>Actual</th>
-
-          <th>Variance</th>
-
+          <td>${cat}</td>
+          <td>${formatCurrency(budget)}</td>
+          <td>${formatCurrency(actual)}</td>
+          <td class="${variance >= 0 ? "text-success" : "text-danger"}">
+            ${variance >= 0 ? "+" : ""}${formatCurrency(variance)}
+          </td>
         </tr>
+      `;
+    });
 
-        ${rows}
+    const sectionVariance = section === "Income" ? sectionActual - sectionBudget : sectionBudget - sectionActual;
 
+    // Section Total Row
+    rows += `
+      <tr class="table-light">
+        <td><strong>TOTAL ${section.toUpperCase()}</strong></td>
+        <td><strong>${formatCurrency(sectionBudget)}</strong></td>
+        <td><strong>${formatCurrency(sectionActual)}</strong></td>
+        <td class="${sectionVariance >= 0 ? "text-success" : "text-danger"}">
+          <strong>${sectionVariance >= 0 ? "+" : ""}${formatCurrency(sectionVariance)}</strong>
+        </td>
+      </tr>
+    `;
+  });
+
+  // 6. Inject HTML Table
+  container.innerHTML = `
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Budget</th>
+            <th>Actual</th>
+            <th>Variance</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows || '<tr><td colspan="4" class="text-center text-muted">No data available for this period.</td></tr>'}
+        </tbody>
       </table>
-
     </div>
-
   `;
-
 }
 
 
