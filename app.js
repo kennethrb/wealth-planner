@@ -346,10 +346,12 @@ async function loadBudgetPlanner() {
 
   const container = document.getElementById("budget");
 
+  // Wrap ONLY the table inside the scrollable container
   let html = `
-    <table>
-      <tr>
-        <th>Category</th>
+    <div class="table-responsive">
+      <table>
+        <tr>
+          <th>Category</th>
   `;
 
   months.forEach(month => {
@@ -404,14 +406,16 @@ async function loadBudgetPlanner() {
     });
   });
 
+  // Close table and table-responsive wrapper before action buttons
   html += `
-    </table>
+      </table>
+    </div>
     <div class="action-buttons">
       <button onclick="saveBudgetChanges()">💾 Save Changes</button>
       <button onclick="copyJanuaryToWholeYear()">📋 Copy Jan → Whole Year</button>
       <button onclick="copyCurrentYearToNextYear()">📅 Copy 2027 → 2028</button>
     </div>
-    <span id="saveStatus" style="margin-left:10px;"></span>
+    <span id="saveStatus" style="display: block; text-align: center; margin-top: 8px;"></span>
   `;
 
   container.innerHTML = html;
