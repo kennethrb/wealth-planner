@@ -301,8 +301,10 @@ function loadTransactions() {
           <th>Account</th>
           <th>Position</th>
           <th>Details</th>
-
+          <th></th>
+        
         </tr>
+
 
         ${recent.map(tx => `
 
@@ -327,6 +329,14 @@ function loadTransactions() {
 
             <td>
               ${tx.Details}
+            </td>
+
+            <td>
+              <button
+                class="btn-delete-row"
+                onclick="deleteTransaction(${tx.rowNumber})">
+                ✕          
+              </button>
             </td>
 
           </tr>
@@ -1912,6 +1922,8 @@ function loadBudgetVsActual() {
 
   const sections = ["Income", "Expense", "Savings", "Debt"];
   let rows = "";
+  let grandBudget = 0;
+  let grandActual = 0;
 
   // 5. Build Section Rows
   sections.forEach(section => {
@@ -1938,6 +1950,10 @@ function loadBudgetVsActual() {
 
       sectionBudget += budget;
       sectionActual += actual;
+
+      grandBudget += budget;
+      grandActual += actual;
+
 
       const variance = section === "Income" ? actual - budget : budget - actual;
 
@@ -1966,6 +1982,40 @@ function loadBudgetVsActual() {
       </tr>
     `;
   });
+
+  const grandVariance =
+  grandBudget - grandActual;
+
+rows += `
+
+  <tr class="grand-total">
+
+    <td><strong>GRAND TOTAL</strong></td>
+
+    <td><strong>${formatCurrency(grandBudget)}</strong></td>
+
+    <td><strong>${formatCurrency(grandActual)}</strong></td>
+
+    <td class="${
+      grandVariance >= 0
+        ? "text-success"
+        : "text-danger"
+    }">
+
+      <strong>
+        ${
+          grandVariance >= 0
+            ? "+"
+            : ""
+        }
+        ${formatCurrency(grandVariance)}
+      </strong>
+
+    </td>
+
+  </tr>
+
+`;
 
   // 6. Inject HTML Table
   container.innerHTML = `
