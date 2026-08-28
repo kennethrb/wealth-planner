@@ -123,10 +123,12 @@ async function addCategory() {
     !group
   ) {
 
-    document.getElementById(
-      "globalStatus"
-    ).innerHTML =
-      "⚠ Please complete all fields.";
+    showStatus(
+  "⚠ Please complete all fields.",
+  "warning"
+);
+
+return;
 
     return;
 
@@ -148,7 +150,8 @@ async function addCategory() {
   await loadScenarioCategories();
 
   showStatus(
-  `✅ Category ${categoryName} added successfully`
+  `✅ Category ${categoryName} added successfully`,
+  "success"
 );
 
   document.getElementById(
@@ -266,7 +269,10 @@ async function deleteCategory() {
   await loadCategoryDropdown();
   await loadScenarioCategories();
 
-  showStatus(`🗑 Category ${categoryName} deleted`);
+  showStatus(
+  `🗑 Category ${categoryName} deleted`,
+  "success"
+);
 }
 
 async function addBudgetItem() {
@@ -296,10 +302,13 @@ async function addBudgetItem() {
   Number(amount) <= 0
   ) {
   
-    document.getElementById(
-      "globalStatus"
-    ).innerHTML =
-      "⚠ Amount must be greater than zero";
+    showStatus(
+  "⚠ Amount must be greater than zero",
+  "warning"
+);
+
+return;
+
   
     return;
   
@@ -330,7 +339,8 @@ async function addBudgetItem() {
     );
 
   showStatus(
-  "✅ Budget Item Added"
+  "✅ Budget Item Added",
+  "success"
 );
 
 }
@@ -358,7 +368,10 @@ async function deleteBudgetItem(category) {
     loadProjection()
   ]);
 
-  showStatus(`🗑 Deleted ${category}`);
+  showStatus(
+  `🗑 Deleted ${category}`,
+  "success"
+);
 }
 
 // ====================
@@ -997,7 +1010,8 @@ async function copyJanuaryToWholeYear() {
   if (status) {
 
     showStatus(
-  "✅ January copied to all months"
+  "✅ January copied to all months",
+  "success"
 );
 
   }
@@ -1006,38 +1020,30 @@ async function copyJanuaryToWholeYear() {
 
 async function copyCurrentYearToNextYear() {
 
-  await fetch(
-    `${BASE_URL}?action=copyCurrentYearToNextYear`
-  );
+  const response =
+    await fetch(
+      `${BASE_URL}?action=copyCurrentYearToNextYear`
+    );
+
+  const result =
+    await response.json();
 
   await loadData();
 
-  const status =
-    document.getElementById(
-      "globalStatus"
-    );
+  if (result.success) {
 
-  if (status) {
-
-    const years =
-      [...new Set(
-        appData.budget.map(
-          item => Number(item.year)
-        )
-      )];
-    
-    const nextYear =
-      Math.max(...years) + 1;
-    
     showStatus(
-      `✅ ${nextYear} budget created`
+      `✅ ${result.nextYear} budget created`,
+      "success"
     );
 
-    status.style.color =
-      "green";
+  } else {
 
-    status.style.fontWeight =
-      "bold";
+    showStatus(
+      result.message ||
+      "❌ Failed to create next year budget",
+      "error"
+    );
 
   }
 
@@ -1095,13 +1101,22 @@ async function saveBudgetChanges() {
         loadFundingPlan()
       ]);
 
-      showStatus(`✅ ${budgetItems.length} items saved successfully at ${new Date().toLocaleTimeString()}`);
+      showStatus(
+  `✅ ${budgetItems.length} items saved successfully at ${new Date().toLocaleTimeString()}`,
+  "success"
+);
     } else {
-      showStatus("❌ Failed to save budget changes.");
+      showStatus(
+  "❌ Failed to save budget changes.",
+  "error"
+);
     }
   } catch (error) {
     console.error("Save error:", error);
-    showStatus("❌ Error saving budget changes.");
+    showStatus(
+  "❌ Error saving budget changes.",
+  "error"
+);
   }
 }
 
