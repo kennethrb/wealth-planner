@@ -1919,23 +1919,78 @@ function loadBudgetVsActual() {
 
   sections.forEach(section => {
 
+  rows += `
+
+    <tr class="section-${section.toLowerCase()}">
+
+      <td colspan="5">
+
+        <strong>
+          ${section.toUpperCase()}
+        </strong>
+
+      </td>
+
+    </tr>
+
+  `;
+
+  const sectionCategories =
+
+    categories.filter(cat =>
+
+      categoryTypes[cat] === section
+
+    );
+
+  sectionCategories.forEach(cat => {
+
+    const budget =
+      budgetMap[cat] || 0;
+
+    const actual =
+      actualMap[cat] || 0;
+
+    const remaining =
+      budget - actual;
+
     rows += `
-  
-      <tr class="section-${section.toLowerCase()}">
-  
-        <td colspan="5">
-  
-          <strong>
-            ${section.toUpperCase()}
-          </strong>
-  
+
+      <tr>
+
+        <td>
+          ${cat}
         </td>
-  
+
+        <td>
+          ${formatCurrency(budget)}
+        </td>
+
+        <td>
+          ${formatCurrency(actual)}
+        </td>
+
+        <td>
+          ${formatCurrency(remaining)}
+        </td>
+
+        <td>
+
+          ${
+            remaining >= 0
+              ? "✅"
+              : "🔴"
+          }
+
+        </td>
+
       </tr>
-  
+
     `;
-  
+
   });
+
+});
 
   container.innerHTML = `
 
