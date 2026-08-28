@@ -247,6 +247,16 @@ function loadYearDropdown() {
     .join("");
 }
 
+function getSelectedYear() {
+
+  return Number(
+    document.getElementById(
+      "budgetYear"
+    )?.value
+  );
+
+}
+
 // ====================
 // CATEGORIES
 // ====================
@@ -511,7 +521,16 @@ async function loadBudgetPlanner() {
 }
 
 async function loadSummary() {
-  const budgetData = appData.budget;
+
+  const selectedYear =
+    getSelectedYear();
+
+  const budgetData =
+    appData.budget.filter(
+      item =>
+        Number(item.year) ===
+        selectedYear
+    );
   const categoryData = appData.categories;
 
   const categoryTypes = {};
@@ -570,8 +589,13 @@ async function loadSummary() {
 
 async function loadDashboard() {
 
+  const selectedYear =
+    getSelectedYear();
+
   const budgetData =
-    appData.budget;
+    appData.budget.filter(
+      item =>
+        Number(item.year) 
 
   const categoryData =
     appData.categories;
@@ -768,8 +792,15 @@ async function loadProjection() {
   const accounts =
   appData.accounts;
 
+  const selectedYear =
+  getSelectedYear();
+
   const budgetData =
-    appData.budget;
+    appData.budget.filter(
+      item =>
+        Number(item.year) ===
+        selectedYear
+    );
   
   const categories =
     appData.categories;
@@ -902,6 +933,8 @@ async function loadProjection() {
 // FUNDING BREAKDOWN (GROUP TYPE = CASH)
 // ====================
 function loadFundingPlan() {
+  const selectedYear =
+  getSelectedYear();
   const container = document.getElementById("fundingPlanList");
   const cashContainer = document.getElementById("cashToWithdraw");
   if (!container || !appData.budget || !appData.categories) return;
@@ -922,7 +955,13 @@ function loadFundingPlan() {
   let cashToWithdraw = 0;
 
   // Calculate totals for January (or baseline month)
-  appData.budget.forEach(item => {
+  appData.budget
+    .filter(
+      item =>
+        Number(item.year) ===
+        selectedYear
+    )
+    .forEach(item => {
     if (item.month !== "Jan") return;
 
     const type = categoryTypes[item.category];
@@ -1440,6 +1479,18 @@ if (
     </div>
 
   `;
+
+}
+
+async function changeBudgetYear() {
+
+  await Promise.all([
+    loadBudgetPlanner(),
+    loadSummary(),
+    loadDashboard(),
+    loadProjection(),
+    loadFundingPlan()
+  ]);
 
 }
 
