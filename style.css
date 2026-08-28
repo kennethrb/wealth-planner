@@ -50,6 +50,70 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+.section-nav {
+
+  position: sticky;
+
+  top: 12px;
+
+  z-index: 100;
+
+  display: flex;
+
+  gap: 10px;
+
+  padding: 12px;
+
+  margin-bottom: 24px;
+
+  background:
+    rgba(11,15,23,.88);
+
+  backdrop-filter:
+    blur(16px);
+
+  border:
+    1px solid var(--border);
+
+  border-radius:
+    var(--radius-lg);
+
+  overflow-x: auto;
+
+}
+
+.section-nav a {
+
+  text-decoration: none;
+
+  color: var(--text-muted);
+
+  padding: 8px 14px;
+
+  border-radius: 999px;
+
+  white-space: nowrap;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+}
+
+.section-nav a:hover {
+
+  background:
+    rgba(16,185,129,.12);
+
+  color:
+    var(--text-main);
+
+}
+
 /* Custom Scrollbar for Webkit */
 ::-webkit-scrollbar {
   height: 6px;
