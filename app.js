@@ -1966,41 +1966,39 @@ function loadBudgetVsActual() {
 
     rows += `
 
-      <tr>
+  <tr>
 
-        <td>
-          ${cat}
-        </td>
+    <td>
+      ${cat}
+    </td>
 
-        <td>
-          ${formatCurrency(budget)}
-        </td>
+    <td>
+      ${formatCurrency(budget)}
+    </td>
 
-        <td>
-          ${formatCurrency(actual)}
-        </td>
+    <td>
+      ${formatCurrency(actual)}
+    </td>
 
-        <td>
-          ${formatCurrency(remaining)}
-        </td>
+    <td class="${
+      variance >= 0
+        ? "text-success"
+        : "text-danger"
+    }">
 
-        <td class="${
-          variance >= 0
-            ? "text-success"
-            : "text-danger"
-        }">
-        
-          ${
-            variance >= 0
-              ? "+"
-              : ""
-          }
-        
-          ${formatCurrency
+      ${
+        variance >= 0
+          ? "+"
+          : ""
+      }
 
-      </tr>
+      ${formatCurrency(variance)}
 
-    `;
+    </td>
+
+  </tr>
+
+`;
 
   });
 
