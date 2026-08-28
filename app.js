@@ -27,42 +27,26 @@ function showStatus(message) {
 
 }
 
-
 // ====================
-// ACCOUNTS
+// ACCOUNTS (UPDATED)
 // ====================
-
 async function loadAccounts() {
+  const data = appData.accounts;
+  const container = document.getElementById("accounts");
 
-  const data =
-    appData.accounts;
-
-
-  const container =
-    document.getElementById("accounts");
-
-  let html = "";
+  let html = `<div class="accounts-container">`;
 
   data.forEach(account => {
-
     html += `
-      <div class="card">
-
-        <div class="account-name">
-          ${account.accountName}
-        </div>
-
-        <div class="balance">
-          Balance: ₱${Number(account.currentBalance).toLocaleString()}
-        </div>
-
+      <div class="account-item">
+        <span class="item-title">${account.accountName}</span>
+        <span class="item-value">₱${Number(account.currentBalance).toLocaleString()}</span>
       </div>
     `;
-
   });
 
+  html += `</div>`;
   container.innerHTML = html;
-
 }
 
 async function addCategory() {
@@ -575,103 +559,49 @@ async function loadDashboard() {
   `;
 }
 
+// ====================
+// GOALS (UPDATED)
+// ====================
 async function loadGoals() {
+  const goals = appData.goals;
+  const container = document.getElementById("goals");
 
-  const goals =
-  appData.goals;
-
-  let html = "";
+  let html = `<div class="goals-container">`;
 
   goals.forEach(goal => {
+    const progress = ((goal.current / goal.target) * 100).toFixed(1);
+    const remainingAmount = goal.target - goal.current;
+    const monthsRemaining = Math.ceil(remainingAmount / goal.monthlyContribution);
 
-    const progress =
-      (
-        (goal.current / goal.target) * 100
-      ).toFixed(1);
+    const completionDate = new Date();
+    completionDate.setMonth(completionDate.getMonth() + monthsRemaining);
 
-    const remainingAmount =
-      goal.target - goal.current;
-
-    const monthsRemaining =
-      Math.ceil(
-        remainingAmount /
-        goal.monthlyContribution
-      );
-
-    const completionDate =
-      new Date();
-
-    completionDate.setMonth(
-      completionDate.getMonth() +
-      monthsRemaining
-    );
-
-    const forecast =
-      completionDate.toLocaleDateString(
-        "en-US",
-        {
-          year: "numeric",
-          month: "long"
-        }
-      );
+    const forecast = completionDate.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short"
+    });
 
     html += `
+      <div class="goal-item">
+        <div class="item-header">
+          <span class="item-title">🎯 ${goal.goal}</span>
+          <span class="item-value">₱${Number(goal.current).toLocaleString()}</span>
+        </div>
+        
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" style="width: ${Math.min(progress, 100)}%;"></div>
+        </div>
 
-      <div class="card">
-
-        <h3>
-          🎯 ${goal.goal}
-        </h3>
-
-        <p>
-          Current:
-          ₱${Number(goal.current)
-            .toLocaleString()}
-        </p>
-
-        <p>
-          Target:
-          ₱${Number(goal.target)
-            .toLocaleString()}
-        </p>
-
-        <p>
-          Progress:
-          ${progress}%
-        </p>
-
-        <progress
-          value="${goal.current}"
-          max="${goal.target}">
-        </progress>
-
-        <p>
-          Monthly Contribution:
-          ₱${Number(goal.monthlyContribution)
-            .toLocaleString()}
-        </p>
-
-        <p>
-          Months Remaining:
-          ${monthsRemaining}
-        </p>
-
-        <p>
-          Estimated Completion:
-          <strong>
-            ${forecast}
-          </strong>
-        </p>
-
+        <div class="goal-details">
+          <span>Target: ₱${Number(goal.target).toLocaleString()} (${progress}%)</span>
+          <span>Est: <strong>${forecast}</strong> (${monthsRemaining} mos)</span>
+        </div>
       </div>
-
     `;
-
   });
 
-  document.getElementById("goals")
-    .innerHTML = html;
-
+  html += `</div>`;
+  container.innerHTML = html;
 }
 
 async function loadNetWorth() {
