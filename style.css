@@ -109,7 +109,8 @@ body {
   transition: var(--transition);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start; /* FIX: Prevents items from stretching to the bottom */
+  gap: 12px;                  /* FIX: Keeps consistent spacing between title and content */
 }
 
 .card:hover {
