@@ -676,3 +676,138 @@ td.col-debt, tr.section-debt td:first-child {
     flex-direction: column;
   }
 }
+
+/* ===================================
+   PREMIUM TOAST NOTIFICATIONS
+=================================== */
+
+.status-banner{
+
+  position: fixed;
+
+  top: 20px;
+  right: 20px;
+
+  z-index: 9999;
+
+  min-width: 320px;
+  max-width: 450px;
+
+  padding: 14px 18px;
+
+  border-radius: 12px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  color: white;
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,.35);
+
+  animation:
+    slideIn .3s ease;
+
+  transition:
+    all .3s ease;
+
+  display: none;
+}
+
+/* SUCCESS */
+
+.status-banner.success{
+
+  background:
+    linear-gradient(
+      135deg,
+      #10b981,
+      #059669
+    );
+
+  border:
+    1px solid
+    rgba(255,255,255,.15);
+
+}
+
+/* WARNING */
+
+.status-banner.warning{
+
+  background:
+    linear-gradient(
+      135deg,
+      #f59e0b,
+      #d97706
+    );
+
+  border:
+    1px solid
+    rgba(255,255,255,.15);
+
+}
+
+/* ERROR */
+
+.status-banner.error{
+
+  background:
+    linear-gradient(
+      135deg,
+      #ef4444,
+      #dc2626
+    );
+
+  border:
+    1px solid
+    rgba(255,255,255,.15);
+
+}
+
+.status-banner.hide{
+
+  opacity: 0;
+
+  transform:
+    translateX(30px);
+
+}
+
+@keyframes slideIn{
+
+  from{
+
+    opacity: 0;
+
+    transform:
+      translateX(40px);
+
+  }
+
+  to{
+
+    opacity: 1;
+
+    transform:
+      translateX(0);
+
+  }
+
+}
+
+@media(max-width:768px){
+
+  .status-banner{
+
+    left: 12px;
+    right: 12px;
+
+    top: 12px;
+
+    min-width: auto;
+    max-width: none;
+
+  }
+
+}
