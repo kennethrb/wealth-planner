@@ -1,237 +1,121 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-  <title>Wealth Planner</title>
-  <meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Financial Dashboard</title>
   <link rel="stylesheet" href="style.css">
-
 </head>
-
 <body>
 
-  <div class="hero-header">
-    <h1>Wealth Planner</h1>
-    <p>Personal Finance Command Center</p>
-  </div>
+  <!-- Top Status Banner -->
+  <div id="globalStatus" class="status-banner"></div>
 
-  <div id="globalStatus"></div>
-
-  <!-- KPI DASHBOARD -->
-
-  <div class="dashboard-grid">
-
-    <div id="networth">
-      Loading Net Worth...
-    </div>
-
-    <div id="projection">
-      Loading Wealth Projection...
-    </div>
-
-    <div id="dashboard">
-      Loading Dashboard...
-    </div>
-
-    <div id="fundingPlan">
-      Loading Funding Plan...
-    </div>
-
-  </div>
-
-  <!-- SCENARIO -->
-
-  <div class="card">
-
-    <h2>🧪 Scenario Planner</h2>
-
-    <label>Category</label>
-    <br><br>
-
-    <select id="scenarioCategory">
-    </select>
-
-    <br><br>
-
-    <label>Scenario Amount</label>
-    <br><br>
-
-    <input
-      type="number"
-      id="scenarioAmount"
-      placeholder="Enter amount">
-
-    <br><br>
-
-    <button onclick="runScenario()">
-      Run Scenario
-    </button>
-
-    <br><br>
-
-    <div id="scenarioResult"></div>
-
-  </div>
-
-  <!-- GOALS -->
-
-  <div class="card">
-
-    <h2>🎯 Goals</h2>
-
-    <div id="goals">
-      Loading Goals...
-    </div>
-
-  </div>
-
-  <!-- ACCOUNTS -->
-
-  <div class="card">
-
-    <h2>🏦 Accounts</h2>
-
-    <div id="accounts">
-      Loading Accounts...
-    </div>
-
-  </div>
-
-  <!-- CATEGORY MANAGER -->
-
-  <div class="card">
-
-    <h2>🏷️ Category Manager</h2>
-
-    <input
-      type="text"
-      id="categoryName"
-      placeholder="Category Name">
-
-    <select id="budgetType">
-
-      <option value="Income">
-        Income
-      </option>
-
-      <option value="Expense">
-        Expense
-      </option>
-
-      <option value="Savings">
-        Savings
-      </option>
-
-      <option value="Debt">
-        Debt
-      </option>
-
-    </select>
-
-    <input
-      type="text"
-      id="categoryGroup"
-      placeholder="Group">
-
-    <button
-      class="add-btn"
-      onclick="addCategory()">
+  <main class="container">
     
-      ➕ Add Category
-    
-    </button>
+    <!-- Hero Section: Net Worth -->
+    <section class="section">
+      <div id="networth"></div>
+    </section>
 
-    <hr>
+    <!-- Dashboard & Projections Grid -->
+    <section class="grid-2">
+      <div id="dashboard"></div>
+      <div id="projection"></div>
+    </section>
 
-    <h3>🗑 Delete Category</h3>
+    <!-- Category Management -->
+    <section class="card">
+      <h2>🏷️ Manage Categories</h2>
+      <div class="form-row">
+        <input type="text" id="categoryName" placeholder="Category Name">
+        <select id="budgetType">
+          <option value="Income">Income</option>
+          <option value="Expense">Expense</option>
+          <option value="Savings">Savings</option>
+          <option value="Debt">Debt</option>
+        </select>
+        <input type="text" id="categoryGroup" placeholder="Group (e.g. Cash, Bank)">
+        <button onclick="addCategory()">Add Category</button>
+      </div>
 
-    <select id="deleteCategorySelect">
-    </select>
+      <hr class="divider">
 
-    <button
-      class="delete-btn"
-      onclick="deleteCategory()">
-    
-      🗑 Delete Category
-    
-    </button>
+      <div class="form-row">
+        <select id="deleteCategorySelect"></select>
+        <button class="btn-danger" onclick="deleteCategory()">Delete Category</button>
+      </div>
+    </section>
 
-  </div>
+    <!-- Add Budget Item Form -->
+    <section class="card">
+      <h2>➕ Add Budget Item</h2>
+      <div class="form-row">
+        <input type="number" id="newYear" value="2027" placeholder="Year">
+        <select id="newMonth">
+          <option value="Jan">Jan</option>
+          <option value="Feb">Feb</option>
+          <option value="Mar">Mar</option>
+          <option value="Apr">Apr</option>
+          <option value="May">May</option>
+          <option value="Jun">Jun</option>
+          <option value="Jul">Jul</option>
+          <option value="Aug">Aug</option>
+          <option value="Sep">Sep</option>
+          <option value="Oct">Oct</option>
+          <option value="Nov">Nov</option>
+          <option value="Dec">Dec</option>
+        </select>
+        <select id="newCategory"></select>
+        <input type="number" id="newAmount" placeholder="Amount">
+        <button onclick="addBudgetItem()">Add Item</button>
+      </div>
+    </section>
 
-  <!-- ADD BUDGET ITEM -->
+    <!-- Budget Planner Section -->
+    <section class="card">
+      <h2>📅 Budget Planner</h2>
+      <!-- Responsive Scroll Container -->
+      <div id="budget" class="table-responsive"></div>
+    </section>
 
-  <div class="card">
+    <!-- Monthly Summary Section -->
+    <section class="card">
+      <h2>📊 Monthly Summary</h2>
+      <!-- Responsive Scroll Container -->
+      <div id="summary" class="table-responsive"></div>
+    </section>
 
-    <h2>➕ Add Budget Item</h2>
+    <!-- Scenario Simulator -->
+    <section class="card">
+      <h2>🔮 Scenario Simulator</h2>
+      <div class="form-row">
+        <select id="scenarioCategory"></select>
+        <input type="number" id="scenarioAmount" placeholder="New Monthly Amount">
+        <button onclick="runScenario()">Run Scenario</button>
+      </div>
+      <div id="scenarioResult" class="margin-top"></div>
+    </section>
 
-    <input
-      type="number"
-      id="newYear"
-      value="2027">
+    <!-- Accounts & Goals Grid -->
+    <section class="grid-2">
+      <div>
+        <h2>🏦 Accounts</h2>
+        <div id="accounts"></div>
+      </div>
+      <div>
+        <h2>🎯 Goals</h2>
+        <div id="goals"></div>
+      </div>
+    </section>
 
-    <select id="newMonth">
+    <!-- Funding Plan -->
+    <section class="section">
+      <div id="fundingPlan"></div>
+    </section>
 
-      <option>Jan</option>
-      <option>Feb</option>
-      <option>Mar</option>
-      <option>Apr</option>
-      <option>May</option>
-      <option>Jun</option>
-      <option>Jul</option>
-      <option>Aug</option>
-      <option>Sep</option>
-      <option>Oct</option>
-      <option>Nov</option>
-      <option>Dec</option>
-
-    </select>
-
-    <select id="newCategory">
-    </select>
-
-    <input
-      type="number"
-      id="newAmount"
-      placeholder="Amount">
-
-    <button
-      class="add-btn"
-      onclick="addBudgetItem()">
-    
-      ➕ Add
-    
-    </button>
-
-  </div>
-
-  <!-- BUDGET PLANNER -->
-
-  <div class="card">
-
-    <h2>📅 Budget Planner</h2>
-
-    <div id="budget">
-      Loading Budget...
-    </div>
-
-  </div>
-
-  <!-- MONTHLY SUMMARY -->
-
-  <div class="card">
-
-    <h2>📊 Monthly Summary</h2>
-
-    <div id="summary">
-      Loading Summary...
-    </div>
-
-  </div>
+  </main>
 
   <script src="app.js"></script>
-
 </body>
-
 </html>
