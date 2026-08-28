@@ -288,48 +288,52 @@ function loadTransactions() {
 
   container.innerHTML = `
 
-    <table>
+    <div class="table-responsive">
 
-      <tr>
-
-        <th>Date</th>
-        <th>Amount</th>
-        <th>Account</th>
-        <th>Type</th>
-        <th>Position</th>
-
-      </tr>
-
-      ${recent.map(tx => `
+      <table>
 
         <tr>
 
-          <td>
-            ${new Date(tx.Date)
-              .toLocaleDateString()}
-          </td>
-
-          <td>
-            ${formatCurrency(tx.Amount)}
-          </td>
-
-          <td>
-            ${tx.Account}
-          </td>
-
-          <td>
-            ${tx["Budget Type"]}
-          </td>
-
-          <td>
-            ${tx["Budget Position"]}
-          </td>
+          <th>Date</th>
+          <th>Amount</th>
+          <th>Account</th>
+          <th>Position</th>
+          <th>Details</th>
 
         </tr>
 
-      `).join("")}
+        ${recent.map(tx => `
 
-    </table>
+          <tr>
+
+            <td>
+              ${new Date(tx.Date)
+                .toLocaleDateString()}
+            </td>
+
+            <td>
+              ${formatCurrency(tx.Amount)}
+            </td>
+
+            <td>
+              ${tx.Account}
+            </td>
+
+            <td>
+              ${tx["Budget Position"]}
+            </td>
+
+            <td>
+              ${tx.Details}
+            </td>
+
+          </tr>
+
+        `).join("")}
+
+      </table>
+
+    </div>
 
   `;
 
