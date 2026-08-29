@@ -946,6 +946,11 @@ async function copyCurrentYearToNextYear() {
     loadYearDropdown();
     if (result.success) {
         document.getElementById("budgetYear").value = result.nextYear;
+        // Keep Add Budget Item in sync
+        const addYearInput = document.getElementById("newYear");
+        if (addYearInput) {
+            addYearInput.value = result.nextYear;
+        }
         await changeBudgetYear();
         showStatus(`✅ ${result.nextYear} budget created`, "success");
     } else {
@@ -1252,6 +1257,13 @@ async function refreshUI() {
 async function initializeApp() {
     await loadData();
     await refreshUI();
+    // Default Add Budget Item year to latest budget year
+    const years = [...new Set(appData.budget.map(item => Number(item.year)))].filter(Boolean);
+    const latestYear = years.length > 0 ? Math.max(...years) : new Date().getFullYear();
+    const newYearInput = document.getElementById("newYear");
+    if (newYearInput) {
+        newYearInput.value = latestYear;
+    }
     setupScrollSpy();
 }
 initializeApp();
