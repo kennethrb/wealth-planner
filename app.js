@@ -420,6 +420,7 @@ function loadRecurringBills() {
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
         <span>${formatCurrency(bill.defaultAmount)}</span>
+        <button class="btn-delete-row" onclick="editRecurringBill('${bill.billId}')">✏️</button>
         <button class="btn-delete-row" onclick="deleteRecurringBill('${bill.billId}')">✕</button>
       </div>
     </div>
