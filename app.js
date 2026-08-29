@@ -940,7 +940,7 @@ async function copyCurrentYearToNextYear() {
     const confirmed = await showConfirmDialog("Create Budget Year", "Generate next year's budget?");
     if (!confirmed) return;
     const selectedYear = getSelectedYear();
-    const response = await fetch(`${BASE_URL}?action=copyCurrentYearToNextYear`
+    const response = await fetch(`${BASE_URL}?action=copyCurrentYearToNextYear` + `&year=${selectedYear}`);
     const result = await response.json();
     await loadData();
     loadYearDropdown();
