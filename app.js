@@ -11,6 +11,8 @@ const formatCurrency = (amount) => {
 const BASE_URL =
 "https://script.google.com/macros/s/AKfycbwZGBobKrROvavAglc9QZlBmbSggBudqJBH6dT7LrkPopdZDQVbCZ4FWhE926f1Z_Y-NQ/exec";
 
+let hasUnsavedBudgetChanges = false;
+
 let appData = {
     accounts: [],
     budget: [],
@@ -666,6 +668,13 @@ async function loadBudgetPlanner() {
     </div>
   `;
     container.innerHTML = html;
+    document
+    .querySelectorAll("#budget input[type='number']")
+    .forEach(input => {
+      input.addEventListener("input", () => {
+        hasUnsavedBudgetChanges = true;
+      });
+    });
 }
 async function loadSummary() {
     const selectedYear = getSelectedYear();
@@ -895,6 +904,11 @@ function loadFundingPlan() {
   `;
 }
 async function copyJanuaryToWholeYear() {
+    if (hasUnsavedBudgetChanges) {
+        const saveFirst = await showConfirmDialog("Unsaved Changes", "Save budget changes before copying January values to the whole year?");
+        if (!saveFirst) return;
+        await saveBudgetChanges(true);
+    }
     const confirmed = await showConfirmDialog("Copy Budget", "Copy January budget amounts to all other months?");
     if (!confirmed) return;
     await fetch(`${BASE_URL}?action=copyJanuaryToWholeYear`);
@@ -902,6 +916,7 @@ async function copyJanuaryToWholeYear() {
     await refreshUI();
     showStatus("✅ January copied to all months", "success");
 }
+
 async function copyCurrentYearToNextYear() {
     const confirmed = await showConfirmDialog("Create Budget Year", "Generate next year's budget?");
     if (!confirmed) return;
@@ -917,9 +932,11 @@ async function copyCurrentYearToNextYear() {
         showStatus(result.message || "❌ Failed to create next year budget", "error");
     }
 }
-async function saveBudgetChanges() {
-    const confirmed = await showConfirmDialog("Save Budget", "Save all changes to the budget?");
-    if (!confirmed) return;
+async function saveBudgetChanges(silent = false) {
+    if (!silent) {
+        const confirmed = await showConfirmDialog("Save Budget", "Save all changes to the budget?");
+        if (!confirmed) return;
+    }
     const inputs = document.querySelectorAll("#budget input[type='number']");
     const budgetItems = [];
     const selectedYear = getSelectedYear();
@@ -945,10 +962,16 @@ async function saveBudgetChanges() {
         });
         const result = await response.json();
         if (result.success) {
-            await loadData();
-            await refreshUI();
-            showStatus(`✅ Saved ${budgetItems.length} items successfully`, "success");
-        } else {
+        hasUnsavedBudgetChanges = false;
+        await loadData();
+        await refreshUI();
+        if (!silent) {
+        showStatus(
+            `✅ Saved ${budgetItems.length} items successfully`,
+            "success"
+        );
+    }
+    } else {
             showStatus("❌ Failed to save budget changes.", "error");
         }
     } catch (error) {
