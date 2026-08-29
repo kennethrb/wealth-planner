@@ -379,9 +379,10 @@ function loadUpcomingBills() {
       <span>${paidCount}/${totalBills} (${completionPercent}%)</span>
     </div>
     
-    <div style="height:8px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-bottom:12px;">
-      <div style="height:100%;width:${completionPercent}%;background:#34d399;border-radius:999px;"></div>
+    <div class="progress-mini">
+      <div class="progress-mini-fill" style="width:${completionPercent}%"></div>
     </div>
+
 
       <div class="funding-row">
         <span>✅ Paid Bills</span>
