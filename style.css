@@ -63,7 +63,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{
 /* Small progress bars */
 .progress-mini{
     height:8px;
-*   background:rgba(255,255,255,.08*;
+    background:rgba(255,255,255,.08);
     border-radius:999px;
     overflow:hidden;
     margin-bottom:12px;
@@ -926,7 +926,6 @@ tr.section-debt td:first-child {
         padding: 8px 12px;
     }
 
-    ``
 }
 
 /* ===================================
@@ -1097,6 +1096,10 @@ input[type="date"] {
     font-size: 14px;
     color: var(--text-main);
     background-color: rgba(255, 255, 255, .03);
+}
+
+#inputValue{
+    margin-bottom:8px;
 }
 
 #transactionsList {
