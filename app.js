@@ -121,6 +121,29 @@ function loadTransactionPositions() {
         dropdown.innerHTML += `<option value="${cat.categoryName}">${cat.categoryName}</option>`;
     });
 }
+
+function toggleTransactionFields() {
+    const type = document.getElementById("txBudgetType")?.value;
+    const positionContainer = document.getElementById("txBudgetPosition")?.closest(".form-group");
+    const transferContainer = document.getElementById("txTransferContainer");
+    if (type === "Transfer") {
+        if (positionContainer) {
+            positionContainer.style.display = "none";
+        }
+        if (transferContainer) {
+            transferContainer.style.display = "flex";
+        }
+    } else {
+        if (positionContainer) {
+            positionContainer.style.display = "flex";
+        }
+        if (transferContainer) {
+            transferContainer.style.display = "none";
+        }
+        loadTransactionPositions();
+    }
+}
+
 async function addTransaction() {
     const date = document.getElementById("txDate")?.value;
     const amount = document.getElementById("txAmount")?.value;
@@ -184,6 +207,20 @@ async function deleteTransactionRecord(rowNumber) {
     loadProjection();
     loadFundingPlan();
     showStatus("🗑 Transaction deleted", "success");
+}
+
+function loadTransferAccounts() {
+    const dropdown = document.getElementById("txToAccount");
+    if (!dropdown) return;
+    dropdown.innerHTML = "";
+    appData.accounts.forEach(account => {
+        const name = account.accountName || account.name;
+        dropdown.innerHTML += `
+            <option value="${name}">
+                ${name}
+            </option>
+        `;
+    });
 }
 
 async function addRecurringBill() {
@@ -1240,6 +1277,7 @@ function loadBudgetVsActual() {
 async function refreshUI() {
     loadYearDropdown();
     loadCategoryDropdown();
+    loadTransferAccounts();
     loadTransactionAccounts();
     loadTransactionPositions();
     loadRecurringBillAccounts();
