@@ -551,10 +551,15 @@ async function loadCategoryDropdown() {
 function loadYearDropdown() {
     const dropdown = document.getElementById("budgetYear");
     if (!dropdown) return;
+    const selectedYear = dropdown.value;
     const years = [...new Set(appData.budget.map(item => item.year))].filter(Boolean);
     years.sort();
     dropdown.innerHTML = years.map(year => `<option value="${year}">${year}</option>`).join("");
+    if (selectedYear) {
+        dropdown.value = selectedYear;
+    }
 }
+
 async function deleteCategory() {
     const categoryName = document.getElementById("deleteCategorySelect")?.value;
     if (!categoryName) return;
