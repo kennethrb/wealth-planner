@@ -295,10 +295,21 @@ function loadUpcomingBills() {
   });
 
   const remainingAmount = totalBillsAmount - paidAmount;
+  // Calculate bill completion percentage
+  const totalBills = activeBills.length;
+  const completionPercent = totalBills > 0 ? Math.round((paidCount / totalBills) * 100) : 0;
 
   container.innerHTML = `
     <div class="card">
       <h2>🔔 Upcoming Bills</h2>
+      <div class="funding-row">
+      <span>Bill Completion</span>
+      <span>${paidCount}/${totalBills} (${completionPercent}%)</span>
+    </div>
+    
+    <div style="height:8px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-bottom:12px;">
+      <div style="height:100%;width:${completionPercent}%;background:#34d399;border-radius:999px;"></div>
+    </div>
 
       <div class="funding-row">
         <span>✅ Paid Bills</span>
