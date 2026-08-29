@@ -295,6 +295,16 @@ function loadUpcomingBills() {
   });
 
   const remainingAmount = totalBillsAmount - paidAmount;
+  // Find next unpaid bill due
+  const nextBill = activeBills
+    .filter(bill => !(appData.transactions || []).some(tx => {
+      const txDate = new Date(tx.Date || tx.date);
+      const details = tx.Details || tx.details || "";
+      return details === bill.billName &&
+        txDate.getMonth() === currentMonth &&
+        txDate.getFullYear() === currentYear;
+    }))
+    .sort((a,b) => a.dueDay - b.dueDay)[0];
   // Calculate bill completion percentage
   const totalBills = activeBills.length;
   const completionPercent = totalBills > 0 ? Math.round((paidCount / totalBills) * 100) : 0;
@@ -335,6 +345,25 @@ function loadUpcomingBills() {
         <span>Remaining Amount</span>
         <span>${formatCurrency(remainingAmount)}</span>
       </div>
+      ${nextBill ? `
+      <div class="funding-row">
+        <span>📅 Next Bill Due</span>
+        <span></span>
+      </div>
+      
+      <div class="funding-row">
+        <div>
+          <div>${nextBill.billName}</div>
+          <small>Due Day ${nextBill.dueDay}</small>
+        </div>
+        <span>${formatCurrency(nextBill.defaultAmount)}</span>
+      </div>
+      ` : `
+      <div class="funding-row">
+        <span>🎉 All Bills Paid</span>
+        <span>✅</span>
+      </div>
+      `}
 
       <hr>
 
