@@ -209,7 +209,26 @@ function loadUpcomingBills() {
     <div class="card">
       <h2>🔔 Upcoming Bills</h2>
       ${activeBills.map(bill => {
-        const daysRemaining = bill.dueDay - currentDay;
+        let daysRemaining;
+          if (bill.dueDay >= currentDay) {
+          
+            daysRemaining =
+              bill.dueDay - currentDay;
+          
+          } else {
+          
+            const daysInMonth =
+              new Date(
+                today.getFullYear(),
+                today.getMonth() + 1,
+                0
+              ).getDate();
+          
+            daysRemaining =
+              (daysInMonth - currentDay)
+              + Number(bill.dueDay);
+          
+          }
         let status = "";
         let statusClass = "";
 
