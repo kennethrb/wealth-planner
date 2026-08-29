@@ -312,7 +312,16 @@ function editTransaction(rowNumber) {
     const tx = appData.transactions.find(t => t.rowNumber === rowNumber);
     if (!tx) return;
     editingRowNumber = rowNumber;
-    document.getElementById("txDate").value = tx.Date || "";
+    const rawDate =
+        tx.Date || tx.date || "";
+    let formattedDate = "";
+    if (rawDate) {
+        const date = new Date(rawDate);
+        formattedDate =
+            date.toISOString().split("T")[0];
+    }
+    document.getElementById("txDate").value =
+        formattedDate;
     document.getElementById("txAmount").value = tx.Amount || 0;
     document.getElementById("txDetails").value = tx.Details || "";
     document.getElementById("txAccount").value = tx.Account || "";
