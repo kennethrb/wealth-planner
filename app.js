@@ -1309,6 +1309,7 @@ async function initializeApp() {
         newYearInput.value = latestYear;
     }
     setupScrollSpy();
+    toggleTransactionFields();
 }
 initializeApp();
 // Back to Top Button Listener
