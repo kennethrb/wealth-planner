@@ -902,9 +902,9 @@ async function loadBudgetPlanner() {
       </table>
     </div>
     <div class="action-buttons">
-      <button onclick="saveBudgetChanges()">💾 Save Changes</button>
-      <button onclick="copyJanuaryToWholeYear()">📋 Copy Jan → Whole Year</button>
-      <button onclick="copyCurrentYearToNextYear()">📅 Copy ${currentYear} → ${nextYear}</button>
+      <button onclick="saveBudgetChanges()">💾 Save Budget</button>
+      <button onclick="copyJanuaryToWholeYear()">📑 Replicate Year</button>
+      <button onclick="copyCurrentYearToNextYear()">📅 Create ${nextYear}</button>
     </div>
   `;
     container.innerHTML = html;
@@ -1297,7 +1297,7 @@ function loadFundingPlan() {
 
         <hr>
 
-        <h3>Funding Requirements</h3>
+        <h3>Funding Sources</h3>
 
         ${fundingHtml}
     `;
