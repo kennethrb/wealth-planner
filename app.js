@@ -1068,12 +1068,16 @@ async function loadProjection() {
 
 function loadFundingPlan() {
 
-    const selectedYear =
-        getSelectedYear();
+    const selectedYear = getSelectedYear();
 
     const container =
         document.getElementById(
             "fundingPlanList"
+        );
+
+    const cashContainer =
+        document.getElementById(
+            "cashToWithdraw"
         );
 
     if (
@@ -1102,13 +1106,14 @@ function loadFundingPlan() {
     let totalExpense = 0;
     let totalSavings = 0;
     let totalDebt = 0;
+    let cashToWithdraw = 0;
 
     const fundingRequirements = {};
 
     appData.budget
         .filter(
             item =>
-            Number(item.year) === selectedYear
+                Number(item.year) === selectedYear
         )
         .forEach(item => {
 
@@ -1153,13 +1158,32 @@ function loadFundingPlan() {
                     fundingRequirements[
                         source
                     ] = 0;
+
                 }
 
                 fundingRequirements[
                     source
                 ] += amount;
+
+                if (
+                    source === "Cash Wallet"
+                ) {
+
+                    cashToWithdraw += amount;
+
+                }
             }
+
         });
+
+    if (cashContainer) {
+
+        cashContainer.textContent =
+            formatCurrency(
+                cashToWithdraw
+            );
+
+    }
 
     let fundingHtml = "";
 
@@ -1187,6 +1211,7 @@ function loadFundingPlan() {
             <span class="label">
                 Total Monthly Income
             </span>
+
             <span class="amount">
                 ${formatCurrency(totalIncome)}
             </span>
@@ -1196,6 +1221,7 @@ function loadFundingPlan() {
             <span class="label">
                 Total Expenses
             </span>
+
             <span class="amount">
                 ${formatCurrency(totalExpense)}
             </span>
@@ -1205,6 +1231,7 @@ function loadFundingPlan() {
             <span class="label">
                 Total Savings
             </span>
+
             <span class="amount">
                 ${formatCurrency(totalSavings)}
             </span>
@@ -1214,6 +1241,7 @@ function loadFundingPlan() {
             <span class="label">
                 Total Debt Payments
             </span>
+
             <span class="amount">
                 ${formatCurrency(totalDebt)}
             </span>
