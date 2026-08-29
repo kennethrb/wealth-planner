@@ -735,15 +735,6 @@ async function addCategory() {
     document.getElementById("preferredFundingSource").selectedIndex = 0;
 }
 
-const fundingDropdown =
-    document.getElementById(
-        "preferredFundingSource"
-    );
-
-if (fundingDropdown) {
-    fundingDropdown.selectedIndex = 0;
-}
-
 async function loadCategoryDropdown() {
     const addSelect = document.getElementById("newCategory");
     const deleteSelect = document.getElementById("deleteCategorySelect");
@@ -1197,30 +1188,33 @@ function loadFundingPlan() {
             if (type === "Debt")
                 totalDebt += amount;
 
-            if (source) {
-
+            if (
+                source &&
+                type !== "Income"
+            ) {
+            
                 if (
                     !fundingRequirements[
                         source
                     ]
                 ) {
-
+            
                     fundingRequirements[
                         source
                     ] = 0;
-
+            
                 }
-
+            
                 fundingRequirements[
                     source
                 ] += amount;
-
+            
                 if (
                     source === "Cash Wallet"
                 ) {
-
+            
                     cashToWithdraw += amount;
-
+            
                 }
             }
 
