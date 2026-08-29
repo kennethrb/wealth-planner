@@ -179,22 +179,62 @@ function loadTransactions() {
           <th>Date</th>
           <th>Amount</th>
           <th>Account</th>
-          <th>Position</th>
+          <th>Flow / Category</th>
           <th>Details</th>
           <th></th>
         </tr>
-        ${recent.map(tx => `
-          <tr>
-            <td>${new Date(tx.Date || tx.date).toLocaleDateString()}</td>
-            <td>${formatCurrency(tx.Amount || tx.amount)}</td>
-            <td>${tx.Account || tx.account}</td>
-            <td>${tx["Budget Position"] || tx.budgetPosition || tx.category || ""}</td>
-            <td>${tx.Details || tx.details || ""}</td>
-            <td>
-              <button class="btn-delete-row" onclick="deleteTransactionRecord(${tx.rowNumber})">🗑</button>
-            </td>
-          </tr>
-        `).join("")}
+
+        ${recent.map(tx => {
+
+            const budgetType =
+                tx["Budget Type"] ||
+                tx.budgetType ||
+                "";
+
+            const account =
+                tx.Account ||
+                tx.account ||
+                "";
+
+            const transferTo =
+                tx["Transfer To Account"] ||
+                tx.transferToAccount ||
+                "";
+
+            let flowDisplay =
+                tx["Budget Position"] ||
+                tx.budgetPosition ||
+                tx.category ||
+                "";
+
+            if (
+                budgetType === "Transfer"
+            ) {
+
+                flowDisplay = `
+                    <strong>${account}</strong>
+                    <br>
+                    → ${transferTo}
+                `;
+            }
+
+            return ` < tr > < td > $ {
+        new Date(tx.Date || tx.date).toLocaleDateString()
+    } < /td> < td > $ {
+        formatCurrency(tx.Amount || tx.amount)
+    } < /td> < td > $ {
+        account
+    } < /td> < td > $ {
+        flowDisplay
+    } < /td> < td > $ {
+        tx.Details || tx.details || ""
+    } < /td> < td > < button
+    class = "btn-delete-row"
+    onclick = "deleteTransactionRecord(${tx.rowNumber})" > 🗑 < /button> < /td> < /tr>
+    `;
+
+        }).join("")}
+
       </table>
     </div>
   `;
