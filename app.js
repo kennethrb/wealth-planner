@@ -234,12 +234,6 @@ function loadUpcomingBills() {
   if (!container) return;
 
   const activeBills = (appData.recurringBills || []).filter(bill => bill.active);
-  // Calculate bill summary totals
-  let paidCount = 0;
-  let dueCount = 0;
-  let overdueCount = 0;
-  let totalBillsAmount = 0;
-  let paidAmount = 0;
 
   if (!activeBills.length) {
     container.innerHTML = `
@@ -255,7 +249,6 @@ function loadUpcomingBills() {
   const currentDay = today.getDate();
   const currentMonth = today.getMonth();
   const currentYear = today.getFullYear();
-  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
   // Helper: check if paid this month
   const checkIsPaid = (billName) => {
@@ -268,55 +261,74 @@ function loadUpcomingBills() {
     });
   };
 
-  // Helper: calculate raw remaining days for the current month
+  // Helper: calculate raw remaining days for sorting
   const getDaysRemaining = (bill) => {
-    if (checkIsPaid(bill.billName)) return 999; // Paid items go to bottom
+    if (checkIsPaid(bill.billName)) return 999;
     const diff = bill.dueDay - currentDay;
-    return diff < 0 ? -100 + diff : diff; // Overdue items go to top
+    return diff < 0 ? -100 + diff : diff;
   };
 
   // Sort by urgency: Overdue -> Due Soon -> Future -> Paid
   activeBills.sort((a, b) => getDaysRemaining(a) - getDaysRemaining(b));
+
+  // Calculate totals BEFORE rendering HTML
+  let paidCount = 0;
+  let dueCount = 0;
+  let overdueCount = 0;
+  let totalBillsAmount = 0;
+  let paidAmount = 0;
+
+  activeBills.forEach(bill => {
+    const isPaid = checkIsPaid(bill.billName);
+    const amount = Number(bill.defaultAmount || 0);
+
+    totalBillsAmount += amount;
+
+    if (isPaid) {
+      paidCount++;
+      paidAmount += amount;
+    } else if (bill.dueDay < currentDay) {
+      overdueCount++;
+    } else {
+      dueCount++;
+    }
+  });
+
   const remainingAmount = totalBillsAmount - paidAmount;
 
   container.innerHTML = `
     <div class="card">
       <h2>🔔 Upcoming Bills</h2>
 
-    <div class="funding-row">
-      <span>✅ Paid Bills</span>
-      <span>${paidCount}</span>
-    </div>
-    
-    <div class="funding-row">
-      <span>🟡 Remaining Bills</span>
-      <span>${dueCount}</span>
-    </div>
-    
-    <div class="funding-row">
-      <span>🔴 Overdue Bills</span>
-      <span>${overdueCount}</span>
-    </div>
-    
-    <div class="funding-row">
-      <span>Total Bills</span>
-      <span>${formatCurrency(totalBillsAmount)}</span>
-    </div>
-    
-    <div class="funding-row">
-      <span>Paid Amount</span>
-      <span>${formatCurrency(paidAmount)}</span>
-    </div>
-    
-    <div class="funding-row">
-      <span>Remaining Amount</span>
-      <span>${formatCurrency(remainingAmount)}</span>
-    </div>
-    
-    <hr>
+      <div class="funding-row">
+        <span>✅ Paid Bills</span>
+        <span>${paidCount}</span>
+      </div>
+      <div class="funding-row">
+        <span>🟡 Remaining Bills</span>
+        <span>${dueCount}</span>
+      </div>
+      <div class="funding-row">
+        <span>🔴 Overdue Bills</span>
+        <span>${overdueCount}</span>
+      </div>
+      <div class="funding-row">
+        <span>Total Bills</span>
+        <span>${formatCurrency(totalBillsAmount)}</span>
+      </div>
+      <div class="funding-row">
+        <span>Paid Amount</span>
+        <span>${formatCurrency(paidAmount)}</span>
+      </div>
+      <div class="funding-row">
+        <span>Remaining Amount</span>
+        <span>${formatCurrency(remainingAmount)}</span>
+      </div>
+
+      <hr>
+
       ${activeBills.map(bill => {
         const isPaid = checkIsPaid(bill.billName);
-        totalBillsAmount += Number(bill.defaultAmount || 0);
         const daysRemaining = bill.dueDay - currentDay;
         let status = "";
         let statusClass = "";
@@ -324,16 +336,15 @@ function loadUpcomingBills() {
         if (isPaid) {
           status = "✅ Paid";
           statusClass = "text-success";
-          paidCount++;
-          paidAmount += Number(bill.defaultAmount || 0);
-        } else if (bill.dueDay < currentDay) {
-          status = "🔴 Overdue";
+        } else if (daysRemaining < 0) {
+          status = `🔴 Overdue by ${Math.abs(daysRemaining)} day(s)`;
           statusClass = "bill-overdue";
-          overdueCount++;
-        } else {
+        } else if (daysRemaining <= 7) {
           status = `🟡 Due in ${daysRemaining} day(s)`;
           statusClass = "bill-due-soon";
-          dueCount++;
+        } else {
+          status = `🟢 Due in ${daysRemaining} day(s)`;
+          statusClass = "bill-upcoming";
         }
 
         return `
