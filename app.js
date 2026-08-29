@@ -162,7 +162,7 @@ function loadTransactions() {
             <td>${tx["Budget Position"] || tx.budgetPosition || tx.category || ""}</td>
             <td>${tx.Details || tx.details || ""}</td>
             <td>
-              <button class="btn-delete-row" onclick="deleteTransactionRecord(${tx.rowNumber})">✕</button>
+              <button class="btn-delete-row" onclick="deleteTransactionRecord(${tx.rowNumber})">🗑</button>
             </td>
           </tr>
         `).join("")}
@@ -484,7 +484,7 @@ function loadRecurringBills() {
       <div style="display:flex;gap:8px;align-items:center;">
         <span>${formatCurrency(bill.defaultAmount)}</span>
         <button class="btn-delete-row" onclick="editRecurringBill('${bill.billId}')">✏️</button>
-        <button class="btn-delete-row" onclick="deleteRecurringBill('${bill.billId}')">✕</button>
+        <button class="btn-delete-row" onclick="deleteRecurringBill('${bill.billId}')">🗑</button>
       </div>
     </div>
   `).join("");
@@ -626,7 +626,7 @@ async function loadBudgetPlanner() {
           <tr style="height: 38px;">
             <td style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
               <span>${category}</span>
-              <span onclick="deleteBudgetItem('${category}')" style="cursor: pointer; opacity: 0.5; font-size: 12px;" title="Delete row">✕</span>
+              <span onclick="deleteBudgetItem('${category}')" style="cursor: pointer; opacity: 0.5; font-size: 12px;" title="Delete row">🗑</span>
             </td>
         `;
                 months.forEach(month => {
