@@ -908,7 +908,10 @@ async function copyCurrentYearToNextYear() {
     const response = await fetch(`${BASE_URL}?action=copyCurrentYearToNextYear`);
     const result = await response.json();
     await loadData();
+    loadYearDropdown();
     if (result.success) {
+        document.getElementById("budgetYear").value = result.nextYear;
+        await changeBudgetYear();
         showStatus(`✅ ${result.nextYear} budget created`, "success");
     } else {
         showStatus(result.message || "❌ Failed to create next year budget", "error");
