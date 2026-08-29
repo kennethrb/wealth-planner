@@ -241,15 +241,25 @@ function loadUpcomingBills() {
     <h2>🔔 Upcoming Bills</h2>
     ${activeBills.map(bill => {
       const daysRemaining = bill.dueDay - currentDay;
-      const status = daysRemaining >= 0
-        ? `Due in ${daysRemaining} day(s)`
-        : `Overdue by ${Math.abs(daysRemaining)} day(s)`;
+      let status = "";
+      let statusClass = "";
+      
+      if (daysRemaining < 0) {
+        status = `🔴 Overdue by ${Math.abs(daysRemaining)} day(s)`;
+        statusClass = "bill-overdue";
+      } else if (daysRemaining <= 7) {
+        status = `🟡 Due in ${daysRemaining} day(s)`;
+        statusClass = "bill-due-soon";
+      } else {
+        status = `🟢 Due in ${daysRemaining} day(s)`;
+        statusClass = "bill-upcoming";
+      }
   
       return `
         <div class="funding-row">
           <div>
             <div>${bill.billName}</div>
-            <small style="color:var(--text-muted);">${status}</small>
+            <small class="${statusClass}">${status}</small>
           </div>
           <span class="amount">${formatCurrency(bill.defaultAmount)}</span>
         </div>
