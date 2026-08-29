@@ -215,6 +215,37 @@ function loadAccounts() {
   `;
 }
 
+function loadUpcomingBills() {
+  const container = document.getElementById("upcomingBills");
+  if (!container) return;
+
+  const activeBills = (appData.recurringBills || []).filter(bill => bill.active);
+
+  if (!activeBills.length) {
+    container.innerHTML = `
+      <div class="card">
+        <h2>🔔 Upcoming Bills</h2>
+        <p>No recurring bills found.</p>
+      </div>
+    `;
+    return;
+  }
+
+  activeBills.sort((a, b) => a.dueDay - b.dueDay);
+
+  container.innerHTML = `
+    <div class="card">
+      <h2>🔔 Upcoming Bills</h2>
+      ${activeBills.map(bill => `
+        <div class="funding-row">
+          <span class="label">${bill.billName}</span>
+          <span class="amount">Day ${bill.dueDay}</span>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
 async function addCategory() {
   const categoryName = document.getElementById("categoryName")?.value;
   const budgetType = document.getElementById("budgetType")?.value;
@@ -982,6 +1013,7 @@ async function refreshUI() {
     loadNetWorth(),
     loadProjection(),
     loadDashboard(),
+    loadUpcomingBills(),
     loadGoals(),
     loadAccounts(),
     loadBudgetPlanner(),
