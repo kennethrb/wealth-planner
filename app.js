@@ -293,11 +293,10 @@ function loadRecurringBills() {
         <strong>${bill.billName}</strong><br>
         <small>${bill.budgetType} • Due Day ${bill.dueDay}</small>
       </div>
-      < div style = "display:flex;gap:8px;align-items:center;" > < span > $ {
-            formatCurrency(bill.defaultAmount)
-        } < /span> < button
-        class = "btn-delete-row"
-        onclick = "deleteRecurringBill('${bill.billId}')" > ✕ < /button> < /div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span>${formatCurrency(bill.defaultAmount)}</span>
+        <button class="btn-delete-row" onclick="deleteRecurringBill('${bill.billId}')">✕</button>
+      </div>
     </div>
   `).join("");
 }
