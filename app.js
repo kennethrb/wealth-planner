@@ -231,6 +231,9 @@ function loadUpcomingBills() {
     return;
   }
 
+  const today = new Date();
+  const currentDay = today.getDate();
+
   activeBills.sort((a, b) => a.dueDay - b.dueDay);
 
   container.innerHTML = `
