@@ -185,60 +185,59 @@ function loadAccounts() {
 }
 
 function loadUpcomingBills() {
-    const container = document.getElementById("upcomingBills");
-    if (!container) return;
-    const activeBills = (appData.recurringBills || []).filter(bill => bill.active);
-    if (!activeBills.length) {
-        container.innerHTML = `
+  const container = document.getElementById("upcomingBills");
+  if (!container) return;
+
+  const activeBills = (appData.recurringBills || []).filter(bill => bill.active);
+
+  if (!activeBills.length) {
+    container.innerHTML = `
       <div class="card">
         <h2>🔔 Upcoming Bills</h2>
         <p>No recurring bills found.</p>
       </div>
     `;
-        return;
-    }
-    const today = new Date();
-    const currentDay = today.getDate();
-    activeBills.sort((a, b) => a.dueDay - b.dueDay);
-    container.innerHTML = `
-  <div class="card">
-    <h2>🔔 Upcoming Bills</h2>
-    ${activeBills.map(bill => {
-      const daysRemaining = bill.dueDay - currentDay;
-      let status = "";
-      let statusClass = "";
-      
-      if (daysRemaining < 0) {
-        status = `🔴 Overdue by ${Math.abs(daysRemaining)} day(s)`;
-        statusClass = "bill-overdue";
-      } else if (daysRemaining <= 7) {
-        status = `🟡
-    Due in $ {
-        daysRemaining
-    }
-    day(s)`;
-        statusClass = "bill-due-soon";
-      } else {
-        status = `🟢
-    Due in $ {
-        daysRemaining
-    }
-    day(s)`;
-        statusClass = "bill-upcoming";
-      }
-  
-      return ` < div class = "funding-row" > < div > < div > $ {
-        bill.billName
-    } < /div> < small class = "${statusClass}" > $ {
-        status
-    } < /small> < /div> < span class = "amount" > $ {
-        formatCurrency(bill.defaultAmount)
-    } < /span> < /div>
-    `;
-    }).join("")}
-  </div>
+    return;
+  }
+
+  const today = new Date();
+  const currentDay = today.getDate();
+
+  activeBills.sort((a, b) => a.dueDay - b.dueDay);
+
+  container.innerHTML = `
+    <div class="card">
+      <h2>🔔 Upcoming Bills</h2>
+      ${activeBills.map(bill => {
+        const daysRemaining = bill.dueDay - currentDay;
+        let status = "";
+        let statusClass = "";
+
+        if (daysRemaining < 0) {
+          status = `🔴 Overdue by ${Math.abs(daysRemaining)} day(s)`;
+          statusClass = "bill-overdue";
+        } else if (daysRemaining <= 7) {
+          status = `🟡 Due in ${daysRemaining} day(s)`;
+          statusClass = "bill-due-soon";
+        } else {
+          status = `🟢 Due in ${daysRemaining} day(s)`;
+          statusClass = "bill-upcoming";
+        }
+
+        return `
+          <div class="funding-row">
+            <div>
+              <div>${bill.billName}</div>
+              <small class="${statusClass}">${status}</small>
+            </div>
+            <span class="amount">${formatCurrency(bill.defaultAmount)}</span>
+          </div>
+        `;
+      }).join("")}
+    </div>
   `;
 }
+
 async function addCategory() {
     const categoryName = document.getElementById("categoryName")?.value;
     const budgetType = document.getElementById("budgetType")?.value;
