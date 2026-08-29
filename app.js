@@ -942,7 +942,6 @@ async function copyCurrentYearToNextYear() {
     const selectedYear = getSelectedYear();
     const response = await fetch(`${BASE_URL}?action=copyCurrentYearToNextYear` + `&year=${selectedYear}`);
     const result = await response.json();
-    console.log("Copy Year Result:", result);
     await loadData();
     loadYearDropdown();
     if (result.success) {
