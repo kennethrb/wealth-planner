@@ -269,6 +269,34 @@ function loadRecurringBills() {
   `).join("");
 }
 
+function loadRecurringBillAccounts() {
+    const dropdown = document.getElementById("billAccount");
+    if (!dropdown) return;
+    dropdown.innerHTML = "";
+    appData.accounts.forEach(account => {
+        const name = account.accountName || account.name;
+        dropdown.innerHTML += `
+      <option value="${name}">
+        ${name}
+      </option>
+    `;
+    });
+}
+
+function loadRecurringBillPositions() {
+    const type = document.getElementById("billBudgetType")?.value;
+    const dropdown = document.getElementById("billBudgetPosition");
+    if (!dropdown) return;
+    dropdown.innerHTML = "";
+    appData.categories.filter(cat => cat.budgetType === type).forEach(cat => {
+        dropdown.innerHTML += `
+        <option value="${cat.categoryName}">
+          ${cat.categoryName}
+        </option>
+      `;
+    });
+}
+
 async function addCategory() {
     const categoryName = document.getElementById("categoryName")?.value;
     const budgetType = document.getElementById("budgetType")?.value;
