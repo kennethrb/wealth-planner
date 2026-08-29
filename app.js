@@ -234,6 +234,10 @@ function loadUpcomingBills() {
   if (!container) return;
 
   const activeBills = (appData.recurringBills || []).filter(bill => bill.active);
+  // Detect paid bills for current month
+  const today = new Date();
+  const currentMonth = today.getMonth();
+  const currentYear = today.getFullYear();
 
   if (!activeBills.length) {
     container.innerHTML = `
@@ -263,12 +267,24 @@ function loadUpcomingBills() {
     <div class="card">
       <h2>🔔 Upcoming Bills</h2>
       ${activeBills.map(bill => {
+        const isPaid = (appData.transactions || []).some(tx => {
+        const txDate = new Date(tx.Date || tx.date);
+        const details = tx.Details || tx.details || "";
+      
+        return details === bill.billName &&
+          txDate.getMonth() === currentMonth &&
+          txDate.getFullYear() === currentYear;
+      });
+
         const daysRemaining = getDaysRemaining(bill.dueDay);
         let status = "";
         let statusClass = "";
 
-        if (daysRemaining === 0) {
-          status = "🔴 Due Today";
+        if (isPaid) {
+          status = "✅ Paid";
+          statusClass = "text-success";
+        } else if (bill.dueDay < currentDay) {
+          status = "🔴 Overdue";
           statusClass = "bill-overdue";
         } else if (daysRemaining <= 7) {
           status = `🟡 Due in ${daysRemaining} day(s)`;
