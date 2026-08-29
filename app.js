@@ -675,7 +675,7 @@ async function loadBudgetPlanner() {
         });
     });
     const years = [...new Set(appData.budget.map(item => Number(item.year)))].filter(Boolean);
-    const currentYear = years.length ? Math.max(...years) : new Date().getFullYear();
+    const currentYear = getSelectedYear();
     const nextYear = currentYear + 1;
     html += `
       </table>
