@@ -1020,8 +1020,16 @@ function runScenario() {
     </div>
   `;
 }
+
 async function changeBudgetYear() {
-    await refreshUI();
+    await Promise.all([
+        loadBudgetPlanner(),
+        loadSummary(),
+        loadDashboard(),
+        loadProjection(),
+        loadFundingPlan(),
+        loadBudgetVsActual()
+    ]);
 }
 
 function loadBudgetVsActual() {
