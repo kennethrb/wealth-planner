@@ -182,6 +182,29 @@
         <div id="recurringBillsList"></div>
     </section>
 
+    <section class="card">
+          <h2>➕ Add Recurring Bill</h2>
+          <div class="form-row">
+              <input type="text" id="billName" placeholder="Bill Name">
+              <select id="billBudgetType">
+                  <option value="Expense">Expense</option>
+                  <option value="Savings">Savings</option>
+                  <option value="Debt">Debt</option>
+              </select>
+              <select id="billBudgetPosition">
+              </select>
+              <select id="billAmountType">
+                  <option value="Fixed">Fixed</option>
+                  <option value="Variable">Variable</option>
+              </select>
+              <input type="number" id="billAmount" placeholder="Amount">
+              <input type="number" id="billDueDay" min="1" max="31" placeholder="Due Day">
+              <select id="billAccount">
+              </select>
+              <button onclick="addRecurringBill()"> Add Bill </button>
+          </div>
+      </section>
+
     <!-- 💳 EXECUTION -->
     <div class="section-header">
     
