@@ -274,47 +274,31 @@ function loadTransactions() {
             }
 
             return `
-              <tr>
+            <tr>
+                <td>${new Date(tx.Date || tx.date).toLocaleDateString()}</td>
+            
+                <td>${formatCurrency(tx.Amount || tx.amount)}</td>
+            
+                <td>${account}</td>
+            
+                <td>${flowDisplay}</td>
+            
+                <td>${tx.Details || tx.details || ""}</td>
+            
                 <td>
-                  ${new Date(
-                        tx.Date || tx.date
-                  ).toLocaleDateString()}
+                    <button
+                        class="btn-delete-row"
+                        onclick="editTransaction(${tx.rowNumber})">
+                        ✏️
+                    </button>
+            
+                    <button
+                        class="btn-delete-row"
+                        onclick="deleteTransactionRecord(${tx.rowNumber})">
+                        🗑
+                    </button>
                 </td>
-
-                <td>
-                  ${formatCurrency(
-                        tx.Amount || tx.amount
-                  )}
-                </td>
-
-                <td>
-                  ${account}
-                </td>
-
-                <td>
-                  ${flowDisplay}
-                </td>
-
-                <td>
-                  ${tx.Details ||
-                    tx.details ||
-                    ""}
-                </td>
-
-                <td>
-                  <button
-                      class="btn-delete-row"
-                      onclick="editTransaction(${tx.rowNumber})">
-                      ✏️
-                  </button>
-                  
-                  <button
-                      class="btn-delete-row"
-                      onclick="deleteTransactionRecord(${tx.rowNumber})">
-                      🗑
-                  </button>
-                </td>
-              </tr>
+            </tr>
             `;
 
         }).join("")}
