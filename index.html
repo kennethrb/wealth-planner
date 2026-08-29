@@ -111,14 +111,25 @@
     <section id="planning" class="card">
     <h2>🏷️ Manage Categories</h2>
       <div class="form-row">
-        <input type="text" id="categoryName" placeholder="Category Name">
+        <input
+            type="text"
+            id="categoryName"
+            placeholder="Category Name">
+        
         <select id="budgetType">
-          <option value="Income">Income</option>
-          <option value="Expense">Expense</option>
-          <option value="Savings">Savings</option>
-          <option value="Debt">Debt</option>
+            <option>Income</option>
+            <option>Expense</option>
+            <option>Savings</option>
+            <option>Debt</option>
         </select>
-        <input type="text" id="categoryGroup" placeholder="Group (e.g. Cash, Bank)">
+        
+        <input
+            type="text"
+            id="categoryGroup"
+            placeholder="Group">
+        
+        <select id="preferredFundingSource">
+        </select>
         <button onclick="addCategory()">Add Category</button>
       </div>
 
