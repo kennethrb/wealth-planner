@@ -12,6 +12,7 @@ const BASE_URL =
 "https://script.google.com/macros/s/AKfycbwZGBobKrROvavAglc9QZlBmbSggBudqJBH6dT7LrkPopdZDQVbCZ4FWhE926f1Z_Y-NQ/exec";
 
 let hasUnsavedBudgetChanges = false;
+let editingRowNumber = null;
 
 let appData = {
     accounts: [],
@@ -161,8 +162,52 @@ async function addTransaction() {
     }
     const confirmed = await showConfirmDialog("Add Transaction", "Do you want to add this transaction?");
     if (!confirmed) return;
-    await fetch(`${BASE_URL}?action=addTransaction` + `&date=${encodeURIComponent(date)}` + `&amount=${amount}` + `&details=${encodeURIComponent(details)}` + `&account=${encodeURIComponent(account)}` + `&budgetType=${encodeURIComponent(budgetType)}` + `&budgetPosition=${encodeURIComponent(budgetPosition)}` + `&transferToAccount=${encodeURIComponent(transferToAccount)}`);
+    const action =
+        editingRowNumber
+            ? "updateTransaction"
+            : "addTransaction";
+    
+    let url =
+        `${BASE_URL}?action=${action}`
+        + `&date=${encodeURIComponent(date)}`
+        + `&amount=${amount}`
+        + `&details=${encodeURIComponent(details)}`
+        + `&account=${encodeURIComponent(account)}`
+        + `&budgetType=${encodeURIComponent(budgetType)}`
+        + `&budgetPosition=${encodeURIComponent(budgetPosition)}`
+        + `&transferToAccount=${encodeURIComponent(transferToAccount)}`;
+    
+    if (editingRowNumber) {
+    
+        url +=
+            `&rowNumber=${editingRowNumber}`;
+    }
+    
+    await fetch(url);
     await loadData();
+    editingRowNumber = null;
+    
+    document.getElementById(
+        "txDate"
+    ).value = "";
+    
+    document.getElementById(
+        "txAmount"
+    ).value = "";
+    
+    document.getElementById(
+        "txDetails"
+    ).value = "";
+    
+    const button =
+        document.querySelector(
+            'button[onclick="addTransaction()"]'
+        );
+    
+    if (button) {
+        button.innerHTML =
+            "➕ Add Transaction";
+    }
     loadTransactions();
     loadBudgetVsActual();
     showStatus("✅ Transaction Added", "success");
@@ -258,9 +303,15 @@ function loadTransactions() {
 
                 <td>
                   <button
-                    class="btn-delete-row"
-                    onclick="deleteTransactionRecord(${tx.rowNumber})">
-                    🗑
+                      class="btn-delete-row"
+                      onclick="editTransaction(${tx.rowNumber})">
+                      ✏️
+                  </button>
+                  
+                  <button
+                      class="btn-delete-row"
+                      onclick="deleteTransactionRecord(${tx.rowNumber})">
+                      🗑
                   </button>
                 </td>
               </tr>
@@ -272,6 +323,28 @@ function loadTransactions() {
     </div>
   `;
 }
+
+function editTransaction(rowNumber) {
+    const tx = appData.transactions.find(t => t.rowNumber === rowNumber);
+    if (!tx) return;
+    editingRowNumber = rowNumber;
+    document.getElementById("txDate").value = tx.Date || "";
+    document.getElementById("txAmount").value = tx.Amount || 0;
+    document.getElementById("txDetails").value = tx.Details || "";
+    document.getElementById("txAccount").value = tx.Account || "";
+    document.getElementById("txBudgetType").value = tx["Budget Type"] || tx.budgetType || "";
+    toggleTransactionFields();
+    document.getElementById("txBudgetPosition").value = tx["Budget Position"] || tx.budgetPosition || "";
+    const transferTo = tx["Transfer To Account"] || tx.transferToAccount || "";
+    if (document.getElementById("txToAccount")) {
+        document.getElementById("txToAccount").value = transferTo;
+    }
+    const button = document.querySelector('button[onclick="addTransaction()"]');
+    if (button) {
+        button.innerHTML = "💾 Save Changes";
+    }
+}
+
 async function deleteTransactionRecord(rowNumber) {
     const confirmed = await showConfirmDialog("Delete Transaction", "Delete this transaction?");
     if (!confirmed) return;
