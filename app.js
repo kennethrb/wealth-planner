@@ -704,13 +704,14 @@ async function addCategory() {
     const categoryName = document.getElementById("categoryName")?.value;
     const budgetType = document.getElementById("budgetType")?.value;
     const group = document.getElementById("categoryGroup")?.value;
+    const preferredFundingSource = document.getElementById("preferredFundingSource")?.value;
     if (!categoryName || !group) {
         showStatus("⚠ Please complete all fields.", "warning");
         return;
     }
     const confirmed = await showConfirmDialog("Add Category", `Add category "${categoryName}"?`);
     if (!confirmed) return;
-    await fetch(`${BASE_URL}?action=addCategory` + `&categoryName=${encodeURIComponent(categoryName)}` + `&budgetType=${encodeURIComponent(budgetType)}` + `&group=${encodeURIComponent(group)}`);
+    await fetch(`${BASE_URL}?action=addCategory` + `&categoryName=${encodeURIComponent(categoryName)}` + `&budgetType=${encodeURIComponent(budgetType)}` + `&group=${encodeURIComponent(group)}` + `&preferredFundingSource=${encodeURIComponent(preferredFundingSource)}`);
     await loadData();
     await loadCategoryDropdown();
     await loadScenarioCategories();
@@ -740,6 +741,31 @@ function loadYearDropdown() {
     if (selectedYear) {
         dropdown.value = selectedYear;
     }
+}
+
+function loadFundingSources() {
+
+    const dropdown =
+        document.getElementById(
+            "preferredFundingSource"
+        );
+
+    if (!dropdown) return;
+
+    dropdown.innerHTML = "";
+
+    appData.accounts.forEach(account => {
+
+        const name =
+            account.accountName ||
+            account.name;
+
+        dropdown.innerHTML += `
+            <option value="${name}">
+                ${name}
+            </option>
+        `;
+    });
 }
 
 async function deleteCategory() {
@@ -1572,14 +1598,20 @@ function loadBudgetVsActual() {
 async function refreshUI() {
     loadYearDropdown();
     loadCategoryDropdown();
+
+    loadFundingSources();
+
     loadTransferAccounts();
     loadTransactionAccounts();
     loadTransactionPositions();
+
     loadRecurringBillAccounts();
     loadRecurringBillPositions();
+
     loadTransactions();
     loadBudgetVsActual();
     loadScenarioCategories();
+
     await Promise.all([
         loadNetWorth(),
         loadProjection(),
