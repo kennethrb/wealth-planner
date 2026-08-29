@@ -618,10 +618,24 @@ tr:hover {
     background: transparent;
     color: var(--text-muted);
     border: none;
-    padding: 4px 8px;
+    width: 32px;
+    height: 32px;
+    padding: 0;
     box-shadow: none;
     font-size: 14px;
     border-radius: var(--radius-sm);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    min-width: 80px;
 }
 
 .btn-delete-row:hover {
@@ -954,6 +968,12 @@ tr.section-debt td:first-child {
     .section-nav a {
         font-size: 13px;
         padding: 8px 12px;
+    }
+
+    .action-cell {
+        flex-direction: column;
+        gap: 4px;
+        min-width: 48px;
     }
 
 }
