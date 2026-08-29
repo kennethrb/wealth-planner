@@ -50,14 +50,32 @@ html {
 }
 
 /* Date picker dark theme */
+input[type="date"] {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    color: var(--text-main);
+    background-color: rgba(255, 255, 255, .03);
+    color-scheme: dark;
+}
+
 input[type="date"]::-webkit-calendar-picker-indicator{
-    filter:invert(.8);
-    cursor:pointer;
-    opacity:.8;
+    filter: invert(.85);
+    cursor: pointer;
+    opacity: .8;
+    transition: .2s ease;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator:hover{
-    opacity:1;
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.icon{
+    margin-right:6px;
+    opacity:.9;
 }
 
 /* Small progress bars */
@@ -1088,18 +1106,9 @@ tr.section-debt td:first-child {
         translateX(30px);
 }
 
-input[type="date"] {
-    width: 100%;
-    padding: 10px 14px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    font-size: 14px;
-    color: var(--text-main);
-    background-color: rgba(255, 255, 255, .03);
-}
-
 #inputValue{
-    margin-bottom:8px;
+   margin-top:12px;
+   margin-bottom:8px;
 }
 
 #transactionsList {
