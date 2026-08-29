@@ -203,7 +203,17 @@ function loadUpcomingBills() {
   const today = new Date();
   const currentDay = today.getDate();
 
-  activeBills.sort((a, b) => a.dueDay - b.dueDay);
+  activeBills.sort((a, b) => a.dueDay - b.dueDay);activeBills.sort((a, b) => {
+    const getDaysRemaining = (bill) => {
+      if (bill.dueDay >= currentDay) {
+        return bill.dueDay - currentDay;
+      }
+      const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+      return (daysInMonth - currentDay) + Number(bill.dueDay);
+    };
+  
+    return getDaysRemaining(a) - getDaysRemaining(b);
+  });
 
   container.innerHTML = `
     <div class="card">
