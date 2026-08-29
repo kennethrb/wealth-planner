@@ -1067,40 +1067,164 @@ async function loadProjection() {
 }
 
 function loadFundingPlan() {
-    const selectedYear = getSelectedYear();
-    const container = document.getElementById("fundingPlanList");
-    const cashContainer = document.getElementById("cashToWithdraw");
-    if (!container || !appData.budget || !appData.categories) return;
+
+    const selectedYear =
+        getSelectedYear();
+
+    const container =
+        document.getElementById(
+            "fundingPlanList"
+        );
+
+    if (
+        !container ||
+        !appData.budget ||
+        !appData.categories
+    ) return;
+
     const categoryTypes = {};
-    const categoryGroups = {};
+    const fundingSources = {};
+
     appData.categories.forEach(cat => {
-        categoryTypes[cat.categoryName] = cat.budgetType;
-        categoryGroups[cat.categoryName] = cat.group;
+
+        categoryTypes[
+            cat.categoryName
+        ] = cat.budgetType;
+
+        fundingSources[
+            cat.categoryName
+        ] =
+            cat.preferredFundingSource || "";
+
     });
-    let totalIncome = 0,
-        totalExpense = 0,
-        totalSavings = 0,
-        totalDebt = 0,
-        cashToWithdraw = 0;
-    appData.budget.filter(item => Number(item.year) === selectedYear).forEach(item => {
-        if (item.month !== "Jan") return;
-        const type = categoryTypes[item.category];
-        const group = categoryGroups[item.category];
-        const amount = Number(item.plannedAmount) || 0;
-        if (type === "Income") totalIncome += amount;
-        if (type === "Expense") totalExpense += amount;
-        if (type === "Savings") totalSavings += amount;
-        if (type === "Debt") totalDebt += amount;
-        if (group === "Cash") cashToWithdraw += amount;
-    });
-    if (cashContainer) cashContainer.textContent = formatCurrency(cashToWithdraw);
+
+    let totalIncome = 0;
+    let totalExpense = 0;
+    let totalSavings = 0;
+    let totalDebt = 0;
+
+    const fundingRequirements = {};
+
+    appData.budget
+        .filter(
+            item =>
+            Number(item.year) === selectedYear
+        )
+        .forEach(item => {
+
+            if (item.month !== "Jan")
+                return;
+
+            const amount =
+                Number(
+                    item.plannedAmount
+                ) || 0;
+
+            const type =
+                categoryTypes[
+                    item.category
+                ];
+
+            const source =
+                fundingSources[
+                    item.category
+                ];
+
+            if (type === "Income")
+                totalIncome += amount;
+
+            if (type === "Expense")
+                totalExpense += amount;
+
+            if (type === "Savings")
+                totalSavings += amount;
+
+            if (type === "Debt")
+                totalDebt += amount;
+
+            if (source) {
+
+                if (
+                    !fundingRequirements[
+                        source
+                    ]
+                ) {
+
+                    fundingRequirements[
+                        source
+                    ] = 0;
+                }
+
+                fundingRequirements[
+                    source
+                ] += amount;
+            }
+        });
+
+    let fundingHtml = "";
+
+    Object.entries(
+        fundingRequirements
+    ).forEach(
+        ([source, amount]) => {
+
+            fundingHtml += `
+                <div class="funding-row">
+                    <span class="label">
+                        ${source}
+                    </span>
+
+                    <span class="amount">
+                        ${formatCurrency(amount)}
+                    </span>
+                </div>
+            `;
+        }
+    );
+
     container.innerHTML = `
-    <div class="funding-row"><span class="label">Total Monthly Income</span><span class="amount">${formatCurrency(totalIncome)}</span></div>
-    <div class="funding-row"><span class="label">Total Expenses</span><span class="amount">${formatCurrency(totalExpense)}</span></div>
-    <div class="funding-row"><span class="label">Total Savings</span><span class="amount">${formatCurrency(totalSavings)}</span></div>
-    <div class="funding-row"><span class="label">Total Debt Payments</span><span class="amount">${formatCurrency(totalDebt)}</span></div>
-    <div class="funding-row highlight"><span class="label">Cash Requirements</span><span class="amount">${formatCurrency(cashToWithdraw)}</span></div>
-  `;
+        <div class="funding-row">
+            <span class="label">
+                Total Monthly Income
+            </span>
+            <span class="amount">
+                ${formatCurrency(totalIncome)}
+            </span>
+        </div>
+
+        <div class="funding-row">
+            <span class="label">
+                Total Expenses
+            </span>
+            <span class="amount">
+                ${formatCurrency(totalExpense)}
+            </span>
+        </div>
+
+        <div class="funding-row">
+            <span class="label">
+                Total Savings
+            </span>
+            <span class="amount">
+                ${formatCurrency(totalSavings)}
+            </span>
+        </div>
+
+        <div class="funding-row">
+            <span class="label">
+                Total Debt Payments
+            </span>
+            <span class="amount">
+                ${formatCurrency(totalDebt)}
+            </span>
+        </div>
+
+        <hr>
+
+        <h3>Funding Requirements</h3>
+
+        ${fundingHtml}
+    `;
 }
 async function copyJanuaryToWholeYear() {
     if (hasUnsavedBudgetChanges) {
