@@ -411,42 +411,28 @@
   </main>
 
   <!-- Confirmation Modal -->
-  <div
-    id="confirmModal"
-    class="confirm-modal">
-
-    <div class="confirm-card">
-
-      <h3 id="confirmTitle">
-        Confirm Action
-      </h3>
-
-      <p id="confirmMessage">
-        Are you sure?
-      </p>
-
-      <div class="confirm-actions">
-
-        <button
-          class="btn-secondary"
-          id="confirmCancel">
-
-          Cancel
-
-        </button>
-
-        <button
-          class="btn-danger"
-          id="confirmOk">
-
-          Confirm
-
-        </button>
-
+  <div id="confirmModal" class="confirm-modal">
+      <div class="confirm-card">
+          <h3 id="confirmTitle"> Confirm Action </h3>
+          <p id="confirmMessage"> Are you sure? </p>
+          <div class="confirm-actions">
+              <button class="btn-secondary" id="confirmCancel"> Cancel </button>
+              <button class="btn-danger" id="confirmOk"> Confirm </button>
+          </div>
       </div>
+  </div>
 
+  <!-- Input Modal -->
+  <div id="inputModal" class="confirm-modal">
+    <div class="confirm-card">
+      <h3 id="inputTitle">Edit Value</h3>
+      <p id="inputMessage">Enter a new value.</p>
+      <input type="number" id="inputValue">
+      <div class="confirm-actions" style="margin-top:20px;">
+        <button class="btn-secondary" id="inputCancel">Cancel</button>
+        <button id="inputSave">Save</button>
+      </div>
     </div>
-
   </div>
   
   <button id="backToTop" title="Go to top">↑</button>
