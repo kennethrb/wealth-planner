@@ -182,6 +182,33 @@ async function deleteRecurringBill(billId) {
     showStatus("🗑 Recurring Bill Deleted", "success");
 }
 
+// Edit recurring bill amount
+async function editRecurringBill(billId) {
+    const bill = appData.recurringBills.find(b => b.billId === billId);
+    if (!bill) return;
+  
+    const newAmount = prompt(`Enter new amount for ${bill.billName}`, bill.defaultAmount);
+  
+    if (newAmount === null) return;
+    if (isNaN(newAmount) || Number(newAmount) < 0) {
+      showStatus("⚠ Invalid amount","warning");
+      return;
+    }
+  
+    await fetch(
+      `${BASE_URL}?action=updateRecurringBill` +
+      `&billId=${billId}` +
+      `&amount=${newAmount}`
+    );
+  
+    await loadData();
+  
+    loadRecurringBills();
+    loadUpcomingBills();
+  
+    showStatus("✅ Recurring Bill Updated","success");
+  }
+
 // Generate transactions from recurring bills
 async function generateBills() {
   const confirmed = await showConfirmDialog("Generate Bills","Generate transactions from all active recurring bills?");
