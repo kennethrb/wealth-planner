@@ -234,10 +234,6 @@ function loadUpcomingBills() {
   if (!container) return;
 
   const activeBills = (appData.recurringBills || []).filter(bill => bill.active);
-  // Detect paid bills for current month
-  const today = new Date();
-  const currentMonth = today.getMonth();
-  const currentYear = today.getFullYear();
 
   if (!activeBills.length) {
     container.innerHTML = `
@@ -251,40 +247,45 @@ function loadUpcomingBills() {
 
   const today = new Date();
   const currentDay = today.getDate();
-  const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+  const currentMonth = today.getMonth();
+  const currentYear = today.getFullYear();
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-  // Helper to calculate days remaining
-  const getDaysRemaining = (dueDay) => {
-    const diff = dueDay - currentDay;
-    // If due day has passed, treat it as due next month
-    return diff >= 0 ? diff : (daysInMonth - currentDay) + Number(dueDay);
+  // Helper: check if paid this month
+  const checkIsPaid = (billName) => {
+    return (appData.transactions || []).some(tx => {
+      const txDate = new Date(tx.Date || tx.date);
+      const details = tx.Details || tx.details || "";
+      return details === billName &&
+        txDate.getMonth() === currentMonth &&
+        txDate.getFullYear() === currentYear;
+    });
   };
 
-  // Sort by upcoming urgency
-  activeBills.sort((a, b) => getDaysRemaining(a.dueDay) - getDaysRemaining(b.dueDay));
+  // Helper: calculate raw remaining days for the current month
+  const getDaysRemaining = (bill) => {
+    if (checkIsPaid(bill.billName)) return 999; // Paid items go to bottom
+    const diff = bill.dueDay - currentDay;
+    return diff < 0 ? -100 + diff : diff; // Overdue items go to top
+  };
+
+  // Sort by urgency: Overdue -> Due Soon -> Future -> Paid
+  activeBills.sort((a, b) => getDaysRemaining(a) - getDaysRemaining(b));
 
   container.innerHTML = `
     <div class="card">
       <h2>🔔 Upcoming Bills</h2>
       ${activeBills.map(bill => {
-        const isPaid = (appData.transactions || []).some(tx => {
-        const txDate = new Date(tx.Date || tx.date);
-        const details = tx.Details || tx.details || "";
-      
-        return details === bill.billName &&
-          txDate.getMonth() === currentMonth &&
-          txDate.getFullYear() === currentYear;
-      });
-
-        const daysRemaining = getDaysRemaining(bill.dueDay);
+        const isPaid = checkIsPaid(bill.billName);
+        const daysRemaining = bill.dueDay - currentDay;
         let status = "";
         let statusClass = "";
 
         if (isPaid) {
           status = "✅ Paid";
           statusClass = "text-success";
-        } else if (bill.dueDay < currentDay) {
-          status = "🔴 Overdue";
+        } else if (daysRemaining < 0) {
+          status = `🔴 Overdue by ${Math.abs(daysRemaining)} day(s)`;
           statusClass = "bill-overdue";
         } else if (daysRemaining <= 7) {
           status = `🟡 Due in ${daysRemaining} day(s)`;
