@@ -182,6 +182,22 @@ async function deleteRecurringBill(billId) {
     showStatus("🗑 Recurring Bill Deleted", "success");
 }
 
+// Generate transactions from recurring bills
+async function generateBills() {
+  const confirmed = await showConfirmDialog("Generate Bills","Generate transactions from all active recurring bills?");
+  if (!confirmed) return;
+
+  const response = await fetch(`${BASE_URL}?action=generateBills`);
+  const result = await response.json();
+
+  await loadData();
+
+  loadTransactions();
+  loadBudgetVsActual();
+
+  showStatus(`✅ ${result.count} bills generated`,"success");
+}
+
 function loadAccounts() {
     const container = document.getElementById("accounts");
     if (!container) return;
