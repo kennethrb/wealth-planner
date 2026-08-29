@@ -1079,6 +1079,12 @@ function runScenario() {
 }
 
 async function changeBudgetYear() {
+    if (hasUnsavedBudgetChanges) {
+        const proceed = await showConfirmDialog("Unsaved Changes", "You have unsaved budget changes. Continue without saving?");
+        if (!proceed) {
+            return;
+        }
+    }
     await Promise.all([
         loadBudgetPlanner(),
         loadSummary(),
