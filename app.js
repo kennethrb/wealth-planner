@@ -592,10 +592,20 @@ async function addBudgetItem() {
         return;
     }
     await loadData();
+    // Refresh year dropdown
+    loadYearDropdown();
+    // Automatically switch to the year just added
+    const yearDropdown = document.getElementById("budgetYear");
+    if (yearDropdown) {
+        yearDropdown.value = year;
+    }
     await Promise.all([
         loadBudgetPlanner(),
         loadSummary(),
-        loadDashboard()
+        loadDashboard(),
+        loadProjection(),
+        loadFundingPlan(),
+        loadBudgetVsActual()
     ]);
     showStatus(result.message || "✅ Budget Item Added", "success");
 }
