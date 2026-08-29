@@ -940,6 +940,8 @@ async function refreshUI() {
     loadCategoryDropdown();
     loadTransactionAccounts();
     loadTransactionPositions();
+    loadRecurringBillAccounts();
+    loadRecurringBillPositions();
     loadTransactions();
     loadBudgetVsActual();
     loadScenarioCategories();
