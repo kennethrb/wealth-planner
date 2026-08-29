@@ -210,7 +210,7 @@ async function addTransaction() {
     }
     loadTransactions();
     loadBudgetVsActual();
-    showStatus("✅ Transaction Added", "success");
+    showStatus("✅ Transaction recorded", "success");
 }
 
 function loadTransactions() {
@@ -382,7 +382,7 @@ async function addRecurringBill() {
     await loadData();
     loadRecurringBills();
     loadUpcomingBills();
-    showStatus("✅ Recurring Bill Added", "success");
+    showStatus("✅ Recurring bill created", "success");
 }
 
 async function deleteRecurringBill(billId) {
@@ -482,7 +482,7 @@ function loadUpcomingBills() {
   if (!activeBills.length) {
     container.innerHTML = `
       <div class="card">
-        <h2>🔔 Upcoming Bills</h2>
+        <h2>📅 Upcoming Bills</h2>
         <p>No recurring bills found.</p>
       </div>
     `;
@@ -828,7 +828,7 @@ async function addBudgetItem() {
         loadFundingPlan(),
         loadBudgetVsActual()
     ]);
-    showStatus(result.message || "✅ Budget Item Added", "success");
+    showStatus(result.message || "✅ Budget updated", "success");
 }
 
 async function deleteBudgetItem(category) {
