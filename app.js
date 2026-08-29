@@ -566,6 +566,7 @@ async function deleteCategory() {
     await loadScenarioCategories();
     showStatus(`🗑 Category ${categoryName} deleted`, "success");
 }
+
 async function addBudgetItem() {
     const year = document.getElementById("newYear")?.value;
     const month = document.getElementById("newMonth")?.value;
@@ -577,11 +578,21 @@ async function addBudgetItem() {
     }
     const confirmed = await showConfirmDialog("Add Budget Item", `Add budget item "${category}" for ${month} ${year}?`);
     if (!confirmed) return;
-    await fetch(`${BASE_URL}?action=addBudgetItem` + `&year=${year}&month=${month}` + `&category=${encodeURIComponent(category)}` + `&amount=${amount}`);
+    const response = await fetch(`${BASE_URL}?action=addBudgetItem` + `&year=${year}` + `&month=${month}` + `&category=${encodeURIComponent(category)}` + `&amount=${amount}`);
+    const result = await response.json();
+    if (!result.success) {
+        showStatus(`⚠ ${result.message || "Unable to add budget item"}`, "warning");
+        return;
+    }
     await loadData();
-    await Promise.all([loadBudgetPlanner(), loadSummary(), loadDashboard()]);
-    showStatus("✅ Budget Item Added", "success");
+    await Promise.all([
+        loadBudgetPlanner(),
+        loadSummary(),
+        loadDashboard()
+    ]);
+    showStatus(result.message || "✅ Budget Item Added", "success");
 }
+
 async function deleteBudgetItem(category) {
     const confirmed = await showConfirmDialog("Delete Budget Item", `Delete "${category}" from all months?`);
     if (!confirmed) return;
