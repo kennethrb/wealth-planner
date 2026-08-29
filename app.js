@@ -172,6 +172,16 @@ async function addRecurringBill() {
     showStatus("✅ Recurring Bill Added", "success");
 }
 
+async function deleteRecurringBill(billId) {
+    const confirmed = await showConfirmDialog("Delete Recurring Bill", "Delete this recurring bill?");
+    if (!confirmed) return;
+    await fetch(`${BASE_URL}?action=deleteRecurringBill` + `&billId=${billId}`);
+    await loadData();
+    loadRecurringBills();
+    loadUpcomingBills();
+    showStatus("🗑 Recurring Bill Deleted", "success");
+}
+
 function loadAccounts() {
     const container = document.getElementById("accounts");
     if (!container) return;
@@ -283,7 +293,11 @@ function loadRecurringBills() {
         <strong>${bill.billName}</strong><br>
         <small>${bill.budgetType} • Due Day ${bill.dueDay}</small>
       </div>
-      <div>${formatCurrency(bill.defaultAmount)}</div>
+      < div style = "display:flex;gap:8px;align-items:center;" > < span > $ {
+            formatCurrency(bill.defaultAmount)
+        } < /span> < button
+        class = "btn-delete-row"
+        onclick = "deleteRecurringBill('${bill.billId}')" > ✕ < /button> < /div>
     </div>
   `).join("");
 }
