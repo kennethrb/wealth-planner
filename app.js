@@ -145,20 +145,23 @@ function toggleTransactionFields() {
 }
 
 async function addTransaction() {
-    const transferToAccount = document.getElementById("txToAccount")?.value || "";
     const date = document.getElementById("txDate")?.value;
     const amount = document.getElementById("txAmount")?.value;
     const details = document.getElementById("txDetails")?.value;
     const account = document.getElementById("txAccount")?.value;
     const budgetType = document.getElementById("txBudgetType")?.value;
-    const budgetPosition = document.getElementById("txBudgetPosition")?.value;
+    let budgetPosition = document.getElementById("txBudgetPosition")?.value || "";
+    const transferToAccount = document.getElementById("txToAccount")?.value || "";
+    if (budgetType === "Transfer") {
+        budgetPosition = "";
+    }
     if (!date || !amount || !account) {
         showStatus("⚠ Please complete all required fields.", "warning");
         return;
     }
     const confirmed = await showConfirmDialog("Add Transaction", "Do you want to add this transaction?");
     if (!confirmed) return;
-    await fetch(`${BASE_URL}?action=addTransaction` + `&date=${encodeURIComponent(date)}` + `&amount=${amount}` + `&details=${encodeURIComponent(details)}` + `&account=${encodeURIComponent(account)}` + `&budgetType=${encodeURIComponent(budgetType)}` + `&budgetPosition=${encodeURIComponent(budgetPosition)}`+ `&transferToAccount=${encodeURIComponent(transferToAccount)}`);
+    await fetch(`${BASE_URL}?action=addTransaction` + `&date=${encodeURIComponent(date)}` + `&amount=${amount}` + `&details=${encodeURIComponent(details)}` + `&account=${encodeURIComponent(account)}` + `&budgetType=${encodeURIComponent(budgetType)}` + `&budgetPosition=${encodeURIComponent(budgetPosition)}` + `&transferToAccount=${encodeURIComponent(transferToAccount)}`);
     await loadData();
     loadTransactions();
     loadBudgetVsActual();
