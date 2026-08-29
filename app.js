@@ -611,13 +611,22 @@ async function addBudgetItem() {
 }
 
 async function deleteBudgetItem(category) {
-    const confirmed = await showConfirmDialog("Delete Budget Item", `Delete "${category}" from all months?`);
+    const selectedYear = getSelectedYear();
+    const confirmed = await showConfirmDialog("Delete Budget Item", `Delete "${category}" from ${selectedYear}?`);
     if (!confirmed) return;
-    await fetch(`${BASE_URL}?action=deleteBudgetItem&category=${encodeURIComponent(category)}`);
+    await fetch(`${BASE_URL}?action=deleteBudgetItem` + `&year=${selectedYear}` + `&category=${encodeURIComponent(category)}`);
     await loadData();
-    await Promise.all([loadBudgetPlanner(), loadSummary(), loadDashboard(), loadProjection()]);
-    showStatus(`🗑 Deleted ${category}`, "success");
+    await Promise.all([
+        loadBudgetPlanner(),
+        loadSummary(),
+        loadDashboard(),
+        loadProjection(),
+        loadFundingPlan(),
+        loadBudgetVsActual()
+    ]);
+    showStatus(`🗑 Deleted ${category} from ${selectedYear}`, "success");
 }
+
 async function loadBudgetPlanner() {
     const selectedYear = getSelectedYear();
     const budgetData = appData.budget.filter(item => Number(item.year) === selectedYear);
@@ -930,7 +939,8 @@ async function copyJanuaryToWholeYear() {
 async function copyCurrentYearToNextYear() {
     const confirmed = await showConfirmDialog("Create Budget Year", "Generate next year's budget?");
     if (!confirmed) return;
-    const response = await fetch(`${BASE_URL}?action=copyCurrentYearToNextYear`);
+    const selectedYear = getSelectedYear();
+    const response = await fetch(`${BASE_URL}?action=copyCurrentYearToNextYear`
     const result = await response.json();
     await loadData();
     loadYearDropdown();
