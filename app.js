@@ -202,48 +202,28 @@ function loadUpcomingBills() {
 
   const today = new Date();
   const currentDay = today.getDate();
+  const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
 
-  activeBills.sort((a, b) => a.dueDay - b.dueDay);activeBills.sort((a, b) => {
-    const getDaysRemaining = (bill) => {
-      if (bill.dueDay >= currentDay) {
-        return bill.dueDay - currentDay;
-      }
-      const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
-      return (daysInMonth - currentDay) + Number(bill.dueDay);
-    };
-  
-    return getDaysRemaining(a) - getDaysRemaining(b);
-  });
+  // Helper to calculate days remaining
+  const getDaysRemaining = (dueDay) => {
+    const diff = dueDay - currentDay;
+    // If due day has passed, treat it as due next month
+    return diff >= 0 ? diff : (daysInMonth - currentDay) + Number(dueDay);
+  };
+
+  // Sort by upcoming urgency
+  activeBills.sort((a, b) => getDaysRemaining(a.dueDay) - getDaysRemaining(b.dueDay));
 
   container.innerHTML = `
     <div class="card">
       <h2>🔔 Upcoming Bills</h2>
       ${activeBills.map(bill => {
-        let daysRemaining;
-          if (bill.dueDay >= currentDay) {
-          
-            daysRemaining =
-              bill.dueDay - currentDay;
-          
-          } else {
-          
-            const daysInMonth =
-              new Date(
-                today.getFullYear(),
-                today.getMonth() + 1,
-                0
-              ).getDate();
-          
-            daysRemaining =
-              (daysInMonth - currentDay)
-              + Number(bill.dueDay);
-          
-          }
+        const daysRemaining = getDaysRemaining(bill.dueDay);
         let status = "";
         let statusClass = "";
 
-        if (daysRemaining < 0) {
-          status = `🔴 Overdue by ${Math.abs(daysRemaining)} day(s)`;
+        if (daysRemaining === 0) {
+          status = "🔴 Due Today";
           statusClass = "bill-overdue";
         } else if (daysRemaining <= 7) {
           status = `🟡 Due in ${daysRemaining} day(s)`;
