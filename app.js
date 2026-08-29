@@ -153,6 +153,25 @@ async function deleteTransactionRecord(rowNumber) {
     showStatus("🗑 Transaction deleted", "success");
 }
 
+async function addRecurringBill() {
+    const billName = document.getElementById("billName")?.value;
+    const budgetType = document.getElementById("billBudgetType")?.value;
+    const budgetPosition = document.getElementById("billBudgetPosition")?.value;
+    const amountType = document.getElementById("billAmountType")?.value;
+    const amount = document.getElementById("billAmount")?.value;
+    const dueDay = document.getElementById("billDueDay")?.value;
+    const account = document.getElementById("billAccount")?.value;
+    if (!billName || !amount || !dueDay) {
+        showStatus("⚠ Please complete all required fields.", "warning");
+        return;
+    }
+    await fetch(`${BASE_URL}?action=addRecurringBill` + `&billName=${encodeURIComponent(billName)}` + `&budgetType=${encodeURIComponent(budgetType)}` + `&budgetPosition=${encodeURIComponent(budgetPosition)}` + `&amountType=${encodeURIComponent(amountType)}` + `&amount=${amount}` + `&dueDay=${dueDay}` + `&account=${encodeURIComponent(account)}`);
+    await loadData();
+    loadRecurringBills();
+    loadUpcomingBills();
+    showStatus("✅ Recurring Bill Added", "success");
+}
+
 function loadAccounts() {
     const container = document.getElementById("accounts");
     if (!container) return;
