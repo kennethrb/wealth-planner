@@ -285,19 +285,19 @@ function loadTransactions() {
             
                 <td>${tx.Details || tx.details || ""}</td>
             
-                <td>
-                    <button
-                        class="btn-delete-row"
-                        onclick="editTransaction(${tx.rowNumber})">
-                        ✏️
-                    </button>
-            
-                    <button
-                        class="btn-delete-row"
-                        onclick="deleteTransactionRecord(${tx.rowNumber})">
-                        🗑
-                    </button>
-                </td>
+                <td class="action-cell">
+                  <button
+                      class="btn-delete-row"
+                      onclick="editTransaction(${tx.rowNumber})">
+                      ✏️
+                  </button>
+              
+                  <button
+                      class="btn-delete-row"
+                      onclick="deleteTransactionRecord(${tx.rowNumber})">
+                      🗑
+                  </button>
+              </td>
             </tr>
             `;
 
