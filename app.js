@@ -704,9 +704,22 @@ async function addCategory() {
     const categoryName = document.getElementById("categoryName")?.value;
     const budgetType = document.getElementById("budgetType")?.value;
     const group = document.getElementById("categoryGroup")?.value;
-    const preferredFundingSource = document.getElementById("preferredFundingSource")?.value;
-    if (!categoryName || !group) {
-        showStatus("⚠ Please complete all fields.", "warning");
+    const preferredFundingSource =
+        document.getElementById(
+            "preferredFundingSource"
+        )?.value;
+    
+    if (
+        !categoryName ||
+        !group ||
+        !preferredFundingSource
+    ) {
+    
+        showStatus(
+            "⚠ Please complete all fields.",
+            "warning"
+        );
+    
         return;
     }
     const confirmed = await showConfirmDialog("Add Category", `Add category "${categoryName}"?`);
@@ -719,7 +732,18 @@ async function addCategory() {
     document.getElementById("categoryName").value = "";
     document.getElementById("categoryGroup").value = "";
     document.getElementById("budgetType").selectedIndex = 0;
+    document.getElementById("preferredFundingSource").selectedIndex = 0;
 }
+
+const fundingDropdown =
+    document.getElementById(
+        "preferredFundingSource"
+    );
+
+if (fundingDropdown) {
+    fundingDropdown.selectedIndex = 0;
+}
+
 async function loadCategoryDropdown() {
     const addSelect = document.getElementById("newCategory");
     const deleteSelect = document.getElementById("deleteCategorySelect");
@@ -1215,15 +1239,19 @@ function loadFundingPlan() {
 
     Object.entries(
         fundingRequirements
-    ).forEach(
+    )
+    .sort(
+        (a, b) => b[1] - a[1]
+    )
+    .forEach(
         ([source, amount]) => {
-
+    
             fundingHtml += `
                 <div class="funding-row">
                     <span class="label">
                         ${source}
                     </span>
-
+    
                     <span class="amount">
                         ${formatCurrency(amount)}
                     </span>
