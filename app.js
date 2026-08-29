@@ -234,15 +234,25 @@ function loadUpcomingBills() {
   activeBills.sort((a, b) => a.dueDay - b.dueDay);
 
   container.innerHTML = `
-    <div class="card">
-      <h2>🔔 Upcoming Bills</h2>
-      ${activeBills.map(bill => `
+  <div class="card">
+    <h2>🔔 Upcoming Bills</h2>
+    ${activeBills.map(bill => {
+      const daysRemaining = bill.dueDay - currentDay;
+      const status = daysRemaining >= 0
+        ? `Due in ${daysRemaining} day(s)`
+        : `Overdue by ${Math.abs(daysRemaining)} day(s)`;
+  
+      return `
         <div class="funding-row">
-          <span class="label">${bill.billName}</span>
-          <span class="amount">Day ${bill.dueDay}</span>
+          <div>
+            <div>${bill.billName}</div>
+            <small style="color:var(--text-muted);">${status}</small>
+          </div>
+          <span class="amount">${formatCurrency(bill.defaultAmount)}</span>
         </div>
-      `).join("")}
-    </div>
+      `;
+    }).join("")}
+  </div>
   `;
 }
 
