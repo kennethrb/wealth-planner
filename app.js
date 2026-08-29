@@ -16,7 +16,8 @@ let appData = {
   budget: [],
   categories: [],
   goals: [],
-  transactions: []
+  transactions: [],
+  recurringBills: []
 };
 
 function showStatus(message, type = "success") {
@@ -720,6 +721,7 @@ async function loadData() {
     appData.categories = result.categories || [];
     appData.goals = result.goals || [];
     appData.transactions = result.transactions || [];
+    appData.recurringBills = result.recurringBills || [];
   } catch (error) {
     console.error("Failed to load application data:", error);
   }
