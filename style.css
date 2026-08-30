@@ -1208,12 +1208,6 @@ tr.section-debt td:first-child {
         margin-bottom: 12px;
     }
 
-    .action-cell {
-        flex-direction: column;
-        gap: 4px;
-        min-width: 48px;
-    }
-
     .analytics-toolbar {
         flex-direction: column;
         align-items: stretch;
