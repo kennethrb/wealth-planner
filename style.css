@@ -220,6 +220,18 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{
     scroll-margin-top: 120px;
 }
 
+.section-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.section-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 /* Custom Scrollbar for Webkit */
 ::-webkit-scrollbar {
     height: 6px;
@@ -974,6 +986,18 @@ tr.section-debt td:first-child {
         flex-direction: column;
         gap: 4px;
         min-width: 48px;
+    }
+
+
+    .section-nav {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .period-selector {
+        margin-top: 12px;
+        justify-content: center;
+        margin-left: 0;
     }
 
 }
