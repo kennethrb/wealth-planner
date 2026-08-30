@@ -171,13 +171,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{
     display: none; 
 }
 
-/* Flex layout container for links */
-.nav-links {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    width: max-content; /* Prevents links from squishing or wrapping */
-}
+
 
 .section-nav a {
     text-decoration: none;
@@ -229,6 +223,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{
     margin-bottom:20px;
 }
 
+
+.period-selector select {
+    width: 95px;
+    min-width: 95px;
+}
+
 .period-chip {
     padding: 6px 10px;
     border-radius: 999px;
@@ -237,6 +237,37 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{
     font-size: 12px;
     font-weight: 600;
     white-space: nowrap;
+}
+
+.section-nav{
+    display:flex;
+    align-items:center;
+    flex-wrap:nowrap;
+    overflow-x:auto;
+}
+
+.nav-links{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:nowrap;
+    width:auto;
+}
+
+.period-selector{
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    margin-left:16px;
+    flex-shrink:0;
+    white-space:nowrap;
+}
+
+.period-selector select{
+    width:90px;
+    min-width:90px;
+    flex-shrink:0;
 }
 
 /* Custom Scrollbar for Webkit */
@@ -1096,15 +1127,8 @@ tr.section-debt td:first-child {
     }
 }
 
-
-
-
 @media screen and (max-width: 768px) {
 
-    .period-selector{
-        margin-left:16px;
-        flex-shrink:0;
-    }
     .section-nav {
         flex-direction: row;
         align-items: center;
