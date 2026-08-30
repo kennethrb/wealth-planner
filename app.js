@@ -96,7 +96,7 @@ function showInputDialog(title, message, value = "") {
 }
 
 function getSelectedYear() {
-    const val = document.getElementById("budgetYear")?.value;
+    const val = document.getElementById("actualYear")?.value || document.getElementById("budgetYear")?.value;
     if (!val || val === "CURRENT") {
         return new Date().getFullYear();
     }
@@ -776,29 +776,26 @@ async function loadCategoryDropdown() {
     });
 }
 
-function loadYearDropdown() {
-    const dropdown = document.getElementById("budgetYear");
-    if (!dropdown) return;
+function loadYearDropdowns() {
+    const dropdowns = [document.getElementById("actualYear"), document.getElementById("budgetYear")].filter(Boolean);
+    if (dropdowns.length === 0) return;
     
-    // Remember currently selected value if user already picked one
-    const selectedVal = dropdown.value;
-    
-    // Extract unique years from dataset
-    const years = [...new Set(appData.budget.map(item => item.year))].filter(Boolean);
+    // Extract unique years from budget dataset
+    const years = [...new Set((appData.budget || []).map(item => item.year))].filter(Boolean);
     years.sort((a, b) => a - b);
 
-    // Build options with "CURRENT" at the top
-    let html = `<option value="CURRENT">Current Year (${new Date().getFullYear()})</option>`;
-    html += years.map(year => `<option value="${year}">${year}</option>`).join("");
-    
-    dropdown.innerHTML = html;
-
-    // Restore previous selection or default back to "CURRENT"
-    if (selectedVal) {
-        dropdown.value = selectedVal;
-    } else {
-        dropdown.value = "CURRENT";
-    }
+    dropdowns.forEach(dropdown => {
+        const selectedVal = dropdown.value;
+        let html = `<option value="CURRENT">Current Year (${new Date().getFullYear()})</option>`;
+        html += years.map(year => `<option value="${year}">${year}</option>`).join("");
+        
+        dropdown.innerHTML = html;
+        if (selectedVal) {
+            dropdown.value = selectedVal;
+        } else {
+            dropdown.value = "CURRENT";
+        }
+    });
 }
 
 function loadFundingSources() {
