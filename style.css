@@ -1261,4 +1261,11 @@ tr.section-debt td:first-child {
         min-width: auto;
         max-width: none;
     }
+
+    .nav-links{
+        margin-bottom:16px;
+    }
+
+
+   
 }
