@@ -856,7 +856,7 @@ async function addBudgetItem() {
     }
     await loadData();
     // Refresh year dropdown
-    loadYearDropdown();
+    loadYearDropdowns();
     // Automatically switch to the year just added
     const yearDropdown = document.getElementById("budgetYear");
     if (yearDropdown) {
@@ -1380,7 +1380,7 @@ async function copyCurrentYearToNextYear() {
     const response = await fetch(`${BASE_URL}?action=copyCurrentYearToNextYear` + `&year=${selectedYear}`);
     const result = await response.json();
     await loadData();
-    loadYearDropdown();
+    loadYearDropdowns();
     if (result.success) {
         document.getElementById("budgetYear").value = result.nextYear;
         // Keep Add Budget Item in sync
