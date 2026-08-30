@@ -780,17 +780,22 @@ function loadYearDropdown() {
     const dropdown = document.getElementById("budgetYear");
     if (!dropdown) return;
     
-    const selectedYear = dropdown.value;
+    // Remember currently selected value if user already picked one
+    const selectedVal = dropdown.value;
+    
+    // Extract unique years from dataset
     const years = [...new Set(appData.budget.map(item => item.year))].filter(Boolean);
     years.sort((a, b) => a - b);
 
+    // Build options with "CURRENT" at the top
     let html = `<option value="CURRENT">Current Year (${new Date().getFullYear()})</option>`;
     html += years.map(year => `<option value="${year}">${year}</option>`).join("");
     
     dropdown.innerHTML = html;
 
-    if (selectedYear) {
-        dropdown.value = selectedYear;
+    // Restore previous selection or default back to "CURRENT"
+    if (selectedVal) {
+        dropdown.value = selectedVal;
     } else {
         dropdown.value = "CURRENT";
     }
