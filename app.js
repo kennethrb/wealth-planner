@@ -1720,6 +1720,7 @@ async function changeViewPeriod() {
 
 async function refreshUI() {
     loadYearDropdown();
+    loadViewYearDropdown();
     loadCategoryDropdown();
 
     loadFundingSources();
