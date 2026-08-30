@@ -1109,10 +1109,28 @@ tr.section-debt td:first-child {
 }
 
 @media screen and (max-width: 768px) {
+
     .section-nav {
-        flex-wrap: nowrap;
+        flex-direction: row;
+        align-items: center;
         overflow-x: auto;
-        justify-content: flex-start;
+        overflow-y: hidden;
+        flex-wrap: nowrap;
+    }
+
+    .nav-links {
+        display: flex;
+        flex-wrap: nowrap;
+        min-width: max-content;
+    }
+
+    .nav-item {
+        flex-shrink: 0;
+    }
+
+    .period-selector {
+        flex-shrink: 0;
+        margin-left: 16px;
     }
 
     .section-nav a {
