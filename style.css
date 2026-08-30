@@ -232,6 +232,23 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{
     justify-content: space-between;
 }
 
+.nav-item{
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    padding:10px 18px;
+    min-height:48px;
+
+    flex-shrink:0; /* important */
+}
+
+.nav-links{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+}
+
 .analytics-toolbar{
     display:flex;
     gap:12px;
@@ -1261,11 +1278,4 @@ tr.section-debt td:first-child {
         min-width: auto;
         max-width: none;
     }
-
-    .nav-links{
-        margin-bottom:16px;
-    }
-
-
-   
 }
