@@ -1063,14 +1063,8 @@ async function loadSummary() {
     document.getElementById("summary").innerHTML = html;
 }
 async function loadDashboard() {
-    const selectedYear = getViewYear();
-    const selectedMonth = getViewMonth();
-    
-    const budgetData = appData.budget.filter(
-        item =>
-            Number(item.year) === selectedYear &&
-            item.month === selectedMonth
-    );
+    const selectedYear = getSelectedYear();
+    const budgetData = appData.budget.filter(item => Number(item.year) === selectedYear);
     const categoryTypes = {};
     appData.categories.forEach(cat => {
         categoryTypes[cat.categoryName] = cat.budgetType;
@@ -1080,6 +1074,7 @@ async function loadDashboard() {
         savings = 0,
         debt = 0;
     budgetData.forEach(item => {
+        if (item.month !== "Jan") return;
         const type = categoryTypes[item.category];
         const amount = Number(item.plannedAmount);
         if (type === "Income") income += amount;
@@ -1720,7 +1715,6 @@ async function changeViewPeriod() {
 
 async function refreshUI() {
     loadYearDropdown();
-    loadViewYearDropdown();
     loadCategoryDropdown();
 
     loadFundingSources();
