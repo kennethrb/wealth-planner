@@ -24,6 +24,40 @@ function getViewMonth() {
     return viewState.month || "Jan";
 }
 
+function loadViewYearDropdown() {
+
+    const dropdown =
+        document.getElementById("viewYear");
+
+    if (!dropdown) return;
+
+    const years =
+        [...new Set(
+            appData.budget.map(
+                item => Number(item.year)
+            )
+        )]
+        .filter(Boolean)
+        .sort();
+
+    dropdown.innerHTML =
+        years.map(year =>
+            `<option value="${year}">
+                ${year}
+            </option>`
+        ).join("");
+
+    if (!viewState.year) {
+
+        viewState.year =
+            Math.max(...years);
+
+    }
+
+    dropdown.value =
+        viewState.year;
+}
+
 function getBudgetDataForPeriod() {
 
     const year = getViewYear();
@@ -1661,6 +1695,24 @@ async function refreshFinancialViews() {
     ]);
 }
 
+async function changeViewPeriod() {
+
+    viewState.year =
+        Number(
+            document.getElementById("viewYear").value
+        );
+
+    viewState.month =
+        document.getElementById("viewMonth").value;
+
+    await Promise.all([
+        loadDashboard(),
+        loadProjection(),
+        loadFundingPlan(),
+        loadBudgetVsActual()
+    ]);
+}
+
 async function refreshUI() {
     loadYearDropdown();
     loadCategoryDropdown();
@@ -1701,6 +1753,17 @@ async function initializeApp() {
     if (newYearInput) {
         newYearInput.value = latestYear;
     }
+  const monthNames = [
+ "Jan","Feb","Mar","Apr",
+ "May","Jun","Jul","Aug",
+ "Sep","Oct","Nov","Dec"
+];
+
+    viewState.month =
+    monthNames[new Date().getMonth()];
+    document.getElementById("viewMonth").value =
+    viewState.month;
+  
     setupScrollSpy();
     toggleTransactionFields();
 }
