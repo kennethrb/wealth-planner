@@ -95,8 +95,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{
 
 #transactionsList td:last-child,
 #transactionsList th:last-child {
-    min-width: 90px;
-    text-align: center;
+    min-width: 100px;
 }
 
 /* ====================
