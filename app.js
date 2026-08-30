@@ -11,6 +11,41 @@ const formatCurrency = (amount) => {
 const BASE_URL =
 "https://script.google.com/macros/s/AKfycbwZGBobKrROvavAglc9QZlBmbSggBudqJBH6dT7LrkPopdZDQVbCZ4FWhE926f1Z_Y-NQ/exec";
 
+let viewState = {
+    year: null,
+    month: null
+};
+
+function getViewYear() {
+    return viewState.year || getSelectedYear();
+}
+
+function getViewMonth() {
+    return viewState.month || "Jan";
+}
+
+function getBudgetDataForPeriod() {
+
+    const year = getViewYear();
+    const month = getViewMonth();
+
+    return appData.budget.filter(item =>
+        Number(item.year) === Number(year) &&
+        item.month === month
+    );
+}
+
+function getCategoryTypeMap() {
+
+    const map = {};
+
+    appData.categories.forEach(cat => {
+        map[cat.categoryName] = cat.budgetType;
+    });
+
+    return map;
+}
+
 let hasUnsavedBudgetChanges = false;
 let editingRowNumber = null;
 
