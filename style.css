@@ -127,14 +127,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{
     backdrop-filter: blur(12px);
 }
 
-/* Shown state toggled via JS */
 #backToTop.show {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
 }
 
-/* Hover & Focus state for Desktop */
 #backToTop:hover {
     background-color: var(--primary);
     color: #042f2e;
@@ -147,24 +145,30 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{
     transform: translateY(0);
 }
 
-
+/* ====================
+   SECTION NAVIGATION
+==================== */
 .section-nav {
     position: sticky;
     top: 12px;
     z-index: 100;
     display: flex;
+    align-items: center;
+    justify-content: space-between;
     gap: 10px;
     padding: 12px;
     margin-bottom: 24px;
-    background:
-        rgba(11, 15, 23, .88);
-    backdrop-filter:
-        blur(16px);
-    border:
-        1px solid var(--border);
-    border-radius:
-        var(--radius-lg);
+    background: rgba(11, 15, 23, .88);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+}
+
+.section-nav::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
 }
 
 .section-nav a {
@@ -175,24 +179,26 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{
     white-space: nowrap;
     font-size: 14px;
     font-weight: 600;
+    transition: var(--transition);
 }
 
 .section-nav a:hover {
-    background:
-        rgba(16, 185, 129, .12);
-    color:
-        var(--text-main);
+    background: rgba(16, 185, 129, .12);
+    color: var(--text-main);
 }
 
 .section-nav a.active {
-    background:
-        rgba(16, 185, 129, .18);
-    color:
-        #34d399;
-    border:
-        1px solid rgba(16, 185, 129, .25);
-    box-shadow:
-        0 0 16px rgba(16, 185, 129, .15);
+    background: rgba(16, 185, 129, .18);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, .25);
+    box-shadow: 0 0 16px rgba(16, 185, 129, .15);
+}
+
+.nav-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 4px;
 }
 
 #overview,
@@ -204,26 +210,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{
     scroll-margin-top: 120px;
 }
 
-.section-nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.section-nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.nav-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-
-    margin: 4px;
-}
-
 .analytics-toolbar{
     display:flex;
     gap:12px;
@@ -231,7 +217,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{
     justify-content:flex-end;
     margin-bottom:20px;
 }
-
 
 .period-selector {
     display: flex;
@@ -254,7 +239,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{
     font-weight: 600;
     white-space: nowrap;
 }
-
 
 /* Custom Scrollbar for Webkit */
 ::-webkit-scrollbar {
@@ -353,12 +337,9 @@ main>section {
 }
 
 .card:hover {
-    border-color:
-        rgba(255, 255, 255, .18);
-    transform:
-        translateY(-3px);
-    box-shadow:
-        0 24px 50px rgba(0, 0, 0, .45);
+    border-color: rgba(255, 255, 255, .18);
+    transform: translateY(-3px);
+    box-shadow: 0 24px 50px rgba(0, 0, 0, .45);
 }
 
 .card-title {
@@ -522,12 +503,9 @@ button,
 
 button:hover,
 .btn:hover {
-    background-color:
-        #34d399;
-    transform:
-        translateY(-2px);
-    box-shadow:
-        0 12px 24px rgba(16, 185, 129, .25);
+    background-color: #34d399;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(16, 185, 129, .25);
 }
 
 button:active,
@@ -599,8 +577,7 @@ th {
 }
 
 tbody tr {
-    transition:
-        background .15s ease;
+    transition: background .15s ease;
 }
 
 td,
@@ -660,7 +637,6 @@ tr:hover {
     box-shadow: none;
     font-size: 14px;
     border-radius: var(--radius-sm);
-
     display: flex;
     align-items: center;
     justify-content: center;
@@ -803,8 +779,7 @@ tr.section-debt td:first-child {
 .grand-total td {
     border-top: 6px solid #ffffff !important;
     font-weight: 800;
-    background-color:
-        rgba(255, 255, 255, .08);
+    background-color: rgba(255, 255, 255, .08);
 }
 
 /* ====================
@@ -819,25 +794,15 @@ tr.section-debt td:first-child {
 }
 
 .networth-banner.positive {
-    background:
-        linear-gradient(135deg,
-            rgba(16, 185, 129, .18),
-            rgba(16, 185, 129, .04));
-    border-color:
-        rgba(16, 185, 129, .30);
-    backdrop-filter:
-        blur(20px);
+    background: linear-gradient(135deg, rgba(16, 185, 129, .18), rgba(16, 185, 129, .04));
+    border-color: rgba(16, 185, 129, .30);
+    backdrop-filter: blur(20px);
 }
 
 .networth-banner.negative {
-    background:
-        linear-gradient(135deg,
-            rgba(239, 68, 68, .16),
-            rgba(239, 68, 68, .04));
-    border-color:
-        rgba(239, 68, 68, .30);
-    backdrop-filter:
-        blur(20px);
+    background: linear-gradient(135deg, rgba(239, 68, 68, .16), rgba(239, 68, 68, .04));
+    border-color: rgba(239, 68, 68, .30);
+    backdrop-filter: blur(20px);
 }
 
 .networth-banner h2 {
@@ -947,7 +912,6 @@ tr.section-debt td:first-child {
     color: var(--text-main);
 }
 
-
 /* ===================================
    PREMIUM TOAST NOTIFICATIONS
 =================================== */
@@ -963,62 +927,36 @@ tr.section-debt td:first-child {
     font-size: 14px;
     font-weight: 600;
     color: white;
-    box-shadow:
-        0 10px 30px rgba(0, 0, 0, .35);
-    animation:
-        slideIn .3s ease;
-    transition:
-        all .3s ease;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+    animation: slideIn .3s ease;
+    transition: all .3s ease;
     display: none;
-   letter-spacing: .3px;
-   text-align: center;
-}
-
-/* SUCCESS */
-.status-banner.success {
-    background:
-        linear-gradient(135deg,
-            #10b981,
-            #059669);
-    border:
-        1px solid rgba(255, 255, 255, .15);
-}
-
-/* WARNING */
-.status-banner.warning {
-    background:
-        linear-gradient(135deg,
-            #f59e0b,
-            #d97706);
-    border:
-        1px solid rgba(255, 255, 255, .15);
-}
-
-/* ERROR */
-.status-banner.error {
-    background:
-        linear-gradient(135deg,
-            #ef4444,
-            #dc2626);
-    border:
-        1px solid rgba(255, 255, 255, .15);
-}
-
-.status-banner.success,
-.status-banner.warning,
-.status-banner.error {
+    letter-spacing: .3px;
     text-align: center;
+}
+
+.status-banner.success {
+    background: linear-gradient(135deg, #10b981, #059669);
+    border: 1px solid rgba(255, 255, 255, .15);
+}
+
+.status-banner.warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border: 1px solid rgba(255, 255, 255, .15);
+}
+
+.status-banner.error {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border: 1px solid rgba(255, 255, 255, .15);
 }
 
 .status-banner.hide {
     opacity: 0;
-    transform:
-        translateX(30px);
+    transform: translateX(30px);
 }
 
 .section-total {
-    background-color:
-        rgba(255, 255, 255, .04);
+    background-color: rgba(255, 255, 255, .04);
     font-weight: 700;
 }
 
@@ -1073,10 +1011,8 @@ tr.section-debt td:first-child {
 .confirm-modal {
     position: fixed;
     inset: 0;
-    background:
-        rgba(0, 0, 0, .7);
-    backdrop-filter:
-        blur(6px);
+    background: rgba(0, 0, 0, .7);
+    backdrop-filter: blur(6px);
     display: none;
     justify-content: center;
     align-items: center;
@@ -1093,10 +1029,8 @@ tr.section-debt td:first-child {
     padding: 24px;
     border-radius: 16px;
     background: var(--surface);
-    border:
-        1px solid var(--border);
-    box-shadow:
-        var(--shadow-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
 }
 
 .confirm-card h3 {
@@ -1140,24 +1074,19 @@ tr.section-debt td:first-child {
     left: 0;
     background: var(--surface);
     z-index: 2;
-    box-shadow:
-        2px 0 5px rgba(0, 0, 0, .2);
+    box-shadow: 2px 0 5px rgba(0, 0, 0, .2);
 }
 
 @keyframes slideIn {
     from {
         opacity: 0;
-        transform:
-            translateX(40px);
+        transform: translateX(40px);
     }
-
     to {
         opacity: 1;
-        transform:
-            translateX(0);
+        transform: translateX(0);
     }
 }
-
 
 /* ====================
    MOBILE RESPONSIVENESS
@@ -1168,41 +1097,17 @@ tr.section-debt td:first-child {
     }
 }
 
-/* Base Horizontal Scroll (Mobile First) */
-.section-nav {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    gap: 8px;
-    padding: 8px;
-    scrollbar-width: none; /* Hides scrollbar in Firefox */
-}
-
-.section-nav::-webkit-scrollbar {
-    display: none; /* Hides scrollbar in Chrome/Safari */
-}
-
-.section-nav a {
-    flex: 0 0 auto;
-    white-space: nowrap;
-    font-size: 13px;
-    padding: 8px 12px;
-    box-sizing: border-box;
-    text-align: center;
-}
-
-
-/* Mobile View Adjustments */
 @media screen and (max-width: 768px) {
-
-     .section-nav {
-        flex-wrap: wrap;
-        overflow-x: visible;
+    .section-nav {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        justify-content: flex-start;
     }
 
     .section-nav a {
-        flex: 1 1 calc(50% - 8px);
+        flex: 0 0 auto;
+        font-size: 13px;
+        padding: 8px 12px;
     }
 
     .status-banner {
@@ -1286,6 +1191,4 @@ tr.section-debt td:first-child {
     .analytics-toolbar select {
         width: 100%;
     }
-
 }
-
