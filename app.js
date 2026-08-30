@@ -96,12 +96,14 @@ function showInputDialog(title, message, value = "") {
 }
 
 function getSelectedYear() {
-    const val = document.getElementById("actualYear")?.value || document.getElementById("budgetYear")?.value;
-    if (!val || val === "CURRENT") {
-        return new Date().getFullYear();
-    }
-    return Number(val);
+    const yearSelect = document.getElementById("yearSelect"); // Ensure this matches your HTML ID
+    return yearSelect ? Number(yearSelect.value) : new Date().getFullYear();
 }
+
+// Ensure this runs when your page initializes or populates dropdowns
+document.getElementById("yearSelect")?.addEventListener("change", () => {
+    loadBudgetPlanner();
+});
 
 function getSelectedMonth() {
     const val = document.getElementById("actualMonth")?.value;
@@ -890,19 +892,21 @@ async function deleteBudgetItem(category) {
 
 async function loadBudgetPlanner() {
     const selectedYear = getSelectedYear();
+    
+    // Filter budget data for the selected year
     const budgetData = appData.budget.filter(item => Number(item.year) === selectedYear);
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    
+    // Map planned amounts by category and month
     const categories = {};
-    const categoryTypes = {};
-    appData.categories.forEach(cat => {
-        categoryTypes[cat.categoryName] = cat.budgetType;
-    });
     budgetData.forEach(item => {
         if (!categories[item.category]) categories[item.category] = {};
         categories[item.category][item.month] = Number(item.plannedAmount);
     });
+
     const container = document.getElementById("budget");
     if (!container) return;
+
     let html = `
     <div class="table-responsive">
       <table>
@@ -910,34 +914,44 @@ async function loadBudgetPlanner() {
           <th>Category</th>
           ${months.map(m => `<th>${m}</th>`).join('')}
         </tr>
-  `;
+    `;
+
     const sections = ["Income", "Expense", "Savings", "Debt"];
+    
     sections.forEach(section => {
         html += `
-      <tr class="section-${section.toLowerCase()}">
-        <td colspan="${months.length + 1}"><strong>${section.toUpperCase()}</strong></td>
-      </tr>
-    `;
-        Object.keys(categories).forEach(category => {
-            if (categoryTypes[category] === section) {
-                html += `
-          <tr style="height: 38px;">
-            <td style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-              <span>${category}</span>
-              <span onclick="deleteBudgetItem('${category}')" style="cursor: pointer; opacity: 0.5; font-size: 12px;" title="Delete row">🗑</span>
-            </td>
+        <tr class="section-${section.toLowerCase()}">
+          <td colspan="${months.length + 1}"><strong>${section.toUpperCase()}</strong></td>
+        </tr>
         `;
+
+        // Iterate over all available categories to display empty rows when data is missing for the year
+        appData.categories.forEach(cat => {
+            if (cat.budgetType === section) {
+                const category = cat.categoryName;
+                html += `
+                <tr style="height: 38px;">
+                  <td style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                    <span>${category}</span>
+                    <span onclick="deleteBudgetItem('${category}')" style="cursor: pointer; opacity: 0.5; font-size: 12px;" title="Delete row">🗑</span>
+                  </td>
+                `;
+
                 months.forEach(month => {
-                    const amount = categories[category][month] || "";
+                    const amount = (categories[category] && categories[category][month] !== undefined) 
+                        ? categories[category][month] 
+                        : "";
                     html += `<td><input type="number" value="${amount}" id="${category}|${month}"></td>`;
                 });
+
                 html += `</tr>`;
             }
         });
     });
-    const years = [...new Set(appData.budget.map(item => Number(item.year)))].filter(Boolean);
+
     const currentYear = getSelectedYear();
     const nextYear = currentYear + 1;
+
     html += `
       </table>
     </div>
@@ -946,15 +960,18 @@ async function loadBudgetPlanner() {
       <button onclick="copyJanuaryToWholeYear()">📑 Replicate Year</button>
       <button onclick="copyCurrentYearToNextYear()">📅 Create ${nextYear}</button>
     </div>
-  `;
+    `;
+
     container.innerHTML = html;
+
+    // Track unsaved changes on input interaction
     document
-    .querySelectorAll("#budget input[type='number']")
-    .forEach(input => {
-      input.addEventListener("input", () => {
-        hasUnsavedBudgetChanges = true;
+      .querySelectorAll("#budget input[type='number']")
+      .forEach(input => {
+        input.addEventListener("input", () => {
+          hasUnsavedBudgetChanges = true;
+        });
       });
-    });
 }
 async function loadSummary() {
     const selectedYear = getSelectedYear();
