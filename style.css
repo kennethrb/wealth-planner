@@ -147,22 +147,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{
     transform: translateY(0);
 }
 
-/* Mobile View Adjustments */
-@media screen and (max-width: 768px) {
-    #backToTop {
-        bottom: 16px;
-        right: 16px;
-        width: 42px;
-        height: 42px;
-        font-size: 16px;
-    }
-    #transactionsList td:last-child {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        align-items: center;
-    }
-}
 
 .section-nav {
     position: sticky;
@@ -963,93 +947,6 @@ tr.section-debt td:first-child {
     color: var(--text-main);
 }
 
-/* ====================
-   MOBILE RESPONSIVENESS
-==================== */
-@media screen and (max-width: 1024px) {
-    .dashboard-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media screen and (max-width: 768px) {
-    body {
-        padding: 16px 12px;
-    }
-
-    .dashboard-grid,
-    .grid-2,
-    .grid-3 {
-        grid-template-columns: 1fr;
-    }
-
-    .card,
-    .form-card {
-        padding: 16px;
-    }
-
-    .form-group {
-        width: 100%;
-    }
-
-    button,
-    .btn,
-    .action-buttons button {
-        width: 100%;
-        padding: 12px;
-    }
-
-    .action-buttons {
-        flex-direction: column;
-    }
-
-    /* NEW */
-    main>section {
-        margin-bottom: 16px;
-    }
-
-    .card h2 {
-        margin-bottom: 12px;
-    }
-
-    .section-nav {
-        gap: 8px;
-        padding: 8px;
-    }
-
-    .section-nav a {
-        font-size: 13px;
-        padding: 8px 12px;
-    }
-
-    .action-cell {
-        flex-direction: column;
-        gap: 4px;
-        min-width: 48px;
-    }
-
-
-    .section-nav {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .period-selector {
-        margin-top: 12px;
-        justify-content: center;
-        margin-left: 0;
-    }
-
-    .analytics-toolbar{
-        flex-direction:column;
-        align-items:stretch;
-    }
-
-    .analytics-toolbar select{
-        width:100%;
-    }
-
-}
 
 /* ===================================
    PREMIUM TOAST NOTIFICATIONS
@@ -1261,7 +1158,19 @@ tr.section-debt td:first-child {
     }
 }
 
-@media(max-width:768px) {
+
+/* ====================
+   MOBILE RESPONSIVENESS
+==================== */
+@media screen and (max-width: 1024px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Mobile View Adjustments */
+@media screen and (max-width: 768px) {
+
     .status-banner {
         left: 12px;
         right: 12px;
@@ -1269,4 +1178,99 @@ tr.section-debt td:first-child {
         min-width: auto;
         max-width: none;
     }
+
+    #backToTop {
+        bottom: 16px;
+        right: 16px;
+        width: 42px;
+        height: 42px;
+        font-size: 16px;
+    }
+
+    #transactionsList td:last-child {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        align-items: center;
+    }
+    
+    body {
+        padding: 16px 12px;
+    }
+
+    .dashboard-grid,
+    .grid-2,
+    .grid-3 {
+        grid-template-columns: 1fr;
+    }
+
+    .card,
+    .form-card {
+        padding: 16px;
+    }
+
+    .form-group {
+        width: 100%;
+    }
+
+    button,
+    .btn,
+    .action-buttons button {
+        width: 100%;
+        padding: 12px;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    main > section {
+        margin-bottom: 16px;
+    }
+
+    .card h2 {
+        margin-bottom: 12px;
+    }
+
+    /* FIXED: Navigation Wrapping & Spacing */
+    .section-nav {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row; /* Overrides the duplicate flex-direction: column below */
+        gap: 8px;
+        padding: 8px;
+        height: auto; /* Ensures container grows dynamically with items */
+        min-height: min-content;
+    }
+
+    .section-nav a {
+        font-size: 13px;
+        padding: 8px 12px;
+        white-space: nowrap; /* Prevents text breaking onto multiple lines */
+        flex: 1 1 calc(50% - 8px); /* Displays items in a clean 2-column grid layout */
+        box-sizing: border-box;
+        text-align: center;
+    }
+
+    .action-cell {
+        flex-direction: column;
+        gap: 4px;
+        min-width: 48px;
+    }
+
+    .period-selector {
+        margin-top: 12px;
+        justify-content: center;
+        margin-left: 0;
+    }
+
+    .analytics-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .analytics-toolbar select {
+        width: 100%;
+    }
 }
+
