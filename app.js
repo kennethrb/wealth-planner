@@ -209,7 +209,7 @@ async function addTransaction() {
             "➕ Add Transaction";
     }
     loadTransactions();
-    loadBudgetVsActual();
+    await refreshFinancialViews();
     showStatus("✅ Transaction recorded", "success");
 }
 
@@ -344,11 +344,7 @@ async function deleteTransactionRecord(rowNumber) {
     await fetch(`${BASE_URL}?action=deleteTransaction&rowNumber=${rowNumber}`);
     await loadData();
     loadTransactions();
-    loadBudgetVsActual();
-    loadSummary();
-    loadDashboard();
-    loadProjection();
-    loadFundingPlan();
+    await refreshFinancialViews();
     showStatus("🗑 Transaction deleted", "success");
 }
 
@@ -381,7 +377,7 @@ async function addRecurringBill() {
     await fetch(`${BASE_URL}?action=addRecurringBill` + `&billName=${encodeURIComponent(billName)}` + `&budgetType=${encodeURIComponent(budgetType)}` + `&budgetPosition=${encodeURIComponent(budgetPosition)}` + `&amountType=${encodeURIComponent(amountType)}` + `&amount=${amount}` + `&dueDay=${dueDay}` + `&account=${encodeURIComponent(account)}`);
     await loadData();
     loadRecurringBills();
-    loadUpcomingBills();
+    await refreshFinancialViews();
     showStatus("✅ Recurring bill created", "success");
 }
 
@@ -391,7 +387,7 @@ async function deleteRecurringBill(billId) {
     await fetch(`${BASE_URL}?action=deleteRecurringBill` + `&billId=${billId}`);
     await loadData();
     loadRecurringBills();
-    loadUpcomingBills();
+    await refreshFinancialViews();
     showStatus("🗑 Recurring Bill Deleted", "success");
 }
 
@@ -421,7 +417,7 @@ async function editRecurringBill(billId) {
     await loadData();
   
     loadRecurringBills();
-    loadUpcomingBills();
+    await refreshFinancialViews();
   
     showStatus("✅ Recurring Bill Updated","success");
   }
@@ -437,7 +433,7 @@ async function generateBills() {
   await loadData();
 
   loadTransactions();
-  loadBudgetVsActual();
+  await refreshFinancialViews();
 
   showStatus(`✅ ${result.count} bills generated`,"success");
 }
@@ -1617,6 +1613,18 @@ function loadBudgetVsActual() {
     </div>
   `;
 }
+
+async function refreshFinancialViews() {
+    await Promise.all([
+        loadUpcomingBills(),
+        loadDashboard(),
+        loadProjection(),
+        loadSummary(),
+        loadFundingPlan(),
+        loadBudgetVsActual()
+    ]);
+}
+
 async function refreshUI() {
     loadYearDropdown();
     loadCategoryDropdown();
