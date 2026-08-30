@@ -1584,17 +1584,45 @@ function loadBudgetVsActual() {
       </tr>
     `;
     });
-    const grandVariance = grandBudget - grandActual;
-    rows += `
-    <tr class="grand-total">
-      <td><strong>GRAND TOTAL</strong></td>
-      <td><strong>${formatCurrency(grandBudget)}</strong></td>
-      <td><strong>${formatCurrency(grandActual)}</strong></td>
-      <td class="${grandVariance >= 0 ? "text-success" : "text-danger"}">
-        <strong>${grandVariance >= 0 ? "+" : ""}${formatCurrency(grandVariance)}</strong>
-      </td>
-    </tr>
-  `;
+    const budgetIncome =
+      budgetMapTotals.Income || 0;
+    
+    const budgetExpense =
+      budgetMapTotals.Expense || 0;
+    
+    const budgetSavings =
+      budgetMapTotals.Savings || 0;
+    
+    const budgetDebt =
+      budgetMapTotals.Debt || 0;
+    
+    const actualIncome =
+      actualMapTotals.Income || 0;
+    
+    const actualExpense =
+      actualMapTotals.Expense || 0;
+    
+    const actualSavings =
+      actualMapTotals.Savings || 0;
+    
+    const actualDebt =
+      actualMapTotals.Debt || 0;
+    
+    const budgetCashFlow =
+      budgetIncome -
+      budgetExpense -
+      budgetSavings -
+      budgetDebt;
+    
+    const actualCashFlow =
+      actualIncome -
+      actualExpense -
+      actualSavings -
+      actualDebt;
+    
+    const cashFlowVariance =
+      actualCashFlow -
+      budgetCashFlow;
     container.innerHTML = `
     <div class="table-responsive">
       <table class="table table-hover align-middle">
