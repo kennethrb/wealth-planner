@@ -232,6 +232,16 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{
     justify-content: space-between;
 }
 
+.period-chip {
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(16,185,129,.15);
+    color: #34d399;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
 /* Custom Scrollbar for Webkit */
 ::-webkit-scrollbar {
     height: 6px;
