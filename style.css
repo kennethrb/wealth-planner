@@ -232,6 +232,15 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{
     justify-content: space-between;
 }
 
+.analytics-toolbar{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    justify-content:flex-end;
+    margin-bottom:20px;
+}
+
+
 .period-selector {
     display: flex;
     align-items: center;
@@ -1021,6 +1030,15 @@ tr.section-debt td:first-child {
         margin-top: 12px;
         justify-content: center;
         margin-left: 0;
+    }
+
+    .analytics-toolbar{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .analytics-toolbar select{
+        width:100%;
     }
 
 }
