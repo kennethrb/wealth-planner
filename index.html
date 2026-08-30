@@ -170,12 +170,15 @@
     <section class="card">
       <h2>📅 Budget Planner</h2>
       <div class="form-row">
-        <select id="budgetYear" onchange="changeBudgetYear()">
-          <option value="CURRENT" selected>Current Year</option>
+        <select
+          id="budgetYear"
+          onchange="changeBudgetYear()">
         </select>
       </div>
     
-      <div id="budget" class="table-responsive"></div>
+      <div id="budget"
+           class="table-responsive"></div>
+    
     </section>
 
     <!-- Monthly Summary Section -->
@@ -331,11 +334,9 @@
       <h2>📊 Budget vs Actual</h2>
       
       <div class="form-row" style="margin-bottom: 16px;">
-        <!-- Month Dropdown -->
         <div class="form-group">
           <label>Select Month</label>
           <select id="actualMonth" onchange="loadBudgetVsActual()">
-            <option value="CURRENT" selected>Current Month</option>
             <option value="Jan">Jan</option>
             <option value="Feb">Feb</option>
             <option value="Mar">Mar</option>
@@ -350,15 +351,7 @@
             <option value="Dec">Dec</option>
           </select>
         </div>
-    
-        <!-- Year Dropdown -->
-        <div class="form-group">
-          <label>Select Year</label>
-          <select id="actualYear" onchange="loadBudgetVsActual()">
-            <option value="CURRENT" selected>Current Year</option>
-          </select>
-        </div>
-      </div> 
+      </div>
     
       <div id="budgetVsActual"></div>
     </section>
