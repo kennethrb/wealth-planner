@@ -363,21 +363,46 @@ function loadTransferAccounts() {
 }
 
 async function addRecurringBill() {
-    const billName = document.getElementById("billName")?.value;
-    const budgetType = document.getElementById("billBudgetType")?.value;
-    const budgetPosition = document.getElementById("billBudgetPosition")?.value;
-    const amountType = document.getElementById("billAmountType")?.value;
-    const amount = document.getElementById("billAmount")?.value;
-    const dueDay = document.getElementById("billDueDay")?.value;
-    const account = document.getElementById("billAccount")?.value;
+    const billNameInput = document.getElementById("billName");
+    const budgetTypeInput = document.getElementById("billBudgetType");
+    const budgetPositionInput = document.getElementById("billBudgetPosition");
+    const amountTypeInput = document.getElementById("billAmountType");
+    const amountInput = document.getElementById("billAmount");
+    const dueDayInput = document.getElementById("billDueDay");
+    const accountInput = document.getElementById("billAccount");
+
+    const billName = billNameInput?.value;
+    const budgetType = budgetTypeInput?.value;
+    const budgetPosition = budgetPositionInput?.value;
+    const amountType = amountTypeInput?.value;
+    const amount = amountInput?.value;
+    const dueDay = dueDayInput?.value;
+    const account = accountInput?.value;
+
     if (!billName || !amount || !dueDay) {
         showStatus("⚠ Please complete all required fields.", "warning");
         return;
     }
-    await fetch(`${BASE_URL}?action=addRecurringBill` + `&billName=${encodeURIComponent(billName)}` + `&budgetType=${encodeURIComponent(budgetType)}` + `&budgetPosition=${encodeURIComponent(budgetPosition)}` + `&amountType=${encodeURIComponent(amountType)}` + `&amount=${amount}` + `&dueDay=${dueDay}` + `&account=${encodeURIComponent(account)}`);
+
+    await fetch(`${BASE_URL}?action=addRecurringBill` + 
+        `&billName=${encodeURIComponent(billName)}` + 
+        `&budgetType=${encodeURIComponent(budgetType)}` + 
+        `&budgetPosition=${encodeURIComponent(budgetPosition)}` + 
+        `&amountType=${encodeURIComponent(amountType)}` + 
+        `&amount=${amount}` + 
+        `&dueDay=${dueDay}` + 
+        `&account=${encodeURIComponent(account)}`
+    );
+
     await loadData();
     loadRecurringBills();
     await refreshFinancialViews();
+
+    // Reset Form Input Fields
+    if (billNameInput) billNameInput.value = "";
+    if (amountInput) amountInput.value = "";
+    if (dueDayInput) dueDayInput.value = "";
+
     showStatus("✅ Recurring bill created", "success");
 }
 
@@ -1475,39 +1500,24 @@ function loadBudgetVsActual() {
     if (!container) return;
     const selectedYear = Number(getSelectedYear());
     const selectedMonth = getSelectedMonth();
-    const monthMap = {
-        Jan: 0,
-        Feb: 1,
-        Mar: 2,
-        Apr: 3,
-        May: 4,
-        Jun: 5,
-        Jul: 6,
-        Aug: 7,
-        Sep: 8,
-        Oct: 9,
-        Nov: 10,
-        Dec: 11
-    };
+    const monthMap = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
     const targetMonthIndex = monthMap[selectedMonth] ?? 0;
-    // 1. Map Planned Budgets
+
     const budgetMap = {};
     (appData.budget || []).filter(row => Number(row.year) === selectedYear && row.month === selectedMonth).forEach(row => {
         const cat = (row.category || "").trim();
         if (cat) budgetMap[cat] = Number(row.plannedAmount) || 0;
     });
-    // 2. Map Actual Transactions Data
+
     const actualMap = {};
     (appData.transactions || []).forEach(tx => {
-        // Search dynamically across possible case variations for object properties
         const rawDate = tx.Date || tx.date || tx.DATE;
         if (!rawDate) return;
-        // Parse date safely
         let txYear, txMonthIndex;
         if (typeof rawDate === "string" && rawDate.includes("-")) {
             const parts = rawDate.split("T")[0].split("-");
             txYear = Number(parts[0]);
-            txMonthIndex = Number(parts[1]) - 1; // 0-indexed month
+            txMonthIndex = Number(parts[1]) - 1;
         } else {
             const txDate = new Date(rawDate);
             if (isNaN(txDate.getTime())) return;
@@ -1515,103 +1525,94 @@ function loadBudgetVsActual() {
             txMonthIndex = txDate.getMonth();
         }
         if (txYear !== selectedYear || txMonthIndex !== targetMonthIndex) return;
-        // Grab Category Name safely across all API field variants
-        const category = tx["Budget Position"] || tx["budgetPosition"] || tx["BudgetPosition"] || tx["Category"] || tx["category"];
+        const category = tx["Budget Position"] || tx["budgetPosition"] || tx["Category"] || tx["category"];
         if (!category) return;
         const rawAmount = tx.Amount || tx.amount || tx.AMOUNT || 0;
-        const amount = Math.abs(Number(rawAmount) || 0);
-        if (!actualMap[category]) {
-            actualMap[category] = 0;
-        }
-        actualMap[category] += amount;
+        actualMap[category] = (actualMap[category] || 0) + Math.abs(Number(rawAmount) || 0);
     });
+
     const categories = [...new Set([...Object.keys(budgetMap), ...Object.keys(actualMap)])];
-    // 3. Map Category Types (Normalize Casing & Whitespace)
     const categoryTypes = {};
     (appData.categories || []).forEach(cat => {
         const catName = (cat.categoryName || cat.category || cat.name || "").trim();
         const bType = (cat.budgetType || cat.type || "").trim();
         if (catName) {
-            // Normalize to Title Case (e.g., "expense" -> "Expense")
             categoryTypes[catName] = bType.charAt(0).toUpperCase() + bType.slice(1).toLowerCase();
         }
     });
+
     const sections = ["Income", "Expense", "Savings", "Debt", "Other"];
     let rows = "";
-    let grandBudget = 0;
-    let grandActual = 0;
+
+    // Track totals per financial category
+    const sectionTotals = { Income: { b: 0, a: 0 }, Expense: { b: 0, a: 0 }, Savings: { b: 0, a: 0 }, Debt: { b: 0, a: 0 }, Other: { b: 0, a: 0 } };
+
     sections.forEach(section => {
-        const sectionCategories = categories.filter(cat => {
-            const type = categoryTypes[cat] || "Other";
-            return type === section;
-        }).sort((a, b) => (actualMap[b] || 0) - (actualMap[a] || 0));
+        const sectionCategories = categories.filter(cat => (categoryTypes[cat] || "Other") === section);
         if (sectionCategories.length === 0) return;
-        rows += `
-      <tr class="table-secondary section-${section.toLowerCase()}">
-        <td colspan="4"><strong>${section.toUpperCase()}</strong></td>
-      </tr>
-    `;
-        let sectionBudget = 0;
-        let sectionActual = 0;
+
+        rows += `<tr class="table-secondary section-${section.toLowerCase()}"><td colspan="4"><strong>${section.toUpperCase()}</strong></td></tr>`;
+        
+        let sBudget = 0;
+        let sActual = 0;
+
         sectionCategories.forEach(cat => {
             const budget = budgetMap[cat] || 0;
             const actual = actualMap[cat] || 0;
-            sectionBudget += budget;
-            sectionActual += actual;
-            grandBudget += budget;
-            grandActual += actual;
+            sBudget += budget;
+            sActual += actual;
             const variance = section === "Income" ? actual - budget : budget - actual;
+
             rows += `
-        <tr>
-          <td>${cat}</td>
-          <td>${formatCurrency(budget)}</td>
-          <td>${formatCurrency(actual)}</td>
-          <td class="${variance >= 0 ? "text-success" : "text-danger"}">
-            ${variance >= 0 ? "+" : ""}${formatCurrency(variance)}
-          </td>
-        </tr>
-      `;
+                <tr>
+                    <td>${cat}</td>
+                    <td>${formatCurrency(budget)}</td>
+                    <td>${formatCurrency(actual)}</td>
+                    <td class="${variance >= 0 ? "text-success" : "text-danger"}">
+                        ${variance >= 0 ? "+" : ""}${formatCurrency(variance)}
+                    </td>
+                </tr>`;
         });
-        const sectionVariance = section === "Income" ? sectionActual - sectionBudget : sectionBudget - sectionActual;
+
+        sectionTotals[section].b = sBudget;
+        sectionTotals[section].a = sActual;
+
+        const sVariance = section === "Income" ? sActual - sBudget : sBudget - sActual;
         rows += `
-      <tr class="section-total total-${section.toLowerCase()}">
-        <td><strong>TOTAL ${section.toUpperCase()}</strong></td>
-        <td><strong>${formatCurrency(sectionBudget)}</strong></td>
-        <td><strong>${formatCurrency(sectionActual)}</strong></td>
-        <td class="${sectionVariance >= 0 ? "text-success" : "text-danger"}">
-          <strong>${sectionVariance >= 0 ? "+" : ""}${formatCurrency(sectionVariance)}</strong>
-        </td>
-      </tr>
-    `;
+            <tr class="section-total total-${section.toLowerCase()}">
+                <td><strong>TOTAL ${section.toUpperCase()}</strong></td>
+                <td><strong>${formatCurrency(sBudget)}</strong></td>
+                <td><strong>${formatCurrency(sActual)}</strong></td>
+                <td class="${sVariance >= 0 ? "text-success" : "text-danger"}">
+                    <strong>${sVariance >= 0 ? "+" : ""}${formatCurrency(sVariance)}</strong>
+                </td>
+            </tr>`;
     });
-    const grandVariance = grandBudget - grandActual;
+
+    // Compute Net Grand Total (Net Surplus = Income - Outflows)
+    const netBudget = sectionTotals.Income.b - (sectionTotals.Expense.b + sectionTotals.Savings.b + sectionTotals.Debt.b + sectionTotals.Other.b);
+    const netActual = sectionTotals.Income.a - (sectionTotals.Expense.a + sectionTotals.Savings.a + sectionTotals.Debt.a + sectionTotals.Other.a);
+    const netVariance = netActual - netBudget;
+
     rows += `
-    <tr class="grand-total">
-      <td><strong>GRAND TOTAL</strong></td>
-      <td><strong>${formatCurrency(grandBudget)}</strong></td>
-      <td><strong>${formatCurrency(grandActual)}</strong></td>
-      <td class="${grandVariance >= 0 ? "text-success" : "text-danger"}">
-        <strong>${grandVariance >= 0 ? "+" : ""}${formatCurrency(grandVariance)}</strong>
-      </td>
-    </tr>
-  `;
+        <tr class="grand-total">
+            <td><strong>NET SURPLUS / DEFICIT</strong></td>
+            <td><strong>${formatCurrency(netBudget)}</strong></td>
+            <td><strong>${formatCurrency(netActual)}</strong></td>
+            <td class="${netVariance >= 0 ? "text-success" : "text-danger"}">
+                <strong>${netVariance >= 0 ? "+" : ""}${formatCurrency(netVariance)}</strong>
+            </td>
+        </tr>`;
+
     container.innerHTML = `
-    <div class="table-responsive">
-      <table class="table table-hover align-middle">
-        <thead>
-          <tr>
-            <th>Category</th>
-            <th>Budget</th>
-            <th>Actual</th>
-            <th>Variance</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows || '<tr><td colspan="4" class="text-center text-muted">No data available for this period.</td></tr>'}
-        </tbody>
-      </table>
-    </div>
-  `;
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr><th>Category</th><th>Budget</th><th>Actual</th><th>Variance</th></tr>
+                </thead>
+                <tbody>${rows || '<tr><td colspan="4" class="text-center text-muted">No data available for this period.</td></tr>'}</tbody>
+            </table>
+        </div>`;
 }
 
 async function refreshFinancialViews() {
