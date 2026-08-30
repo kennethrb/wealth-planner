@@ -1162,12 +1162,13 @@ tr.section-debt td:first-child {
         font-size: 16px;
     }
 
-    #transactionsList td:last-child {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        align-items: center;
-    }
+   #transactionsList .action-cell {
+       display: flex !important;
+       flex-direction: row !important;
+       align-items: center;
+       justify-content: center;
+       gap: 8px;
+   }
     
     body {
         padding: 16px 12px;
