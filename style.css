@@ -1168,8 +1168,42 @@ tr.section-debt td:first-child {
     }
 }
 
+/* Base Horizontal Scroll (Mobile First) */
+.section-nav {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 8px;
+    padding: 8px;
+    scrollbar-width: none; /* Hides scrollbar in Firefox */
+}
+
+.section-nav::-webkit-scrollbar {
+    display: none; /* Hides scrollbar in Chrome/Safari */
+}
+
+.section-nav a {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    font-size: 13px;
+    padding: 8px 12px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+
 /* Mobile View Adjustments */
 @media screen and (max-width: 768px) {
+
+     .section-nav {
+        flex-wrap: wrap;
+        overflow-x: visible;
+    }
+
+    .section-nav a {
+        flex: 1 1 calc(50% - 8px);
+    }
 
     .status-banner {
         left: 12px;
@@ -1232,26 +1266,6 @@ tr.section-debt td:first-child {
         margin-bottom: 12px;
     }
 
-    /* FIXED: Navigation Wrapping & Spacing */
-    .section-nav {
-        display: flex;
-        flex-wrap: wrap;
-        flex-direction: row; /* Overrides the duplicate flex-direction: column below */
-        gap: 8px;
-        padding: 8px;
-        height: auto; /* Ensures container grows dynamically with items */
-        min-height: min-content;
-    }
-
-    .section-nav a {
-        font-size: 13px;
-        padding: 8px 12px;
-        white-space: nowrap; /* Prevents text breaking onto multiple lines */
-        flex: 1 1 calc(50% - 8px); /* Displays items in a clean 2-column grid layout */
-        box-sizing: border-box;
-        text-align: center;
-    }
-
     .action-cell {
         flex-direction: column;
         gap: 4px;
@@ -1272,5 +1286,6 @@ tr.section-debt td:first-child {
     .analytics-toolbar select {
         width: 100%;
     }
+
 }
 
