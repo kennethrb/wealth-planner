@@ -146,7 +146,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{
 }
 
 /* ====================
-   SECTION NAVIGATION (SCROLLABLE)
+   SECTION NAVIGATION (SINGLE-ROW SCROLL)
 ==================== */
 .section-nav {
     position: sticky;
@@ -158,33 +158,45 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{
     backdrop-filter: blur(16px);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
+
+    /* Flexbox inline setup */
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
     
-    /* Enable horizontal scroll container */
+    /* Enable horizontal scrolling on the main container */
     overflow-x: auto;
     overflow-y: hidden;
-    -webkit-overflow-scrolling: touch; /* Smooth inertia scrolling on iOS */
-    scrollbar-width: none; /* Hide scrollbar Firefox */
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
 }
 
-/* Hide scrollbar for Chrome, Safari, Edge */
 .section-nav::-webkit-scrollbar {
-    display: none; 
+    display: none;
 }
 
-
+/* Nav Links Group */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0; /* Prevents navigation items from shrinking */
+}
 
 .section-nav a {
     text-decoration: none;
     color: var(--text-muted);
     padding: 8px 16px;
     border-radius: 999px;
-    white-space: nowrap; /* Prevents text wrap inside links */
+    white-space: nowrap;
     font-size: 14px;
     font-weight: 600;
     transition: var(--transition);
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    flex-shrink: 0;
 }
 
 .section-nav a:hover {
@@ -199,11 +211,33 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{
     box-shadow: 0 0 16px rgba(16, 185, 129, .15);
 }
 
-.nav-item {
-    display: inline-flex;
+/* Right Side Controls */
+.period-selector {
+    display: flex;
     align-items: center;
-    gap: 6px;
-    margin: 4px;
+    gap: 8px;
+    margin-left: 16px;
+    flex-shrink: 0; /* Keeps controls fixed on the same line */
+}
+
+/* Force selects to remain compact and inline */
+.period-selector select {
+    width: auto !important;
+    min-width: 75px !important;
+    padding: 6px 10px;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.period-chip {
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(16, 185, 129, .15);
+    color: #34d399;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 #overview,
@@ -239,30 +273,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{
     white-space: nowrap;
 }
 
-.section-nav{
-    display:flex;
-    align-items:center;
-    flex-wrap:nowrap;
-    overflow-x:auto;
-}
 
-.nav-links{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    flex-wrap:nowrap;
-    width:auto;
-}
-
-.period-selector{
-    display:flex;
-    align-items:center;
-    gap:8px;
-
-    margin-left:16px;
-    flex-shrink:0;
-    white-space:nowrap;
-}
 
 .period-selector select{
     width:90px;
@@ -1129,29 +1140,12 @@ tr.section-debt td:first-child {
 
 @media screen and (max-width: 768px) {
 
-    .section-nav {
-        flex-direction: row;
-        align-items: center;
-        overflow-x: auto;
-        overflow-y: hidden;
-        flex-wrap: nowrap;
-    }
 
-    .nav-links {
-        display: flex;
-        flex-wrap: nowrap;
-        min-width: max-content;
-    }
 
     .nav-item {
         flex-shrink: 0;
     }
-
-    .section-nav a {
-        flex: 0 0 auto;
-        font-size: 13px;
-        padding: 8px 12px;
-    }
+   
 
     .status-banner {
         left: 12px;
