@@ -1646,7 +1646,7 @@ async function refreshFinancialViews() {
 }
 
 async function refreshUI() {
-    loadYearDropdown();
+    loadYearDropdowns(); // Updated from loadYearDropdown()
     loadCategoryDropdown();
 
     loadFundingSources();
