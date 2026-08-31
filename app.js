@@ -378,10 +378,10 @@ function loadTransactions() {
 }
 
 // Fix potential date timezone offsets when editing transactions
-function editTransaction(rowNumber) {
-    const tx = appData.transactions.find(t => t.rowNumber === rowNumber);
+function editTransaction(transactionId) {
+    const tx = appData.transactions.find(t => (t.transactionId || t['Transaction ID']) === transactionId);
     if (!tx) return;
-    editingRowNumber = rowNumber;
+    editingTransactionId = transactionId;
     
     const rawDate = tx.Date || tx.date || "";
     let formattedDate = "";
@@ -411,10 +411,10 @@ function editTransaction(rowNumber) {
     }
 }
 
-async function deleteTransactionRecord(rowNumber) {
+async function deleteTransactionRecord(transactionId) {
     const confirmed = await showConfirmDialog("Delete Transaction", "Delete this transaction?");
     if (!confirmed) return;
-    await fetch(`${BASE_URL}?action=deleteTransaction&rowNumber=${rowNumber}`);
+    await fetch(`${BASE_URL}?action=deleteTransaction&transactionId=${transactionId}`);
     await loadData();
     loadTransactions();
     await refreshFinancialViews();
@@ -877,16 +877,16 @@ function loadFundingSources() {
     });
 }
 
+// AFTER (ID-based)
 async function deleteCategory() {
-    const categoryName = document.getElementById("deleteCategorySelect")?.value;
-    if (!categoryName) return;
-    const confirmDelete = await showConfirmDialog("Delete Category", `Delete "${categoryName}"?\nThis will remove related budget entries.`);
+    const categoryId = document.getElementById("deleteCategorySelect")?.value; // set value to cat.categoryId
+    if (!categoryId) return;
+    const confirmDelete = await showConfirmDialog("Delete Category", `Delete this category?`);
     if (!confirmDelete) return;
-    await fetch(`${BASE_URL}?action=deleteCategory&categoryName=${encodeURIComponent(categoryName)}`);
+    await fetch(`${BASE_URL}?action=deleteCategory&categoryId=${categoryId}`);
     await loadData();
     await loadCategoryDropdown();
-    await loadScenarioCategories();
-    showStatus(`🗑 Category ${categoryName} deleted`, "success");
+    showStatus(`🗑 Category deleted`, "success");
 }
 
 async function addBudgetItem() {
