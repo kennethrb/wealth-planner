@@ -214,6 +214,7 @@ function toggleTransactionFields() {
     }
 }
 
+// Replace addTransaction in script.js
 async function addTransaction() {
     const date = document.getElementById("txDate")?.value;
     const amount = document.getElementById("txAmount")?.value;
@@ -222,22 +223,22 @@ async function addTransaction() {
     const budgetType = document.getElementById("txBudgetType")?.value;
     let budgetPosition = document.getElementById("txBudgetPosition")?.value || "";
     const transferToAccount = document.getElementById("txToAccount")?.value || "";
+    
     if (budgetType === "Transfer") {
         budgetPosition = "";
     }
+    
     if (!date || !amount || !account) {
         showStatus("⚠ Please complete all required fields.", "warning");
         return;
     }
-    const confirmed = await showConfirmDialog("Add Transaction", "Do you want to add this transaction?");
-    if (!confirmed) return;
-    const action =
-        editingRowNumber
-            ? "updateTransaction"
-            : "addTransaction";
     
-    let url =
-        `${BASE_URL}?action=${action}`
+    const confirmed = await showConfirmDialog("Save Transaction", "Do you want to save this transaction?");
+    if (!confirmed) return;
+    
+    const action = editingTransactionId ? "updateTransaction" : "addTransaction";
+    
+    let url = `${BASE_URL}?action=${action}`
         + `&date=${encodeURIComponent(date)}`
         + `&amount=${amount}`
         + `&details=${encodeURIComponent(details)}`
@@ -246,37 +247,25 @@ async function addTransaction() {
         + `&budgetPosition=${encodeURIComponent(budgetPosition)}`
         + `&transferToAccount=${encodeURIComponent(transferToAccount)}`;
     
-    if (editingRowNumber) {
-    
-        url +=
-            `&rowNumber=${editingRowNumber}`;
+    // Pass 'id' so backend updateTransaction(params) can read params.id
+    if (editingTransactionId) {
+        url += `&id=${encodeURIComponent(editingTransactionId)}`;
     }
     
     await fetch(url);
     await loadData();
-    editingRowNumber = null;
     
-    document.getElementById(
-        "txDate"
-    ).value = "";
+    // Reset state
+    editingTransactionId = null;
+    document.getElementById("txDate").value = "";
+    document.getElementById("txAmount").value = "";
+    document.getElementById("txDetails").value = "";
     
-    document.getElementById(
-        "txAmount"
-    ).value = "";
-    
-    document.getElementById(
-        "txDetails"
-    ).value = "";
-    
-    const button =
-        document.querySelector(
-            'button[onclick="addTransaction()"]'
-        );
-    
+    const button = document.querySelector('button[onclick="addTransaction()"]');
     if (button) {
-        button.innerHTML =
-            "➕ Add Transaction";
+        button.innerHTML = "➕ Add Transaction";
     }
+    
     loadTransactions();
     await refreshFinancialViews();
     showStatus("✅ Transaction recorded", "success");
@@ -357,16 +346,16 @@ function loadTransactions() {
                 <td class="action-cell">
                   <button
                       class="btn-delete-row"
-                      onclick="editTransaction(${tx.rowNumber})">
+                      onclick="editTransaction('${tx.transactionId || tx['Transaction ID']}')">
                       ✏️
                   </button>
-              
+                
                   <button
                       class="btn-delete-row"
-                      onclick="deleteTransactionRecord(${tx.rowNumber})">
+                      onclick="deleteTransactionRecord('${tx.transactionId || tx['Transaction ID']}')">
                       🗑
                   </button>
-              </td>
+                </td>
             </tr>
             `;
 
@@ -378,16 +367,20 @@ function loadTransactions() {
 }
 
 // Fix potential date timezone offsets when editing transactions
+// Replace editTransaction in script.js
+let editingTransactionId = null;
+
 function editTransaction(transactionId) {
     const tx = appData.transactions.find(t => (t.transactionId || t['Transaction ID']) === transactionId);
     if (!tx) return;
-    editingTransactionId = transactionId;
+    
+    // Store the actual unique ID instead of the row number
+    editingTransactionId = tx.transactionId || tx['Transaction ID'];
     
     const rawDate = tx.Date || tx.date || "";
     let formattedDate = "";
     if (rawDate) {
         const date = new Date(rawDate);
-        // Format as YYYY-MM-DD using local time instead of UTC to ISO String
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
@@ -401,10 +394,12 @@ function editTransaction(transactionId) {
     document.getElementById("txBudgetType").value = tx["Budget Type"] || tx.budgetType || "";
     toggleTransactionFields();
     document.getElementById("txBudgetPosition").value = tx["Budget Position"] || tx.budgetPosition || "";
+    
     const transferTo = tx["Transfer To Account"] || tx.transferToAccount || "";
     if (document.getElementById("txToAccount")) {
         document.getElementById("txToAccount").value = transferTo;
     }
+    
     const button = document.querySelector('button[onclick="addTransaction()"]');
     if (button) {
         button.innerHTML = "💾 Save Changes";
