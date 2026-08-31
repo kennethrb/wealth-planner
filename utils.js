@@ -1,3 +1,6 @@
+console.log("UTILS FILE LOADED");
+
+
 // Universal Philippine Peso Currency Formatter
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat('en-PH', {
