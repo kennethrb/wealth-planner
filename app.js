@@ -834,7 +834,7 @@ async function loadCategoryDropdown() {
     if (deleteSelect) deleteSelect.innerHTML = "";
     appData.categories.forEach(cat => {
         if (addSelect) addSelect.innerHTML += `<option value="${cat.categoryName}">${cat.categoryName}</option>`;
-        if (deleteSelect) deleteSelect.innerHTML += `<option value="${cat.categoryName}">${cat.categoryName}</option>`;
+        if (deleteSelect) deleteSelect.innerHTML += `<option value="${cat.categoryId}">${cat.categoryName}</option>`;
     });
 }
 
@@ -877,13 +877,16 @@ function loadFundingSources() {
 
 // AFTER (ID-based)
 async function deleteCategory() {
-    const categoryId = document.getElementById("deleteCategorySelect")?.value; // set value to cat.categoryId
+    const categoryId = document.getElementById("deleteCategorySelect")?.value;
     if (!categoryId) return;
+
     const confirmDelete = await showConfirmDialog("Delete Category", `Delete this category?`);
     if (!confirmDelete) return;
-    await fetch(`${BASE_URL}?action=deleteCategory&categoryId=${categoryId}`);
+
+    await fetch(`${BASE_URL}?action=deleteCategory&categoryId=${encodeURIComponent(categoryId)}`);
+
     await loadData();
-    await loadCategoryDropdown();
+    await refreshUI();
     showStatus(`🗑 Category deleted`, "success");
 }
 
