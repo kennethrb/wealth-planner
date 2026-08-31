@@ -409,7 +409,10 @@ function editTransaction(transactionId) {
 async function deleteTransactionRecord(transactionId) {
     const confirmed = await showConfirmDialog("Delete Transaction", "Delete this transaction?");
     if (!confirmed) return;
-    await fetch(`${BASE_URL}?action=deleteTransaction&transactionId=${transactionId}`);
+    
+    // Updated 'transactionId=' to 'id='
+    await fetch(`${BASE_URL}?action=deleteTransaction&id=${transactionId}`);
+    
     await loadData();
     loadTransactions();
     await refreshFinancialViews();
