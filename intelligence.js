@@ -409,30 +409,85 @@ async function loadPersonalInflation() {
         }
     });
 
-    let inflationRate = 0;
+    // No historical data available
+    if (previousExpense === 0) {
 
-    if (previousExpense > 0) {
+        container.innerHTML = `
+            <div class="card">
 
-        inflationRate =
-            (
-                (
-                    currentExpense -
-                    previousExpense
-                ) /
-                previousExpense
-            ) * 100;
+                <h2>
+                    📊 Personal Inflation
+                </h2>
+
+                <div class="metric-row">
+                    <span>
+                        Current Expenses
+                    </span>
+
+                    <strong>
+                        ${formatCurrency(
+                            currentExpense
+                        )}
+                    </strong>
+                </div>
+
+                <div class="metric-row">
+                    <span>
+                        Prior Year
+                    </span>
+
+                    <strong>
+                        No Data
+                    </strong>
+                </div>
+
+                <div class="metric-row">
+                    <span>
+                        Personal Inflation
+                    </span>
+
+                    <strong>
+                        N/A
+                    </strong>
+                </div>
+
+                <div class="metric-row">
+                    <span>
+                        Status
+                    </span>
+
+                    <strong>
+                        ℹ️ Need Previous Year Budget
+                    </strong>
+                </div>
+
+            </div>
+        `;
+
+        return;
     }
+
+    const inflationRate =
+        (
+            (
+                currentExpense -
+                previousExpense
+            ) /
+            previousExpense
+        ) * 100;
 
     let status =
         "✅ Spending Stable";
 
-    if (inflationRate > 5)
+    if (inflationRate > 5) {
         status =
             "⚠️ Lifestyle Inflation";
+    }
 
-    if (inflationRate > 10)
+    if (inflationRate > 10) {
         status =
             "🚨 Expense Growth High";
+    }
 
     container.innerHTML = `
         <div class="card">
@@ -445,6 +500,7 @@ async function loadPersonalInflation() {
                 <span>
                     Current Expenses
                 </span>
+
                 <strong>
                     ${formatCurrency(
                         currentExpense
@@ -456,6 +512,7 @@ async function loadPersonalInflation() {
                 <span>
                     Prior Year
                 </span>
+
                 <strong>
                     ${formatCurrency(
                         previousExpense
@@ -467,6 +524,7 @@ async function loadPersonalInflation() {
                 <span>
                     Personal Inflation
                 </span>
+
                 <strong>
                     ${inflationRate.toFixed(1)}%
                 </strong>
@@ -476,6 +534,7 @@ async function loadPersonalInflation() {
                 <span>
                     Status
                 </span>
+
                 <strong>
                     ${status}
                 </strong>
