@@ -1171,9 +1171,9 @@ tr.section-debt td:first-child {
 }
 
 .guide-card h2 {
-    margin-bottom: 20px;
-    font-size: 24px;
     color: #34d399;
+    font-size: 24px;
+    margin-bottom: 24px;
 }
 
 .guide-section {
@@ -1181,17 +1181,46 @@ tr.section-debt td:first-child {
 }
 
 .guide-section h4 {
-    margin-bottom: 8px;
-    color: var(--text-main);
-    font-size: 13px;
+    font-size: 11px;
     text-transform: uppercase;
     letter-spacing: .08em;
+    color: var(--text-muted);
+    margin-bottom: 8px;
 }
 
 .guide-section p {
-    color: var(--text-muted);
     line-height: 1.7;
+    color: var(--text-main);
 }
+
+#guideFormula {
+    background:
+        rgba(16, 185, 129, .08);
+    border:
+        1px solid rgba(16, 185, 129, .15);
+    border-radius: 12px;
+    padding: 12px 14px;
+    color: #34d399;
+    font-family:
+        ui-monospace,
+        monospace;
+}
+
+#guideExample {
+    background:
+        rgba(255, 255, 255, .03);
+    border:
+        1px solid rgba(255, 255, 255, .05);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-family:
+        ui-monospace,
+        monospace;
+}
+
+/*
+end of modal
+*/
 
 #inputValue{
    margin-top:12px;
