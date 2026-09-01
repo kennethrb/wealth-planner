@@ -367,7 +367,8 @@ async function refreshFinancialViews() {
         loadSummary(),
         loadFundingPlan(),
         loadBudgetVsActual(),
-        loadBufferVsInvest()
+        loadBufferVsInvest(),
+        loadPersonalInflation()
     ]);
 }
 
@@ -385,7 +386,8 @@ async function changeViewPeriod() {
         loadFinancialHealth(),
         loadProjection(),
         loadFundingPlan(),
-        loadBudgetVsActual()
+        loadBudgetVsActual(),
+        loadPersonalInflation()
     ]);
 }
 
@@ -419,7 +421,8 @@ async function refreshUI() {
         loadSummary(),
         loadFundingPlan(),
         loadBufferVsInvest(),
-        loadNetWorthVelocity()
+        loadNetWorthVelocity(),
+        loadPersonalInflation()
     ]);
 }
 async function initializeApp() {
