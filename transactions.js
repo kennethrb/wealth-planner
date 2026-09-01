@@ -256,9 +256,19 @@ async function deleteTransactionRecord(transactionId) {
 function loadTransferAccounts() {
     const dropdown = document.getElementById("txToAccount");
     if (!dropdown) return;
+
     dropdown.innerHTML = "";
+
     appData.accounts.forEach(account => {
-        const name = account.accountName || account.name;
+        const accountId =
+            account.accountId ||
+            account["Account ID"];
+
+        const name =
+            account.accountName ||
+            account.name ||
+            account["Account Name"];
+
         dropdown.innerHTML += `
             <option value="${accountId}">
                 ${name}
