@@ -294,3 +294,118 @@ function loadFundingPlan() {
         ${fundingHtml}
     `;
 }
+
+function loadReconciliation() {
+
+    const container =
+        document.getElementById(
+            "reconciliation"
+        );
+
+    if (!container) return;
+
+    let html = "";
+
+    appData.accounts.forEach(account => {
+
+        const accountId =
+            account.accountId;
+
+        const openingBalance =
+            Number(
+                account.openingBalance || 0
+            );
+
+        const currentBalance =
+            Number(
+                account.currentBalance || 0
+            );
+
+        let expectedBalance =
+            openingBalance;
+
+        appData.transactions.forEach(tx => {
+
+            const txAccountId =
+                tx.accountId ||
+                tx["Account ID"];
+
+            if (
+                txAccountId !== accountId
+            ) {
+                return;
+            }
+
+            const amount =
+                Number(
+                    tx.Amount ||
+                    tx.amount ||
+                    0
+                );
+
+            const type =
+                tx["Budget Type"] ||
+                tx.budgetType ||
+                "";
+
+            if (
+                type === "Income"
+            ) {
+                expectedBalance += amount;
+            }
+
+            if (
+                type === "Expense" ||
+                type === "Debt" ||
+                type === "Savings"
+            ) {
+                expectedBalance -= amount;
+            }
+        });
+
+        const difference =
+            currentBalance -
+            expectedBalance;
+
+        const reconciled =
+            Math.abs(
+                difference
+            ) < 0.01;
+
+        html += `
+        <div class="goal-item">
+            <div class="item-header">
+                <span class="item-title">
+                    ${account.accountName}
+                </span>
+
+                <span class="item-value">
+                    ${reconciled ? "✅" : "⚠"}
+                </span>
+            </div>
+
+            <div>
+                Opening:
+                ${formatCurrency(openingBalance)}
+            </div>
+
+            <div>
+                Current:
+                ${formatCurrency(currentBalance)}
+            </div>
+
+            <div>
+                Expected:
+                ${formatCurrency(expectedBalance)}
+            </div>
+
+            <div>
+                Difference:
+                ${formatCurrency(difference)}
+            </div>
+        </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
