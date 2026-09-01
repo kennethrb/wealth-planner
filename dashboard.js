@@ -433,4 +433,11 @@ function loadReconciliation() {
 
                             </strong>
 
-                  
+                        </div>
+                    `)
+                    .join("")
+        }
+
+    `;
+
+}
