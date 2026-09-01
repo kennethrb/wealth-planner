@@ -1,16 +1,23 @@
 const FEATURE_GUIDES = {
   networth: {
-    title: "Net Worth",
-    what: "The difference between everything you own and everything you owe.",
-    formula: "Assets − Liabilities",
-    example: "₱789,000 − ₱440,000 = ₱349,000",
-    interpretation: () => {
-      const netWorthVal = typeof calculateNetWorth === "function" ? calculateNetWorth() : 0;
-      const formatted = typeof formatCurrency === "function" ? formatCurrency(netWorthVal) : `₱${netWorthVal}`;
-      return `Your current net worth is ${formatted}. A positive net worth means your assets exceed your liabilities.`;
-    },
-    why: "Net worth is the most important measure of overall financial health."
-  }
+  title: "Net Worth",
+  what: "The difference between everything you own and everything you owe.",
+  formula: "Assets − Liabilities",
+  example: "₱789,000 − ₱440,000 = ₱349,000",
+
+  interpretation: () => {
+    const amount =
+      document.querySelector("#networth .big-amount")
+        ?.textContent || "Unavailable";
+
+    return `
+      Your current net worth is ${amount}.
+      A positive net worth means your assets exceed your liabilities.
+    `;
+  },
+
+  why: "Net worth is the most important measure of overall financial health."
+}
 };
 
 function showFeatureGuide(key) {
