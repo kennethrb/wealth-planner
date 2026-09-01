@@ -48,7 +48,7 @@ async function loadNetWorth() {
     <div class="networth-banner ${isNegative ? 'negative' : 'positive'}">
     <div class="card-header">
         <h2> 💎 Net Worth </h2>
-        <button class="info-button" onclick="showFeatureGuide('netWorth')"> ? </button>
+        <button class="info-button" onclick="showFeatureGuide('networth')"> ? </button>
     </div>
       <div class="big-amount">${formatCurrency(netWorth)}</div>
       <div class="networth-details">
