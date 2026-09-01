@@ -1,10 +1,18 @@
 function loadTransactionAccounts() {
     const dropdown = document.getElementById("txAccount");
     if (!dropdown) return;
+
     dropdown.innerHTML = "";
+
     appData.accounts.forEach(account => {
-        const name = account.accountName || account.name;
-        dropdown.innerHTML += `<option value="${name}">${name}</option>`;
+        const accountId = account.accountId || account["Account ID"];
+        const name = account.accountName || account.name || account["Account Name"];
+
+        dropdown.innerHTML += `
+            <option value="${accountId}">
+                ${name}
+            </option>
+        `;
     });
 }
 
@@ -252,7 +260,7 @@ function loadTransferAccounts() {
     appData.accounts.forEach(account => {
         const name = account.accountName || account.name;
         dropdown.innerHTML += `
-            <option value="${name}">
+            <option value="${accountId}">
                 ${name}
             </option>
         `;
