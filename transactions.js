@@ -224,12 +224,18 @@ function editTransaction(transactionId) {
     document.getElementById("txDate").value = formattedDate;
     document.getElementById("txAmount").value = tx.Amount || 0;
     document.getElementById("txDetails").value = tx.Details || "";
-    document.getElementById("txAccount").value = tx.Account || "";
+    document.getElementById("txAccount").value =
+    tx["Account ID"] ||
+    tx.accountId ||
+    "";
     document.getElementById("txBudgetType").value = tx["Budget Type"] || tx.budgetType || "";
     toggleTransactionFields();
     document.getElementById("txBudgetPosition").value = tx["Budget Position"] || tx.budgetPosition || "";
     
-    const transferTo = tx["Transfer To Account"] || tx.transferToAccount || "";
+    const transferTo =
+    tx["Transfer To Account ID"] ||
+    tx.transferToAccountId ||
+    "";
     if (document.getElementById("txToAccount")) {
         document.getElementById("txToAccount").value = transferTo;
     }
