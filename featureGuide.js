@@ -14,28 +14,28 @@ const FEATURE_GUIDES = {
         const projected = projection.projectedAssets || 0;
         if (surplus > 0) {
             return `
-Your current surplus is generating additional wealth each month.
-
-At your current pace, assets could grow to approximately
-${formatCurrency(projected)} over the next year.
-
-This suggests a positive wealth trajectory.
-`;
-        }
-        if (surplus < 0) {
-            return `
-Current spending exceeds available income.
-
-Projected asset growth may slow or decline unless cash flow improves.
-
-Reducing expenses or increasing income could improve future wealth growth.
-`;
-        }
-        return `
-Current cash flow is neutral.
-
-Future wealth growth will likely remain flat unless surplus increases.
-`;
+        Your current surplus is generating additional wealth each month.
+        
+        At your current pace, assets could grow to approximately
+        ${formatCurrency(projected)} over the next year.
+        
+        This suggests a positive wealth trajectory.
+        `;
+                }
+                if (surplus < 0) {
+                    return `
+        Current spending exceeds available income.
+        
+        Projected asset growth may slow or decline unless cash flow improves.
+        
+        Reducing expenses or increasing income could improve future wealth growth.
+        `;
+                }
+                return `
+        Current cash flow is neutral.
+        
+        Future wealth growth will likely remain flat unless surplus increases.
+        `;
     }
 }
 };
