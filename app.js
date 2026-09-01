@@ -366,7 +366,8 @@ async function refreshFinancialViews() {
         loadProjection(),
         loadSummary(),
         loadFundingPlan(),
-        loadBudgetVsActual()
+        loadBudgetVsActual(),
+        loadBufferVsInvest()
     ]);
 }
 
