@@ -583,6 +583,38 @@ button:active,
     margin-bottom: 16px;
 }
 
+
+/*-- FEATURE GUIDES----*/
+.info-button {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, .08);
+    background:
+        rgba(255, 255, 255, .04);
+    color:
+        var(--text-muted);
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.info-button:hover {
+    color: #34d399;
+    border-color: #34d399;
+    transform: scale(1.08);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
 /* ====================
    TABLES & RESPONSIVE SCROLL
 ==================== */
