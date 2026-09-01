@@ -10,11 +10,6 @@ const FEATURE_GUIDES = {
             A positive net worth means your assets exceed your liabilities.
         `,
         why: "Net worth is the most important measure of overall financial health."
-    },
-
-    projection: {
-        title: "Wealth Projection",
-        ...
     }
 };
 
