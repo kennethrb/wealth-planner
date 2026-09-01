@@ -416,7 +416,8 @@ async function refreshUI() {
         loadAccounts(),
         loadBudgetPlanner(),
         loadSummary(),
-        loadFundingPlan()
+        loadFundingPlan(),
+        loadBufferVsInvest()
     ]);
 }
 async function initializeApp() {
