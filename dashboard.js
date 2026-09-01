@@ -46,7 +46,10 @@ async function loadNetWorth() {
     const isNegative = netWorth < 0;
     document.getElementById("networth").innerHTML = `
     <div class="networth-banner ${isNegative ? 'negative' : 'positive'}">
-      <h2>💎 Net Worth</h2>
+    <div class="card-header">
+        <h2> 💎 Net Worth </h2>
+        <button class="info-button" onclick="showFeatureGuide('netWorth')"> ? </button>
+    </div>
       <div class="big-amount">${formatCurrency(netWorth)}</div>
       <div class="networth-details">
         <span>Assets: <strong>${formatCurrency(assets)}</strong></span>
