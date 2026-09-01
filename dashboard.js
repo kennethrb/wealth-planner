@@ -298,28 +298,22 @@ function loadFundingPlan() {
 function loadReconciliation() {
 
     const container =
-        document.getElementById(
-            "reconciliation"
-        );
+        document.getElementById("reconciliation");
 
     if (!container) return;
 
-    let html = "";
+    let reconciledCount = 0;
+    let exceptionAccounts = [];
 
     appData.accounts.forEach(account => {
 
-        const accountId =
-            account.accountId;
+        const accountId = account.accountId;
 
         const openingBalance =
-            Number(
-                account.openingBalance || 0
-            );
+            Number(account.openingBalance || 0);
 
         const currentBalance =
-            Number(
-                account.currentBalance || 0
-            );
+            Number(account.currentBalance || 0);
 
         let expectedBalance =
             openingBalance;
@@ -330,82 +324,86 @@ function loadReconciliation() {
                 tx.accountId ||
                 tx["Account ID"];
 
-            if (
-                txAccountId !== accountId
-            ) {
-                return;
-            }
+            if (txAccountId !== accountId) return;
 
             const amount =
-                Number(
-                    tx.Amount ||
-                    tx.amount ||
-                    0
-                );
+                Number(tx.Amount || tx.amount || 0);
 
             const type =
                 tx["Budget Type"] ||
                 tx.budgetType ||
                 "";
 
-            if (
-                type === "Income"
-            ) {
+            if (type === "Income") {
                 expectedBalance += amount;
             }
 
             if (
                 type === "Expense" ||
-                type === "Debt" ||
-                type === "Savings"
+                type === "Savings" ||
+                type === "Debt"
             ) {
                 expectedBalance -= amount;
             }
+
         });
 
         const difference =
-            currentBalance -
-            expectedBalance;
+            currentBalance - expectedBalance;
 
         const reconciled =
-            Math.abs(
+            Math.abs(difference) < 0.01;
+
+        if (reconciled) {
+            reconciledCount++;
+        } else {
+            exceptionAccounts.push({
+                name: account.accountName,
+                variance: Math.abs(difference),
                 difference
-            ) < 0.01;
+            });
+        }
 
-        html += `
-        <div class="goal-item">
-            <div class="item-header">
-                <span class="item-title">
-                    ${account.accountName}
-                </span>
-
-                <span class="item-value">
-                    ${reconciled ? "✅" : "⚠"}
-                </span>
-            </div>
-
-            <div>
-                Opening:
-                ${formatCurrency(openingBalance)}
-            </div>
-
-            <div>
-                Current:
-                ${formatCurrency(currentBalance)}
-            </div>
-
-            <div>
-                Expected:
-                ${formatCurrency(expectedBalance)}
-            </div>
-
-            <div>
-                Difference:
-                ${formatCurrency(difference)}
-            </div>
-        </div>
-        `;
     });
 
-    container.innerHTML = html;
+    exceptionAccounts.sort(
+        (a, b) => b.variance - a.variance
+    );
+
+    const reviewCount =
+        exceptionAccounts.length;
+
+    container.innerHTML = `
+        <div class="funding-row">
+            <span>✅ Reconciled</span>
+            <strong>${reconciledCount}</strong>
+        </div>
+
+        <div class="funding-row">
+            <span>⚠ Need Review</span>
+            <strong>${reviewCount}</strong>
+        </div>
+
+        <hr>
+
+        <h3>Top Variances</h3>
+
+        ${
+            reviewCount === 0
+                ? '<p>🎉 All accounts reconciled.</p>'
+                : exceptionAccounts
+                    .slice(0, 5)
+                    .map(acc => `
+                        <div class="funding-row">
+                            <span>${acc.name}</span>
+                            <strong>
+                                ${formatCurrency(
+                                    acc.difference
+                                )}
+                            </strong>
+                        </div>
+                    `)
+                    .join("")
+        }
+    `;
 }
