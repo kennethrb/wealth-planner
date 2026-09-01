@@ -585,34 +585,40 @@ button:active,
 
 
 /*-- FEATURE GUIDES----*/
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
 .info-button {
     width: 24px;
     height: 24px;
+    min-width: 24px;
     border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, .08);
     background:
         rgba(255, 255, 255, .04);
+    border:
+        1px solid rgba(255, 255, 255, .08);
     color:
         var(--text-muted);
     font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    transition: .2s;
+    padding: 0;
 }
 
 .info-button:hover {
     color: #34d399;
     border-color: #34d399;
+    background:
+        rgba(16, 185, 129, .12);
     transform: scale(1.08);
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
 }
 
 /* ====================
@@ -1152,6 +1158,39 @@ tr.section-debt td:first-child {
     display: flex;
     justify-content: flex-end;
     gap: 12px;
+}
+
+.guide-card {
+    max-width: 650px;
+    background:
+        linear-gradient(180deg,
+            rgba(21, 29, 42, .98),
+            rgba(11, 15, 23, .98));
+    border:
+        1px solid rgba(16, 185, 129, .15);
+}
+
+.guide-card h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #34d399;
+}
+
+.guide-section {
+    margin-bottom: 20px;
+}
+
+.guide-section h4 {
+    margin-bottom: 8px;
+    color: var(--text-main);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
+
+.guide-section p {
+    color: var(--text-muted);
+    line-height: 1.7;
 }
 
 #inputValue{
