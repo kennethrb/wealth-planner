@@ -543,3 +543,186 @@ async function loadPersonalInflation() {
         </div>
     `;
 }
+
+async function loadPurchaseEvaluator() {
+
+    const container =
+        document.getElementById(
+            "purchaseEvaluator"
+        );
+
+    if (!container) return;
+
+    const purchaseAmount =
+        Number(
+            document.getElementById(
+                "purchaseAmount"
+            )?.value || 0
+        );
+
+    const selectedYear =
+        getViewYear();
+
+    const selectedMonth =
+        getViewMonth();
+
+    const categoryTypes = {};
+
+    appData.categories.forEach(cat => {
+        categoryTypes[
+            cat.categoryName
+        ] = cat.budgetType;
+    });
+
+    let monthlyExpense = 0;
+    let monthlyDebt = 0;
+
+    appData.budget.forEach(item => {
+
+        if (
+            Number(item.year) !== selectedYear
+        ) return;
+
+        if (
+            item.month !== selectedMonth
+        ) return;
+
+        const amount =
+            Number(
+                item.plannedAmount || 0
+            );
+
+        const type =
+            categoryTypes[
+                item.category
+            ];
+
+        if (type === "Expense")
+            monthlyExpense += amount;
+
+        if (type === "Debt")
+            monthlyDebt += amount;
+    });
+
+    const monthlyObligations =
+        monthlyExpense +
+        monthlyDebt;
+
+    const bufferTarget =
+        monthlyObligations * 3;
+
+    let availableCash = 0;
+
+    appData.accounts.forEach(account => {
+
+        const balance =
+            Number(
+                account.currentBalance ||
+                account.balance ||
+                0
+            );
+
+        if (
+            account.netWorthType === "Asset"
+        ) {
+            availableCash += balance;
+        }
+    });
+
+    const cashAfterPurchase =
+        availableCash - purchaseAmount;
+
+    const bufferRemaining =
+        cashAfterPurchase -
+        bufferTarget;
+
+    const monthsCovered =
+        monthlyObligations > 0
+            ? cashAfterPurchase /
+              monthlyObligations
+            : 0;
+
+    let recommendation =
+        "✅ Affordable";
+
+    if (
+        cashAfterPurchase <
+        bufferTarget
+    ) {
+        recommendation =
+            "⚠️ Impacts Emergency Buffer";
+    }
+
+    if (
+        cashAfterPurchase <= 0
+    ) {
+        recommendation =
+            "🚨 Not Recommended";
+    }
+
+    container.innerHTML = `
+        <div class="card">
+
+            <h2>
+                🛒 Purchase Evaluator
+            </h2>
+
+            <div class="metric-row">
+                <span>
+                    Purchase Amount
+                </span>
+
+                <strong>
+                    ${formatCurrency(
+                        purchaseAmount
+                    )}
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>
+                    Cash After Purchase
+                </span>
+
+                <strong>
+                    ${formatCurrency(
+                        cashAfterPurchase
+                    )}
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>
+                    Buffer Remaining
+                </span>
+
+                <strong>
+                    ${formatCurrency(
+                        bufferRemaining
+                    )}
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>
+                    Months Covered
+                </span>
+
+                <strong>
+                    ${monthsCovered.toFixed(1)}
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>
+                    Recommendation
+                </span>
+
+                <strong>
+                    ${recommendation}
+                </strong>
+            </div>
+
+        </div>
+    `;
+}
