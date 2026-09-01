@@ -349,3 +349,138 @@ async function loadNetWorthVelocity() {
         </div>
     `;
 }
+
+async function loadPersonalInflation() {
+
+    const container =
+        document.getElementById(
+            "personalInflation"
+        );
+
+    if (!container) return;
+
+    const currentYear =
+        getViewYear();
+
+    const currentMonth =
+        getViewMonth();
+
+    const previousYear =
+        currentYear - 1;
+
+    const categoryTypes = {};
+
+    appData.categories.forEach(cat => {
+        categoryTypes[
+            cat.categoryName
+        ] = cat.budgetType;
+    });
+
+    let currentExpense = 0;
+    let previousExpense = 0;
+
+    appData.budget.forEach(item => {
+
+        const type =
+            categoryTypes[
+                item.category
+            ];
+
+        if (type !== "Expense")
+            return;
+
+        const amount =
+            Number(
+                item.plannedAmount || 0
+            );
+
+        if (
+            Number(item.year) === currentYear &&
+            item.month === currentMonth
+        ) {
+            currentExpense += amount;
+        }
+
+        if (
+            Number(item.year) === previousYear &&
+            item.month === currentMonth
+        ) {
+            previousExpense += amount;
+        }
+    });
+
+    let inflationRate = 0;
+
+    if (previousExpense > 0) {
+
+        inflationRate =
+            (
+                (
+                    currentExpense -
+                    previousExpense
+                ) /
+                previousExpense
+            ) * 100;
+    }
+
+    let status =
+        "✅ Spending Stable";
+
+    if (inflationRate > 5)
+        status =
+            "⚠️ Lifestyle Inflation";
+
+    if (inflationRate > 10)
+        status =
+            "🚨 Expense Growth High";
+
+    container.innerHTML = `
+        <div class="card">
+
+            <h2>
+                📊 Personal Inflation
+            </h2>
+
+            <div class="metric-row">
+                <span>
+                    Current Expenses
+                </span>
+                <strong>
+                    ${formatCurrency(
+                        currentExpense
+                    )}
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>
+                    Prior Year
+                </span>
+                <strong>
+                    ${formatCurrency(
+                        previousExpense
+                    )}
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>
+                    Personal Inflation
+                </span>
+                <strong>
+                    ${inflationRate.toFixed(1)}%
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>
+                    Status
+                </span>
+                <strong>
+                    ${status}
+                </strong>
+            </div>
+
+        </div>
+    `;
+}
