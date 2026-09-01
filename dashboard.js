@@ -386,7 +386,14 @@ function loadReconciliation() {
 
         <hr>
 
-        <h3>Top Variances</h3>
+        <h3>⚠ Accounts Requiring Attention</h3>
+        <strong class="${
+            acc.difference < 0
+                ? 'text-danger'
+                : 'text-warning'
+        }">
+            ${formatCurrency(acc.difference)}
+        </strong>
 
         ${
             reviewCount === 0
