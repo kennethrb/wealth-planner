@@ -1,33 +1,11 @@
 const FEATURE_GUIDES = {
-
     networth: {
         title: "Net Worth",
         what: "The difference between everything you own and everything you owe.",
         formula: "Assets − Liabilities",
         example: "₱789,000 − ₱440,000 = ₱349,000",
-        interpretation: () => {
-
-    const netWorth =
-        calculateNetWorth();
-
-    if (netWorth > 0) {
-        return `
-            Your assets exceed your liabilities.
-            This indicates a positive financial position.
-        `;
-    }
-
-    if (netWorth < 0) {
-        return `
-            Your liabilities exceed your assets.
-            Focus on debt reduction and asset accumulation.
-        `;
-    }
-
-    return `
-        Your assets and liabilities are currently equal.
-    `;
-}
+        interpretation: "A positive net worth means assets exceed liabilities.",
+        why: "Net worth is one of the best indicators of long-term financial health."
     }
 };
 
