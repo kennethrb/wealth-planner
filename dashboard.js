@@ -396,13 +396,13 @@ function loadReconciliation() {
         </div>
 
         <div class="funding-row">
-            <span>⚠ Need Review</span>
+            <span>⚠️ Need Review</span>
             <strong>${reviewCount}</strong>
         </div>
 
         <hr>
 
-        <h3>⚠ Accounts Requiring Attention</h3>
+        <h3>⚠️ Accounts Requiring Attention</h3>
 
         ${
             reviewCount === 0
