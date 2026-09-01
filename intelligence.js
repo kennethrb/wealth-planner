@@ -752,3 +752,184 @@ async function loadPurchaseEvaluator() {
         </div>
     `;
 }
+
+async function loadWealthSweep() {
+
+    const container =
+        document.getElementById(
+            "wealthSweep"
+        );
+
+    if (!container) return;
+
+    const selectedYear =
+        getViewYear();
+
+    const selectedMonth =
+        getViewMonth();
+
+    const categoryTypes = {};
+
+    appData.categories.forEach(cat => {
+
+        categoryTypes[
+            cat.categoryName
+        ] = cat.budgetType;
+
+    });
+
+    let monthlyExpense = 0;
+    let monthlyDebt = 0;
+
+    appData.budget.forEach(item => {
+
+        if (
+            Number(item.year) !== selectedYear
+        ) return;
+
+        if (
+            item.month !== selectedMonth
+        ) return;
+
+        const amount =
+            Number(
+                item.plannedAmount || 0
+            );
+
+        const type =
+            categoryTypes[
+                item.category
+            ];
+
+        if (type === "Expense")
+            monthlyExpense += amount;
+
+        if (type === "Debt")
+            monthlyDebt += amount;
+
+    });
+
+    const monthlyObligations =
+        monthlyExpense +
+        monthlyDebt;
+
+    const bufferTarget =
+        monthlyObligations * 3;
+
+    let availableCash = 0;
+
+    appData.accounts.forEach(account => {
+
+        const balance =
+            Number(
+                account.currentBalance ||
+                account.balance ||
+                0
+            );
+
+        if (
+            account.netWorthType === "Asset"
+        ) {
+            availableCash += balance;
+        }
+
+    });
+
+    const excessCash =
+        availableCash -
+        bufferTarget;
+
+    if (excessCash <= 0) {
+
+        container.innerHTML = `
+            <div class="card">
+
+                <h2>
+                    🧹 Wealth Sweep
+                </h2>
+
+                <div class="metric-row">
+                    <span>
+                        Status
+                    </span>
+
+                    <strong>
+                        Build Buffer First
+                    </strong>
+                </div>
+
+            </div>
+        `;
+
+        return;
+    }
+
+    const debtSweep =
+        excessCash * 0.20;
+
+    const emergencySweep =
+        excessCash * 0.10;
+
+    const investmentSweep =
+        excessCash * 0.70;
+
+    container.innerHTML = `
+        <div class="card">
+
+            <h2>
+                🧹 Wealth Sweep
+            </h2>
+
+            <div class="metric-row">
+                <span>
+                    Excess Cash
+                </span>
+
+                <strong>
+                    ${formatCurrency(
+                        excessCash
+                    )}
+                </strong>
+            </div>
+
+            <hr>
+
+            <div class="metric-row">
+                <span>
+                    Debt Reduction
+                </span>
+
+                <strong>
+                    ${formatCurrency(
+                        debtSweep
+                    )}
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>
+                    Emergency Fund
+                </span>
+
+                <strong>
+                    ${formatCurrency(
+                        emergencySweep
+                    )}
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>
+                    Investments
+                </span>
+
+                <strong>
+                    ${formatCurrency(
+                        investmentSweep
+                    )}
+                </strong>
+            </div>
+
+        </div>
+    `;
+}
