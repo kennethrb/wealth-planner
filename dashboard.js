@@ -307,7 +307,8 @@ function loadReconciliation() {
 
     appData.accounts.forEach(account => {
 
-        const accountId = account.accountId;
+        const accountId =
+            account.accountId;
 
         const openingBalance =
             Number(account.openingBalance || 0);
@@ -327,7 +328,11 @@ function loadReconciliation() {
             if (txAccountId !== accountId) return;
 
             const amount =
-                Number(tx.Amount || tx.amount || 0);
+                Number(
+                    tx.Amount ||
+                    tx.amount ||
+                    0
+                );
 
             const type =
                 tx["Budget Type"] ||
@@ -355,13 +360,17 @@ function loadReconciliation() {
             Math.abs(difference) < 0.01;
 
         if (reconciled) {
+
             reconciledCount++;
+
         } else {
+
             exceptionAccounts.push({
                 name: account.accountName,
                 variance: Math.abs(difference),
                 difference
             });
+
         }
 
     });
@@ -374,6 +383,12 @@ function loadReconciliation() {
         exceptionAccounts.length;
 
     container.innerHTML = `
+
+        <div class="funding-row">
+            <span>🏦 Total Accounts</span>
+            <strong>${appData.accounts.length}</strong>
+        </div>
+
         <div class="funding-row">
             <span>✅ Reconciled</span>
             <strong>${reconciledCount}</strong>
@@ -387,30 +402,35 @@ function loadReconciliation() {
         <hr>
 
         <h3>⚠ Accounts Requiring Attention</h3>
-        <strong class="${
-            acc.difference < 0
-                ? 'text-danger'
-                : 'text-warning'
-        }">
-            ${formatCurrency(acc.difference)}
-        </strong>
 
         ${
             reviewCount === 0
-                ? '<p>🎉 All accounts reconciled.</p>'
+
+                ? `
+                    <p>
+                        🎉 All accounts reconciled.
+                    </p>
+                  `
+
                 : exceptionAccounts
                     .slice(0, 5)
                     .map(acc => `
                         <div class="funding-row">
-                            <span>${acc.name}</span>
-                            <strong>
+
+                            <span>
+                                ${acc.name}
+                            </span>
+
+                            <strong class="${
+                                acc.difference < 0
+                                    ? "text-danger"
+                                    : "text-warning"
+                            }">
+
                                 ${formatCurrency(
                                     acc.difference
                                 )}
+
                             </strong>
-                        </div>
-                    `)
-                    .join("")
-        }
-    `;
-}
+
+                  
