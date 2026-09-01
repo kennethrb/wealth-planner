@@ -1,5 +1,5 @@
 const FEATURE_GUIDES = {
-    networth: {
+    projection: {
     title: "Wealth Projection",
     what: "Projects future wealth based on current financial behavior.",
     formula: "Current Assets + (Monthly Surplus × 12)",
