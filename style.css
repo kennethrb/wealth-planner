@@ -1123,14 +1123,15 @@ tr.section-debt td:first-child {
     inset: 0;
     background: rgba(0, 0, 0, .7);
     backdrop-filter: blur(6px);
-    display: none;
+    display: none; /* Hidden by default */
     justify-content: center;
     align-items: center;
     z-index: 99999;
 }
 
+/* Add this to ensure the JS class addition triggers visibility */
 .confirm-modal.show {
-    display: flex;
+    display: flex !important;
 }
 
 .confirm-card {
