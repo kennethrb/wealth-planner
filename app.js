@@ -409,6 +409,7 @@ async function refreshUI() {
         loadNetWorth(),
         loadProjection(),
         loadFinancialHealth(),
+        loadReconciliation();
         loadUpcomingBills(),
         loadRecurringBills(),
         loadGoals(),
