@@ -301,14 +301,24 @@ function loadRecurringBills() {
 function loadRecurringBillAccounts() {
     const dropdown = document.getElementById("billAccount");
     if (!dropdown) return;
+
     dropdown.innerHTML = "";
+
     appData.accounts.forEach(account => {
-        const name = account.accountName || account.name;
+        const accountId =
+            account.accountId ||
+            account["Account ID"];
+
+        const name =
+            account.accountName ||
+            account.name ||
+            account["Account Name"];
+
         dropdown.innerHTML += `
-      <option value="${name}">
-        ${name}
-      </option>
-    `;
+            <option value="${accountId}">
+                ${name}
+            </option>
+        `;
     });
 }
 
