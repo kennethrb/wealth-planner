@@ -57,10 +57,6 @@ async function loadBufferVsInvest() {
 
     appData.accounts.forEach(account => {
 
-        const type =
-            String(account.type || "")
-            .toLowerCase();
-
         const balance =
             Number(
                 account.currentBalance ||
