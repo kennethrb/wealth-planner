@@ -1,4 +1,6 @@
-// ===== SHEET NAMES =====
+/* ===================================================
+    1. CONFIGURATION & CONSTANTS
+=================================================== */
 const SHEET_TRANSACTIONS = "Transactions";
 const SHEET_ACCOUNTS = "Accounts";
 const SHEET_CATEGORIES = "Categories";
@@ -7,53 +9,113 @@ const SHEET_GOALS = "Goals";
 const SHEET_RECURRING = "RecurringBills";
 
 /* ===================================================
-    HELPERS
+    2. WEB APP HANDLERS (ROUTERS)
 =================================================== */
+function doGet(e) {
+  try {
+    const params = e ? e.parameter : {};
+    const action = params.action;
 
-function getSheetObjects(sheetName) {
-  const sheet = SpreadsheetApp
-    .getActiveSpreadsheet()
-    .getSheetByName(sheetName);
-
-  if (!sheet) return [];
-
-  const data = sheet.getDataRange().getValues();
-  if (data.length <= 1) return [];
-
-  const headers = data.shift();
-
-  return data.map(row => {
-    const obj = {};
-    headers.forEach((header, index) => {
-      obj[String(header).trim()] = row[index];
-    });
-    return obj;
-  });
+    switch (action) {
+      case "getAllData":
+        return getAllData();
+      case "getTransactions":
+        return createJsonResponse(getTransactions());
+      case "addTransaction":
+        return addTransaction(params);
+      case "updateTransaction":
+        return updateTransaction(params);
+      case "deleteTransaction":
+        return deleteTransaction(params);
+      case "getAccounts":
+        return createJsonResponse(getAccounts());
+      case "getCategories":
+        return createJsonResponse(getCategories());
+      case "getBudgetPlan":
+        return createJsonResponse(getBudgetPlan());
+      case "getGoals":
+        return createJsonResponse(getGoals());
+      case "copyJanuaryToWholeYear":
+        return copyJanuaryToWholeYear();
+      case "copyCurrentYearToNextYear":
+        return copyCurrentYearToNextYear({ year: params.year });
+      case "saveBudget":
+        return saveBudget({
+          year: params.year,
+          month: params.month,
+          category: params.category,
+          amount: params.amount
+        });
+      case "addCategory":
+        return addCategory({
+          budgetType: params.budgetType,
+          group: params.group,
+          categoryName: params.categoryName,
+          preferredFundingSource: params.preferredFundingSource
+        });
+      case "deleteCategory":
+        return deleteCategory({categoryId: params.categoryId});
+      case "addBudgetItem":
+        return addBudgetItem({
+          year: params.year,
+          month: params.month,
+          category: params.category,
+          amount: params.amount
+        });
+      case "deleteBudgetItem":
+        return deleteBudgetItem({
+          year: params.year,
+          category: params.category
+        });
+      case "addRecurringBill":
+        return createJsonResponse(addRecurringBill(params));
+      case "deleteRecurringBill":
+        return createJsonResponse(deleteRecurringBill({ billId: params.billId }));
+      case "updateRecurringBill":
+        return createJsonResponse(updateRecurringBill({ billId: params.billId, amount: params.amount }));
+      case "generateBills":
+        return createJsonResponse(
+            generateBills()
+        );
+      default:
+        return createJsonResponse({ error: "Invalid Action: " + action });
+    }
+  } catch (err) {
+    return createJsonResponse({ error: err.toString() });
+  }
 }
 
-function getColumnIndexMap(sheetName) {
-  const sheet = SpreadsheetApp
-    .getActiveSpreadsheet()
-    .getSheetByName(sheetName);
+function doPost(e) {
+  try {
+    const contents = JSON.parse(e.postData.contents);
+    const action = contents.action;
 
-  if (!sheet) return {};
+    if (action === "saveAllBudgets") {
+      return saveAllBudgets(contents.budgetItems);
+    }
 
-  const headers = sheet
-    .getRange(1, 1, 1, sheet.getLastColumn())
-    .getValues()[0];
+    if (action === "deleteCategory") {
+      return deleteCategory({
+        categoryId: contents.categoryId
+      });
+    }
 
-  const map = {};
-  headers.forEach((header, index) => {
-    map[String(header).trim()] = index + 1;
-  });
+    return createJsonResponse({
+      success: false,
+      error: "Invalid POST Action: " + action
+    });
 
-  return map;
+  } catch (err) {
+    return createJsonResponse({
+      success: false,
+      error: err.toString()
+    });
+  }
 }
 
 /* ===================================================
-    READ OPERATIONS
+    3. READ OPERATIONS
 =================================================== */
-
 function getAllData() {
   return createJsonResponse({
     accounts: getAccounts(),
@@ -75,14 +137,13 @@ function getTransactions() {
 
   return data.map((row, index) => {
     const obj = {
-      rowNumber: index + 2 // Preserve 1-based row index for deletions/updates
+      rowNumber: index + 2
     };
 
     headers.forEach((header, colIndex) => {
       obj[String(header).trim()] = row[colIndex];
     });
 
-    // Explicit standardized mappings for frontend compatibility
     obj.transactionId = obj["Transaction ID"] || "";
     obj.Date = obj["Date"] || obj.date || "";
     obj.Amount = Number(obj["Amount"] || obj.amount || 0);
@@ -91,6 +152,9 @@ function getTransactions() {
     obj.budgetType = obj["Budget Type"] || obj.budgetType || "";
     obj.budgetPosition = obj["Budget Position"] || obj.budgetPosition || obj.Category || "";
     obj.transferToAccount = obj["Transfer To Account"] || obj.transferToAccount || "";
+    obj.recurringBillId = obj["Recurring Bill ID"] || "";
+    obj.accountId = obj["Account ID"] || "";
+    obj.transferToAccountId = obj["Transfer To Account ID"] || "";
 
     return obj;
   });
@@ -160,73 +224,170 @@ function getRecurringBills() {
     defaultAmount: Number(row["Default Amount"] || 0),
     dueDay: Number(row["Due Day"] || 0),
     account: row["Account"] || "",
+    accountId: row["Account ID"] || "",
     active: row["Active"]
   }));
 }
 
 /* ===================================================
-    WRITE & UPDATE OPERATIONS
+    4. WRITE & UPDATE OPERATIONS
 =================================================== */
-
-function addTransaction(request) {
+function addTransaction(data) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_TRANSACTIONS);
-  if (!sheet) {
-    return createJsonResponse({
-      success: false,
-      error: "Transactions sheet missing"
-    });
+  if (!sheet) return createJsonResponse({ success: false, error: "Sheet not found" });
+
+  const lastCol = sheet.getLastColumn();
+  if (lastCol === 0) {
+    return createJsonResponse({ success: false, error: "Sheet is empty or missing headers." });
+  }
+
+  const id = generateUUID();
+  const cols = getColumnIndexMap(SHEET_TRANSACTIONS);
+  
+  const newRow = new Array(lastCol).fill("");
+
+  const txDate = data.date || data.Date || new Date();
+  const txAmount = data.amount !== undefined ? data.amount : (data.Amount !== undefined ? data.Amount : 0);
+  const txDetails = data.details || data.Details || "";
+  const txBudgetType = data.budgetType || data["Budget Type"] || "";
+  const txBudgetPosition = data.budgetPosition || data["Budget Position"] || "";
+  const txRecurringBillId = data.recurringBillId || data["Recurring Bill ID"] || "";
+  const txAccountId =
+      data.account || data.Account || "";
+
+  const txAccountName =
+      getAccountNameById(txAccountId);
+
+  const txTransferToId =
+      data.transferToAccount ||
+      data["Transfer To Account"] ||
+      "";
+
+  const txTransferToName =
+      getAccountNameById(txTransferToId);
+
+  if (cols["Transaction ID"]) newRow[cols["Transaction ID"] - 1] = id;
+  if (cols["Date"]) newRow[cols["Date"] - 1] = txDate;
+  if (cols["Amount"]) newRow[cols["Amount"] - 1] = txAmount;
+  if (cols["Details"]) newRow[cols["Details"] - 1] = txDetails;
+  if (cols["Budget Type"]) newRow[cols["Budget Type"] - 1] = txBudgetType;
+  if (cols["Budget Position"]) newRow[cols["Budget Position"] - 1] = txBudgetPosition;
+  if (cols["Recurring Bill ID"]) newRow[cols["Recurring Bill ID"] - 1] = txRecurringBillId;
+  if (cols["Account"])
+      newRow[cols["Account"] - 1] = txAccountName;
+
+  if (cols["Account ID"])
+      newRow[cols["Account ID"] - 1] = txAccountId;
+
+  if (cols["Transfer To Account"])
+      newRow[cols["Transfer To Account"] - 1] = txTransferToName;
+
+  if (cols["Transfer To Account ID"])
+      newRow[cols["Transfer To Account ID"] - 1] = txTransferToId;
+
+  sheet.appendRow(newRow);
+  return createJsonResponse({ success: true, id: id });
+}
+
+function updateTransaction(data) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_TRANSACTIONS);
+  const txAccountId =
+      data.account || "";
+
+  const txAccountName =
+      getAccountNameById(txAccountId);
+
+  const txTransferToId =
+      data.transferToAccount || "";
+
+  const txTransferToName =
+      getAccountNameById(txTransferToId);
+  if (!sheet) return createJsonResponse({ success: false, error: "Sheet not found" });
+
+  if (!data.id) {
+    return createJsonResponse({ success: false, error: "Missing Transaction ID" });
   }
 
   const cols = getColumnIndexMap(SHEET_TRANSACTIONS);
-  const row = new Array(sheet.getLastColumn()).fill("");
-  const transactionId = "TX" + Date.now();
+  const idColIndex = cols["Transaction ID"] - 1;
 
-  row[cols["Transaction ID"] - 1] = transactionId;
-  row[cols["Date"] - 1] = request.date;
-  row[cols["Amount"] - 1] = Number(request.amount);
-  row[cols["Details"] - 1] = request.details || "";
-  row[cols["Account"] - 1] = request.account;
-  row[cols["Budget Type"] - 1] = request.budgetType || "";
-  row[cols["Budget Position"] - 1] = request.budgetPosition || "";
-  row[cols["Transfer To Account"] - 1] = request.transferToAccount || "";
+  if (idColIndex === undefined || idColIndex < 0) {
+    return createJsonResponse({ success: false, error: "'Transaction ID' column not found in sheet" });
+  }
 
-  sheet.appendRow(row);
+  const values = sheet.getDataRange().getValues();
+  const searchId = String(data.id).trim();
 
-  return createJsonResponse({
-    success: true,
-    transactionId: transactionId
-  });
-}
+  let rowIndexToUpdate = -1;
+  for (let i = 1; i < values.length; i++) {
+    if (String(values[i][idColIndex]).trim() === searchId) {
+      rowIndexToUpdate = i + 1;
+      break;
+    }
+  }
 
-function updateTransaction(request) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_TRANSACTIONS);
-  if (!sheet) return createJsonResponse({ success: false, error: "Transactions sheet missing" });
+  if (rowIndexToUpdate === -1) {
+    return createJsonResponse({ success: false, error: "Transaction ID not found: " + searchId });
+  }
 
-  const row = Number(request.rowNumber);
-  const cols = getColumnIndexMap(SHEET_TRANSACTIONS);
+  if (cols["Date"]) sheet.getRange(rowIndexToUpdate, cols["Date"]).setValue(data.date);
+  if (cols["Amount"]) sheet.getRange(rowIndexToUpdate, cols["Amount"]).setValue(data.amount);
+  if (cols["Details"]) sheet.getRange(rowIndexToUpdate, cols["Details"]).setValue(data.details);
+  if (cols["Budget Type"]) sheet.getRange(rowIndexToUpdate, cols["Budget Type"]).setValue(data.budgetType);
+  if (cols["Budget Position"]) sheet.getRange(rowIndexToUpdate, cols["Budget Position"]).setValue(data.budgetPosition);
+  if (cols["Account"])
+      sheet.getRange(
+          rowIndexToUpdate,
+          cols["Account"]
+      ).setValue(txAccountName);
 
-  if (cols["Date"]) sheet.getRange(row, cols["Date"]).setValue(request.date);
-  if (cols["Amount"]) sheet.getRange(row, cols["Amount"]).setValue(Number(request.amount));
-  if (cols["Details"]) sheet.getRange(row, cols["Details"]).setValue(request.details || "");
-  if (cols["Account"]) sheet.getRange(row, cols["Account"]).setValue(request.account);
-  if (cols["Budget Type"]) sheet.getRange(row, cols["Budget Type"]).setValue(request.budgetType || "");
-  if (cols["Budget Position"]) sheet.getRange(row, cols["Budget Position"]).setValue(request.budgetPosition || "");
-  if (cols["Transfer To Account"]) sheet.getRange(row, cols["Transfer To Account"]).setValue(request.transferToAccount || "");
+  if (cols["Account ID"])
+      sheet.getRange(
+          rowIndexToUpdate,
+          cols["Account ID"]
+      ).setValue(txAccountId);
+
+  if (cols["Transfer To Account"])
+      sheet.getRange(
+          rowIndexToUpdate,
+          cols["Transfer To Account"]
+      ).setValue(txTransferToName);
+
+  if (cols["Transfer To Account ID"])
+      sheet.getRange(
+          rowIndexToUpdate,
+          cols["Transfer To Account ID"]
+      ).setValue(txTransferToId);
 
   return createJsonResponse({ success: true });
 }
 
-function deleteTransaction(request) {
+function deleteTransaction(data) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_TRANSACTIONS);
-  if (!sheet) return createJsonResponse({ success: false, error: "Transactions sheet missing" });
+  if (!sheet) return createJsonResponse({ success: false, error: "Sheet not found" });
 
-  const rowNumber = Number(request.rowNumber);
-  if (rowNumber > 1 && rowNumber <= sheet.getLastRow()) {
-    sheet.deleteRow(rowNumber);
-    return createJsonResponse({ success: true });
+  if (!data.id) {
+    return createJsonResponse({ success: false, error: "Missing Transaction ID" });
   }
 
-  return createJsonResponse({ success: false, error: "Invalid row number" });
+  const cols = getColumnIndexMap(SHEET_TRANSACTIONS);
+  const idColIndex = cols["Transaction ID"] - 1;
+
+  if (idColIndex === undefined || idColIndex < 0) {
+    return createJsonResponse({ success: false, error: "'Transaction ID' column not found in sheet" });
+  }
+
+  const values = sheet.getDataRange().getValues();
+  const searchId = String(data.id).trim();
+
+  for (let i = 1; i < values.length; i++) {
+    if (String(values[i][idColIndex]).trim() === searchId) {
+      sheet.deleteRow(i + 1);
+      return createJsonResponse({ success: true });
+    }
+  }
+
+  return createJsonResponse({ success: false, error: "Transaction ID not found: " + searchId });
 }
 
 function copyJanuaryToWholeYear() {
@@ -339,6 +500,31 @@ function saveAllBudgets(budgetItems) {
   return createJsonResponse({ success: true });
 }
 
+function saveBudget(request) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_BUDGET);
+  if (!sheet) return createJsonResponse({ success: false });
+
+  const cols = getColumnIndexMap(SHEET_BUDGET);
+  const data = sheet.getDataRange().getValues();
+
+  const yearCol = cols["Year"] - 1;
+  const monthCol = cols["Month"] - 1;
+  const categoryCol = cols["Category"] - 1;
+
+  for (let i = 1; i < data.length; i++) {
+    if (
+      data[i][yearCol] == request.year &&
+      data[i][monthCol] == request.month &&
+      data[i][categoryCol] == request.category
+    ) {
+      sheet.getRange(i + 1, cols["Planned Amount"]).setValue(Number(request.amount));
+      return createJsonResponse({ success: true });
+    }
+  }
+
+  return createJsonResponse({ success: false, message: "Item not found" });
+}
+
 function addCategory(request) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_CATEGORIES);
   const cols = getColumnIndexMap(SHEET_CATEGORIES);
@@ -357,17 +543,27 @@ function addCategory(request) {
 }
 
 function deleteCategory(request) {
-  const categorySheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_CATEGORIES);
-  const budgetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_BUDGET);
+  const categoryId = request.categoryId;
+  if (!categoryId) return createJsonResponse({ success: false, message: "Category ID required" });
 
+  let categoryName = "";
+
+  // 1. Find and remove category from Categories sheet, and capture categoryName for BudgetPlan cleanup
+  const categorySheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_CATEGORIES);
   if (categorySheet) {
     const cols = getColumnIndexMap(SHEET_CATEGORIES);
     const catData = categorySheet.getDataRange().getValues();
 
-    if (catData.length > 0) {
+    if (catData.length > 1) {
       const header = catData[0];
-      const categoryNameCol = cols["Category Name"] - 1;
-      const filtered = catData.slice(1).filter(row => row[categoryNameCol] !== request.categoryName);
+      const idCol = cols["Category ID"] - 1;
+      const nameCol = cols["Category Name"] - 1;
+
+      // Locate target row to get its name before deleting
+      const targetRow = catData.slice(1).find(row => row[idCol] === categoryId);
+      if (targetRow) categoryName = targetRow[nameCol];
+
+      const filtered = catData.slice(1).filter(row => row[idCol] !== categoryId);
       const updated = [header, ...filtered];
 
       categorySheet.clearContents();
@@ -375,14 +571,16 @@ function deleteCategory(request) {
     }
   }
 
-  if (budgetSheet) {
+  // 2. Remove matching rows from BudgetPlan sheet using the retrieved categoryName
+  const budgetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_BUDGET);
+  if (budgetSheet && categoryName) {
     const cols = getColumnIndexMap(SHEET_BUDGET);
     const budgetData = budgetSheet.getDataRange().getValues();
 
-    if (budgetData.length > 0) {
+    if (budgetData.length > 1) {
       const header = budgetData[0];
       const categoryCol = cols["Category"] - 1;
-      const filtered = budgetData.slice(1).filter(row => row[categoryCol] !== request.categoryName);
+      const filtered = budgetData.slice(1).filter(row => row[categoryCol] !== categoryName);
       const updated = [header, ...filtered];
 
       budgetSheet.clearContents();
@@ -471,7 +669,14 @@ function addRecurringBill(params) {
   row[cols["Amount Type"] - 1] = params.amountType;
   row[cols["Default Amount"] - 1] = Number(params.amount);
   row[cols["Due Day"] - 1] = Number(params.dueDay);
-  row[cols["Account"] - 1] = params.account;
+  const accountId = params.account || "";
+  const accountName = getAccountNameById(accountId);
+
+  if (cols["Account"])
+      row[cols["Account"] - 1] = accountName;
+
+  if (cols["Account ID"])
+      row[cols["Account ID"] - 1] = accountId;
   row[cols["Active"] - 1] = true;
 
   sheet.appendRow(row);
@@ -479,20 +684,30 @@ function addRecurringBill(params) {
 }
 
 function updateRecurringBill(request) {
+  if (!request.billId) {
+    return { success: false, message: "Missing Bill ID" };
+  }
+  
+  const amount = Number(request.amount);
+  if (isNaN(amount) || amount < 0) {
+    return { success: false, message: "Invalid amount value" };
+  }
+
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_RECURRING);
+  if (!sheet) return { success: false, message: "Sheet not found" };
+
   const cols = getColumnIndexMap(SHEET_RECURRING);
   const data = sheet.getDataRange().getValues();
-
   const billIdCol = cols["Bill ID"] - 1;
 
   for (let i = 1; i < data.length; i++) {
-    if (data[i][billIdCol] === request.billId) {
-      sheet.getRange(i + 1, cols["Default Amount"]).setValue(Number(request.amount));
+    if (String(data[i][billIdCol]).trim() === String(request.billId).trim()) {
+      sheet.getRange(i + 1, cols["Default Amount"]).setValue(amount);
       return { success: true };
     }
   }
 
-  return { success: false };
+  return { success: false, message: "Bill ID not found" };
 }
 
 function deleteRecurringBill(request) {
@@ -515,7 +730,6 @@ function deleteRecurringBill(request) {
 function generateBills() {
   const recurringBills = getRecurringBills();
   const transactions = getTransactions();
-  const transactionSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_TRANSACTIONS);
 
   if (!recurringBills.length) {
     return { success: true, count: 0 };
@@ -531,13 +745,17 @@ function generateBills() {
 
     const billName = bill.billName;
 
-    const alreadyExists = transactions.some(tx => {
-      const txDate = new Date(tx.Date);
-      return (
-        tx.Details === billName &&
-        txDate.getMonth() === currentMonth &&
-        txDate.getFullYear() === currentYear
-      );
+    const alreadyExists =
+        transactions.some(tx => {
+
+        const txDate =
+            new Date(tx.Date);
+
+        return (
+            tx.recurringBillId === bill.billId &&
+            txDate.getMonth() === currentMonth &&
+            txDate.getFullYear() === currentYear
+        );
     });
 
     if (alreadyExists) return;
@@ -546,11 +764,12 @@ function generateBills() {
       date: Utilities.formatDate(today, Session.getScriptTimeZone(), "yyyy-MM-dd"),
       amount: bill.defaultAmount,
       details: billName,
-      account: bill.account,
+      account: bill.accountId,
       budgetType: bill.budgetType,
       budgetPosition: bill.budgetPosition,
-      transferToAccount: ""
-    });
+      transferToAccount: "",
+      recurringBillId: bill.billId
+      });
 
     count++;
   });
@@ -558,140 +777,128 @@ function generateBills() {
   return { success: true, count: count };
 }
 
-function saveBudget(request) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_BUDGET);
-  if (!sheet) return createJsonResponse({ success: false });
-
-  const cols = getColumnIndexMap(SHEET_BUDGET);
-  const data = sheet.getDataRange().getValues();
-
-  const yearCol = cols["Year"] - 1;
-  const monthCol = cols["Month"] - 1;
-  const categoryCol = cols["Category"] - 1;
-
-  for (let i = 1; i < data.length; i++) {
-    if (
-      data[i][yearCol] == request.year &&
-      data[i][monthCol] == request.month &&
-      data[i][categoryCol] == request.category
-    ) {
-      sheet.getRange(i + 1, cols["Planned Amount"]).setValue(Number(request.amount));
-      return createJsonResponse({ success: true });
-    }
+function testUUIDGeneration() {
+  var testId = generateUUID();
+  Logger.log("Generated UUID: " + testId);
+  
+  // Verify it returns a non-empty string format
+  if (testId && testId.length > 20) {
+    Logger.log("SUCCESS: UUID generated correctly.");
+  } else {
+    Logger.log("FAILED: UUID issue detected.");
   }
-
-  return createJsonResponse({ success: false, message: "Item not found" });
 }
 
 /* ===================================================
-    ROUTERS & UTILS
+    5. CORE HELPERS & UTILITIES
 =================================================== */
-
-function doGet(e) {
-  try {
-    const params = e ? e.parameter : {};
-    const action = params.action;
-
-    switch (action) {
-      case "getAllData":
-        return getAllData();
-      case "getTransactions":
-        return createJsonResponse(getTransactions());
-      case "addTransaction":
-        return addTransaction({
-          date: params.date,
-          amount: params.amount,
-          details: params.details,
-          account: params.account,
-          budgetType: params.budgetType,
-          budgetPosition: params.budgetPosition,
-          transferToAccount: params.transferToAccount
-        });
-      case "updateTransaction":
-        return updateTransaction({
-          rowNumber: params.rowNumber,
-          date: params.date,
-          amount: params.amount,
-          details: params.details,
-          account: params.account,
-          budgetType: params.budgetType,
-          budgetPosition: params.budgetPosition,
-          transferToAccount: params.transferToAccount
-        });
-      case "deleteTransaction":
-        return deleteTransaction({ rowNumber: params.rowNumber });
-      case "getAccounts":
-        return createJsonResponse(getAccounts());
-      case "getCategories":
-        return createJsonResponse(getCategories());
-      case "getBudgetPlan":
-        return createJsonResponse(getBudgetPlan());
-      case "getGoals":
-        return createJsonResponse(getGoals());
-      case "copyJanuaryToWholeYear":
-        return copyJanuaryToWholeYear();
-      case "copyCurrentYearToNextYear":
-        return copyCurrentYearToNextYear({ year: params.year });
-      case "saveBudget":
-        return saveBudget({
-          year: params.year,
-          month: params.month,
-          category: params.category,
-          amount: params.amount
-        });
-      case "addCategory":
-        return addCategory({
-          budgetType: params.budgetType,
-          group: params.group,
-          categoryName: params.categoryName,
-          preferredFundingSource: params.preferredFundingSource
-        });
-      case "deleteCategory":
-        return deleteCategory({ categoryName: params.categoryName });
-      case "addBudgetItem":
-        return addBudgetItem({
-          year: params.year,
-          month: params.month,
-          category: params.category,
-          amount: params.amount
-        });
-      case "deleteBudgetItem":
-        return deleteBudgetItem({
-          year: params.year,
-          category: params.category
-        });
-      case "addRecurringBill":
-        return createJsonResponse(addRecurringBill(params));
-      case "deleteRecurringBill":
-        return createJsonResponse(deleteRecurringBill({ billId: params.billId }));
-      case "updateRecurringBill":
-        return createJsonResponse(updateRecurringBill({ billId: params.billId, amount: params.amount }));
-      case "generateBills":
-        return createJsonResponse(generateBills());
-      default:
-        return createJsonResponse({ error: "Invalid Action: " + action });
-    }
-  } catch (err) {
-    return createJsonResponse({ error: err.toString() });
-  }
-}
-
-function doPost(e) {
-  try {
-    const request = JSON.parse(e.postData.contents);
-
-    if (request.action === "saveAllBudgets") {
-      return saveAllBudgets(request.budgetItems);
-    }
-
-    return createJsonResponse({ success: false, error: "Invalid action" });
-  } catch (err) {
-    return createJsonResponse({ success: false, error: err.message });
-  }
+function generateUUID() {
+  return Utilities.getUuid();
 }
 
 function createJsonResponse(data) {
   return ContentService
     .createTextOutput(JSON.stringify(data))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+function getColumnIndexMap(sheetName) {
+  const sheet = SpreadsheetApp
+    .getActiveSpreadsheet()
+    .getSheetByName(sheetName);
+
+  if (!sheet) return {};
+
+  const headers = sheet
+    .getRange(1, 1, 1, sheet.getLastColumn())
+    .getValues()[0];
+
+  const map = {};
+  headers.forEach((header, index) => {
+    map[String(header).trim()] = index + 1;
+  });
+
+  return map;
+}
+
+function getSheetObjects(sheetName) {
+  const sheet = SpreadsheetApp
+    .getActiveSpreadsheet()
+    .getSheetByName(sheetName);
+
+  if (!sheet) return [];
+
+  const data = sheet.getDataRange().getValues();
+  if (data.length <= 1) return [];
+
+  const headers = data.shift();
+
+  return data.map(row => {
+    const obj = {};
+    headers.forEach((header, index) => {
+      obj[String(header).trim()] = row[index];
+    });
+    return obj;
+  });
+}
+
+function showInputDialog(title, message, value = "") {
+  return new Promise(resolve => {
+    const modal = document.getElementById("inputModal");
+    const titleEl = document.getElementById("inputTitle");
+    const messageEl = document.getElementById("inputMessage");
+    const inputEl = document.getElementById("inputValue");
+    const saveBtn = document.getElementById("inputSave");
+    const cancelBtn = document.getElementById("inputCancel");
+
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+    inputEl.value = value;
+
+    modal.classList.add("show");
+
+    const cleanup = () => {
+      modal.classList.remove("show");
+      inputEl.removeEventListener("keydown", handleKeyDown);
+    };
+
+    const handleSave = () => {
+      cleanup();
+      resolve(inputEl.value);
+    };
+
+    const handleCancel = () => {
+      cleanup();
+      resolve(null);
+    };
+
+    const handleKeyDown = (e) => {
+      if (e.key === "Enter") handleSave();
+      if (e.key === "Escape") handleCancel();
+    };
+
+    saveBtn.onclick = handleSave;
+    cancelBtn.onclick = handleCancel;
+    inputEl.addEventListener("keydown", handleKeyDown);
+
+    inputEl.focus();
+    inputEl.select();
+  });
+}
+
+function getAccountById(accountId) {
+  const accounts = getAccounts();
+
+  return accounts.find(acc =>
+    String(acc.accountId).trim() ===
+    String(accountId).trim()
+  );
+}
+
+function getAccountNameById(accountId) {
+  const account = getAccountById(accountId);
+
+  return account
+    ? account.accountName
+    : "";
 }
