@@ -210,14 +210,142 @@ async function loadNetWorthVelocity() {
 
     if (!container) return;
 
+    let assets = 0;
+    let liabilities = 0;
+
+    appData.accounts.forEach(account => {
+
+        const balance =
+            Number(
+                account.currentBalance ||
+                account.balance ||
+                0
+            );
+
+        if (
+            account.netWorthType === "Asset"
+        ) {
+            assets += balance;
+        }
+
+        if (
+            account.netWorthType === "Liability"
+        ) {
+            liabilities += balance;
+        }
+    });
+
+    const netWorth =
+        assets - liabilities;
+
+    const selectedYear =
+        getViewYear();
+
+    const selectedMonth =
+        getViewMonth();
+
+    const categoryTypes = {};
+
+    appData.categories.forEach(cat => {
+        categoryTypes[
+            cat.categoryName
+        ] = cat.budgetType;
+    });
+
+    let income = 0;
+    let expense = 0;
+    let savings = 0;
+    let debt = 0;
+
+    appData.budget.forEach(item => {
+
+        if (
+            Number(item.year) !== selectedYear
+        ) return;
+
+        if (
+            item.month !== selectedMonth
+        ) return;
+
+        const amount =
+            Number(
+                item.plannedAmount || 0
+            );
+
+        const type =
+            categoryTypes[
+                item.category
+            ];
+
+        if (type === "Income")
+            income += amount;
+
+        if (type === "Expense")
+            expense += amount;
+
+        if (type === "Savings")
+            savings += amount;
+
+        if (type === "Debt")
+            debt += amount;
+    });
+
+    const monthlyVelocity =
+        income -
+        expense -
+        savings -
+        debt;
+
+    const annualVelocity =
+        monthlyVelocity * 12;
+
+    const projectedNetWorth =
+        netWorth +
+        annualVelocity;
+
     container.innerHTML = `
         <div class="card">
-            <h2>📈 Net Worth Velocity</h2>
+
+            <h2>
+                📈 Net Worth Velocity
+            </h2>
 
             <div class="metric-row">
-                <span>Status</span>
-                <strong>Coming Soon</strong>
+                <span>
+                    Current Net Worth
+                </span>
+                <strong>
+                    ${formatCurrency(netWorth)}
+                </strong>
             </div>
+
+            <div class="metric-row">
+                <span>
+                    Monthly Velocity
+                </span>
+                <strong>
+                    ${formatCurrency(monthlyVelocity)}
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>
+                    Annual Velocity
+                </span>
+                <strong>
+                    ${formatCurrency(annualVelocity)}
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>
+                    Projected Next Year
+                </span>
+                <strong>
+                    ${formatCurrency(projectedNetWorth)}
+                </strong>
+            </div>
+
         </div>
     `;
 }
