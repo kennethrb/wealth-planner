@@ -602,6 +602,7 @@ async function loadPurchaseEvaluator() {
 
         if (type === "Debt")
             monthlyDebt += amount;
+
     });
 
     const monthlyObligations =
@@ -627,6 +628,7 @@ async function loadPurchaseEvaluator() {
         ) {
             availableCash += balance;
         }
+
     });
 
     const cashAfterPurchase =
@@ -660,6 +662,9 @@ async function loadPurchaseEvaluator() {
             "🚨 Not Recommended";
     }
 
+    const showResults =
+        purchaseAmount > 0;
+
     container.innerHTML = `
         <div class="card">
 
@@ -667,61 +672,82 @@ async function loadPurchaseEvaluator() {
                 🛒 Purchase Evaluator
             </h2>
 
-            <div class="metric-row">
-                <span>
-                    Purchase Amount
-                </span>
+            <div class="form-row">
 
-                <strong>
-                    ${formatCurrency(
-                        purchaseAmount
-                    )}
-                </strong>
+                <input
+                    type="number"
+                    id="purchaseAmount"
+                    placeholder="Purchase Amount"
+                    value="${
+                        purchaseAmount || ""
+                    }">
+
+                <button
+                    onclick="loadPurchaseEvaluator()">
+                    Evaluate
+                </button>
+
             </div>
 
-            <div class="metric-row">
-                <span>
-                    Cash After Purchase
-                </span>
+            ${
+                showResults
+                ? `
+                <hr>
 
-                <strong>
-                    ${formatCurrency(
-                        cashAfterPurchase
-                    )}
-                </strong>
-            </div>
+                <div class="metric-row">
+                    <span>
+                        Cash After Purchase
+                    </span>
 
-            <div class="metric-row">
-                <span>
-                    Buffer Remaining
-                </span>
+                    <strong>
+                        ${formatCurrency(
+                            cashAfterPurchase
+                        )}
+                    </strong>
+                </div>
 
-                <strong>
-                    ${formatCurrency(
-                        bufferRemaining
-                    )}
-                </strong>
-            </div>
+                <div class="metric-row">
+                    <span>
+                        Buffer Remaining
+                    </span>
 
-            <div class="metric-row">
-                <span>
-                    Months Covered
-                </span>
+                    <strong>
+                        ${formatCurrency(
+                            bufferRemaining
+                        )}
+                    </strong>
+                </div>
 
-                <strong>
-                    ${monthsCovered.toFixed(1)}
-                </strong>
-            </div>
+                <div class="metric-row">
+                    <span>
+                        Months Covered
+                    </span>
 
-            <div class="metric-row">
-                <span>
-                    Recommendation
-                </span>
+                    <strong>
+                        ${monthsCovered.toFixed(1)}
+                    </strong>
+                </div>
 
-                <strong>
-                    ${recommendation}
-                </strong>
-            </div>
+                <div class="metric-row">
+                    <span>
+                        Recommendation
+                    </span>
+
+                    <strong>
+                        ${recommendation}
+                    </strong>
+                </div>
+                `
+                : `
+                <hr>
+
+                <p>
+                    Enter a purchase amount
+                    to evaluate its impact
+                    on your finances.
+                </p>
+                `
+            }
 
         </div>
     `;
