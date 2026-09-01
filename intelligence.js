@@ -200,3 +200,24 @@ async function loadBufferVsInvest() {
         </div>
     `;
 }
+
+async function loadNetWorthVelocity() {
+
+    const container =
+        document.getElementById(
+            "netWorthVelocity"
+        );
+
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="card">
+            <h2>📈 Net Worth Velocity</h2>
+
+            <div class="metric-row">
+                <span>Status</span>
+                <strong>Coming Soon</strong>
+            </div>
+        </div>
+    `;
+}
