@@ -126,7 +126,6 @@ async function addCategory() {
 }
 
 function loadFundingSources() {
-
     const dropdown =
         document.getElementById(
             "preferredFundingSource"
@@ -138,12 +137,14 @@ function loadFundingSources() {
 
     appData.accounts.forEach(account => {
 
+        const accountId =
+            account.accountId;
+
         const name =
-            account.accountName ||
-            account.name;
+            account.accountName;
 
         dropdown.innerHTML += `
-            <option value="${name}">
+            <option value="${accountId}">
                 ${name}
             </option>
         `;
