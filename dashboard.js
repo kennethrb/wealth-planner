@@ -92,7 +92,15 @@ async function loadProjection() {
     const projectedNetWorth = projectedAssets - liabilities;
     document.getElementById("projection").innerHTML = `
     <div class="card">
-      <h2>📈 Wealth Projection</h2>
+      <div class="card-header">
+            <h2>📈 Wealth Projection</h2>
+        
+            <button
+                class="info-button"
+                onclick="showFeatureGuide('projection')">
+                ?
+            </button>
+        </div>
       <div class="metric-row"><span>Current Assets</span><strong>${formatCurrency(assets)}</strong></div>
       <div class="metric-row"><span>Current Net Worth</span><strong>${formatCurrency(assets - liabilities)}</strong></div>
       <hr>
