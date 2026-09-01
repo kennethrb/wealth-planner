@@ -53,7 +53,7 @@ async function loadBudgetPlanner() {
     </div>
     <div class="action-buttons">
       <button onclick="saveBudgetChanges()">💾 Save Budget</button>
-      <button onclick="copyJanuaryToWholeYear()">📑 Replicate Year</button>
+      <button onclick="copyJanuaryToWholeYear()">📑 Copy Jan → Year</button>
       <button onclick="copyCurrentYearToNextYear()">📅 Create ${nextYear}</button>
     </div>
   `;
