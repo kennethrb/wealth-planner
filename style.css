@@ -1207,6 +1207,7 @@ tr.section-debt td:first-child {
 }
 
 #guideExample {
+    white-space: pre-line;
     background:
         rgba(255, 255, 255, .03);
     border:
