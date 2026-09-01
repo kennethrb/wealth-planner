@@ -383,7 +383,8 @@ function loadReconciliation() {
         exceptionAccounts.length;
 
     container.innerHTML = `
-
+        <div class="card">
+            <h2>✅ Account Reconciliation</h2>
         <div class="funding-row">
             <span>🏦 Total Accounts</span>
             <strong>${appData.accounts.length}</strong>
