@@ -422,7 +422,8 @@ async function refreshUI() {
         loadFundingPlan(),
         loadBufferVsInvest(),
         loadNetWorthVelocity(),
-        loadPersonalInflation()
+        loadPersonalInflation(),
+        loadPurchaseEvaluator()
     ]);
 }
 async function initializeApp() {
