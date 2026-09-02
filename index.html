@@ -11,73 +11,45 @@
   <!-- Top Status Banner -->
   <div id="globalStatus" class="status-banner"></div>
 
-  <main class="container">
+<main class="container">
 
-    <!-- App Title Header -->
-    <header class="hero-header">
-      
-      <!--Month and Year Filter-->
-      <div class="period-selector">
-          <span class="period-chip"> Analytics View </span>
-          <select id="viewMonth" onchange="changeViewPeriod()">
-              <option value="Jan">Jan</option>
-              <option value="Feb">Feb</option>
-              <option value="Mar">Mar</option>
-              <option value="Apr">Apr</option>
-              <option value="May">May</option>
-              <option value="Jun">Jun</option>
-              <option value="Jul">Jul</option>
-              <option value="Aug">Aug</option>
-              <option value="Sep">Sep</option>
-              <option value="Oct">Oct</option>
-              <option value="Nov">Nov</option>
-              <option value="Dec">Dec</option>
-          </select>
-          <select id="viewYear" onchange="changeViewPeriod()">
-          </select>
-      </div>
-    
-      <h1>
-        Wealth Planner
-      </h1>
-    
-      <p>
-        💎 Personal Wealth Operating System
-      </p>
-    
-    </header>
+  <!-- STANDALONE STICKY ANALYTICS FILTER -->
+  <div class="period-selector">
+      <span class="period-chip"> Analytics View </span>
+      <select id="viewMonth" onchange="changeViewPeriod()">
+          <option value="Jan">Jan</option>
+          <option value="Feb">Feb</option>
+          <option value="Mar">Mar</option>
+          <option value="Apr">Apr</option>
+          <option value="May">May</option>
+          <option value="Jun">Jun</option>
+          <option value="Jul">Jul</option>
+          <option value="Aug">Aug</option>
+          <option value="Sep">Sep</option>
+          <option value="Oct">Oct</option>
+          <option value="Nov">Nov</option>
+          <option value="Dec">Dec</option>
+      </select>
+      <select id="viewYear" onchange="changeViewPeriod()">
+      </select>
+  </div>
 
-    <nav class="section-nav">      
-      <!--Navigation Bar-->
+  <!-- App Title Header -->
+  <header class="hero-header">
+    <h1>Wealth Planner</h1>
+    <p>💎 Personal Wealth Operating System</p>
+  </header>
+
+  <!-- Navigation Bar -->
+  <nav class="section-nav">      
     <div class="nav-links">
-      <a href="#overview" class="nav-item active">
-        <span class="icon">🏦</span>
-        <span>Overview</span>
-      </a>
-      <a href="#planning" class="nav-item">
-        <span class="icon">🗂</span>
-        <span>Planning</span>
-      </a>
-      <a href="#execution" class="nav-item">
-        <span class="icon">💳</span>
-        <span>Transactions</span>
-      </a>
-      <a href="#performance" class="nav-item">
-        <span class="icon">📈</span>
-        <span>Performance</span>
-      </a>
-      <a href="#scenarios" class="nav-item">
-        <span class="icon">🧪</span>
-        <span>Scenarios</span>
-      </a>
-      <a href="#goals" class="nav-item">
-        <span class="icon">🎯</span>
-        <span>Goals</span>
-      </a>
+      <a href="#overview" class="nav-item active"><span class="icon">🏦</span><span>Overview</span></a>
+      <a href="#planning" class="nav-item"><span class="icon">🗂</span><span>Planning</span></a>
+      <a href="#execution" class="nav-item"><span class="icon">💳</span><span>Transactions</span></a>
+      <a href="#performance" class="nav-item"><span class="icon">📈</span><span>Performance</span></a>
+      <a href="#scenarios" class="nav-item"><span class="icon">🧪</span><span>Scenarios</span></a>
+      <a href="#goals" class="nav-item"><span class="icon">🎯</span><span>Goals</span></a>
     </div>
-      
-
-
   </nav>
 
 
