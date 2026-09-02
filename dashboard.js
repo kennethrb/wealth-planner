@@ -1,5 +1,6 @@
 async function loadFinancialHealth() {
-    const selectedYear = getSelectedYear();
+    const selectedYear = getViewYear();
+    const selectedMonth = getViewMonth();
     const budgetData = appData.budget.filter(item => Number(item.year) === selectedYear);
     const categoryTypes = {};
     appData.categories.forEach(cat => {
@@ -10,7 +11,7 @@ async function loadFinancialHealth() {
         savings = 0,
         debt = 0;
     budgetData.forEach(item => {
-        if (item.month !== "Jan") return;
+        if (item.month !== selectedMonth) return;
         const type = categoryTypes[item.category];
         const amount = Number(item.plannedAmount);
         if (type === "Income") income += amount;
@@ -112,7 +113,8 @@ async function loadProjection() {
 
 function loadFundingPlan() {
 
-    const selectedYear = getSelectedYear();
+    const selectedYear = getViewYear();
+    const selectedMonth = getViewMonth();
 
     const container =
         document.getElementById(
@@ -161,7 +163,7 @@ function loadFundingPlan() {
         )
         .forEach(item => {
 
-            if (item.month !== "Jan")
+            if (item.month !== selectedMonth)
                 return;
 
             const amount =
