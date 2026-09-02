@@ -61,7 +61,8 @@ async function loadNetWorth() {
 }
 
 async function loadProjection() {
-    const selectedYear = getSelectedYear();
+    const selectedYear = getViewYear();
+    const selectedMonth = getViewMonth();
     const budgetData = appData.budget.filter(item => Number(item.year) === selectedYear);
     const categoryTypes = {};
     appData.categories.forEach(cat => {
@@ -79,7 +80,7 @@ async function loadProjection() {
         savings = 0,
         debt = 0;
     budgetData.forEach(item => {
-        if (item.month !== "Jan") return;
+        if (item.month !== selectedMonth) return;
         const amount = Number(item.plannedAmount);
         const type = categoryTypes[item.category];
         if (type === "Income") income += amount;
