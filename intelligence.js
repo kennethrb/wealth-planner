@@ -371,24 +371,41 @@ async function loadPersonalInflation() {
 
     let currentExpense = 0;
     let previousExpense = 0;
-    let sourceUsed = "BudgetPlan";
-
-    // 1. Primary Source: BudgetPlan
-    appData.budget.forEach(item => {
-        const type = categoryTypes[item.category];
-        if (type !== "Expense") return;
-
-        const amount = Number(item.plannedAmount || 0);
-        const itemYear = Number(item.year);
-
-        if (itemYear === currentYear && item.month === currentMonth) {
+    let sourceUsed = "Transactions";
+    // PRIMARY SOURCE
+    appData.transactions.forEach(tx => {
+        const txDate = new Date(tx.Date || tx.date);
+        if (isNaN(txDate.getTime())) return;
+        const txYear = txDate.getFullYear();
+        const txMonth = txDate.toLocaleString("en-US", {
+            month: "short"
+        });
+        const txType = tx["Budget Type"] || tx.budgetType;
+        if (txType !== "Expense") return;
+        const amount = Number(tx.Amount || tx.amount || 0);
+        if (txYear === currentYear && txMonth === currentMonth) {
             currentExpense += amount;
         }
-
-        if (itemYear === previousYear && item.month === currentMonth) {
+        if (txYear === previousYear && txMonth === currentMonth) {
             previousExpense += amount;
         }
     });
+
+    if (currentExpense === 0 && previousExpense === 0) {
+        sourceUsed = "BudgetPlan";
+        appData.budget.forEach(item => {
+            const type = categoryTypes[item.category];
+            if (type !== "Expense") return;
+            const amount = Number(item.plannedAmount || 0);
+            const itemYear = Number(item.year);
+            if (itemYear === currentYear && item.month === currentMonth) {
+                currentExpense += amount;
+            }
+            if (itemYear === previousYear && item.month === currentMonth) {
+                previousExpense += amount;
+            }
+        });
+    }
 
     // 2. Fallback Source: Transactions (if BudgetPlan has no prior year data)
     if (previousExpense === 0 && appData.transactions && appData.transactions.length > 0) {
@@ -416,17 +433,16 @@ async function loadPersonalInflation() {
     }
 
     // QA Debug Logging
-    if (DEBUG_QA) {
-        console.log("🔍 QA DEBUG [WI-003: Personal Inflation]", {
-            currentYear,
-            previousYear,
-            currentMonth,
-            currentExpense,
-            previousExpense,
-            sourceUsed,
-            status: previousExpense === 0 ? "FAILED / NO_DATA" : "PASS"
-        });
-    }
+    console.log("🔍 QA DEBUG [WI-003: Personal Inflation]", {
+        currentYear,
+        previousYear,
+        currentMonth,
+        currentExpense,
+        previousExpense,
+        inflationRate: previousExpense > 0 ? (
+            (currentExpense - previousExpense) / previousExpense) * 100 : null,
+        sourceUsed
+    });
 
     // No historical data available
     if (previousExpense === 0) {
