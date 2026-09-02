@@ -191,8 +191,9 @@ async function loadScenarioCategories() {
 }
 
 function getCurrentAmount(category) {
-    const selectedYear = getSelectedYear();
-    const item = appData.budget.find(row => Number(row.year) === selectedYear && row.category === category && row.month === "Jan");
+    const selectedYear = getViewYear();
+    const selectedMonth = getViewMonth();
+    const item = appData.budget.find(row => Number(row.year) === selectedYear && row.category === category && row.month === selectedMonth);
     return item ? Number(item.plannedAmount) : 0;
 }
 
@@ -207,8 +208,9 @@ function runScenario() {
         expense = 0,
         savings = 0,
         debt = 0;
-    const selectedYear = getSelectedYear();
-    appData.budget.filter(item => Number(item.year) === selectedYear && item.month === "Jan").forEach(item => {
+    const selectedYear = getViewYear();
+    const selectedMonth = getViewMonth();
+    appData.budget.filter(item => Number(item.year) === selectedYear && item.month === selectedMonth).forEach(item => {
         const cat = appData.categories.find(c => c.categoryName === item.category);
         if (!cat) return;
         const amount = Number(item.plannedAmount);
