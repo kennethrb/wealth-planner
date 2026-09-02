@@ -292,12 +292,23 @@ async function loadCategoryDropdown() {
 function loadYearDropdown() {
     const dropdown = document.getElementById("budgetYear");
     if (!dropdown) return;
-    const selectedYear = dropdown.value;
-    const years = [...new Set(appData.budget.map(item => item.year))].filter(Boolean);
-    years.sort();
-    dropdown.innerHTML = years.map(year => `<option value="${year}">${year}</option>`).join("");
-    if (selectedYear) {
+    const selectedYear = Number(dropdown.value);
+    const years = [...new Set(appData.budget.map(item => Number(item.year)))].filter(Boolean).sort((a, b) => a - b);
+    dropdown.innerHTML = years.map(year => `<option value="${year}">
+                ${year}
+            </option>`).join("");
+    // Preserve existing user selection
+    if (selectedYear && years.includes(selectedYear)) {
         dropdown.value = selectedYear;
+        return;
+    }
+    // Default to current year if available
+    const currentYear = new Date().getFullYear();
+    if (years.includes(currentYear)) {
+        dropdown.value = currentYear;
+    } else {
+        // Fallback to latest budget year
+        dropdown.value = Math.max(...years);
     }
 }
 
