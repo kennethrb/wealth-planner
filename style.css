@@ -61,36 +61,36 @@ input[type="date"] {
     color-scheme: dark;
 }
 
-input[type="date"]::-webkit-calendar-picker-indicator{
+input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(.85);
     cursor: pointer;
     opacity: .8;
     transition: .2s ease;
 }
 
-input[type="date"]::-webkit-calendar-picker-indicator:hover{
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
     opacity: 1;
     transform: scale(1.1);
 }
 
-.icon{
-    margin-right:6px;
-    opacity:.9;
+.icon {
+    margin-right: 6px;
+    opacity: .9;
 }
 
 /* Small progress bars */
-.progress-mini{
-    height:8px;
-    background:rgba(255,255,255,.08);
-    border-radius:999px;
-    overflow:hidden;
-    margin-bottom:12px;
+.progress-mini {
+    height: 8px;
+    background: rgba(255, 255, 255, .08);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 12px;
 }
 
-.progress-mini-fill{
-    height:100%;
-    background:linear-gradient(90deg,#10b981,#34d399);
-    border-radius:999px;
+.progress-mini-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981, #34d399);
+    border-radius: 999px;
 }
 
 #transactionsList td:last-child,
@@ -145,12 +145,11 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{
 }
 
 /* ====================
-   SECTION NAVIGATION (SINGLE-ROW SCROLL)
+   UNIFIED STICKY NAVIGATION & FILTER BAR
 ==================== */
-/* ADJUST SECTION NAV TOP OFFSET SO IT STACKS BELOW THE FILTER */
 .section-nav {
     position: sticky;
-    top: 64px; /* Offset below sticky period-selector */
+    top: 12px;
     z-index: 100;
     padding: 8px 12px;
     margin-bottom: 24px;
@@ -158,26 +157,28 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{
     backdrop-filter: blur(16px);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+/* Nav Links Container (Horizontal Scroll) */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     overflow-x: auto;
     overflow-y: hidden;
     white-space: nowrap;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    flex: 1;
 }
 
-.section-nav::-webkit-scrollbar {
+.nav-links::-webkit-scrollbar {
     display: none;
-}
-
-/* Nav Links Group */
-.nav-links {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0; /* Prevents navigation items from shrinking */
 }
 
 .section-nav a {
@@ -207,24 +208,16 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{
     box-shadow: 0 0 16px rgba(16, 185, 129, .15);
 }
 
-/* ====================
-   STANDALONE STICKY PERIOD SELECTOR
-==================== */
+/* Integrated Period Selector Capsule */
 .period-selector {
-    position: sticky;
-    top: 12px;
-    z-index: 102;
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 14px;
-    background: rgba(11, 15, 23, 0.92);
-    backdrop-filter: blur(16px);
+    padding: 4px 8px;
+    background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
-    margin-bottom: 16px;
-    width: fit-content;
+    border-radius: 999px;
+    flex-shrink: 0;
 }
 
 .period-selector select {
@@ -233,6 +226,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{
     padding: 6px 10px;
     font-size: 13px;
     flex-shrink: 0;
+    border-radius: var(--radius-sm);
 }
 
 .period-chip {
@@ -252,39 +246,15 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{
 #performance,
 #scenarios,
 #goals {
-    scroll-margin-top: 120px;
+    scroll-margin-top: 100px;
 }
 
-.analytics-toolbar{
-    display:flex;
-    gap:12px;
-    align-items:center;
-    justify-content:flex-end;
-    margin-bottom:20px;
-}
-
-
-.period-selector select {
-    width: 95px;
-    min-width: 95px;
-}
-
-.period-chip {
-    padding: 6px 10px;
-    border-radius: 999px;
-    background: rgba(16,185,129,.15);
-    color: #34d399;
-    font-size: 12px;
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-
-
-.period-selector select{
-    width:90px;
-    min-width:90px;
-    flex-shrink:0;
+.analytics-toolbar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 20px;
 }
 
 /* Custom Scrollbar for Webkit */
@@ -588,44 +558,6 @@ button:active,
     gap: 12px;
     margin-top: 16px;
     margin-bottom: 16px;
-}
-
-
-/*-- FEATURE GUIDES----*/
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-}
-
-.info-button {
-    width: 24px;
-    height: 24px;
-    min-width: 24px;
-    border-radius: 50%;
-    background:
-        rgba(255, 255, 255, .04);
-    border:
-        1px solid rgba(255, 255, 255, .08);
-    color:
-        var(--text-muted);
-    font-size: 12px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: .2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-}
-
-.info-button:hover {
-    color: #34d399;
-    border-color: #34d399;
-    background:
-        rgba(16, 185, 129, .12);
-    transform: scale(1.08);
 }
 
 /* ====================
@@ -1130,13 +1062,12 @@ tr.section-debt td:first-child {
     inset: 0;
     background: rgba(0, 0, 0, .7);
     backdrop-filter: blur(6px);
-    display: none; /* Hidden by default */
+    display: none;
     justify-content: center;
     align-items: center;
     z-index: 99999;
 }
 
-/* Add this to ensure the JS class addition triggers visibility */
 .confirm-modal.show {
     display: flex !important;
 }
@@ -1170,12 +1101,8 @@ tr.section-debt td:first-child {
 
 .guide-card {
     max-width: 650px;
-    background:
-        linear-gradient(180deg,
-            rgba(21, 29, 42, .98),
-            rgba(11, 15, 23, .98));
-    border:
-        1px solid rgba(16, 185, 129, .15);
+    background: linear-gradient(180deg, rgba(21, 29, 42, .98), rgba(11, 15, 23, .98));
+    border: 1px solid rgba(16, 185, 129, .15);
 }
 
 .guide-card h2 {
@@ -1202,38 +1129,26 @@ tr.section-debt td:first-child {
 }
 
 #guideFormula {
-    background:
-        rgba(16, 185, 129, .08);
-    border:
-        1px solid rgba(16, 185, 129, .15);
+    background: rgba(16, 185, 129, .08);
+    border: 1px solid rgba(16, 185, 129, .15);
     border-radius: 12px;
     padding: 12px 14px;
     color: #34d399;
-    font-family:
-        ui-monospace,
-        monospace;
+    font-family: ui-monospace, monospace;
 }
 
 #guideExample {
     white-space: pre-line;
-    background:
-        rgba(255, 255, 255, .03);
-    border:
-        1px solid rgba(255, 255, 255, .05);
+    background: rgba(255, 255, 255, .03);
+    border: 1px solid rgba(255, 255, 255, .05);
     border-radius: 12px;
     padding: 12px 14px;
-    font-family:
-        ui-monospace,
-        monospace;
+    font-family: ui-monospace, monospace;
 }
 
-/*
-end of modal
-*/
-
-#inputValue{
-   margin-top:12px;
-   margin-bottom:8px;
+#inputValue {
+    margin-top: 12px;
+    margin-bottom: 8px;
 }
 
 #transactionsList {
@@ -1270,7 +1185,7 @@ end of modal
 }
 
 /* ====================
-   MOBILE RESPONSIVENESS
+   MOBILE & TABLET RESPONSIVENESS
 ==================== */
 @media screen and (max-width: 1024px) {
     .dashboard-grid {
@@ -1279,13 +1194,31 @@ end of modal
 }
 
 @media screen and (max-width: 768px) {
+    body {
+        padding: 16px 12px;
+    }
 
+    /* Stack Nav & Period Selector on Mobile */
+    .section-nav {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 10px 12px;
+    }
 
+    .nav-links {
+        width: 100%;
+    }
+
+    .period-selector {
+        width: 100%;
+        justify-content: space-between;
+        background: rgba(255, 255, 255, 0.05);
+    }
 
     .nav-item {
         flex-shrink: 0;
     }
-   
 
     .status-banner {
         left: 12px;
@@ -1303,16 +1236,12 @@ end of modal
         font-size: 16px;
     }
 
-   #transactionsList .action-cell {
-       display: flex !important;
-       flex-direction: row !important;
-       align-items: center;
-       justify-content: center;
-       gap: 8px;
-   }
-    
-    body {
-        padding: 16px 12px;
+    #transactionsList .action-cell {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
     }
 
     .dashboard-grid,
@@ -1348,5 +1277,4 @@ end of modal
     .card h2 {
         margin-bottom: 12px;
     }
-
 }
