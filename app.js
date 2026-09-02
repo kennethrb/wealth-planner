@@ -242,8 +242,8 @@ function runScenario() {
 function loadBudgetVsActual() {
     const container = document.getElementById("budgetVsActual");
     if (!container) return;
-    const selectedYear = Number(getSelectedYear());
-    const selectedMonth = getSelectedMonth();
+    const selectedYear = getViewYear();
+    const selectedMonth = getViewMonth();
     const monthMap = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
     const targetMonthIndex = monthMap[selectedMonth] ?? 0;
 
