@@ -443,6 +443,19 @@ async function loadPersonalInflation() {
             (currentExpense - previousExpense) / previousExpense) * 100 : null,
         sourceUsed
     });
+    
+    console.log({
+    sourceUsed,
+    currentExpense,
+    previousExpense
+});
+    console.log(
+    appData.transactions.filter(tx => {
+        const d = new Date(tx.Date || tx.date);
+
+        return d.getFullYear() === currentYear;
+    })
+);
 
     // No historical data available
     if (previousExpense === 0) {
