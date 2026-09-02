@@ -389,7 +389,11 @@ async function changeViewPeriod() {
         loadFundingPlan(),
         loadBudgetVsActual(),
         loadPersonalInflation(),
-        loadWealthSweep()
+        loadWealthSweep(),
+        loadBufferVsInvest(),
+        loadNetWorthVelocity(),
+        loadPurchaseEvaluator(),
+        loadSummary()
     ]);
 }
 
