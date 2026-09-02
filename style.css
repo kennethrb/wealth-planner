@@ -1342,13 +1342,13 @@ end of modal
         margin-bottom: 12px;
     }
 
-    .analytics-toolbar {
-       position: sticky;
-       top: 10px;
-       z-index: 101;
-   }
+    .period-selector {
+    position: sticky;
+    top: 10px;
+    z-index: 101;
 
-    .analytics-toolbar select {
-        width: 100%;
-    }
+    display: flex;
+    align-items: center;
+    gap: 8px;
+   }
 }
