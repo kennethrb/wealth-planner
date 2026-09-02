@@ -15,7 +15,8 @@ const DEBUG_QA = true;
 
 async function loadBufferVsInvest() {
 
-    const selectedYear = getSelectedYear();
+    const selectedYear = getViewYear();
+    const selectedMonth = getViewMonth();
 
     const budgetData =
         appData.budget.filter(
@@ -34,7 +35,7 @@ async function loadBufferVsInvest() {
 
     budgetData.forEach(item => {
 
-        if (item.month !== "Jan")
+        if (item.month !== selectedMonth)
             return;
 
         const type =
