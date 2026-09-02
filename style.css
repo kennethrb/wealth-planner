@@ -1343,9 +1343,10 @@ end of modal
     }
 
     .analytics-toolbar {
-        flex-direction: column;
-        align-items: stretch;
-    }
+       position: sticky;
+       top: 10px;
+       z-index: 101;
+   }
 
     .analytics-toolbar select {
         width: 100%;
