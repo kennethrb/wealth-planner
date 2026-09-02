@@ -399,6 +399,8 @@ async function changeViewPeriod() {
 
 async function refreshUI() {
     loadYearDropdown();
+    loadViewYearDropdown();
+    
     loadCategoryDropdown();
 
     loadFundingSources();
@@ -435,6 +437,7 @@ async function refreshUI() {
 }
 async function initializeApp() {
     await loadData();
+    loadViewYearDropdown();
     await refreshUI();
     // Default Add Budget Item year to latest budget year
     const years = [...new Set(appData.budget.map(item => Number(item.year)))].filter(Boolean);
