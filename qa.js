@@ -1,3 +1,6 @@
+let totalPassed = 0;
+let totalFailed = 0;
+
 async function runIntelligenceQA() {
     const testCases = [{
         year: 2026,
@@ -21,6 +24,15 @@ async function runIntelligenceQA() {
         await loadPersonalInflation();
         await loadPurchaseEvaluator();
         await loadWealthSweep();
+        const key = `${tc.year}-${tc.month}`;
+        const expected = QA_EXPECTED[key];
+        console.group(key);
+        assertMetric("Inflation", Number(window.qaInflation.inflationRate.toFixed(2)), expected.inflation, 0.1);
+        assertMetric("Monthly Velocity", window.qaVelocity.monthlyVelocity, expected.monthlyVelocity);
+        assertMetric("Annual Velocity", window.qaVelocity.annualVelocity, expected.annualVelocity);
+        assertMetric("Buffer Target", window.qaBuffer.bufferTarget, expected.bufferTarget);
+        assertMetric("Excess Cash", window.qaBuffer.excessCash, expected.excessCash);
+        console.groupEnd();
         console.group(`${tc.month} ${tc.year}`);
         console.log("Inflation", window.qaInflation);
         console.log("Velocity", window.qaVelocity);
@@ -29,9 +41,19 @@ async function runIntelligenceQA() {
         console.log("Purchase", window.qaPurchase);
         console.groupEnd();
     }
-    console.log("=================================");
-    console.log("QA COMPLETE");
-    console.log("=================================");
+        console.log("=================================");
+        console.log("QA COMPLETE");
+        console.log("=================================");
+        
+        console.log(
+            `✅ PASSED: ${totalPassed}`
+        );
+        
+        console.log(
+            `❌ FAILED: ${totalFailed}`
+        );
+        
+        console.log("=================================");
 }
 const QA_EXPECTED = {
     "2026-Jan": {
@@ -58,17 +80,26 @@ const QA_EXPECTED = {
 };
 
 function assertMetric(label, actual, expected, tolerance = 1) {
-    const passed = Math.abs(actual - expected) <= tolerance;
+
+    const passed =
+        Math.abs(actual - expected) <= tolerance;
+
     if (passed) {
-        console.log(`✅ ${label}`, {
-            actual,
-            expected
-        });
+
+        totalPassed++;
+
+        console.log(
+            `✅ ${label}`,
+            {
+                actual,
+                expected
+            }
+        );
+
     } else {
-        console.error(`❌ ${label}`, {
-            actual,
-            expected
-        });
-    }
-    return passed;
+
+        totalFailed++;
+
+        
+}
 }
