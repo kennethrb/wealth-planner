@@ -226,19 +226,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     padding: 6px 10px;
     font-size: 13px;
     flex-shrink: 0;
-    /* Updated background, border styling, and backdrop blur */
-    background: rgba(11, 15, 23, 0.88);
-    backdrop-filter: blur(16px);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    color: var(--text-main);
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.period-selector select:hover {
-    background: rgba(11, 15, 23, 0.95);
-    border-color: rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-sm);
 }
 
 .period-chip {
@@ -1225,7 +1213,7 @@ tr.section-debt td:first-child {
     .period-selector {
         width: 100%;
         justify-content: space-between;
-        background: rgba(11, 15, 23, 0.95);
+        background: rgba(255, 255, 255, 0.05);
     }
 
     .nav-item {
