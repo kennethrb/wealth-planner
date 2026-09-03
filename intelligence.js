@@ -333,12 +333,31 @@ async function loadFinancialHealthAdvisor() {
                 <strong>${problems.length}</strong>
             </div>
 
-            ${actions.map(action => `
-                <div class="metric-row">
-                    <span>Action</span>
-                    <strong>${action}</strong>
-                </div>
-            `).join("")}
+            ${actions.map(action => {
+            
+                if (typeof action === "string") {
+            
+                    return `
+                        <div class="advisor-action">
+                            ✅ ${action}
+                        </div>
+                    `;
+                }
+            
+                return `
+                    <div class="advisor-action priority">
+                        🎯 ${action.title}
+            
+                        <div>
+                            Suggested Increase:
+                            <strong>
+                                ${formatCurrency(action.amount)}
+                            </strong>
+                        </div>
+                    </div>
+                `;
+            
+            }).join("")}
 
             <hr>
 
