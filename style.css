@@ -309,11 +309,11 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     flex-shrink: 0;
 }
 
-#overview,
+#dashboard,
+#intelligence,
 #planning,
 #execution,
 #performance,
-#scenarios,
 #goals {
     scroll-margin-top: 100px;
 }
