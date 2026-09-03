@@ -345,6 +345,23 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     background: var(--text-muted);
 }
 
+.intel-panel {
+    display: none;
+}
+
+.intel-panel.active {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.intel-tabs {
+    display: flex;
+    gap: 12px;
+    margin: 16px 0;
+}
+`
+
 /* ====================
    LAYOUT & GRID SYSTEM
 ==================== */
