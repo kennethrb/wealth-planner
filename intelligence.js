@@ -600,10 +600,10 @@ async function loadWealthProjectionAccelerator() {
 
     // Future Value Formula: FV = P * (((1 + r/n)^(n*t) - 1) / (r/n))
     const calculateFV = (years) => {
-        const r = annualReturnRate / 12;
-        const n = years * 12;
+        const r = annualReturnRate / 12; // Monthly rate
+        const n = years * 12;            // Total months
         if (r === 0) return investableAmount * n;
-        return investableAmount * (((Math.pow(1 + r, n) - 1) / r));
+        return investableAmount * ((Math.pow(1 + r, n) - 1) / r);
     };
 
     const fv5 = calculateFV(5);
