@@ -978,3 +978,94 @@ async function loadWealthSweep() {
         </div>
     `;
 }
+
+// intelligence.js -> DI-008: Monthly Wealth Action Plan
+async function loadMonthlyWealthActionPlan() {
+    const container = document.getElementById("monthlyWealthActionPlan");
+
+    // Ensure prerequisite modules are updated
+    await loadBufferVsInvest();
+    await loadFinancialHealthAdvisor();
+    await loadFundingOptimizationAdvisor();
+    await loadWealthSweep();
+
+    const actions = [];
+
+    // 1. High Priority: Funding Deficits
+    if (window.qaFundingAdvisor?.insightsCount > 0) {
+        actions.push({
+            priority: 1,
+            badge: "🚨 Critical Deficit",
+            title: "Resolve Account Funding Shortfalls",
+            detail: "Address projected account deficits to prevent overdrafts on scheduled obligations.",
+            impact: "Avoids penalty fees and keeps budget on track"
+        });
+    }
+
+    // 2. High Priority: Savings Gap
+    if (window.qaFinancialHealthAdvisor?.savingsRate < 20) {
+        const gap = window.qaFinancialHealthAdvisor.wealthImpact;
+        actions.push({
+            priority: 2,
+            badge: "🎯 Savings Gap",
+            title: "Increase Monthly Savings Rate",
+            detail: "Current savings rate is under 20%. Increase monthly contribution toward savings goals.",
+            impact: `10-Year Net Worth Impact: +${formatCurrency(gap)}`
+        });
+    }
+
+    // 3. Medium Priority: Wealth Sweep Capital Deployment
+    if (window.qaSweep?.excessCash > 0) {
+        const excess = window.qaSweep.excessCash;
+        const invest = window.qaSweep.investmentSweep;
+        const debt = window.qaSweep.debtSweep;
+        const benefit = window.qaSweep.total3YrBenefit;
+
+        actions.push({
+            priority: 3,
+            badge: "🧹 Wealth Sweep",
+            title: `Deploy ${formatCurrency(excess)} Excess Cash`,
+            detail: `Allocate ${formatCurrency(invest)} to investments & ${formatCurrency(debt)} to debt payoff.`,
+            impact: `Estimated 3-Yr Return: +${formatCurrency(benefit)}`
+        });
+    }
+
+    // Sort actions by priority
+    actions.sort((a, b) => a.priority - b.priority);
+
+    // Expose QA Metrics for qa.js
+    window.qaActionPlan = {
+        totalActions: actions.length,
+        topPriority: actions[0]?.title || "Fully Optimized"
+    };
+
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="card">
+            <h2>📋 Monthly Wealth Action Plan</h2>
+            ${actions.length === 0 ? `
+                <div class="advisor-action">
+                    <div class="action-title">✅ Everything is Optimized!</div>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">
+                        No critical actions required for this period. Keep executing your current plan.
+                    </p>
+                </div>
+            ` : ""}
+
+            ${actions.map(act => `
+                <div class="advisor-action priority-${act.priority}" style="margin-bottom: 12px;">
+                    <div class="action-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="action-title" style="font-weight: bold;">${act.title}</div>
+                        <span class="badge" style="font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,0.1);">${act.badge}</span>
+                    </div>
+                    <p style="margin: 6px 0; font-size: 0.85rem; color: var(--text-muted);">${act.detail}</p>
+                    <div class="allocation-row" style="font-size: 0.85rem; color: #10b981; font-weight: bold;">
+                        <span>Projected Benefit:</span>
+                        <span>${act.impact}</span>
+                    </div>
+                </div>
+            `).join("")}
+        </div>
+    `;
+}
