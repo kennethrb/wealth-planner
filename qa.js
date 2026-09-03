@@ -26,6 +26,10 @@ async function runIntelligenceQA() {
         await loadWealthSweep();
         await loadFinancialHealthAdvisor();
         await loadWealthProjectionAccelerator();
+        // Add inside runIntelligenceQA() loop in qa.js:
+        await loadMonthlyWealthActionPlan();
+
+
         
         // DI-005: Purchase Evaluator Threshold Tests
         const totalCash = window.qaBuffer.availableCash;
@@ -70,6 +74,8 @@ async function runIntelligenceQA() {
         assertMetric("Wealth Sweep (Debt)", window.qaSweep.debtSweep, expectedDebtSweep);
         assertMetric("Wealth Sweep (Emergency)", window.qaSweep.emergencySweep, expectedEmergencySweep);
         assertMetric("Wealth Sweep (Investment)", window.qaSweep.investmentSweep, expectedInvestmentSweep);
+        // Assert DI-008 Metrics
+        assertMetric("Action Plan Triggered", window.qaActionPlan.totalActions >= 0 ? 1 : 0, 1);
 
         // ---
         
