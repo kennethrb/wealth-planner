@@ -63,7 +63,6 @@ async function runIntelligenceQA() {
         }
 
         // --- DI-006: Wealth Sweep Automation Assertions ---
-        const excess = window.qaBuffer.excessCash;
         const expectedDebtSweep = excess * 0.20;
         const expectedEmergencySweep = excess * 0.10;
         const expectedInvestmentSweep = excess * 0.70;
