@@ -374,7 +374,8 @@ async function refreshFinancialViews() {
         loadFundingOptimizationAdvisor(), 
         loadWealthProjectionAccelerator(),
         loadPersonalInflation(),
-        loadWealthSweep()
+        loadWealthSweep(),
+        loadMonthlyWealthActionPlan()
     ]);
 }
 
@@ -401,7 +402,8 @@ async function changeViewPeriod() {
         loadBufferVsInvest(),
         loadNetWorthVelocity(),
         loadPurchaseEvaluator(),
-        loadSummary()
+        loadSummary(),
+        loadMonthlyWealthActionPlan()
     ]);
 }
 
@@ -443,7 +445,8 @@ async function refreshUI() {
         loadNetWorthVelocity(),
         loadPersonalInflation(),
         loadPurchaseEvaluator(),
-        loadWealthSweep()
+        loadWealthSweep(),
+        loadMonthlyWealthActionPlan()
     ]);
 }
 async function initializeApp() {
