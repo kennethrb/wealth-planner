@@ -218,7 +218,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 ==================== */
 .section-nav {
     position: sticky;
-    top: 0;
+    top: 12px;
     z-index: 100;
     padding: 8px 12px;
     margin-bottom: 24px;
@@ -231,8 +231,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-   mask-image: linear-gradient(to right, transparent, black 15px, black calc(100% - 15px), transparent);
-   -webkit-mask-image: linear-gradient(to right, transparent, black 15px, black calc(100% - 15px), transparent);
 }
 
 /* Nav Links Container (Horizontal Scroll) */
@@ -830,29 +828,6 @@ tr.section-debt td:first-child {
     color: var(--text-muted);
 }
 
-.progress-bar-container {
-  width: 100%;
-  background-color: #e9ecef;
-  border-radius: 4px;
-  height: 6px;
-  overflow: hidden;
-  margin-top: 4px;
-}
-
-.progress-bar-fill {
-  height: 100%;
-  background-color: #28a745; /* Healthy green */
-  transition: width 0.3s ease;
-}
-
-.progress-bar-fill.warning {
-  background-color: #ffc107; /* Warning yellow */
-}
-
-.progress-bar-fill.danger {
-  background-color: #dc3545; /* Over-budget red */
-}
-
 .progress-bar-bg {
     height: 6px;
     width: 100%;
@@ -861,6 +836,12 @@ tr.section-debt td:first-child {
     overflow: hidden;
 }
 
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981, #34d399);
+    border-radius: 999px;
+    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
 .bill-overdue {
     color: #f87171;
@@ -1272,35 +1253,6 @@ tr.section-debt td:first-child {
     }
 }
 
-.intelligence-accordion {
-  border: 1px solid var(--border-color, #e0e0e0);
-  border-radius: 12px;
-  overflow: hidden;
-  margin-bottom: 20px;
-}
-
-.accordion-header {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 18px;
-  background-color: var(--bg-secondary, #f8f9fa);
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-  text-align: left;
-}
-
-.accordion-content {
-  display: none;
-  padding: 16px;
-}
-
-.accordion-content.active {
-  display: block;
-}
-
 /* ====================
    MOBILE & TABLET RESPONSIVENESS
 ==================== */
@@ -1316,23 +1268,12 @@ tr.section-debt td:first-child {
     }
 
     /* Stack Nav & Period Selector on Mobile */
-   .section-nav {
-       display: flex;
-       flex-wrap: nowrap;
-       overflow-x: auto;
-       padding: 8px 12px;
-       gap: 8px;
-       -webkit-overflow-scrolling: touch;
-     }
-   
-     .section-nav a, 
-     .section-nav button {
-       white-space: nowrap;
-       flex: 0 0 auto;
-       border-radius: 20px;
-       padding: 6px 14px;
-       font-size: 0.85rem;
-     }
+    .section-nav {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 10px 12px;
+    }
 
     .nav-links {
         width: 100%;
