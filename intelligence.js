@@ -342,36 +342,29 @@ async function loadFinancialHealthAdvisor() {
             ${actions.map(action => {
             
                 if (typeof action === "string") {
-            
                     return `
                         <div class="advisor-action">
-                            ✅ ${action}
+                            <div class="action-title">✅ ${action}</div>
                         </div>
                     `;
                 }
             
                 if (action.title === "Increase Savings") {
-            
                     return `
                         <div class="advisor-action priority">
-                            🎯 ${action.title}
-            
-                            <div>
-                                Suggested Increase:
-                                <strong>
-                                    ${formatCurrency(action.amount)}
-                                </strong>
+                            <div class="action-title">🎯 ${action.title}</div>
+                            <div class="allocation-row">
+                                <span>Suggested Increase</span>
+                                <strong>${formatCurrency(action.amount)}</strong>
                             </div>
                         </div>
                     `;
                 }
             
                 if (action.title === "Deploy Monthly Surplus") {
-            
                     return `
                         <div class="advisor-action priority">
-            
-                            🚀 ${action.title}
+                            <div class="action-title">🚀 ${action.title}</div>
             
                             <div class="allocation-row">
                                 <span>📈 Investments</span>
@@ -384,10 +377,9 @@ async function loadFinancialHealthAdvisor() {
                             </div>
             
                             <div class="allocation-row">
-                                <span>🛡 Emergency Fund</span>
+                                <span>🛡️ Emergency Fund</span>
                                 <strong>${formatCurrency(action.emergency)}</strong>
                             </div>
-            
                         </div>
                     `;
                 }
