@@ -1,8 +1,31 @@
 /**
  * Wealth Planner Intelligence Engine
  */
-
 const DEBUG_QA = true;
+
+// Example Debug Wrapper for Personal Inflation Index
+function calculatePersonalInflation() {
+    const currentYearSpend = getCurrentYearSpending(appData.transactions);
+    const previousYearSpend = getPreviousYearSpending(appData.transactions);
+    
+    let rate = 0;
+    if (previousYearSpend > 0) {
+        rate = (currentYearSpend - previousYearSpend) / previousYearSpend;
+    } else {
+        rate = null; // Triggers N/A root cause
+    }
+
+    if (DEBUG_QA) {
+        console.group("WI-005 / DI-005 Personal Inflation Trace");
+        console.log("Current Year Spend:", currentYearSpend);
+        console.log("Previous Year Spend:", previousYearSpend);
+        console.log("Calculated Inflation Rate:", rate);
+        console.log("Status:", rate === null ? "FAILED (Insufficient Historical Data)" : "PASS");
+        console.groupEnd();
+    }
+
+    return rate;
+}
 
 async function loadBufferVsInvest() {
     const selectedYear = getViewYear();
