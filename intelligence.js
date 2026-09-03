@@ -948,7 +948,7 @@ async function loadWealthSweep() {
 
     container.innerHTML = `
         <div class="card">
-            <h2>🧹 DI-006: Wealth Sweep Automation</h2>
+            <h2>🧹 Wealth Sweep Automation</h2>
             ${
                 excessCash > 0
                 ? `
