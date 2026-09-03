@@ -370,14 +370,14 @@ async function refreshFinancialViews() {
         loadFundingPlan(),
         loadBudgetVsActual(),
         loadBufferVsInvest(),
-        loadNetWorthVelocity(),
-        loadPurchaseEvaluator(),
-        loadFinancialHealthAdvisor(),
-        loadFundingOptimizationAdvisor(), 
-        loadWealthProjectionAccelerator(),
-        loadPersonalInflation(),
-        loadWealthSweep(),
-        loadMonthlyWealthActionPlan()
+        loadFinancialHealthAdvisor(),       // DI-001
+        loadFundingOptimizationAdvisor(),  // DI-002
+        loadWealthProjectionAccelerator(), // DI-003
+        loadNetWorthVelocity(),            // DI-004
+        loadPersonalInflation(),           // DI-005
+        loadPurchaseEvaluator(),           // DI-006
+        loadWealthSweep(),                 // DI-007
+        loadMonthlyWealthActionPlan()      // DI-008
         
     ]);
 }
@@ -397,16 +397,16 @@ async function changeViewPeriod() {
         loadProjection(),
         loadFundingPlan(),
         loadBudgetVsActual(),
-        loadFinancialHealthAdvisor(),
-        loadFundingOptimizationAdvisor(),
-        loadWealthProjectionAccelerator(),
-        loadPersonalInflation(),
-        loadWealthSweep(),
+        loadFinancialHealthAdvisor(),       // DI-001
+        loadFundingOptimizationAdvisor(),  // DI-002
+        loadWealthProjectionAccelerator(), // DI-003
+        loadNetWorthVelocity(),            // DI-004
+        loadPersonalInflation(),           // DI-005
+        loadPurchaseEvaluator(),           // DI-006
+        loadWealthSweep(),                 // DI-007
+        loadMonthlyWealthActionPlan(),     // DI-008
         loadBufferVsInvest(),
-        loadNetWorthVelocity(),
-        loadPurchaseEvaluator(),
-        loadSummary(),
-        loadMonthlyWealthActionPlan()
+        loadSummary()
     ]);
 }
 
@@ -433,9 +433,15 @@ async function refreshUI() {
         loadNetWorth(),
         loadProjection(),
         loadFinancialHealth(),
-        loadFinancialHealthAdvisor(),
-        loadFundingOptimizationAdvisor(),
-        loadWealthProjectionAccelerator(),
+        loadFinancialHealthAdvisor(),       // DI-001
+        loadFundingOptimizationAdvisor(),  // DI-002
+        loadWealthProjectionAccelerator(), // DI-003
+        loadNetWorthVelocity(),            // DI-004
+        loadPersonalInflation(),           // DI-005
+        loadPurchaseEvaluator(),           // DI-006
+        loadWealthSweep(),                 // DI-007
+        loadMonthlyWealthActionPlan(),     // DI-008
+        loadBufferVsInvest(),
         loadReconciliation(),
         loadUpcomingBills(),
         loadRecurringBills(),
@@ -443,14 +449,7 @@ async function refreshUI() {
         loadAccounts(),
         loadBudgetPlanner(),
         loadSummary(),
-        loadFundingPlan(),
-        loadBufferVsInvest(),
-        loadNetWorthVelocity(),
-        loadPurchaseEvaluator(),
-        loadPersonalInflation(),
-        loadPurchaseEvaluator(),
-        loadWealthSweep(),
-        loadMonthlyWealthActionPlan()
+        loadFundingPlan()
     ]);
 }
 async function initializeApp() {
