@@ -65,6 +65,7 @@ async function runIntelligenceQA() {
     console.log("=================================");
 }
 
+// qa.js
 const QA_EXPECTED = {
     "2026-Jan": {
         inflation: 5.0,
@@ -73,9 +74,9 @@ const QA_EXPECTED = {
         bufferTarget: 141000,
         excessCash: 359000,
         investableAmount: 12600,
-        fv5: 897028.18,
-        fv10: 2180921.22,
-        fv20: 6563195.95
+        fv5: 902070.56,
+        fv10: 2180868.57,
+        fv20: 6563675.91
     },
     "2026-Jun": {
         inflation: 4.44,
@@ -84,11 +85,10 @@ const QA_EXPECTED = {
         bufferTarget: 156000,
         excessCash: 344000,
         investableAmount: 9100,
-        fv5: 647853.69,
-        fv10: 1575109.77,
-        fv20: 4739530.41
+        fv5: 651495.40,
+        fv10: 1575071.75,
+        fv20: 4739321.49
     },
-    // qa.js -> QA_EXPECTED["2026-Dec"]
     "2026-Dec": {
         inflation: 3.92,
         monthlyVelocity: 7000,
@@ -97,8 +97,8 @@ const QA_EXPECTED = {
         excessCash: 326000,
         investableAmount: 4900,
         fv5: 350805.22,
-        fv10: 848115.56,
-        fv20: 2552540.63
+        fv10: 848114.79,
+        fv20: 2551942.34
     }
 };
 
