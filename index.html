@@ -81,31 +81,30 @@
     </section>
 
 <div class="intel-tabs">
-
-    <button>Action</button>
-    <div id="tab-action" class="intel-panel active">
+    <button onclick="showIntelTab('action')"> Action </button>
+    <button onclick="showIntelTab('growth')"> Growth </button>
+    <button onclick="showIntelTab('risk')"> Risk </button>
+    <button onclick="showIntelTab('decision')"> Decision </button>
+</div>
+<div id="tab-action" class="intel-panel active">
     <div id="monthlyWealthActionPlan"></div>
     <div id="financialHealthAdvisor"></div>
     <div id="fundingOptimizationAdvisor"></div>
-    </div>
-    <button>Growth</button>
-    <div id="tab-growth" class="intel-panel">
+</div>
+<div id="tab-growth" class="intel-panel">
     <div id="netWorthVelocity"></div>
     <div id="wealthProjectionAccelerator"></div>
-    </div>
-    <button>Risk</button>
-    <div id="tab-risk" class="intel-panel">
+</div>
+<div id="tab-risk" class="intel-panel">
     <div id="bufferVsInvest"></div>
     <div id="personalInflation"></div>
-    </div>
-    <button>Decision</button>
-    <div id="tab-decision" class="intel-panel">
+</div>
+<div id="tab-decision" class="intel-panel">
     <div id="purchaseEvaluator"></div>
     <div id="wealthSweep"></div>
     <div id="scenarioWorkbench"></div>
-    </div>
-
-</div>  
+</div>
+ 
     
     <section class="grid-2">
         <div id="upcomingBills"></div>    
