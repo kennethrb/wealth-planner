@@ -187,6 +187,14 @@ async function loadNetWorthVelocity() {
 }
 
 async function loadFinancialHealthAdvisor() {
+    let status = "Healthy";
+    
+    if (
+        savingsRate < 20 ||
+        debtRate > 30
+    ) {
+        status = "Needs Improvement";
+    }
 
     const container =
         document.getElementById("financialHealthAdvisor");
@@ -247,9 +255,16 @@ async function loadFinancialHealthAdvisor() {
             "Savings rate is below recommended 20%"
         );
 
-        actions.push(
-            "Increase monthly savings allocation"
-        );
+    const targetSavingsRate = 20;
+    
+    const savingsGap =
+        income * (targetSavingsRate / 100) - savings;
+    
+    actions.push({
+        priority: 1,
+        title: "Increase Savings",
+        amount: Math.max(0, savingsGap)
+    });
     }
 
     if (debtRate > 30) {
@@ -288,6 +303,11 @@ async function loadFinancialHealthAdvisor() {
         <div class="card">
 
             <h2>🎯 Financial Health Advisor</h2>
+            <div class="advisor-status ${status === "Healthy" ? "success" : "warning"}">
+            ${status === "Healthy"
+            ? "✅ Healthy"
+            : "⚠ Needs Improvement"}
+            </div>
 
             <div class="metric-row">
                 <span>Savings Rate</span>
