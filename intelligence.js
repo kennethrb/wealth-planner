@@ -720,11 +720,14 @@ async function loadPersonalInflation() {
         });
     }
 
-    const inflationRate = previousExpense > 0 
+    // intelligence.js -> loadPersonalInflation()
+    const rawInflationRate = previousExpense > 0 
         ? ((currentExpense - previousExpense) / previousExpense) * 100 
-        : null;
-
-    // Expose QA Metrics[cite: 6]
+        : 0;
+    
+    const inflationRate = Number(rawInflationRate.toFixed(2));
+    
+    // Expose QA Metrics for qa.js
     window.qaInflation = {
         currentYear,
         previousYear,
