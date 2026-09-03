@@ -1,6 +1,9 @@
+let totalPassed = 0;
+let totalFailed = 0;
+
 async function runIntelligenceQA() {
-    let totalPassed = 0;
-    let totalFailed = 0;
+    totalPassed = 0;
+    totalFailed = 0;
     const testCases = [{
         year: 2026,
         month: "Jan"
