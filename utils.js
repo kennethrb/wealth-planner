@@ -1,5 +1,38 @@
 console.log("UTILS FILE LOADED");
 
+function toggleAccordion(button) {
+  const content = button.nextElementSibling;
+  const icon = button.querySelector('.accordion-icon');
+  
+  content.classList.toggle('active');
+  icon.textContent = content.classList.contains('active') ? '▲' : '▼';
+}
+
+/**
+ * Generates an HTML progress bar element string for table cells.
+ * @param {number} actual - Spent amount.
+ * @param {number} budget - Allocated budget.
+ * @returns {string} HTML string for rendered progress bar.
+ */
+function renderBudgetProgressBar(actual, budget) {
+  if (!budget || budget <= 0) return '';
+  
+  const percentage = Math.min(Math.round((actual / budget) * 100), 100);
+  let statusClass = '';
+  
+  if (percentage >= 100) {
+    statusClass = 'danger';
+  } else if (percentage >= 85) {
+    statusClass = 'warning';
+  }
+
+  return `
+    <div class="progress-bar-container" title="${percentage}% used">
+      <div class="progress-bar-fill ${statusClass}" style="width: ${percentage}%;"></div>
+    </div>
+  `;
+}
+
 
 // Universal Philippine Peso Currency Formatter
 const formatCurrency = (amount) => {
