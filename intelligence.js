@@ -790,13 +790,15 @@ async function loadPersonalInflation() {
     `;
 }
 
-async function loadPurchaseEvaluator() {
+// intelligence.js -> DI-005 Purchase Evaluator
+async function loadPurchaseEvaluator(testAmount = null) {
     const container = document.getElementById("purchaseEvaluator");
-    if (!container) return;
 
-    const purchaseAmount = Number(
-        document.getElementById("purchaseAmount")?.value || 0
-    );
+    // Allow manual input or injected test amount for QA
+    const inputVal = document.getElementById("purchaseAmount")?.value;
+    const purchaseAmount = testAmount !== null 
+        ? testAmount 
+        : Number(inputVal || 0);
 
     const selectedYear = getViewYear();
     const selectedMonth = getViewMonth();
@@ -843,14 +845,19 @@ async function loadPurchaseEvaluator() {
         recommendation = "🚨 Not Recommended";
     }
 
-    // Expose QA Metrics[cite: 6]
+    // Expose QA Metrics for qa.js
     window.qaPurchase = {
         purchaseAmount,
+        availableCash,
+        monthlyObligations,
+        bufferTarget,
         cashAfterPurchase,
         bufferRemaining,
-        monthsCovered,
+        monthsCovered: Number(monthsCovered.toFixed(2)),
         recommendation
     };
+
+    if (!container) return;
 
     const showResults = purchaseAmount > 0;
 
