@@ -281,11 +281,17 @@ async function loadFinancialHealthAdvisor() {
     }
 
     if (monthlySurplus > 0) {
-
-        actions.push(
-            `Deploy ${formatCurrency(monthlySurplus)} surplus toward wealth-building assets`
-        );
+    
+        actions.push({
+            priority: 2,
+            title: "Deploy Monthly Surplus",
+            invest: monthlySurplus * 0.70,
+            debt: monthlySurplus * 0.20,
+            emergency: monthlySurplus * 0.10
+        });
+    
     }
+
 
     const wealthImpact =
         monthlySurplus * 12 * 10;
@@ -329,7 +335,7 @@ async function loadFinancialHealthAdvisor() {
             <hr>
 
             <div class="metric-row">
-                <span>Problems</span>
+                <span>Priority Actions</span>
                 <strong>${problems.length}</strong>
             </div>
 
@@ -344,18 +350,49 @@ async function loadFinancialHealthAdvisor() {
                     `;
                 }
             
-                return `
-                    <div class="advisor-action priority">
-                        🎯 ${action.title}
+                if (action.title === "Increase Savings") {
             
-                        <div>
-                            Suggested Increase:
-                            <strong>
-                                ${formatCurrency(action.amount)}
-                            </strong>
+                    return `
+                        <div class="advisor-action priority">
+                            🎯 ${action.title}
+            
+                            <div>
+                                Suggested Increase:
+                                <strong>
+                                    ${formatCurrency(action.amount)}
+                                </strong>
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
+                }
+            
+                if (action.title === "Deploy Monthly Surplus") {
+            
+                    return `
+                        <div class="advisor-action priority">
+            
+                            🚀 ${action.title}
+            
+                            <div class="allocation-row">
+                                <span>📈 Investments</span>
+                                <strong>${formatCurrency(action.invest)}</strong>
+                            </div>
+            
+                            <div class="allocation-row">
+                                <span>💳 Debt Reduction</span>
+                                <strong>${formatCurrency(action.debt)}</strong>
+                            </div>
+            
+                            <div class="allocation-row">
+                                <span>🛡 Emergency Fund</span>
+                                <strong>${formatCurrency(action.emergency)}</strong>
+                            </div>
+            
+                        </div>
+                    `;
+                }
+            
+                return "";
             
             }).join("")}
 
