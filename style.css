@@ -357,10 +357,11 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
 .intel-tabs {
     display: flex;
-    gap: 8px;
+    flex-wrap: nowrap;
     overflow-x: auto;
-    padding-bottom: 8px;
+    gap: 8px;
     margin: 16px 0;
+    padding-bottom: 8px;
     scrollbar-width: none;
 }
 
@@ -369,8 +370,26 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 .intel-tabs button {
-    flex-shrink: 0;
+    width: auto !important;
+    min-width: 110px;
+    flex: 0 0 auto;
+
+    padding: 10px 16px;
+
+    border-radius: 999px;
+
+    background: rgba(16,185,129,.15);
+    border: 1px solid rgba(16,185,129,.25);
+
+    color: #34d399;
+    font-weight: 600;
 }
+
+.intel-tabs button.active {
+    background: var(--primary);
+    color: #042f2e;
+}
+
 
 /* ====================
    LAYOUT & GRID SYSTEM
@@ -1305,13 +1324,6 @@ tr.section-debt td:first-child {
    
    .intel-tabs::-webkit-scrollbar {
        display: none;
-   }
-   
-   .intel-tabs button {
-       width: auto !important;
-       min-width: 100px;
-       flex-shrink: 0;
-       padding: 10px 18px;
    }
    
    /* Intelligence cards */
