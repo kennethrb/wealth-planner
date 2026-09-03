@@ -63,6 +63,7 @@ async function runIntelligenceQA() {
         }
 
         // --- DI-006: Wealth Sweep Automation Assertions ---
+        const excess = window.qaBuffer.excessCash;
         const expectedDebtSweep = excess * 0.20;
         const expectedEmergencySweep = excess * 0.10;
         const expectedInvestmentSweep = excess * 0.70;
@@ -77,6 +78,7 @@ async function runIntelligenceQA() {
         const expected = QA_EXPECTED[key];
         
         console.group(key);
+        // qa.js -> inside runIntelligenceQA()
         assertMetric("Inflation", window.qaInflation.inflationRate, expected.inflation, 0.01);
         assertMetric("Monthly Velocity", window.qaVelocity.monthlyVelocity, expected.monthlyVelocity);
         assertMetric("Annual Velocity", window.qaVelocity.annualVelocity, expected.annualVelocity);
@@ -111,6 +113,7 @@ async function runIntelligenceQA() {
     console.log("=================================");
 }
 
+// qa.js
 const QA_EXPECTED = {
     "2026-Jan": {
         inflation: 5.0,
@@ -132,7 +135,7 @@ const QA_EXPECTED = {
         investableAmount: 9100,
         fv5: 651495.40,
         fv10: 1575071.75,
-        fv20: 4740432.60
+        fv20: 4740432.60 // Updated from 4739321.49
     },
     "2026-Dec": {
         inflation: 3.92,
@@ -143,7 +146,7 @@ const QA_EXPECTED = {
         investableAmount: 4900,
         fv5: 350805.22,
         fv10: 848115.56,
-        fv20: 2552540.63
+        fv20: 2552540.63 // Updated from 2551942.34
     }
 };
 
