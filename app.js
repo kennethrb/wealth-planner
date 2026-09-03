@@ -370,12 +370,15 @@ async function refreshFinancialViews() {
         loadFundingPlan(),
         loadBudgetVsActual(),
         loadBufferVsInvest(),
+        loadNetWorthVelocity(),
+        loadPurchaseEvaluator(),
         loadFinancialHealthAdvisor(),
         loadFundingOptimizationAdvisor(), 
         loadWealthProjectionAccelerator(),
         loadPersonalInflation(),
         loadWealthSweep(),
         loadMonthlyWealthActionPlan()
+        
     ]);
 }
 
@@ -443,6 +446,7 @@ async function refreshUI() {
         loadFundingPlan(),
         loadBufferVsInvest(),
         loadNetWorthVelocity(),
+        loadPurchaseEvaluator(),
         loadPersonalInflation(),
         loadPurchaseEvaluator(),
         loadWealthSweep(),
