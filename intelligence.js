@@ -399,6 +399,169 @@ async function loadFinancialHealthAdvisor() {
     `;
 }
 
+async function loadFundingOptimizationAdvisor() {
+    const container = document.getElementById("fundingOptimizationAdvisor");
+    if (!container) return;
+
+    const selectedYear = getViewYear();
+    const selectedMonth = getViewMonth();
+
+    // Map budget categories for reference
+    const categoryTypes = {};
+    appData.categories.forEach(cat => {
+        categoryTypes[cat.categoryName] = cat.budgetType;
+    });
+
+    // Calculate total monthly obligations across all accounts
+    let totalObligations = 0;
+    appData.budget.forEach(item => {
+        if (Number(item.year) !== selectedYear) return;
+        if (item.month !== selectedMonth) return;
+
+        const amount = Number(item.plannedAmount || 0);
+        const type = categoryTypes[item.category];
+
+        if (type === "Expense" || type === "Debt") {
+            totalObligations += amount;
+        }
+    });
+
+    const bufferTarget = totalObligations * 3;
+    const insights = [];
+
+    // Rule 1: Detect Individual Account Deficits
+    const accounts = appData.accounts || [];
+    accounts.forEach(account => {
+        const balance = Number(account.currentBalance || account.balance || 0);
+        
+        // Skip liabilities
+        if (account.netWorthType === "Liability") return;
+
+        // Calculate allocated planned budget for this specific account
+        const accountAllocated = (appData.fundingAllocations || [])
+            .filter(item => item.accountId === account.id || item.accountName === account.name)
+            .reduce((sum, item) => sum + Number(item.amount || 0), 0);
+
+        if (accountAllocated > 0 && balance < accountAllocated) {
+            const deficit = accountAllocated - balance;
+
+            // Find best source account with excess funds
+            const sourceAccount = accounts
+                .filter(a => a.netWorthType === "Asset" && a.id !== account.id)
+                .sort((a, b) => Number(b.currentBalance || b.balance || 0) - Number(a.currentBalance || a.balance || 0))[0];
+
+            insights.push({
+                type: "DEFICIT",
+                title: `${account.name} Deficit`,
+                required: accountAllocated,
+                current: balance,
+                shortfall: deficit,
+                recommendation: sourceAccount 
+                    ? `Transfer ${formatCurrency(deficit)} from ${sourceAccount.name}`
+                    : `Deposit ${formatCurrency(deficit)} to cover planned obligations`
+            });
+        }
+    });
+
+    // Rule 2: Detect Global Idle Cash
+    let totalAvailableCash = 0;
+    accounts.forEach(account => {
+        const balance = Number(account.currentBalance || account.balance || 0);
+        if (account.netWorthType === "Asset") {
+            totalAvailableCash += balance;
+        }
+    });
+
+    const excessCash = totalAvailableCash - bufferTarget;
+
+    if (excessCash > 0) {
+        insights.push({
+            type: "IDLE_CASH",
+            title: "Idle Cash Detected",
+            excessAmount: excessCash,
+            goalAllocation: excessCash * 0.50,
+            investAllocation: excessCash * 0.50
+        });
+    }
+
+    // Expose QA Metrics
+    window.qaFundingAdvisor = {
+        totalObligations,
+        bufferTarget,
+        totalAvailableCash,
+        excessCash,
+        insightsCount: insights.length
+    };
+
+    container.innerHTML = `
+        <div class="card">
+            <h2>⚡ Funding Optimization Advisor</h2>
+            <div class="metric-row">
+                <span>Total Cash Available</span>
+                <strong>${formatCurrency(totalAvailableCash)}</strong>
+            </div>
+            <div class="metric-row">
+                <span>Optimization Alerts</span>
+                <strong>${insights.length}</strong>
+            </div>
+
+            <hr>
+
+            ${insights.length === 0 ? `
+                <div class="advisor-action">
+                    <div class="action-title">✅ Funding Perfectly Optimized</div>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">
+                        No cash deficits or unallocated excess detected.
+                    </span>
+                </div>
+            ` : ""}
+
+            ${insights.map(item => {
+                if (item.type === "DEFICIT") {
+                    return `
+                        <div class="advisor-action deficit">
+                            <div class="action-title">⚠️ ${item.title}</div>
+                            <div class="allocation-row">
+                                <span>Required / Current</span>
+                                <strong>${formatCurrency(item.required)} / ${formatCurrency(item.current)}</strong>
+                            </div>
+                            <div class="allocation-row">
+                                <span>Shortfall</span>
+                                <strong style="color: #ef4444;">${formatCurrency(item.shortfall)}</strong>
+                            </div>
+                            <div class="recommendation-pill">
+                                💡 ${item.recommendation}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                if (item.type === "IDLE_CASH") {
+                    return `
+                        <div class="advisor-action opportunity">
+                            <div class="action-title">💤 ${item.title}</div>
+                            <div class="allocation-row">
+                                <span>Unallocated Excess</span>
+                                <strong>${formatCurrency(item.excessAmount)}</strong>
+                            </div>
+                            <div class="allocation-row">
+                                <span>🎯 Goal Reserve (50%)</span>
+                                <strong>${formatCurrency(item.goalAllocation)}</strong>
+                            </div>
+                            <div class="allocation-row">
+                                <span>📈 Investment Sweep (50%)</span>
+                                <strong>${formatCurrency(item.investAllocation)}</strong>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                return "";
+            }).join("")}
+        </div>
+    `;
+}
+
 async function loadPersonalInflation() {
     const container = document.getElementById("personalInflation");
     if (!container) return;
