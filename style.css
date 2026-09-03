@@ -351,7 +351,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
 .intel-panel.active {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 20px;
 }
 
@@ -1292,10 +1292,6 @@ tr.section-debt td:first-child {
 @media screen and (max-width: 768px) {
     body {
         padding: 16px 12px;
-    }
-   
-    .intel-panel.active {
-        grid-template-columns: 1fr;
     }
 
     /* Stack Nav & Period Selector on Mobile */
