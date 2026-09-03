@@ -239,16 +239,6 @@ async function loadFinancialHealthAdvisor() {
             ? (debt / income) * 100
             : 0;
     
-    const savingsRate =
-        income > 0
-            ? (savings / income) * 100
-            : 0;
-    
-    const debtRate =
-        income > 0
-            ? (debt / income) * 100
-            : 0;
-    
     let status = "Healthy";
     
     if (
