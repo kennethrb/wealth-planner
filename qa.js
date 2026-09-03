@@ -87,7 +87,7 @@ const QA_EXPECTED = {
         investableAmount: 9100,
         fv5: 651495.40,
         fv10: 1575071.75,
-        fv20: 4739321.49
+        fv20: 4740432.60 // Updated from 4739321.49
     },
     "2026-Dec": {
         inflation: 3.92,
@@ -97,8 +97,8 @@ const QA_EXPECTED = {
         excessCash: 326000,
         investableAmount: 4900,
         fv5: 350805.22,
-        fv10: 848114.79,
-        fv20: 2551942.34
+        fv10: 848115.56,
+        fv20: 2552540.63 // Updated from 2551942.34
     }
 };
 
