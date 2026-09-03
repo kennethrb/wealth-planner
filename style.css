@@ -357,10 +357,20 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
 .intel-tabs {
     display: flex;
-    gap: 12px;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 8px;
     margin: 16px 0;
+    scrollbar-width: none;
 }
-`
+
+.intel-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.intel-tabs button {
+    flex-shrink: 0;
+}
 
 /* ====================
    LAYOUT & GRID SYSTEM
@@ -1282,6 +1292,10 @@ tr.section-debt td:first-child {
 @media screen and (max-width: 768px) {
     body {
         padding: 16px 12px;
+    }
+   
+    .intel-panel.active {
+        grid-template-columns: 1fr;
     }
 
     /* Stack Nav & Period Selector on Mobile */
