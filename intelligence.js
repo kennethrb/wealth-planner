@@ -8,12 +8,12 @@ async function loadBufferVsInvest() {
     const selectedYear = getViewYear();
     const selectedMonth = getViewMonth();
 
-    const budgetData = appData.budget.filter(
+    const budgetData = (appData.budget || []).filter(
         item => Number(item.year) === selectedYear
     );
 
     const categoryTypes = {};
-    appData.categories.forEach(cat => {
+    (appData.categories || []).forEach(cat => {
         categoryTypes[cat.categoryName] = cat.budgetType;
     });
 
@@ -23,7 +23,7 @@ async function loadBufferVsInvest() {
     budgetData.forEach(item => {
         if (item.month !== selectedMonth) return;
         const type = categoryTypes[item.category];
-        const amount = Number(item.plannedAmount || 0);
+        const amount = Number(item.plannedAmount || item.amount || 0);
 
         if (type === "Expense") monthlyExpense += amount;
         if (type === "Debt") monthlyDebt += amount;
@@ -33,22 +33,34 @@ async function loadBufferVsInvest() {
     const bufferTarget = monthlyObligations * 3;
 
     let availableCash = 0;
-    appData.accounts.forEach(account => {
-        const balance = Number(account.currentBalance || account.balance || 0);
-        const isAsset = account.netWorthType === "Asset";
-        if (!isAsset) return;
-        availableCash += balance;
+    (appData.accounts || []).forEach(account => {
+        const balance = Number(account.currentBalance ?? account.balance ?? account.amount ?? 0);
+        const type = String(account.netWorthType || account.type || "").toLowerCase();
+        
+        // Match Asset, liquid, bank, or cash account types
+        if (type === "asset" || type === "liquid" || type === "bank" || type === "cash") {
+            availableCash += balance;
+        }
     });
+
+    // Fallback if netWorthType isn't explicitly set on accounts
+    if (availableCash === 0 && appData.accounts.length > 0) {
+        appData.accounts.forEach(account => {
+            const balance = Number(account.currentBalance ?? account.balance ?? 0);
+            if (balance > 0) availableCash += balance;
+        });
+    }
 
     const excessCash = availableCash - bufferTarget;
 
-    // Expose QA Metrics[cite: 6]
+    // Expose QA Metrics
     window.qaBuffer = {
         availableCash,
         monthlyObligations,
         bufferTarget,
         excessCash
     };
+
 
     let recommendationHtml = "";
 
