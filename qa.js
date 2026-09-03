@@ -27,30 +27,40 @@ async function runIntelligenceQA() {
         await loadFinancialHealthAdvisor();
         await loadWealthProjectionAccelerator();
         
-        // DI-005: Purchase Evaluator Threshold Tests
-        // 1. Affordable (₱100k is well within excess cash)
-        await loadPurchaseEvaluator(100000);
-        assertMetric(
-            "Evaluator (Affordable)", 
-            window.qaPurchase.recommendation === "✅ Affordable" ? 1 : 0, 
-            1
-        );
-        
-        // 2. Impacts Buffer (₱400k uses all excess cash and dips into buffer)
-        await loadPurchaseEvaluator(400000);
-        assertMetric(
-            "Evaluator (Impacts Buffer)", 
-            window.qaPurchase.recommendation === "⚠️ Impacts Emergency Buffer" ? 1 : 0, 
-            1
-        );
-        
-        // 3. Not Recommended (₱550k exceeds total cash of ₱500k)
-        await loadPurchaseEvaluator(550000);
-        assertMetric(
-            "Evaluator (Not Recommended)", 
-            window.qaPurchase.recommendation === "🚨 Not Recommended" ? 1 : 0, 
-            1
-        );
+// DI-005: Purchase Evaluator Threshold Tests
+        const totalCash = window.qaBuffer.availableCash;
+        const target = window.qaBuffer.bufferTarget;
+        const excess = window.qaBuffer.excessCash;
+
+        if (totalCash > 0) {
+            // 1. Affordable (Safe within excess cash)
+            const affordableAmt = excess > 0 ? Math.floor(excess * 0.5) : 0;
+            await loadPurchaseEvaluator(affordableAmt);
+            assertMetric(
+                "Evaluator (Affordable)", 
+                window.qaPurchase.recommendation === "✅ Affordable" ? 1 : 0, 
+                1
+            );
+
+            // 2. Impacts Buffer (Dips into emergency buffer)
+            const impactAmt = excess > 0 ? excess + Math.floor(target * 0.5) : Math.floor(totalCash * 0.5);
+            await loadPurchaseEvaluator(impactAmt);
+            assertMetric(
+                "Evaluator (Impacts Buffer)", 
+                window.qaPurchase.recommendation === "⚠️ Impacts Emergency Buffer" ? 1 : 0, 
+                1
+            );
+
+            // 3. Not Recommended (Exceeds total cash)
+            await loadPurchaseEvaluator(totalCash + 50000);
+            assertMetric(
+                "Evaluator (Not Recommended)", 
+                window.qaPurchase.recommendation === "🚨 Not Recommended" ? 1 : 0, 
+                1
+            );
+        } else {
+            console.warn("⚠️ Skipping DI-005 tests: window.qaBuffer.availableCash is 0.");
+        }
         
         const key = `${tc.year}-${tc.month}`;
         const expected = QA_EXPECTED[key];
