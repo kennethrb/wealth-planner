@@ -380,8 +380,14 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
 .intel-tabs button.active {
     background: #10b981;
-    color: #042f2e;
+    color: #042f2e !important;
     border-color: #10b981;
+}
+
+.intel-tabs button:hover {
+    background: rgba(16,185,129,.25);
+    color: #ffffff;
+    border-color: #34d399;
 }
 
 .intel-tabs::-webkit-scrollbar {
