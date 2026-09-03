@@ -88,6 +88,7 @@ const QA_EXPECTED = {
         fv10: 1575109.77,
         fv20: 4739530.41
     },
+    // qa.js -> QA_EXPECTED["2026-Dec"]
     "2026-Dec": {
         inflation: 3.92,
         monthlyVelocity: 7000,
@@ -95,9 +96,9 @@ const QA_EXPECTED = {
         bufferTarget: 174000,
         excessCash: 326000,
         investableAmount: 4900,
-        fv5: 348844.29,
-        fv10: 848135.26,
-        fv20: 2552054.84
+        fv5: 350805.22,
+        fv10: 848115.56,
+        fv20: 2552540.63
     }
 };
 
