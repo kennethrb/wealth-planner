@@ -1319,15 +1319,21 @@ tr.section-debt td:first-child {
 
    /* Intelligence tabs */
    .intel-tabs {
-       display: flex;
+       display: grid;
+       grid-template-columns: repeat(4, 1fr);
        gap: 8px;
-       overflow-x: auto;
-       padding-bottom: 8px;
-       scrollbar-width: none;
+       margin: 16px 0;
    }
    
-   .intel-tabs::-webkit-scrollbar {
-       display: none;
+   .intel-tabs button {
+       width: 100%;
+       min-width: 0;
+       padding: 10px 8px;
+   
+       border-radius: 999px;
+   
+       font-size: 14px;
+       font-weight: 600;
    }
    
    /* Intelligence cards */
