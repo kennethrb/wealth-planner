@@ -26,14 +26,22 @@ async function runIntelligenceQA() {
         await loadWealthSweep();
         await loadFinancialHealthAdvisor();
         await loadWealthProjectionAccelerator();
-        // Add inside the runIntelligenceQA() loop in qa.js
-        await loadPurchaseEvaluator(50000); // Evaluates a ₱50k test purchase
         
-        const expectedPurchaseCash = window.qaBuffer.availableCash - 50000;
-        const expectedBufferRemaining = expectedPurchaseCash - window.qaBuffer.bufferTarget;
+        // --- DI-005: Purchase Evaluator Threshold Tests ---
+        const totalCash = window.qaBuffer.availableCash;
+        const bufferTarget = window.qaBuffer.bufferTarget;
         
-        assertMetric("Purchase Cash After", window.qaPurchase.cashAfterPurchase, expectedPurchaseCash);
-        assertMetric("Purchase Buffer Remaining", window.qaPurchase.bufferRemaining, expectedBufferRemaining);
+        // Scenario A: Affordable Purchase (Under Excess Cash)
+        await loadPurchaseEvaluator(10000);
+        assertMetric("Evaluator (Affordable)", window.qaPurchase.recommendation === "✅ Affordable" ? 1 : 0, 1);
+        
+        // Scenario B: Impacts Emergency Buffer (Exceeds Excess Cash, but Cash > 0)
+        await loadPurchaseEvaluator(totalCash - bufferTarget + 10000);
+        assertMetric("Evaluator (Impacts Buffer)", window.qaPurchase.recommendation === "⚠️ Impacts Emergency Buffer" ? 1 : 0, 1);
+        
+        // Scenario C: Not Recommended (Exceeds Total Available Cash)
+        await loadPurchaseEvaluator(totalCash + 50000);
+        assertMetric("Evaluator (Not Recommended)", window.qaPurchase.recommendation === "🚨 Not Recommended" ? 1 : 0, 1);
         
         const key = `${tc.year}-${tc.month}`;
         const expected = QA_EXPECTED[key];
