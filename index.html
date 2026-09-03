@@ -80,25 +80,32 @@
         <div id="projection"></div>
     </section>
 
-<!-- 🧠 WEALTH INTELLIGENCE -->
-<section id="intelligence" class="grid-2">
-    <!-- Add DI-008 UI placeholder here -->
+<div class="intel-tabs">
+
+    <button>Action</button>
+    <div id="tab-action" class="intel-panel active">
     <div id="monthlyWealthActionPlan"></div>
-
-    <div id="bufferVsInvest"></div>
-    <div id="netWorthVelocity"></div>
-
     <div id="financialHealthAdvisor"></div>
     <div id="fundingOptimizationAdvisor"></div>
+    </div>
+    <button>Growth</button>
+    <div id="tab-growth" class="intel-panel">
+    <div id="netWorthVelocity"></div>
     <div id="wealthProjectionAccelerator"></div>
-
+    </div>
+    <button>Risk</button>
+    <div id="tab-risk" class="intel-panel">
+    <div id="bufferVsInvest"></div>
     <div id="personalInflation"></div>
+    </div>
+    <button>Decision</button>
+    <div id="tab-decision" class="intel-panel">
     <div id="purchaseEvaluator"></div>
     <div id="wealthSweep"></div>
-    <div id="scenarioWorkbench">TEST WORKBENCHUD</div>
-</section>
+    <div id="scenarioWorkbench"></div>
+    </div>
 
-  
+</div>  
     
     <section class="grid-2">
         <div id="upcomingBills"></div>    
@@ -360,17 +367,6 @@
     <section id="performance" class="card">
       <h2>📊 Budget vs Actual</h2>    
       <div id="budgetVsActual"></div>
-    </section>
-
-    <!-- Scenario Simulator -->
-    <section id="scenarios" class="card">
-      <h2>🧪 Scenario Simulator</h2>
-      <div class="form-row">
-        <select id="scenarioCategory"></select>
-        <input type="number" id="scenarioAmount" placeholder="New Monthly Amount">
-        <button onclick="runScenario()">Run Scenario</button>
-      </div>
-      <div id="scenarioResult" class="margin-top"></div>
     </section>
 
     <!-- 🎯 Wealth Goals -->
