@@ -610,6 +610,14 @@ async function loadWealthProjectionAccelerator() {
     const fv10 = calculateFV(10);
     const fv20 = calculateFV(20);
 
+    // Expose QA Metrics for qa.js
+    window.qaAccelerator = {
+        investableAmount,
+        fv5,
+        fv10,
+        fv20
+    };
+
     container.innerHTML = `
         <div class="card">
             <h2>🚀 Wealth Projection Accelerator</h2>
