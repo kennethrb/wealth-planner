@@ -186,6 +186,149 @@ async function loadNetWorthVelocity() {
     `;
 }
 
+async function loadFinancialHealthAdvisor() {
+
+    const container =
+        document.getElementById("financialHealthAdvisor");
+
+    if (!container) return;
+
+    const selectedYear = getViewYear();
+    const selectedMonth = getViewMonth();
+
+    const categoryTypes = {};
+
+    appData.categories.forEach(cat => {
+        categoryTypes[cat.categoryName] = cat.budgetType;
+    });
+
+    let income = 0;
+    let expenses = 0;
+    let savings = 0;
+    let debt = 0;
+
+    appData.budget.forEach(item => {
+
+        if (Number(item.year) !== selectedYear) return;
+        if (item.month !== selectedMonth) return;
+
+        const amount =
+            Number(item.plannedAmount || 0);
+
+        const type =
+            categoryTypes[item.category];
+
+        if (type === "Income") income += amount;
+        if (type === "Expense") expenses += amount;
+        if (type === "Savings") savings += amount;
+        if (type === "Debt") debt += amount;
+
+    });
+
+    const monthlySurplus =
+        income - expenses - savings - debt;
+
+    const savingsRate =
+        income > 0
+            ? (savings / income) * 100
+            : 0;
+
+    const debtRate =
+        income > 0
+            ? (debt / income) * 100
+            : 0;
+
+    const problems = [];
+    const actions = [];
+
+    if (savingsRate < 20) {
+
+        problems.push(
+            "Savings rate is below recommended 20%"
+        );
+
+        actions.push(
+            "Increase monthly savings allocation"
+        );
+    }
+
+    if (debtRate > 30) {
+
+        problems.push(
+            "Debt payments consume too much income"
+        );
+
+        actions.push(
+            "Prioritize debt reduction"
+        );
+    }
+
+    if (monthlySurplus > 0) {
+
+        actions.push(
+            `Deploy ${formatCurrency(monthlySurplus)} surplus toward wealth-building assets`
+        );
+    }
+
+    const wealthImpact =
+        monthlySurplus * 12 * 10;
+
+    window.qaFinancialHealthAdvisor = {
+        income,
+        expenses,
+        savings,
+        debt,
+        savingsRate,
+        debtRate,
+        monthlySurplus,
+        wealthImpact
+    };
+
+    container.innerHTML = `
+        <div class="card">
+
+            <h2>🎯 Financial Health Advisor</h2>
+
+            <div class="metric-row">
+                <span>Savings Rate</span>
+                <strong>${savingsRate.toFixed(1)}%</strong>
+            </div>
+
+            <div class="metric-row">
+                <span>Debt Rate</span>
+                <strong>${debtRate.toFixed(1)}%</strong>
+            </div>
+
+            <div class="metric-row">
+                <span>Monthly Surplus</span>
+                <strong>${formatCurrency(monthlySurplus)}</strong>
+            </div>
+
+            <hr>
+
+            <div class="metric-row">
+                <span>Problems</span>
+                <strong>${problems.length}</strong>
+            </div>
+
+            ${actions.map(action => `
+                <div class="metric-row">
+                    <span>Action</span>
+                    <strong>${action}</strong>
+                </div>
+            `).join("")}
+
+            <hr>
+
+            <div class="metric-row">
+                <span>10-Year Wealth Impact</span>
+                <strong>${formatCurrency(wealthImpact)}</strong>
+            </div>
+
+        </div>
+    `;
+}
+
 async function loadPersonalInflation() {
     const container = document.getElementById("personalInflation");
     if (!container) return;
