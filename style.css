@@ -1294,6 +1294,34 @@ tr.section-debt td:first-child {
         padding: 16px 12px;
     }
 
+   /* Intelligence tabs */
+   .intel-tabs {
+       display: flex;
+       gap: 8px;
+       overflow-x: auto;
+       padding-bottom: 8px;
+       scrollbar-width: none;
+   }
+   
+   .intel-tabs::-webkit-scrollbar {
+       display: none;
+   }
+   
+   .intel-tabs button {
+       width: auto !important;
+       min-width: 100px;
+       flex-shrink: 0;
+       padding: 10px 18px;
+   }
+   
+   /* Intelligence cards */
+   .intel-panel.active {
+       display: grid;
+       grid-template-columns: 1fr;
+       gap: 20px;
+   }
+   
+
     /* Stack Nav & Period Selector on Mobile */
     .section-nav {
         flex-direction: column;
@@ -1355,12 +1383,11 @@ tr.section-debt td:first-child {
         width: 100%;
     }
 
-    button,
-    .btn,
-    .action-buttons button {
-        width: 100%;
-        padding: 12px;
-    }
+   .btn,
+   .action-buttons button {
+       width: 100%;
+       padding: 12px;
+   }
 
     .action-buttons {
         flex-direction: column;
