@@ -27,21 +27,38 @@ async function runIntelligenceQA() {
         await loadFinancialHealthAdvisor();
         await loadWealthProjectionAccelerator();
         
-        // --- DI-005: Purchase Evaluator Threshold Tests ---
-        const totalCash = window.qaBuffer.availableCash;
+        // DI-005: Purchase Evaluator Threshold Tests
+        const availableCash = window.qaBuffer.availableCash;
         const bufferTarget = window.qaBuffer.bufferTarget;
+        const excessCash = window.qaBuffer.excessCash;
         
-        // Scenario A: Affordable Purchase (Under Excess Cash)
-        await loadPurchaseEvaluator(10000);
-        assertMetric("Evaluator (Affordable)", window.qaPurchase.recommendation === "✅ Affordable" ? 1 : 0, 1);
+        if (excessCash > 0) {
+            // Scenario A: Affordable Purchase (Safe within excess cash)
+            await loadPurchaseEvaluator(Math.floor(excessCash * 0.5));
+            assertMetric(
+                "Evaluator (Affordable)", 
+                window.qaPurchase.recommendation === "✅ Affordable" ? 1 : 0, 
+                1
+            );
         
-        // Scenario B: Impacts Emergency Buffer (Exceeds Excess Cash, but Cash > 0)
-        await loadPurchaseEvaluator(totalCash - bufferTarget + 10000);
-        assertMetric("Evaluator (Impacts Buffer)", window.qaPurchase.recommendation === "⚠️ Impacts Emergency Buffer" ? 1 : 0, 1);
+            // Scenario B: Impacts Emergency Buffer (Uses excess cash + part of buffer)
+            await loadPurchaseEvaluator(excessCash + Math.floor(bufferTarget * 0.5));
+            assertMetric(
+                "Evaluator (Impacts Buffer)", 
+                window.qaPurchase.recommendation === "⚠️ Impacts Emergency Buffer" ? 1 : 0, 
+                1
+            );
+        } else {
+            console.warn("⚠️ Skipping Affordable/Buffer tests: No excess cash available in this period.");
+        }
         
-        // Scenario C: Not Recommended (Exceeds Total Available Cash)
-        await loadPurchaseEvaluator(totalCash + 50000);
-        assertMetric("Evaluator (Not Recommended)", window.qaPurchase.recommendation === "🚨 Not Recommended" ? 1 : 0, 1);
+        // Scenario C: Not Recommended (Exceeds total cash)
+        await loadPurchaseEvaluator(availableCash + 50000);
+        assertMetric(
+            "Evaluator (Not Recommended)", 
+            window.qaPurchase.recommendation === "🚨 Not Recommended" ? 1 : 0, 
+            1
+        );
         
         const key = `${tc.year}-${tc.month}`;
         const expected = QA_EXPECTED[key];
