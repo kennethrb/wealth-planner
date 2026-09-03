@@ -904,98 +904,65 @@ async function loadPurchaseEvaluator(testAmount = null) {
     `;
 }
 
+// intelligence.js -> DI-006 Wealth Sweep Automation
 async function loadWealthSweep() {
     const container = document.getElementById("wealthSweep");
-    if (!container) return;
 
-    const selectedYear = getViewYear();
-    const selectedMonth = getViewMonth();
+    // Retrieve excess cash from DI-002/Buffer calculation
+    const availableCash = window.qaBuffer?.availableCash || 0;
+    const bufferTarget = window.qaBuffer?.bufferTarget || 0;
+    const excessCash = Math.max(0, availableCash - bufferTarget);
 
-    const categoryTypes = {};
-    appData.categories.forEach(cat => {
-        categoryTypes[cat.categoryName] = cat.budgetType;
-    });
-
-    let monthlyExpense = 0;
-    let monthlyDebt = 0;
-
-    appData.budget.forEach(item => {
-        if (Number(item.year) !== selectedYear) return;
-        if (item.month !== selectedMonth) return;
-
-        const amount = Number(item.plannedAmount || 0);
-        const type = categoryTypes[item.category];
-
-        if (type === "Expense") monthlyExpense += amount;
-        if (type === "Debt") monthlyDebt += amount;
-    });
-
-    const monthlyObligations = monthlyExpense + monthlyDebt;
-    const bufferTarget = monthlyObligations * 3;
-
-    let availableCash = 0;
-    appData.accounts.forEach(account => {
-        const balance = Number(account.currentBalance || account.balance || 0);
-        if (account.netWorthType === "Asset") {
-            availableCash += balance;
-        }
-    });
-
-    const excessCash = availableCash - bufferTarget;
-
-    if (excessCash <= 0) {
-        // Expose QA Metrics for negative/zero excess cash[cite: 6]
-        window.qaSweep = {
-            excessCash,
-            debtSweep: 0,
-            emergencySweep: 0,
-            investmentSweep: 0
-        };
-
-        container.innerHTML = `
-            <div class="card">
-                <h2>🧹 Wealth Sweep</h2>
-                <div class="metric-row">
-                    <span>Status</span>
-                    <strong>Build Buffer First</strong>
-                </div>
-            </div>
-        `;
-        return;
-    }
-
+    // Default Allocation Ratios: 20% Debt Payoff, 10% Emergency Top-up, 70% Investment
     const debtSweep = excessCash * 0.20;
     const emergencySweep = excessCash * 0.10;
     const investmentSweep = excessCash * 0.70;
 
-    // Expose QA Metrics[cite: 6]
+    // Projected 3-Year Investment Return @ 8% CAGR
+    const estimated3YrReturn = investmentSweep * (Math.pow(1 + 0.08, 3) - 1);
+    const total3YrBenefit = debtSweep + investmentSweep + estimated3YrReturn;
+
+    // Expose QA Metrics for qa.js
     window.qaSweep = {
         excessCash,
         debtSweep,
         emergencySweep,
-        investmentSweep
+        investmentSweep,
+        estimated3YrReturn: Number(estimated3YrReturn.toFixed(2)),
+        total3YrBenefit: Number(total3YrBenefit.toFixed(2))
     };
+
+    if (!container) return;
 
     container.innerHTML = `
         <div class="card">
-            <h2>🧹 Wealth Sweep</h2>
-            <div class="metric-row">
-                <span>Excess Cash</span>
-                <strong>${formatCurrency(excessCash)}</strong>
-            </div>
-            <hr>
-            <div class="metric-row">
-                <span>Debt Reduction</span>
-                <strong>${formatCurrency(debtSweep)}</strong>
-            </div>
-            <div class="metric-row">
-                <span>Emergency Fund</span>
-                <strong>${formatCurrency(emergencySweep)}</strong>
-            </div>
-            <div class="metric-row">
-                <span>Investments</span>
-                <strong>${formatCurrency(investmentSweep)}</strong>
-            </div>
+            <h2>🧹 DI-006: Wealth Sweep Automation</h2>
+            ${
+                excessCash > 0
+                ? `
+                <p><strong>Available Excess Cash:</strong> ${formatCurrency(excessCash)}</p>
+                <hr>
+                <h3>Recommended Action Plan</h3>
+                <div class="metric-row">
+                    <span>💳 Debt Payoff Allocation (20%)</span>
+                    <strong>${formatCurrency(debtSweep)}</strong>
+                </div>
+                <div class="metric-row">
+                    <span>🛡️ Emergency Buffer Cushion (10%)</span>
+                    <strong>${formatCurrency(emergencySweep)}</strong>
+                </div>
+                <div class="metric-row">
+                    <span>📈 Wealth Investment Sweep (70%)</span>
+                    <strong>${formatCurrency(investmentSweep)}</strong>
+                </div>
+                <hr>
+                <div class="metric-row">
+                    <span>Expected 3-Year Value Added</span>
+                    <strong>${formatCurrency(total3YrBenefit)}</strong>
+                </div>
+                `
+                : `<p>No excess cash detected above buffer targets for this period.</p>`
+            }
         </div>
     `;
 }
