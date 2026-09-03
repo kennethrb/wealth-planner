@@ -27,7 +27,7 @@ async function runIntelligenceQA() {
         await loadFinancialHealthAdvisor();
         await loadWealthProjectionAccelerator();
         
-// DI-005: Purchase Evaluator Threshold Tests
+        // DI-005: Purchase Evaluator Threshold Tests
         const totalCash = window.qaBuffer.availableCash;
         const target = window.qaBuffer.bufferTarget;
         const excess = window.qaBuffer.excessCash;
@@ -61,6 +61,18 @@ async function runIntelligenceQA() {
         } else {
             console.warn("⚠️ Skipping DI-005 tests: window.qaBuffer.availableCash is 0.");
         }
+
+        // --- DI-006: Wealth Sweep Automation Assertions ---
+        const excess = window.qaBuffer.excessCash;
+        const expectedDebtSweep = excess * 0.20;
+        const expectedEmergencySweep = excess * 0.10;
+        const expectedInvestmentSweep = excess * 0.70;
+        
+        assertMetric("Wealth Sweep (Debt)", window.qaSweep.debtSweep, expectedDebtSweep);
+        assertMetric("Wealth Sweep (Emergency)", window.qaSweep.emergencySweep, expectedEmergencySweep);
+        assertMetric("Wealth Sweep (Investment)", window.qaSweep.investmentSweep, expectedInvestmentSweep);
+
+        // ---
         
         const key = `${tc.year}-${tc.month}`;
         const expected = QA_EXPECTED[key];
