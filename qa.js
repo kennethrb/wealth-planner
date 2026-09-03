@@ -26,6 +26,14 @@ async function runIntelligenceQA() {
         await loadWealthSweep();
         await loadFinancialHealthAdvisor();
         await loadWealthProjectionAccelerator();
+        // Add inside the runIntelligenceQA() loop in qa.js
+        await loadPurchaseEvaluator(50000); // Evaluates a ₱50k test purchase
+        
+        const expectedPurchaseCash = window.qaBuffer.availableCash - 50000;
+        const expectedBufferRemaining = expectedPurchaseCash - window.qaBuffer.bufferTarget;
+        
+        assertMetric("Purchase Cash After", window.qaPurchase.cashAfterPurchase, expectedPurchaseCash);
+        assertMetric("Purchase Buffer Remaining", window.qaPurchase.bufferRemaining, expectedBufferRemaining);
         
         const key = `${tc.year}-${tc.month}`;
         const expected = QA_EXPECTED[key];
