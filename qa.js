@@ -28,32 +28,24 @@ async function runIntelligenceQA() {
         await loadWealthProjectionAccelerator();
         
         // DI-005: Purchase Evaluator Threshold Tests
-        const availableCash = window.qaBuffer.availableCash;
-        const bufferTarget = window.qaBuffer.bufferTarget;
-        const excessCash = window.qaBuffer.excessCash;
+        // 1. Affordable (₱100k is well within excess cash)
+        await loadPurchaseEvaluator(100000);
+        assertMetric(
+            "Evaluator (Affordable)", 
+            window.qaPurchase.recommendation === "✅ Affordable" ? 1 : 0, 
+            1
+        );
         
-        if (excessCash > 0) {
-            // Scenario A: Affordable Purchase (Safe within excess cash)
-            await loadPurchaseEvaluator(Math.floor(excessCash * 0.5));
-            assertMetric(
-                "Evaluator (Affordable)", 
-                window.qaPurchase.recommendation === "✅ Affordable" ? 1 : 0, 
-                1
-            );
+        // 2. Impacts Buffer (₱400k uses all excess cash and dips into buffer)
+        await loadPurchaseEvaluator(400000);
+        assertMetric(
+            "Evaluator (Impacts Buffer)", 
+            window.qaPurchase.recommendation === "⚠️ Impacts Emergency Buffer" ? 1 : 0, 
+            1
+        );
         
-            // Scenario B: Impacts Emergency Buffer (Uses excess cash + part of buffer)
-            await loadPurchaseEvaluator(excessCash + Math.floor(bufferTarget * 0.5));
-            assertMetric(
-                "Evaluator (Impacts Buffer)", 
-                window.qaPurchase.recommendation === "⚠️ Impacts Emergency Buffer" ? 1 : 0, 
-                1
-            );
-        } else {
-            console.warn("⚠️ Skipping Affordable/Buffer tests: No excess cash available in this period.");
-        }
-        
-        // Scenario C: Not Recommended (Exceeds total cash)
-        await loadPurchaseEvaluator(availableCash + 50000);
+        // 3. Not Recommended (₱550k exceeds total cash of ₱500k)
+        await loadPurchaseEvaluator(550000);
         assertMetric(
             "Evaluator (Not Recommended)", 
             window.qaPurchase.recommendation === "🚨 Not Recommended" ? 1 : 0, 
