@@ -357,37 +357,35 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
 .intel-tabs {
     display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    gap: 8px;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
     margin: 16px 0;
-    padding-bottom: 8px;
-    scrollbar-width: none;
+}
+
+.intel-tabs button {
+    min-width: 110px;
+    padding: 10px 20px;
+
+    background: rgba(16,185,129,.12);
+    border: 1px solid rgba(16,185,129,.25);
+
+    border-radius: 999px;
+
+    color: #34d399;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.intel-tabs button.active {
+    background: #10b981;
+    color: #042f2e;
+    border-color: #10b981;
 }
 
 .intel-tabs::-webkit-scrollbar {
     display: none;
-}
-
-.intel-tabs button {
-    width: auto !important;
-    min-width: 110px;
-    flex: 0 0 auto;
-
-    padding: 10px 16px;
-
-    border-radius: 999px;
-
-    background: rgba(16,185,129,.15);
-    border: 1px solid rgba(16,185,129,.25);
-
-    color: #34d399;
-    font-weight: 600;
-}
-
-.intel-tabs button.active {
-    background: var(--primary);
-    color: #042f2e;
 }
 
 
