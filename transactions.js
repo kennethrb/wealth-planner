@@ -167,7 +167,14 @@ function loadTransactions() {
 
             return `
             <tr>
-                <td>${new Date(tx.Date || tx.date).toLocaleDateString()}</td>
+                <td>
+                  ${new Date(tx.Date || tx.date).toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric',
+                    timeZone: 'UTC' // Prevents unexpected day shifts due to local timezone offsets
+                  })}
+                </td>
             
                 <td>${formatCurrency(tx.Amount || tx.amount)}</td>
             
