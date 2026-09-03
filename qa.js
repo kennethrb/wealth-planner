@@ -1,7 +1,6 @@
-let totalPassed = 0;
-let totalFailed = 0;
-
 async function runIntelligenceQA() {
+    let totalPassed = 0;
+    let totalFailed = 0;
     const testCases = [{
         year: 2026,
         month: "Jan"
@@ -34,6 +33,11 @@ async function runIntelligenceQA() {
         assertMetric("Excess Cash", window.qaBuffer.excessCash, expected.excessCash);
         console.groupEnd();
         console.group(`${tc.month} ${tc.year}`);
+        console.table(window.qaBuffer);
+        console.table(window.qaVelocity);
+        console.table(window.qaInflation);
+        console.table(window.qaPurchase);
+        console.table(window.qaSweep);
         console.log("Inflation", window.qaInflation);
         console.log("Velocity", window.qaVelocity);
         console.log("Buffer", window.qaBuffer);
@@ -97,9 +101,17 @@ function assertMetric(label, actual, expected, tolerance = 1) {
         );
 
     } else {
-
+    
         totalFailed++;
-
-        
-}
+    
+        console.error(
+            `❌ ${label}`,
+            {
+                actual,
+                expected,
+                difference: actual - expected
+            }
+        );
+    
+    }
 }
