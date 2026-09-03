@@ -186,6 +186,8 @@ async function loadNetWorthVelocity() {
     `;
 }
 
+
+/*---ADVISOR---*/
 async function loadFinancialHealthAdvisor() {
 
 
@@ -558,6 +560,82 @@ async function loadFundingOptimizationAdvisor() {
 
                 return "";
             }).join("")}
+        </div>
+    `;
+}
+
+async function loadWealthProjectionAccelerator() {
+    const container = document.getElementById("wealthProjectionAccelerator");
+    if (!container) return;
+
+    const selectedYear = getViewYear();
+    const selectedMonth = getViewMonth();
+
+    const categoryTypes = {};
+    (appData.categories || []).forEach(cat => {
+        categoryTypes[cat.categoryName] = cat.budgetType;
+    });
+
+    let income = 0;
+    let expense = 0;
+    let savings = 0;
+    let debt = 0;
+
+    (appData.budget || []).forEach(item => {
+        if (Number(item.year) !== selectedYear) return;
+        if (item.month !== selectedMonth) return;
+
+        const amount = Number(item.plannedAmount || 0);
+        const type = categoryTypes[item.category];
+
+        if (type === "Income") income += amount;
+        if (type === "Expense") expense += amount;
+        if (type === "Savings") savings += amount;
+        if (type === "Debt") debt += amount;
+    });
+
+    const monthlySurplus = income - expense - savings - debt;
+    const investableAmount = Math.max(0, monthlySurplus * 0.70); // Assume 70% sweep into investments
+    const annualReturnRate = 0.07; // Assumed 7% conservative annual return
+
+    // Future Value Formula: FV = P * (((1 + r/n)^(n*t) - 1) / (r/n))
+    const calculateFV = (years) => {
+        const r = annualReturnRate / 12;
+        const n = years * 12;
+        if (r === 0) return investableAmount * n;
+        return investableAmount * (((Math.pow(1 + r, n) - 1) / r));
+    };
+
+    const fv5 = calculateFV(5);
+    const fv10 = calculateFV(10);
+    const fv20 = calculateFV(20);
+
+    container.innerHTML = `
+        <div class="card">
+            <h2>🚀 Wealth Projection Accelerator</h2>
+            <div class="metric-row">
+                <span>Monthly Investable Surplus</span>
+                <strong>${formatCurrency(investableAmount)}</strong>
+            </div>
+            <div class="metric-row">
+                <span>Assumed Return (CAGR)</span>
+                <strong>7.0%</strong>
+            </div>
+
+            <hr>
+
+            <div class="metric-row">
+                <span>5-Year Projection</span>
+                <strong style="color: #10b981;">${formatCurrency(fv5)}</strong>
+            </div>
+            <div class="metric-row">
+                <span>10-Year Projection</span>
+                <strong style="color: #10b981;">${formatCurrency(fv10)}</strong>
+            </div>
+            <div class="metric-row">
+                <span>20-Year Projection</span>
+                <strong style="color: #10b981;">${formatCurrency(fv20)}</strong>
+            </div>
         </div>
     `;
 }
