@@ -31,7 +31,8 @@ async function runIntelligenceQA() {
         const expected = QA_EXPECTED[key];
         
         console.group(key);
-        assertMetric("Inflation", Number(window.qaInflation.inflationRate.toFixed(2)), expected.inflation, 0.1);
+        // qa.js -> inside runIntelligenceQA()
+        assertMetric("Inflation", window.qaInflation.inflationRate, expected.inflation, 0.01);
         assertMetric("Monthly Velocity", window.qaVelocity.monthlyVelocity, expected.monthlyVelocity);
         assertMetric("Annual Velocity", window.qaVelocity.annualVelocity, expected.annualVelocity);
         assertMetric("Buffer Target", window.qaBuffer.bufferTarget, expected.bufferTarget);
