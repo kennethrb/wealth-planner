@@ -191,6 +191,28 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     color: #fbbf24;
 }
 
+/* Deficit Alerts (Red Callout) */
+.advisor-action.deficit {
+    border-left: 3px solid #ef4444;
+    background: rgba(239, 68, 68, 0.06);
+}
+
+/* Idle Cash / Sweep Opportunities (Blue Callout) */
+.advisor-action.opportunity {
+    border-left: 3px solid #3b82f6;
+    background: rgba(59, 130, 246, 0.06);
+}
+
+/* Actionable Transfers Pill */
+.recommendation-pill {
+    margin-top: 8px;
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    color: var(--text-primary);
+}
+
 /* ====================
    UNIFIED STICKY NAVIGATION & FILTER BAR
 ==================== */
