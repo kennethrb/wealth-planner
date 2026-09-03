@@ -309,7 +309,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     flex-shrink: 0;
 }
 
-#dashboard,
+#dashboardworkspace,
 #intelligence,
 #planning,
 #execution,
