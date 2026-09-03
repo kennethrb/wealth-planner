@@ -537,3 +537,16 @@ function setupScrollSpy() {
     }, observerOptions);
     sections.forEach((section) => observer.observe(section));
 }
+
+function showIntelTab(tab) {
+
+    document
+        .querySelectorAll(".intel-panel")
+        .forEach(panel => {
+            panel.classList.remove("active");
+        });
+
+    document
+        .getElementById(`tab-${tab}`)
+        .classList.add("active");
+}
