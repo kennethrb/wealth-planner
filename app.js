@@ -371,6 +371,7 @@ async function refreshFinancialViews() {
         loadBudgetVsActual(),
         loadBufferVsInvest(),
         loadFinancialHealthAdvisor(),
+        loadFundingOptimizationAdvisor(), 
         loadPersonalInflation(),
         loadWealthSweep()
     ]);
@@ -392,6 +393,7 @@ async function changeViewPeriod() {
         loadFundingPlan(),
         loadBudgetVsActual(),
         loadFinancialHealthAdvisor(),
+        loadFundingOptimizationAdvisor(),
         loadPersonalInflation(),
         loadWealthSweep(),
         loadBufferVsInvest(),
@@ -425,6 +427,7 @@ async function refreshUI() {
         loadProjection(),
         loadFinancialHealth(),
         loadFinancialHealthAdvisor(),
+        loadFundingOptimizationAdvisor(),
         loadReconciliation(),
         loadUpcomingBills(),
         loadRecurringBills(),
