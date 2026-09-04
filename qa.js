@@ -157,11 +157,25 @@ const QA_EXPECTED = {
 
 function assertMetric(label, actual, expected, tolerance = 1) {
     const passed = Math.abs(actual - expected) <= tolerance;
+    logQATrace("ASSERT", label, {
+        expected,
+        tolerance
+    }, {
+        actual,
+        difference: actual - expected
+    }, passed);
     if (passed) {
         totalPassed++;
-        console.log(`✅ ${label}`, { actual, expected });
+        console.log(`✅ ${label}`, {
+            actual,
+            expected
+        });
     } else {
         totalFailed++;
-        console.error(`❌ ${label}`, { actual, expected, difference: actual - expected });
+        console.error(`❌ ${label}`, {
+            actual,
+            expected,
+            difference: actual - expected
+        });
     }
 }
