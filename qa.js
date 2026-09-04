@@ -25,6 +25,7 @@ async function runIntelligenceQA() {
         await loadNetWorthVelocity();
         await loadPersonalInflation();
         await loadPurchaseEvaluator();
+        validatePurchaseEvaluatorNullHandling();
         await loadWealthSweep();
         await loadFinancialHealthAdvisor();
         await loadWealthProjectionAccelerator();
@@ -195,4 +196,24 @@ function validateDateLineage() {
     assertMetric("Boundary Year", boundary.year, 2025);
     assertMetric("Boundary Month", boundary.monthIndex, 1);
     assertMetric("Boundary Day", boundary.day, 1);
+}
+
+function validatePurchaseEvaluatorNullHandling() {
+
+    if (
+        window.qaPurchase &&
+        window.qaPurchase.monthsCovered === null
+    ) {
+        assertMetric(
+            "Purchase Null Handling",
+            1,
+            1
+        );
+    } else {
+        assertMetric(
+            "Purchase Null Handling",
+            0,
+            1
+        );
+    }
 }
