@@ -98,6 +98,22 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     min-width: 100px;
 }
 
+.priority-1 {
+    border-left: 4px solid #ef4444;
+}
+
+.priority-2 {
+    border-left: 4px solid #f59e0b;
+}
+
+.priority-3 {
+    border-left: 4px solid #10b981;
+}
+
+#purchaseEvaluator button {
+    min-width: 120px;
+}
+
 /* ====================
    BACK TO TOP BUTTON
 ==================== */
