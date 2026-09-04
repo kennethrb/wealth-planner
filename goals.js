@@ -5,7 +5,12 @@ async function loadGoals() {
     appData.goals.forEach(goal => {
         const current = Number(goal.current || 0);
         const target = Number(goal.target || 1);
-        const monthlyContribution = Number(goal.monthlyContribution || 1);
+        const monthlyContribution =
+            Number(goal.monthlyContribution);
+        
+        if (monthlyContribution <= 0) {
+            // Show N/A forecast
+        }
         const progress = ((current / target) * 100).toFixed(1);
         const remainingAmount = target - current;
         const monthsRemaining = Math.ceil(remainingAmount / monthlyContribution);
