@@ -168,9 +168,9 @@ function loadTransactions() {
             return `
             <tr>
                 <td>
-                    formatTransactionDate(
+                    ${formatTransactionDate(
                         tx.Date || tx.date
-                    )
+                    )}
                 </td>
             
                 <td>${formatCurrency(tx.Amount || tx.amount)}</td>
