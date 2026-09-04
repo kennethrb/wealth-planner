@@ -183,3 +183,29 @@ function assertMetric(label, actual, expected, tolerance = 1) {
         });
     }
 }
+
+function validateDateLineage() {
+
+    const parsed =
+        parseTransactionDate(
+            "2024-12-31T16:00:00.000Z"
+        );
+
+    assertMetric(
+        "Date Lineage Year",
+        parsed.year,
+        2025
+    );
+
+    assertMetric(
+        "Date Lineage Month",
+        parsed.monthIndex,
+        0
+    );
+
+    assertMetric(
+        "Date Lineage Day",
+        parsed.day,
+        1
+    );
+}
