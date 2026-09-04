@@ -947,7 +947,7 @@ tr.section-debt td:first-child {
 }
 
 .grand-total td {
-    border-top: 6px solid #ffffff !important;
+    border-top: 4px solid #ffffff !important;
     font-weight: 800;
     background-color: rgba(255, 255, 255, .08);
 }
