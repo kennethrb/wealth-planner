@@ -534,6 +534,18 @@ main>section {
     color: #34d399 !important;
 }
 
+#scenarioResults {
+    margin-top: 16px;
+}
+
+#scenarioResults .advisor-action {
+    margin-top: 0;
+}
+
+#scenarioResults .metric-row strong {
+    color: #34d399;
+}
+
 /* Status Badges */
 .badge {
     display: inline-block;
