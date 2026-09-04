@@ -82,3 +82,30 @@ function showInputDialog(title, message, value = "") {
     inputEl.select();
   });
 }
+
+
+/**
+ * Parse transaction dates consistently
+ * Prevents timezone shifts between views
+ */
+function parseTransactionDate(rawDate) {
+
+    if (!rawDate) return null;
+
+    const datePart =
+        String(rawDate)
+            .split("T")[0];
+
+    const parts =
+        datePart.split("-");
+
+    if (parts.length !== 3) {
+        return null;
+    }
+
+    return {
+        year: Number(parts[0]),
+        monthIndex: Number(parts[1]) - 1,
+        day: Number(parts[2])
+    };
+}
