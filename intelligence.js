@@ -84,6 +84,22 @@ async function loadBufferVsInvest() {
         excessCash
     };
 
+    logQATrace(
+    "DI-002",
+    "loadBufferVsInvest",
+    {
+        selectedYear,
+        selectedMonth,
+        availableCash,
+        monthlyObligations
+    },
+    {
+        bufferTarget,
+        excessCash
+    },
+    !isNaN(excessCash)
+);
+
 
     let recommendationHtml = "";
 
@@ -197,6 +213,27 @@ async function loadNetWorthVelocity() {
         annualVelocity,
         projectedNetWorth
     };
+
+    logQATrace(
+    "DI-004",
+    "loadNetWorthVelocity",
+    {
+        assets,
+        liabilities,
+        income,
+        expense,
+        savings,
+        debt
+    },
+    {
+        netWorth,
+        monthlyVelocity,
+        annualVelocity,
+        projectedNetWorth
+    },
+    !isNaN(projectedNetWorth)
+);
+
 
     container.innerHTML = `
         <div class="card">
@@ -343,6 +380,24 @@ async function loadFinancialHealthAdvisor() {
         monthlySurplus,
         wealthImpact
     };
+    logQATrace(
+    "DI-001",
+    "loadFinancialHealthAdvisor",
+    {
+        income,
+        expenses,
+        savings,
+        debt
+    },
+    {
+        savingsRate,
+        debtRate,
+        monthlySurplus,
+        wealthImpact,
+        status
+    },
+    status !== ""
+);
 
     container.innerHTML = `
         <div class="card">
@@ -529,6 +584,23 @@ async function loadFundingOptimizationAdvisor() {
         excessCash,
         insightsCount: insights.length
     };
+    logQATrace(
+    "DI-002",
+    "loadFundingOptimizationAdvisor",
+    {
+        selectedYear,
+        selectedMonth,
+        totalObligations,
+        totalAvailableCash
+    },
+    {
+        bufferTarget,
+        excessCash,
+        insightsCount: insights.length
+    },
+    totalAvailableCash >= 0 &&
+    bufferTarget >= 0
+);
 
     container.innerHTML = `
         <div class="card">
@@ -653,6 +725,24 @@ async function loadWealthProjectionAccelerator() {
         fv20
     };
 
+    logQATrace(
+    "DI-003",
+    "loadWealthProjectionAccelerator",
+    {
+        income,
+        expense,
+        savings,
+        debt
+    },
+    {
+        investableAmount,
+        fv5,
+        fv10,
+        fv20
+    },
+    fv20 >= fv10 && fv10 >= fv5
+);
+
     container.innerHTML = `
         <div class="card">
             <h2>🚀 Wealth Projection Accelerator</h2>
@@ -773,6 +863,20 @@ async function loadPersonalInflation() {
         sourceUsed
     };
 
+    logQATrace(
+    "DI-005",
+    "loadPersonalInflation",
+    {
+        currentExpense,
+        previousExpense,
+        sourceUsed
+    },
+    {
+        inflationRate
+    },
+    !isNaN(inflationRate)
+);
+
     if (previousExpense === 0) {
         container.innerHTML = `
             <div class="card">
@@ -892,6 +996,23 @@ async function loadPurchaseEvaluator(testAmount = null) {
         recommendation
     };
 
+    logQATrace(
+    "DI-006",
+    "loadPurchaseEvaluator",
+    {
+        purchaseAmount,
+        availableCash,
+        bufferTarget
+    },
+    {
+        cashAfterPurchase,
+        bufferRemaining,
+        monthsCovered,
+        recommendation
+    },
+    recommendation !== ""
+);
+
     if (!container) return;
 
     const showResults = purchaseAmount > 0;
@@ -966,6 +1087,25 @@ async function loadWealthSweep() {
         estimated3YrReturn: Number(estimated3YrReturn.toFixed(2)),
         total3YrBenefit: Number(total3YrBenefit.toFixed(2))
     };
+    logQATrace(
+    "DI-007",
+    "loadWealthSweep",
+    {
+        availableCash,
+        bufferTarget,
+        excessCash
+    },
+    {
+        debtSweep,
+        emergencySweep,
+        investmentSweep,
+        total3YrBenefit
+    },
+    Math.abs(
+        (debtSweep + emergencySweep + investmentSweep)
+        - excessCash
+    ) < 1
+);
 
     if (!container) return;
 
@@ -1064,6 +1204,29 @@ async function loadMonthlyWealthActionPlan() {
         totalActions: actions.length,
         topPriority: actions[0]?.title || "Fully Optimized"
     };
+
+logQATrace(
+    "DI-008",
+    "loadMonthlyWealthActionPlan",
+    {
+        fundingAlerts:
+            window.qaFundingAdvisor?.insightsCount || 0,
+
+        savingsRate:
+            window.qaFinancialHealthAdvisor?.savingsRate || 0,
+
+        excessCash:
+            window.qaSweep?.excessCash || 0
+    },
+    {
+        totalActions:
+            actions.length,
+
+        topPriority:
+            actions[0]?.title || "Fully Optimized"
+    },
+    actions.length >= 0
+);
 
     if (!container) return;
 
