@@ -1347,6 +1347,18 @@ tr.section-debt td:first-child {
 }
 
 @media screen and (max-width: 768px) {
+   
+   /* 1. Prevents iOS Safari from auto-zooming when tapping text/date inputs */
+   input, select, textarea {
+       font-size: 16px !important;
+   }
+   
+   /* 2. Expands small buttons to comfortable touch sizes on mobile screens */
+   .btn-delete-row,
+   .info-button {
+       min-width: 44px;
+       min-height: 44px;
+   }   
     body {
         padding: 16px 12px;
     }
