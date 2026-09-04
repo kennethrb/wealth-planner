@@ -370,7 +370,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 20px;
-    margin-bottom: 32px;
+    margin-bottom: 24px;
 }
 
 .intel-tabs {
