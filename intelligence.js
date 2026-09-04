@@ -200,7 +200,7 @@ async function loadNetWorthVelocity() {
         if (type === "Debt") debt += amount;
     });
 
-    const monthlyVelocity = income - expense - savings - debt;
+    const monthlyVelocity = income - expense;
     const annualVelocity = monthlyVelocity * 12;
     const projectedNetWorth = netWorth + annualVelocity;
 
@@ -975,7 +975,11 @@ async function loadPurchaseEvaluator(testAmount = null) {
 
     const cashAfterPurchase = availableCash - purchaseAmount;
     const bufferRemaining = cashAfterPurchase - bufferTarget;
-    const monthsCovered = monthlyObligations > 0 ? cashAfterPurchase / monthlyObligations : 0;
+    const monthsCovered =
+        monthlyObligations > 0
+            ? cashAfterPurchase / monthlyObligations
+            : null;
+
 
     let recommendation = "✅ Affordable";
     if (cashAfterPurchase < bufferTarget) {
