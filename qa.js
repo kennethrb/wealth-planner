@@ -2,6 +2,7 @@ let totalPassed = 0;
 let totalFailed = 0;
 
 async function runIntelligenceQA() {
+    window.qaTraceLog = [];
     totalPassed = 0;
     totalFailed = 0;
     const testCases = [
@@ -116,6 +117,9 @@ async function runIntelligenceQA() {
     console.log(`✅ PASSED: ${totalPassed}`);
     console.log(`❌ FAILED: ${totalFailed}`);
     console.log("=================================");
+
+printQASummary();
+printQAFailures();
 }
 
 // qa.js
