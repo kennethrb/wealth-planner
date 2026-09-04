@@ -396,7 +396,9 @@ async function loadFinancialHealthAdvisor() {
         wealthImpact,
         status
     },
-    status !== ""
+    !isNaN(savingsRate) &&
+    !isNaN(debtRate) &&
+    !isNaN(monthlySurplus)
 );
 
     container.innerHTML = `
@@ -598,8 +600,9 @@ async function loadFundingOptimizationAdvisor() {
         excessCash,
         insightsCount: insights.length
     },
-    totalAvailableCash >= 0 &&
-    bufferTarget >= 0
+    !isNaN(totalAvailableCash) &&
+    !isNaN(bufferTarget) &&
+    !isNaN(excessCash)
 );
 
     container.innerHTML = `
