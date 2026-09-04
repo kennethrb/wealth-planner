@@ -291,24 +291,16 @@ function loadBudgetVsActual() {
         const rawDate = tx.Date || tx.date || tx.DATE;
         if (!rawDate) return;
         let txYear, txMonthIndex;
-        if (typeof rawDate === "string" && rawDate.includes("-")) {
-            const parts = rawDate.split("T")[0].split("-");
-            txYear = Number(parts[0]);
-            txMonthIndex = Number(parts[1]) - 1;
-        } else {
-            const parsed =
-                parseTransactionDate(
-                    rawDate
-                );
-            
-            if (!parsed) return;
-            
-            txYear =
-                parsed.year;
-            
-            txMonthIndex =
-                parsed.monthIndex;
-        }
+        const parsed =
+            parseTransactionDate(rawDate);
+        
+        if (!parsed) return;
+        
+        txYear =
+            parsed.year;
+        
+        txMonthIndex =
+            parsed.monthIndex;
         if (txYear !== selectedYear || txMonthIndex !== targetMonthIndex) return;
         const category = tx["Budget Position"] || tx["budgetPosition"] || tx["Category"] || tx["category"];
         if (!category) return;
