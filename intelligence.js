@@ -1092,3 +1092,40 @@ async function loadMonthlyWealthActionPlan() {
         </div>
     `;
 }
+
+async function loadScenarioWorkbench() {
+
+    const container =
+        document.getElementById("scenarioWorkbench");
+
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="intel-card">
+            <h2>🧪 Scenario Simulator</h2>
+
+            <div class="form-group">
+                <label>Category</label>
+                <select id="scenarioCategory"></select>
+            </div>
+
+            <div class="form-group">
+                <label>Scenario Amount</label>
+                <input
+                    type="number"
+                    id="scenarioAmount"
+                    placeholder="Enter new amount">
+            </div>
+
+            <button onclick="runScenario()">
+                Run Scenario
+            </button>
+
+            <div id="scenarioResults"
+                 style="margin-top:16px;">
+            </div>
+        </div>
+    `;
+
+    loadScenarioCategories();
+}
