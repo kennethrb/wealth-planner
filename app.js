@@ -377,7 +377,8 @@ async function refreshFinancialViews() {
         loadPersonalInflation(),           // DI-005
         loadPurchaseEvaluator(),           // DI-006
         loadWealthSweep(),                 // DI-007
-        loadMonthlyWealthActionPlan()      // DI-008
+        loadMonthlyWealthActionPlan(),      // DI-008
+        loadScenarioWorkbench()
         
     ]);
 }
@@ -406,7 +407,8 @@ async function changeViewPeriod() {
         loadWealthSweep(),                 // DI-007
         loadMonthlyWealthActionPlan(),     // DI-008
         loadBufferVsInvest(),
-        loadSummary()
+        loadSummary(),
+        loadScenarioWorkbench()
     ]);
 }
 
@@ -441,6 +443,7 @@ async function refreshUI() {
         loadPurchaseEvaluator(),           // DI-006
         loadWealthSweep(),                 // DI-007
         loadMonthlyWealthActionPlan(),     // DI-008
+        loadScenarioWorkbench(),
         loadBufferVsInvest(),
         loadReconciliation(),
         loadUpcomingBills(),
