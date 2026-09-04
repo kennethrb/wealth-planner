@@ -296,10 +296,18 @@ function loadBudgetVsActual() {
             txYear = Number(parts[0]);
             txMonthIndex = Number(parts[1]) - 1;
         } else {
-            const txDate = new Date(rawDate);
-            if (isNaN(txDate.getTime())) return;
-            txYear = txDate.getFullYear();
-            txMonthIndex = txDate.getMonth();
+            const parsed =
+                parseTransactionDate(
+                    rawDate
+                );
+            
+            if (!parsed) return;
+            
+            txYear =
+                parsed.year;
+            
+            txMonthIndex =
+                parsed.monthIndex;
         }
         if (txYear !== selectedYear || txMonthIndex !== targetMonthIndex) return;
         const category = tx["Budget Position"] || tx["budgetPosition"] || tx["Category"] || tx["category"];
