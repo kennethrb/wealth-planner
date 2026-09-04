@@ -401,6 +401,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     border-color: #10b981;
 }
 
+.intel-tabs button.active:hover {
+    color: #ffffff !important;
+}
+
 .intel-tabs button:hover {
     background: rgba(16,185,129,.25);
     color: #ffffff;
