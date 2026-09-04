@@ -226,19 +226,50 @@ function runScenario() {
     const annualDifference = (scenarioSurplus - currentSurplus) * 12;
     const targetContainer = document.getElementById("scenarioResults") || document.getElementById("scenarioResult");
     if (!targetContainer) return;
-    targetContainer.innerHTML = `
-    <div class="card">
-      <h3>Scenario Result</h3>
-      <p>Category: <strong>${category}</strong></p>
-      <p>Current Amount: <strong>${formatCurrency(currentAmount)}</strong></p>
-      <p>Scenario Amount: <strong>${formatCurrency(scenarioAmount)}</strong></p>
-      <p>Difference: <strong>${formatCurrency(difference)}</strong></p>
-      <hr>
-      <p>Current Monthly Surplus: <strong>${formatCurrency(currentSurplus)}</strong></p>
-      <p>Scenario Monthly Surplus: <strong>${formatCurrency(scenarioSurplus)}</strong></p>
-      <p>Annual Impact: <strong>${formatCurrency(annualDifference)}</strong></p>
+targetContainer.innerHTML = `
+<div class="advisor-action priority">
+
+    <div class="action-title">
+        📊 Scenario Result
     </div>
-  `;
+
+    <div class="metric-row">
+        <span>Category</span>
+        <strong>${category}</strong>
+    </div>
+
+    <div class="metric-row">
+        <span>Current Amount</span>
+        <strong>${formatCurrency(currentAmount)}</strong>
+    </div>
+
+    <div class="metric-row">
+        <span>Scenario Amount</span>
+        <strong>${formatCurrency(scenarioAmount)}</strong>
+    </div>
+
+    <div class="metric-row">
+        <span>Difference</span>
+        <strong>${formatCurrency(difference)}</strong>
+    </div>
+
+    <div class="metric-row">
+        <span>Current Monthly Surplus</span>
+        <strong>${formatCurrency(currentSurplus)}</strong>
+    </div>
+
+    <div class="metric-row">
+        <span>Scenario Monthly Surplus</span>
+        <strong>${formatCurrency(scenarioSurplus)}</strong>
+    </div>
+
+    <div class="metric-row">
+        <span>Annual Impact</span>
+        <strong>${formatCurrency(annualDifference)}</strong>
+    </div>
+
+</div>
+`;
 }
 
 function loadBudgetVsActual() {
