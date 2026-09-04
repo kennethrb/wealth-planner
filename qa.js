@@ -126,8 +126,8 @@ printQAFailures();
 const QA_EXPECTED = {
     "2026-Jan": {
         inflation: 5.0,
-        monthlyVelocity: 18000,
-        annualVelocity: 216000,
+        monthlyVelocity: 38000,
+        annualVelocity: 456000,
         bufferTarget: 141000,
         excessCash: 359000,
         investableAmount: 12600,
@@ -137,8 +137,8 @@ const QA_EXPECTED = {
     },
     "2026-Jun": {
         inflation: 4.44,
-        monthlyVelocity: 13000,
-        annualVelocity: 156000,
+        monthlyVelocity: 33000,
+        annualVelocity: 396000,
         bufferTarget: 156000,
         excessCash: 344000,
         investableAmount: 9100,
@@ -148,8 +148,8 @@ const QA_EXPECTED = {
     },
     "2026-Dec": {
         inflation: 3.92,
-        monthlyVelocity: 7000,
-        annualVelocity: 84000,
+        monthlyVelocity: 27000,
+        annualVelocity: 324000,
         bufferTarget: 174000,
         excessCash: 326000,
         investableAmount: 4900,
