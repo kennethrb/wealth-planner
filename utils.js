@@ -98,3 +98,21 @@ function parseTransactionDate(rawDate) {
         day: date.getDate()
     };
 }
+
+function formatTransactionDate(rawDate) {
+
+    const date = new Date(rawDate);
+
+    if (isNaN(date.getTime())) {
+        return "";
+    }
+
+    return date.toLocaleDateString(
+        "en-PH",
+        {
+            weekday: "short",
+            month: "short",
+            day: "numeric"
+        }
+    );
+}
