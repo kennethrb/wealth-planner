@@ -2,7 +2,7 @@
  * QA Utility Framework
  */
 
-const DEBUG_QA = true;
+const DEBUG_QA = window.location.hostname === "localhost";
 
 window.qaTraceLog = [];
 
