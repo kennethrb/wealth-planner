@@ -221,11 +221,24 @@ function editTransaction(transactionId) {
     const rawDate = tx.Date || tx.date || "";
     let formattedDate = "";
     if (rawDate) {
-        const date = new Date(rawDate);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        formattedDate = `${year}-${month}-${day}`;
+        const parsed =
+            parseTransactionDate(
+                rawDate
+            );
+        
+        if (parsed) {
+        
+            formattedDate =
+                `${parsed.year}-${
+                    String(
+                        parsed.monthIndex + 1
+                    ).padStart(2, "0")
+                }-${
+                    String(
+                        parsed.day
+                    ).padStart(2, "0")
+                }`;
+        }
     }
     
     document.getElementById("txDate").value = formattedDate;
