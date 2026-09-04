@@ -576,11 +576,17 @@ function showIntelTab(tab) {
 
     document
         .querySelectorAll(".intel-panel")
-        .forEach(panel => {
-            panel.classList.remove("active");
-        });
+        .forEach(panel => panel.classList.remove("active"));
+
+    document
+        .querySelectorAll(".intel-tabs button")
+        .forEach(btn => btn.classList.remove("active"));
 
     document
         .getElementById(`tab-${tab}`)
+        .classList.add("active");
+
+    document
+        .getElementById(`btn-${tab}`)
         .classList.add("active");
 }
