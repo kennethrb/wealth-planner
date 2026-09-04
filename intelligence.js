@@ -980,6 +980,10 @@ async function loadPurchaseEvaluator(testAmount = null) {
             ? cashAfterPurchase /
               monthlyObligations
             : null;
+    const monthsCoveredDisplay =
+    monthsCovered === null
+        ? "N/A"
+        : monthsCovered.toFixed(1);
 
 
 
