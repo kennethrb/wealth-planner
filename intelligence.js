@@ -899,7 +899,7 @@ async function loadPurchaseEvaluator(testAmount = null) {
     container.innerHTML = `
         <div class="card">
             <h2>🛒 Purchase Evaluator</h2>
-            <div class="form-row">
+            <div class="form-group">
                 <input
                     type="number"
                     id="purchaseAmount"
@@ -975,7 +975,10 @@ async function loadWealthSweep() {
             ${
                 excessCash > 0
                 ? `
-                <p><strong>Available Excess Cash:</strong> ${formatCurrency(excessCash)}</p>
+                <div class="metric-row">
+                    <span>Available Excess Cash</span>
+                    <strong>${formatCurrency(excessCash)}</strong>
+                </div>
                 <hr>
                 <h3>Recommended Action Plan</h3>
                 <div class="metric-row">
@@ -1118,9 +1121,11 @@ async function loadScenarioWorkbench() {
                     placeholder="Enter new amount">
             </div>
 
-            <button onclick="runScenario()">
-                Run Scenario
-            </button>
+            <div class="action-buttons">
+                <button onclick="runScenario()">
+                    📊 Run Scenario
+                </button>
+            </div>
 
             <div id="scenarioResults"></div>
 
