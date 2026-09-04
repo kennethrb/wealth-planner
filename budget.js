@@ -101,13 +101,25 @@ async function loadSummary() {
         <th>Remaining</th>
       </tr>
   `;
+    let totalIncome = 0;
+    let totalExpense = 0;
+    let totalSavings = 0;
+    let totalDebt = 0;
+    
     Object.keys(monthlyTotals).forEach(month => {
+
         const {
             Income,
             Expense,
             Savings,
             Debt
         } = monthlyTotals[month];
+        
+        totalIncome += Income;
+        totalExpense += Expense;
+        totalSavings += Savings;
+        totalDebt += Debt;
+        
         const remaining = Income - Expense - Savings - Debt;
         html += `
       <tr>
@@ -120,6 +132,32 @@ async function loadSummary() {
       </tr>
     `;
     });
+    const totalRemaining =
+    totalIncome -
+    totalExpense -
+    totalSavings -
+    totalDebt;
+
+    html += `
+    <tr class="grand-total">
+        <td class="section-total"><strong>TOTAL</strong></td>
+        <td class="col-income">
+            <strong>${formatCurrency(totalIncome)}</strong>
+        </td>
+        <td class="col-expense">
+            <strong>${formatCurrency(totalExpense)}</strong>
+        </td>
+        <td class="col-savings">
+            <strong>${formatCurrency(totalSavings)}</strong>
+        </td>
+        <td class="col-debt">
+            <strong>${formatCurrency(totalDebt)}</strong>
+        </td>
+        <td>
+            <strong>${formatCurrency(totalRemaining)}</strong>
+        </td>
+    </tr>
+    `;
     html += `</table>`;
     document.getElementById("summary").innerHTML = html;
 }
