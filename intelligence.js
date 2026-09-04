@@ -977,8 +977,10 @@ async function loadPurchaseEvaluator(testAmount = null) {
     const bufferRemaining = cashAfterPurchase - bufferTarget;
     const monthsCovered =
         monthlyObligations > 0
-            ? cashAfterPurchase / monthlyObligations
+            ? cashAfterPurchase /
+              monthlyObligations
             : null;
+
 
 
     let recommendation = "✅ Affordable";
@@ -1050,7 +1052,7 @@ async function loadPurchaseEvaluator(testAmount = null) {
                 </div>
                 <div class="metric-row">
                     <span>Months Covered</span>
-                    <strong>${monthsCovered.toFixed(1)}</strong>
+                    <strong>${monthsCoveredDisplay}</strong>
                 </div>
                 <div class="metric-row">
                     <span>Recommendation</span>
