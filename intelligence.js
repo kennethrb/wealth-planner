@@ -1,8 +1,6 @@
 /**
  * Wealth Planner Intelligence Engine
  */
-const DEBUG_QA = true;
-
 // Example Debug Wrapper for Personal Inflation Index
 function calculatePersonalInflation() {
     const currentYearSpend = getCurrentYearSpending(appData.transactions);
@@ -1013,7 +1011,8 @@ async function loadPurchaseEvaluator(testAmount = null) {
         monthsCovered,
         recommendation
     },
-    recommendation !== ""
+    !isNaN(cashAfterPurchase) &&
+    !isNaN(bufferRemaining)
 );
 
     if (!container) return;
@@ -1228,7 +1227,7 @@ logQATrace(
         topPriority:
             actions[0]?.title || "Fully Optimized"
     },
-    actions.length >= 0
+    !isNaN(actions.length)
 );
 
     if (!container) return;
