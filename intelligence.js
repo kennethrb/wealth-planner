@@ -1099,33 +1099,51 @@ async function loadScenarioWorkbench() {
         document.getElementById("scenarioWorkbench");
 
     if (!container) return;
+    
+    Container.innerHTML = `
+    <div class="advisor-action priority">
 
-    container.innerHTML = `
-        <div class="intel-card">
-            <h2>🧪 Scenario Simulator</h2>
-
-            <div class="form-group">
-                <label>Category</label>
-                <select id="scenarioCategory"></select>
-            </div>
-
-            <div class="form-group">
-                <label>Scenario Amount</label>
-                <input
-                    type="number"
-                    id="scenarioAmount"
-                    placeholder="Enter new amount">
-            </div>
-
-            <button onclick="runScenario()">
-                Run Scenario
-            </button>
-
-            <div id="scenarioResults"
-                 style="margin-top:16px;">
-            </div>
+        <div class="action-title">
+            📊 Scenario Result
         </div>
-    `;
+
+        <div class="metric-row">
+            <span>Category</span>
+            <strong>${category}</strong>
+        </div>
+
+        <div class="metric-row">
+            <span>Current Amount</span>
+            <strong>${formatCurrency(currentAmount)}</strong>
+        </div>
+
+        <div class="metric-row">
+            <span>Scenario Amount</span>
+            <strong>${formatCurrency(scenarioAmount)}</strong>
+        </div>
+
+        <div class="metric-row">
+            <span>Difference</span>
+            <strong>${formatCurrency(difference)}</strong>
+        </div>
+
+        <div class="metric-row">
+            <span>Current Monthly Surplus</span>
+            <strong>${formatCurrency(currentSurplus)}</strong>
+        </div>
+
+        <div class="metric-row">
+            <span>Scenario Monthly Surplus</span>
+            <strong>${formatCurrency(scenarioSurplus)}</strong>
+        </div>
+
+        <div class="metric-row">
+            <span>Annual Impact</span>
+            <strong>${formatCurrency(annualDifference)}</strong>
+        </div>
+
+    </div>
+`;
 
     loadScenarioCategories();
 }
