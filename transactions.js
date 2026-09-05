@@ -168,6 +168,10 @@ function loadTransactions() {
                 budgetType === "Debt" ? "amount-debt" :
                 budgetType === "Transfer" ? "amount-transfer" :
                 "";
+            const amountText =
+                budgetType === "Income"
+                    ? `+ ${formatCurrency(tx.Amount || tx.amount)}`
+                    : formatCurrency(tx.Amount || tx.amount);
         
             return `
                 <tr>
@@ -176,7 +180,7 @@ function loadTransactions() {
                     </td>
         
                     <td class="${amountClass}">
-                        ${formatCurrency(tx.Amount || tx.amount)}
+                        ${amountText}
                     </td>
         
                     <td>${account}</td>
