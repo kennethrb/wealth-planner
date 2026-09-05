@@ -707,6 +707,35 @@ async function loadFundingOptimizationAdvisor() {
     `;
 }
 
+function getAssetAllocationRecommendation() {
+    const allocation = getAssetAllocation();
+    const cashAmount = allocation.Cash?.amount || 0;
+    const cashPercent = allocation.Cash?.percent || 0;
+    const totalAssets = Object.values(allocation).reduce(
+        (sum, item) => sum + item.amount, 0);
+    const targetCashPercent = 20;
+    const targetCashAmount = totalAssets * (targetCashPercent / 100);
+    const excessCash = Math.max(0, cashAmount - targetCashAmount);
+    if (cashPercent > 40) {
+        return {
+            status: "warning",
+            title: "High Cash Allocation",
+            currentPercent: cashPercent,
+            targetPercent: targetCashPercent,
+            cashAmount,
+            excessCash
+        };
+    }
+    return {
+        status: "good",
+        title: "Asset Allocation Healthy",
+        currentPercent: cashPercent,
+        targetPercent: targetCashPercent,
+        cashAmount,
+        excessCash: 0
+    };
+}
+
 async function loadWealthProjectionAccelerator() {
     const container = document.getElementById("wealthProjectionAccelerator");
     if (!container) return;
