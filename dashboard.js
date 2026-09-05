@@ -48,6 +48,20 @@ function getAssetClassTotals() {
     return totals;
 }
 
+function getAssetAllocation() {
+    const totals = getAssetClassTotals();
+    const totalAssets = Object.values(totals).reduce((sum, value) => sum + value, 0);
+    const allocation = {};
+    Object.entries(totals).forEach(([assetClass, value]) => {
+        allocation[assetClass] = {
+            amount: value,
+            percent: totalAssets > 0 ? Number(
+                ((value / totalAssets) * 100).toFixed(1)) : 0
+        };
+    });
+    return allocation;
+}
+
 async function loadNetWorth() {
     let assets = 0,
         liabilities = 0;
