@@ -734,6 +734,53 @@ function getAssetAllocationRecommendation() {
         cashAmount,
         excessCash: 0
     };
+
+    const rec =
+        getAssetAllocationRecommendation();
+    
+    container.innerHTML = `
+    <div class="card">
+        <h2>🎯 Asset Allocation Advisor</h2>
+    
+        <div class="metric-row">
+            <span>Status</span>
+            <strong>${rec.title}</strong>
+        </div>
+    
+        <div class="metric-row">
+            <span>Current Cash</span>
+            <strong>${rec.currentPercent}%</strong>
+        </div>
+    
+        <div class="metric-row">
+            <span>Target Cash</span>
+            <strong>${rec.targetPercent}%</strong>
+        </div>
+    
+        <div class="metric-row">
+            <span>Excess Cash</span>
+            <strong>
+                ${formatCurrency(rec.excessCash)}
+            </strong>
+        </div>
+    
+        <hr>
+    
+        <div class="advisor-action priority">
+            <div class="action-title">
+                🚀 Recommended Action
+            </div>
+    
+            <div class="allocation-row">
+                <span>Deploy Into Growth Assets</span>
+                <strong>
+                    ${formatCurrency(rec.excessCash)}
+                </strong>
+            </div>
+        </div>
+    </div>
+    `;
+    
 }
 
 async function loadWealthProjectionAccelerator() {
