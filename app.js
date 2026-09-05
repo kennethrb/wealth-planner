@@ -403,6 +403,7 @@ async function refreshFinancialViews() {
         loadBufferVsInvest(),
         loadFinancialHealthAdvisor(),       // DI-001
         loadFundingOptimizationAdvisor(),  // DI-002
+        loadAssetAllocationAdvisor(),
         loadWealthProjectionAccelerator(), // DI-003
         loadNetWorthVelocity(),            // DI-004
         loadPersonalInflation(),           // DI-005
@@ -431,6 +432,7 @@ async function changeViewPeriod() {
         loadBudgetVsActual(),
         loadFinancialHealthAdvisor(),       // DI-001
         loadFundingOptimizationAdvisor(),  // DI-002
+        loadAssetAllocationAdvisor(),
         loadWealthProjectionAccelerator(), // DI-003
         loadNetWorthVelocity(),            // DI-004
         loadPersonalInflation(),           // DI-005
@@ -468,6 +470,7 @@ async function refreshUI() {
         loadFinancialHealth(),
         loadFinancialHealthAdvisor(),       // DI-001
         loadFundingOptimizationAdvisor(),  // DI-002
+        loadAssetAllocationAdvisor(),
         loadWealthProjectionAccelerator(), // DI-003
         loadNetWorthVelocity(),            // DI-004
         loadPersonalInflation(),           // DI-005
