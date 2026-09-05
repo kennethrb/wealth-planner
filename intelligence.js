@@ -716,71 +716,58 @@ function getAssetAllocationRecommendation() {
     const targetCashPercent = 20;
     const targetCashAmount = totalAssets * (targetCashPercent / 100);
     const excessCash = Math.max(0, cashAmount - targetCashAmount);
-    if (cashPercent > 40) {
-        return {
-            status: "warning",
-            title: "High Cash Allocation",
-            currentPercent: cashPercent,
-            targetPercent: targetCashPercent,
-            cashAmount,
-            excessCash
-        };
-    }
     return {
-        status: "good",
-        title: "Asset Allocation Healthy",
+        status: cashPercent > 40 ? "warning" : "good",
+        title: cashPercent > 40 ? "High Cash Allocation" : "Asset Allocation Healthy",
         currentPercent: cashPercent,
         targetPercent: targetCashPercent,
         cashAmount,
-        excessCash: 0
+        excessCash
     };
+}
 
-    const rec =
-        getAssetAllocationRecommendation();
-    
+async function loadAssetAllocationAdvisor() {
+    const container = document.getElementById("assetAllocationAdvisor");
+    if (!container) return;
+    const rec = getAssetAllocationRecommendation();
     container.innerHTML = `
-    <div class="card">
-        <h2>🎯 Asset Allocation Advisor</h2>
-    
-        <div class="metric-row">
-            <span>Status</span>
-            <strong>${rec.title}</strong>
-        </div>
-    
-        <div class="metric-row">
-            <span>Current Cash</span>
-            <strong>${rec.currentPercent}%</strong>
-        </div>
-    
-        <div class="metric-row">
-            <span>Target Cash</span>
-            <strong>${rec.targetPercent}%</strong>
-        </div>
-    
-        <div class="metric-row">
-            <span>Excess Cash</span>
-            <strong>
-                ${formatCurrency(rec.excessCash)}
-            </strong>
-        </div>
-    
-        <hr>
-    
-        <div class="advisor-action priority">
-            <div class="action-title">
-                🚀 Recommended Action
+        <div class="card">
+            <h2>🎯 Asset Allocation Advisor</h2>
+
+            <div class="metric-row">
+                <span>Status</span>
+                <strong>${rec.title}</strong>
             </div>
-    
-            <div class="allocation-row">
-                <span>Deploy Into Growth Assets</span>
-                <strong>
-                    ${formatCurrency(rec.excessCash)}
-                </strong>
+
+            <div class="metric-row">
+                <span>Current Cash</span>
+                <strong>${rec.currentPercent}%</strong>
+            </div>
+
+            <div class="metric-row">
+                <span>Target Cash</span>
+                <strong>${rec.targetPercent}%</strong>
+            </div>
+
+            <div class="metric-row">
+                <span>Excess Cash</span>
+                <strong>${formatCurrency(rec.excessCash)}</strong>
+            </div>
+
+            <hr>
+
+            <div class="advisor-action priority">
+                <div class="action-title">
+                    🚀 Recommended Action
+                </div>
+
+                <div class="allocation-row">
+                    <span>Deploy Into Growth Assets</span>
+                    <strong>${formatCurrency(rec.excessCash)}</strong>
+                </div>
             </div>
         </div>
-    </div>
     `;
-    
 }
 
 async function loadWealthProjectionAccelerator() {
