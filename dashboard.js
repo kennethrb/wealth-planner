@@ -38,6 +38,9 @@ async function loadFinancialHealth() {
 function getAssetClassTotals() {
     const totals = {};
     appData.accounts.forEach(account => {
+        if (account.netWorthType !== "Asset") {
+            return;
+        }
         const assetClass = account.assetClass || "Unclassified";
         const balance = Number(account.currentBalance || account.balance || 0);
         totals[assetClass] = (totals[assetClass] || 0) + balance;
