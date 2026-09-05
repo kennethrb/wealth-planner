@@ -99,24 +99,10 @@ async function loadBufferVsInvest() {
     const monthlyObligations = monthlyExpense + monthlyDebt;
     const bufferTarget = monthlyObligations * 3;
 
-    let availableCash = 0;
-    (appData.accounts || []).forEach(account => {
-        const balance = Number(account.currentBalance ?? account.balance ?? account.amount ?? 0);
-        const type = String(account.netWorthType || account.type || "").toLowerCase();
-        
-        // Match Asset, liquid, bank, or cash account types
-        if (type === "asset" || type === "liquid" || type === "bank" || type === "cash") {
-            availableCash += balance;
-        }
-    });
-
-    // Fallback if netWorthType isn't explicitly set on accounts
-    if (availableCash === 0 && appData.accounts.length > 0) {
-        appData.accounts.forEach(account => {
-            const balance = Number(account.currentBalance ?? account.balance ?? 0);
-            if (balance > 0) availableCash += balance;
-        });
-    }
+    const availableCash =
+        getTotalLiquidAssets(
+            appData.accounts || []
+        );
 
     const excessCash = availableCash - bufferTarget;
 
