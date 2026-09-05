@@ -47,6 +47,10 @@ function getTotalLiquidAssets(accounts = []) {
         );
 }
 
+function roundMoney(value) {
+    return Number(value.toFixed(2));
+}
+
 // Example Debug Wrapper for Personal Inflation Index
 function calculatePersonalInflation() {
     const currentYearSpend = getCurrentYearSpending(appData.transactions);
@@ -1106,9 +1110,9 @@ async function loadWealthSweep() {
     const excessCash = Math.max(0, availableCash - bufferTarget);
 
     // Default Allocation Ratios: 20% Debt Payoff, 10% Emergency Top-up, 70% Investment
-    const debtSweep = excessCash * 0.20;
-    const emergencySweep = excessCash * 0.10;
-    const investmentSweep = excessCash * 0.70;
+    const debtSweep = roundMoney(excessCash * 0.20);
+    const emergencySweep = roundMoney(excessCash * 0.10);
+    const investmentSweep = roundMoney(excessCash * 0.70);
 
     // Projected 3-Year Investment Return @ 8% CAGR
     const estimated3YrReturn = investmentSweep * (Math.pow(1 + 0.08, 3) - 1);
