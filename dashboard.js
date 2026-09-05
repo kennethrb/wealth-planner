@@ -79,6 +79,23 @@ function getAssetAllocationRecommendation() {
     };
 }
 
+function loadAssetAllocationAdvisor() {
+    const recommendation = getAssetAllocationRecommendation();
+    document.getElementById("assetAllocationAdvisor").innerHTML = `
+        <div class="card">
+            <h2>🎯 Asset Allocation Advisor</h2>
+
+            <div class="metric-row">
+                <strong>${recommendation.title}</strong>
+            </div>
+
+            <p>
+                ${recommendation.message}
+            </p>
+        </div>
+    `;
+}
+
 async function loadNetWorth() {
     let assets = 0,
         liabilities = 0;
