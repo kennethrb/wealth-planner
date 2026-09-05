@@ -997,13 +997,10 @@ async function loadPurchaseEvaluator(testAmount = null) {
     const monthlyObligations = monthlyExpense + monthlyDebt;
     const bufferTarget = monthlyObligations * 3;
 
-    let availableCash = 0;
-    appData.accounts.forEach(account => {
-        const balance = Number(account.currentBalance || account.balance || 0);
-        if (account.netWorthType === "Asset") {
-            availableCash += balance;
-        }
-    });
+    const availableCash =
+        getTotalLiquidAssets(
+            appData.accounts || []
+        );
 
     const cashAfterPurchase = availableCash - purchaseAmount;
     const bufferRemaining = cashAfterPurchase - bufferTarget;
