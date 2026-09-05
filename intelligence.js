@@ -271,7 +271,7 @@ async function loadNetWorthVelocity() {
 
     container.innerHTML = `
         <div class="card">
-            <h2>📈 Net Worth Velocity</h2>
+            <h2>📈 Monthly Wealth Contribution</h2>
             <div class="metric-row">
                 <span>Current Net Worth</span>
                 <strong>${formatCurrency(netWorth)}</strong>
