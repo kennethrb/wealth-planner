@@ -571,7 +571,7 @@ async function loadFundingOptimizationAdvisor() {
 
             // Find best source account with excess funds
             const sourceAccount = accounts
-                .filter(a => a.netWorthType === "Asset" && a.id !== account.id)
+                .filter(a => isLiquidAccount(a) && a.id !== account.id)
                 .sort((a, b) => Number(b.currentBalance || b.balance || 0) - Number(a.currentBalance || a.balance || 0))[0];
 
             insights.push({
@@ -588,13 +588,8 @@ async function loadFundingOptimizationAdvisor() {
     });
 
     // Rule 2: Detect Global Idle Cash
-    let totalAvailableCash = 0;
-    accounts.forEach(account => {
-        const balance = Number(account.currentBalance || account.balance || 0);
-        if (account.netWorthType === "Asset") {
-            totalAvailableCash += balance;
-        }
-    });
+    const totalAvailableCash =
+        getTotalLiquidAssets(accounts);
 
     const excessCash = totalAvailableCash - bufferTarget;
 
