@@ -271,19 +271,23 @@ async function loadNetWorthVelocity() {
 
     container.innerHTML = `
         <div class="card">
-            <h2>📈 Monthly Wealth Contribution</h2>
+            <h2>📈 Wealth Contribution</h2>
+    
             <div class="metric-row">
                 <span>Current Net Worth</span>
                 <strong>${formatCurrency(netWorth)}</strong>
             </div>
+    
             <div class="metric-row">
-                <span>Monthly Velocity</span>
+                <span>Monthly Wealth Contribution</span>
                 <strong>${formatCurrency(monthlyVelocity)}</strong>
             </div>
+    
             <div class="metric-row">
-                <span>Annual Velocity</span>
+                <span>Annual Wealth Contribution</span>
                 <strong>${formatCurrency(annualVelocity)}</strong>
             </div>
+    
             <div class="metric-row">
                 <span>Projected Next Year</span>
                 <strong>${formatCurrency(projectedNetWorth)}</strong>
