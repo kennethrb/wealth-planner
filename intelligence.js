@@ -1,53 +1,51 @@
 /**
  * Wealth Planner Intelligence Engine
  */
-
 /**
- * Determines if an account should b* considered liquid.
+ * Determines if an account is liquid.
  *
- * Liquid a*counts are immediately available f*r
- * spending, emergency funding, *r deployment.
- *
- * @param {Object* account
+ * @param {Object} account
  * @returns {boolean}
- */*function isLiquidAccount(account) *
+ */
+function isLiquidAccount(account) {
     const type = String(
-        *ccount.type ||
-        account["Ty*e"] ||
+        account.type ||
+        account["Type"] ||
         ""
     )
-    .trim(*
+    .trim()
     .toLowerCase();
 
-    return [*        "cash",
-        "checking"*
+    return [
+        "cash",
+        "checking",
         "savings"
-    ].includes(*ype);
+    ].includes(type);
 }
 
 /**
- * Calculates total l*quid assets available.
+ * Calculates total liquid assets.
  *
- * @para* {Array<Object>} accounts
- * @retu*ns {number}
+ * @param {Array<Object>} accounts
+ * @returns {number}
  */
-function getTotalL*quidAssets(accounts = []) {
-    re*urn accounts
-        .filter(accou*t =>
-            account.netWorthT*pe === "Asset" &&
-            isLi*uidAccount(account)
+function getTotalLiquidAssets(accounts = []) {
+    return accounts
+        .filter(account =>
+            account.netWorthType === "Asset" &&
+            isLiquidAccount(account)
         )
-    *   .reduce(
-            (total, ac*ount) =>
+        .reduce(
+            (total, account) =>
                 total +
- *              Number(
-            *       account.currentBalance ??
- *                  account.balance *?
+                Number(
+                    account.currentBalance ??
+                    account.balance ??
                     0
-          *     ),
+                ),
             0
         );
-}*
+}
 
 // Example Debug Wrapper for Personal Inflation Index
 function calculatePersonalInflation() {
