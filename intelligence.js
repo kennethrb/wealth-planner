@@ -236,7 +236,7 @@ async function loadNetWorthVelocity() {
         if (type === "Debt") debt += amount;
     });
 
-    const monthlyVelocity = income - expense;
+    const monthlyVelocity = savings + debt;
     const annualVelocity = monthlyVelocity * 12;
     const projectedNetWorth = netWorth + annualVelocity;
 
