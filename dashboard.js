@@ -62,23 +62,6 @@ function getAssetAllocation() {
     return allocation;
 }
 
-function getAssetAllocationRecommendation() {
-    const allocation = getAssetAllocation();
-    const cashPercent = allocation.Cash?.percent || 0;
-    if (cashPercent > 40) {
-        return {
-            status: "warning",
-            title: "High Cash Allocation",
-            message: `Cash is ${cashPercent}% of assets. Consider deploying excess cash into long-term growth assets.`
-        };
-    }
-    return {
-        status: "good",
-        title: "Asset Allocation Healthy",
-        message: "Current asset allocation does not require action."
-    };
-}
-
 function loadAssetAllocationAdvisor() {
     const recommendation = getAssetAllocationRecommendation();
     document.getElementById("assetAllocationAdvisor").innerHTML = `
