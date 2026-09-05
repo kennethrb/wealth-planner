@@ -132,56 +132,59 @@ function loadTransactions() {
         </tr>
 
         ${recent.map(tx => {
-
             const budgetType =
                 tx["Budget Type"] ||
                 tx.budgetType ||
                 "";
-
+        
             const account =
                 tx.Account ||
                 tx.account ||
                 "";
-
+        
             const transferTo =
                 tx["Transfer To Account"] ||
                 tx.transferToAccount ||
                 "";
-
+        
             let flowDisplay =
                 tx["Budget Position"] ||
                 tx.budgetPosition ||
                 tx.category ||
                 "";
-
-            if (
-                budgetType === "Transfer"
-            ) {
-
+        
+            if (budgetType === "Transfer") {
                 flowDisplay = `
                     <strong>${account}</strong>
                     <br>
                     → ${transferTo}
                 `;
             }
-
+        
+            const amountClass =
+                budgetType === "Income" ? "amount-income" :
+                budgetType === "Expense" ? "amount-expense" :
+                budgetType === "Savings" ? "amount-savings" :
+                budgetType === "Debt" ? "amount-debt" :
+                budgetType === "Transfer" ? "amount-transfer" :
+                "";
+        
             return `
-            <tr>
-                <td>
-                    ${formatTransactionDate(
-                        tx.Date || tx.date
-                    )}
-                </td>
-            
-                <td>${formatCurrency(tx.Amount || tx.amount)}</td>
-            
-                <td>${account}</td>
-            
-                <td>${flowDisplay}</td>
-            
-                <td>${tx.Details || tx.details || ""}</td>
-            
-                <td class="action-cell">
+                <tr>
+                    <td>
+                        ${formatTransactionDate(tx.Date || tx.date)}
+                    </td>
+        
+                    <td class="${amountClass}">
+                        ${formatCurrency(tx.Amount || tx.amount)}
+                    </td>
+        
+                    <td>${account}</td>
+                    <td>${flowDisplay}</td>
+                    <td>${tx.Details || tx.details || ""}</td>
+        
+                    <td class="action-cell">
+
                   <button
                       class="btn-delete-row"
                       onclick="editTransaction('${tx.transactionId || tx['Transaction ID']}')">
