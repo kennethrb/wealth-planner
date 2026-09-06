@@ -13,39 +13,51 @@ async function handleAddAccount(event) {
 
     event.preventDefault();
 
-    const name =
-        document.getElementById("accountName").value.trim();
+    const name = document.getElementById("accountName").value.trim();
+    const netWorthType = document.getElementById("netWorthType").value;
+    const assetClass = document.getElementById("accountType").value;
+    const currentBalance = document.getElementById("openingBalance").value;
 
-    const netWorthType =
-        document.getElementById("netWorthType").value;
+    try {
 
-    const assetClass =
-        document.getElementById("accountType").value;
+        const url =
+            `${BASE_URL}?action=addAccount`
+            + `&name=${encodeURIComponent(name)}`
+            + `&netWorthType=${encodeURIComponent(netWorthType)}`
+            + `&assetClass=${encodeURIComponent(assetClass)}`
+            + `&currentBalance=${encodeURIComponent(currentBalance)}`;
 
-    const currentBalance =
-        document.getElementById("openingBalance").value;
+        console.log("REQUEST:", url);
 
-    const response = await fetch(
-        `${BASE_URL}?action=addAccount`
-        + `&name=${encodeURIComponent(name)}`
-        + `&netWorthType=${encodeURIComponent(netWorthType)}`
-        + `&assetClass=${encodeURIComponent(assetClass)}`
-        + `&currentBalance=${encodeURIComponent(currentBalance)}`
-    );
+        const response = await fetch(url);
 
-    const result = await response.json();
+        const text = await response.text();
 
-    if (!result.success) {
-        alert("Failed to save account");
-        return;
+        console.log("RAW RESPONSE:", text);
+
+        const result = JSON.parse(text);
+
+        console.log("RESULT:", result);
+
+        if (!result.success) {
+            alert(
+                "Backend Error: "
+                + JSON.stringify(result)
+            );
+            return;
+        }
+
+        alert("✅ Account Added");
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "JS ERROR: "
+            + error.message
+        );
     }
-
-    await loadData();
-    loadAccounts();
-
-    event.target.reset();
-
-    alert("Account added");
 }
 
 
