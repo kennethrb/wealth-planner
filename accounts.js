@@ -1,4 +1,31 @@
 // ==================== FILE: accounts.js ====================
+/**
+ * Handles the submit event for the Add Account HTML form.
+ * @param {Event} event - The DOM submit event.
+ */
+function handleAddAccountForm(event) {
+    event.preventDefault();
+
+    // 1. Extract values from HTML form inputs
+    const name = document.getElementById("accountName")?.value.trim();
+    const netWorthType = document.getElementById("netWorthType")?.value;
+    const assetClass = document.getElementById("accountType")?.value;
+    const currentBalance = document.getElementById("openingBalance")?.value;
+
+    if (!name) return;
+
+    // 2. Pass values as a structured object to addAccount
+    addAccount({
+        name,
+        netWorthType,
+        assetClass,
+        currentBalance
+    });
+
+    // 3. Reset form inputs
+    const form = document.getElementById("addAccountForm");
+    if (form) form.reset();
+}
 
 /**
  * Renders the list of accounts on the dashboard/accounts view.
@@ -21,7 +48,10 @@ function loadAccounts() {
           <div class="goal-item">
             <div class="item-header">
               <span class="item-title">💳 ${name}</span>
-              <span class="item-value">${formatCurrency(balance)}</span>
+              <div class="item-actions">
+                <span class="item-value">${formatCurrency(balance)}</span>
+                <button type="button" class="btn-delete" onclick="deleteAccount(${account.id})" title="Delete Account">🗑️</button>
+              </div>
             </div>
             <div class="goal-details">
               <span>Type: <strong>${type}</strong></span>
@@ -39,6 +69,7 @@ function loadAccounts() {
  */
 function getAssetClassTotals() {
     const totals = {};
+    if (!appData.accounts) return totals;
     appData.accounts.forEach(account => {
         if (account.netWorthType !== "Asset") {
             return;
@@ -68,26 +99,23 @@ function getAssetAllocation() {
 
 /**
  * Adds a new account to appData and refreshes the list view.
- * @param {Object} newAccount - The account details (e.g., name, netWorthType, currentBalance, assetClass)
+ * @param {Object} newAccount - The account details
  */
 function addAccount(newAccount) {
-    // 1. Ensure appData.accounts exists
     if (!appData.accounts) {
         appData.accounts = [];
     }
 
-    // 2. Add default properties if needed and push to array
     const accountToAdd = {
-        id: Date.now(), // Unique ID for key tracking
+        id: Date.now(),
         name: newAccount.name || 'New Account',
-        netWorthType: newAccount.netWorthType || 'Asset', // 'Asset' or 'Liability'
+        netWorthType: newAccount.netWorthType || 'Asset',
         currentBalance: Number(newAccount.currentBalance) || 0,
         assetClass: newAccount.assetClass || 'Cash'
     };
 
     appData.accounts.push(accountToAdd);
 
-    // 3. Refresh the accounts UI
     if (typeof loadAccounts === 'function') {
         loadAccounts();
     }
@@ -100,12 +128,10 @@ function addAccount(newAccount) {
 function deleteAccount(accountId) {
     if (!appData.accounts) return;
 
-    // Filter out the account with the matching ID
     appData.accounts = appData.accounts.filter(
         account => account.id !== accountId
     );
 
-    // Refresh the accounts UI
     if (typeof loadAccounts === 'function') {
         loadAccounts();
     }
