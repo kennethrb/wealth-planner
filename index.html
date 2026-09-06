@@ -377,32 +377,55 @@
   
       <!-- Accounts & Goals Grid -->
       <section id="goals" class="grid-2">
-        <div class="card">
+      <div class="card">
+      
           <div class="card-title">🏦 Accounts</div>
-          
-        <form id="addAccountForm" onsubmit="handleAddAccountForm(event)">
-          <h3>➕ Add Account</h3>
-          <div class="form-row">
-            <input type="text" id="accountName" placeholder="Account Name" required />
-            <select id="netWorthType">
-              <option value="Asset">Asset</option>
-              <option value="Liability">Liability</option>
-            </select>
-            <select id="accountType">
-              <option value="Cash">Cash</option>
-              <option value="Checking">Checking</option>
-              <option value="Savings">Savings</option>
-              <option value="Credit Card">Credit Card</option>
-              <option value="Investment">Investment</option>
-            </select>
-            <input type="number" id="openingBalance" placeholder="Opening Balance" step="0.01" required />
-            <button type="submit">➕ Add Account</button>
-          </div>
-        </form>
-        <hr class="divider">
-  
+      
+          <form id="addAccountForm">
+      
+              <h3>➕ Add Account</h3>
+      
+              <div class="form-row">
+      
+                  <input
+                      type="text"
+                      id="accountName"
+                      placeholder="Account Name"
+                      required>
+      
+                  <select id="netWorthType">
+                      <option value="Asset">Asset</option>
+                      <option value="Liability">Liability</option>
+                  </select>
+      
+                  <select id="accountType">
+                      <option value="Cash">Cash</option>
+                      <option value="Checking">Checking</option>
+                      <option value="Savings">Savings</option>
+                      <option value="Investment">Investment</option>
+                      <option value="Credit Card">Credit Card</option>
+                  </select>
+      
+                  <input
+                      type="number"
+                      id="openingBalance"
+                      placeholder="Opening Balance"
+                      step="0.01"
+                      required>
+      
+                  <button type="submit">
+                      ➕ Add Account
+                  </button>
+      
+              </div>
+      
+          </form>
+      
+          <hr class="divider">
+      
           <div id="accounts"></div>
-        </div>
+      
+      </div>
         <div class="card">
           <div class="card-title">🎯 Goals</div>
           <div id="financialGoals"></div>
