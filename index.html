@@ -380,7 +380,7 @@
         <div class="card">
           <div class="card-title">🏦 Accounts</div>
           
-        <form id="addAccountForm" onsubmit="event.preventDefault(); addAccount();">
+        <form id="addAccountForm" onsubmit="handleAddAccountForm(event)">
           <h3>➕ Add Account</h3>
           <div class="form-row">
             <input type="text" id="accountName" placeholder="Account Name" required />
