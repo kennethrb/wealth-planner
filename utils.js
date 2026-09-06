@@ -1,5 +1,25 @@
 console.log("UTILS FILE LOADED");
 
+const ASSET_CLASSES = {
+  CASH_EQUIVALENT: "Cash & Cash Equivalents",
+  INVESTMENTS: "Investments",
+  RETIREMENT: "Retirement",
+  REAL_ESTATE: "Real Estate",
+  DEBT: "Liabilities & Debt"
+};
+
+const ACCOUNT_TYPES = {
+  SAVINGS: { name: "Savings Account", assetClass: ASSET_CLASSES.CASH_EQUIVALENT, netWorthType: "Asset" },
+  CHECKING: { name: "Checking Account", assetClass: ASSET_CLASSES.CASH_EQUIVALENT, netWorthType: "Asset" },
+  MONEY_MARKET: { name: "Money Market", assetClass: ASSET_CLASSES.CASH_EQUIVALENT, netWorthType: "Asset" },
+  STOCKS: { name: "Individual Stocks", assetClass: ASSET_CLASSES.INVESTMENTS, netWorthType: "Asset" },
+  ETF: { name: "Exchange Traded Funds", assetClass: ASSET_CLASSES.INVESTMENTS, netWorthType: "Asset" },
+  BONDS: { name: "Fixed Income / Bonds", assetClass: ASSET_CLASSES.INVESTMENTS, netWorthType: "Asset" },
+  CRYPTO: { name: "Cryptocurrency", assetClass: ASSET_CLASSES.INVESTMENTS, netWorthType: "Asset" },
+  CREDIT_CARD: { name: "Credit Card", assetClass: ASSET_CLASSES.DEBT, netWorthType: "Liability" },
+  PERSONAL_LOAN: { name: "Personal/Car Loan", assetClass: ASSET_CLASSES.DEBT, netWorthType: "Liability" }
+};
+
 
 // Universal Philippine Peso Currency Formatter
 const formatCurrency = (amount) => {
