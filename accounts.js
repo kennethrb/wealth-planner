@@ -40,23 +40,30 @@ async function handleAddAccount(event) {
         console.log("RESULT:", result);
 
         if (!result.success) {
-            alert(
-                "Backend Error: "
-                + JSON.stringify(result)
-            );
+        showStatus(
+            "Backend Error",
+            "error"
+        );
+        
+        console.error(result);
             return;
         }
 
-        alert("✅ Account Added");
+        showStatus(
+            "Account added successfully",
+            "success"
+        );
 
     } catch (error) {
 
         console.error(error);
 
-        alert(
-            "JS ERROR: "
-            + error.message
+        showStatus(
+            error.message,
+            "error"
         );
+        
+        console.error(error);
     }
 }
 
@@ -96,7 +103,10 @@ async function deleteAccount(accountId) {
     const result = await response.json();
 
     if (!result.success) {
-        alert("Delete failed");
+    showStatus(
+        "Delete failed",
+        "error"
+    );
         return;
     }
 
@@ -131,7 +141,10 @@ async function editAccount(accountId) {
     const result = await response.json();
 
     if (!result.success) {
-        alert("Update failed");
+    showStatus(
+        "Update failed",
+        "error"
+    );
         return;
     }
 
