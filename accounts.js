@@ -82,13 +82,15 @@ function loadAccounts() {
                 <div>${account.netWorthType}</div>
                 <div>${formatCurrency(account.currentBalance)}</div>
 
-                <button onclick="editAccount('${account.accountId}')">
-                    Edit
-                </button>
-
-                <button onclick="deleteAccount('${account.accountId}')">
-                    Delete
-                </button>
+                <div style="margin-top:10px;">
+                    <button style="background:red;color:white;">
+                        TEST DELETE
+                    </button>
+                
+                    <button style="background:blue;color:white;">
+                        TEST EDIT
+                    </button>
+                </div>
             </div>
         `).join("");
 }
