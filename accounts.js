@@ -69,6 +69,11 @@ async function handleAddAccount(event) {
 
 
 function loadAccounts() {
+console.log("LOAD ACCOUNTS RUNNING");
+
+console.log("ACCOUNTS:", appData.accounts);
+
+console.log("ACCOUNT COUNT:", appData.accounts.length);    
 
     const container =
         document.getElementById("accounts");
