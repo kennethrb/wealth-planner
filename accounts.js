@@ -69,35 +69,33 @@ async function handleAddAccount(event) {
 
 
 function loadAccounts() {
-console.log("LOAD ACCOUNTS RUNNING");
 
-console.log("ACCOUNTS:", appData.accounts);
+    console.log("LOAD ACCOUNTS RUNNING");
 
-console.log("ACCOUNT COUNT:", appData.accounts.length);    
+    try {
 
-    const container =
-        document.getElementById("accounts");
+        const container =
+            document.getElementById("accounts");
 
-    if (!container) return;
+        console.log("CONTAINER:", container);
+        console.log("DATA:", appData.accounts);
 
-    container.innerHTML =
-        appData.accounts.map(account => `
-            <div class="account-card">
-                <strong>${account.accountName}</strong>
-                <div>${account.netWorthType}</div>
-                <div>${formatCurrency(account.currentBalance)}</div>
+        if (!container) {
+            console.error("Accounts container not found");
+            return;
+        }
 
-                <div style="margin-top:10px;">
-                    <button style="background:red;color:white;">
-                        TEST DELETE
-                    </button>
-                
-                    <button style="background:blue;color:white;">
-                        TEST EDIT
-                    </button>
-                </div>
-            </div>
-        `).join("");
+        container.innerHTML =
+            "<h3 style='color:lime'>TEST RENDER WORKING</h3>";
+
+    } catch (err) {
+
+        console.error(
+            "LOAD ACCOUNTS ERROR:",
+            err
+        );
+
+    }
 }
 
 async function deleteAccount(accountId) {
