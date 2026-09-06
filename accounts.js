@@ -1,56 +1,34 @@
 // ==================== FILE: accounts.js ====================
-/**
- * Handles the submit event for the Add Account HTML form.
- * @param {Event} event - The DOM submit event.
- */
-function handleAddAccountForm(event) {
-    event.preventDefault();
-
-    // 1. Extract values from HTML form inputs
-    const name = document.getElementById("accountName")?.value.trim();
-    const netWorthType = document.getElementById("netWorthType")?.value;
-    const assetClass = document.getElementById("accountType")?.value;
-    const currentBalance = document.getElementById("openingBalance")?.value;
-
-    if (!name) return;
-
-    // 2. Pass values as a structured object to addAccount
-    addAccount({
-        name,
-        netWorthType,
-        assetClass,
-        currentBalance
-    });
-
-    // 3. Reset form inputs
-    const form = document.getElementById("addAccountForm");
-    if (form) form.reset();
-}
 
 /**
- * Renders the list of accounts on the dashboard/accounts view.
+ * READ: Renders the list of accounts on the UI.
  */
 function loadAccounts() {
     const container = document.getElementById("accounts");
     if (!container) return;
+    
     if (!appData.accounts || appData.accounts.length === 0) {
-        container.innerHTML = `<div class="goal-item"><span class="label">No accounts found</span></div>`;
+        container.innerHTML = `<div class="goal-item"><span class="label">No active accounts found</span></div>`;
         return;
     }
+
     container.innerHTML = `
     <div class="goals-container">
       ${appData.accounts.map(account => {
+        const id = account.accountId || account.id;
         const name = account.name || account.accountName || 'Unnamed Account';
         const balance = Number(account.currentBalance || account.balance || 0);
         const type = account.netWorthType || 'Asset';
+        const assetClass = account.assetClass || account.type || 'Cash';
 
         return `
           <div class="goal-item">
             <div class="item-header">
-              <span class="item-title">💳 ${name}</span>
+              <span class="item-title">💳 ${name} (${assetClass})</span>
               <div class="item-actions">
                 <span class="item-value">${formatCurrency(balance)}</span>
-                <button type="button" class="btn-delete" onclick="deleteAccount(${account.id})" title="Delete Account">🗑️</button>
+                <button type="button" class="btn-secondary" onclick="editAccount('${id}')" title="Edit Account">✏️</button>
+                <button type="button" class="btn-delete" onclick="deleteAccount('${id}')" title="Delete Account">🗑️</button>
               </div>
             </div>
             <div class="goal-details">
@@ -65,16 +43,142 @@ function loadAccounts() {
 }
 
 /**
- * Calculates total balance by asset class across all accounts.
+ * CREATE: Handles submitting the HTML form to create a new account.
+ */
+function handleAddAccountForm(event) {
+    event.preventDefault();
+
+    const name = document.getElementById("accountName")?.value.trim();
+    const netWorthType = document.getElementById("netWorthType")?.value;
+    const assetClass = document.getElementById("accountType")?.value;
+    const currentBalance = document.getElementById("openingBalance")?.value;
+
+    if (!name) return;
+
+    addAccount({
+        name,
+        netWorthType,
+        assetClass,
+        currentBalance
+    });
+
+    const form = document.getElementById("addAccountForm");
+    if (form) form.reset();
+}
+
+/**
+ * CREATE: Sends API request to backend Google Sheet to save the account.
+ */
+function addAccount(newAccount) {
+    showStatus("Saving account to Google Sheets...", "info");
+
+    const params = new URLSearchParams({
+        action: "addAccount",
+        name: newAccount.name,
+        netWorthType: newAccount.netWorthType,
+        assetClass: newAccount.assetClass,
+        type: newAccount.assetClass,
+        currentBalance: newAccount.currentBalance
+    });
+
+    fetch(`${GOOGLE_SCRIPT_URL}?${params.toString()}`)
+        .then(res => res.json())
+        .then(res => {
+            if (res.success) {
+                showStatus("Account saved successfully!", "success");
+                refreshAllData(); // Reloads appData from Sheets
+            } else {
+                showStatus("Error saving account: " + res.error, "error");
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            showStatus("Failed to connect to backend", "error");
+        });
+}
+
+/**
+ * UPDATE: Prompt user for edits and push updates to backend Google Sheet.
+ */
+function editAccount(accountId) {
+    const account = appData.accounts.find(a => (a.accountId || a.id) === accountId);
+    if (!account) return;
+
+    const newName = prompt("Edit Account Name:", account.accountName || account.name);
+    if (newName === null) return; // Canceled
+
+    const newBalanceStr = prompt("Edit Current Balance:", account.currentBalance || account.balance || 0);
+    if (newBalanceStr === null) return; // Canceled
+
+    const newBalance = parseFloat(newBalanceStr);
+    if (isNaN(newBalance)) {
+        alert("Invalid balance entered");
+        return;
+    }
+
+    showStatus("Updating account...", "info");
+
+    const params = new URLSearchParams({
+        action: "updateAccount",
+        accountId: accountId,
+        name: newName,
+        currentBalance: newBalance
+    });
+
+    fetch(`${GOOGLE_SCRIPT_URL}?${params.toString()}`)
+        .then(res => res.json())
+        .then(res => {
+            if (res.success) {
+                showStatus("Account updated successfully!", "success");
+                refreshAllData();
+            } else {
+                showStatus("Error updating account: " + res.error, "error");
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            showStatus("Failed to update account", "error");
+        });
+}
+
+/**
+ * DELETE: Soft deletes the account from backend Google Sheet.
+ */
+function deleteAccount(accountId) {
+    if (!confirm("Are you sure you want to delete this account?")) return;
+
+    showStatus("Deleting account...", "info");
+
+    const params = new URLSearchParams({
+        action: "deleteAccount",
+        accountId: accountId
+    });
+
+    fetch(`${GOOGLE_SCRIPT_URL}?${params.toString()}`)
+        .then(res => res.json())
+        .then(res => {
+            if (res.success) {
+                showStatus("Account deleted successfully!", "success");
+                refreshAllData();
+            } else {
+                showStatus("Error deleting account: " + res.error, "error");
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            showStatus("Failed to delete account", "error");
+        });
+}
+
+/**
+ * Calculates total balance by asset class across all active accounts.
  */
 function getAssetClassTotals() {
     const totals = {};
     if (!appData.accounts) return totals;
     appData.accounts.forEach(account => {
-        if (account.netWorthType !== "Asset") {
-            return;
-        }
-        const assetClass = account.assetClass || "Unclassified";
+        if (account.netWorthType !== "Asset") return;
+        const assetClass = account.assetClass || account.type || "Unclassified";
         const balance = Number(account.currentBalance || account.balance || 0);
         totals[assetClass] = (totals[assetClass] || 0) + balance;
     });
@@ -95,44 +199,4 @@ function getAssetAllocation() {
         };
     });
     return allocation;
-}
-
-/**
- * Adds a new account to appData and refreshes the list view.
- * @param {Object} newAccount - The account details
- */
-function addAccount(newAccount) {
-    if (!appData.accounts) {
-        appData.accounts = [];
-    }
-
-    const accountToAdd = {
-        id: Date.now(),
-        name: newAccount.name || 'New Account',
-        netWorthType: newAccount.netWorthType || 'Asset',
-        currentBalance: Number(newAccount.currentBalance) || 0,
-        assetClass: newAccount.assetClass || 'Cash'
-    };
-
-    appData.accounts.push(accountToAdd);
-
-    if (typeof loadAccounts === 'function') {
-        loadAccounts();
-    }
-}
-
-/**
- * Removes an account by ID from appData and refreshes the accounts UI.
- * @param {number|string} accountId - The unique identifier of the account to remove.
- */
-function deleteAccount(accountId) {
-    if (!appData.accounts) return;
-
-    appData.accounts = appData.accounts.filter(
-        account => account.id !== accountId
-    );
-
-    if (typeof loadAccounts === 'function') {
-        loadAccounts();
-    }
 }
