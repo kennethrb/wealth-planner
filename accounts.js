@@ -95,6 +95,14 @@ function loadAccounts() {
 
 async function deleteAccount(accountId) {
 
+    const confirmed =
+        await showConfirmDialog(
+            "Delete Account",
+            "Are you sure you want to delete this account?"
+        );
+
+    if (!confirmed) return;
+
     const response = await fetch(
         `${BASE_URL}?action=deleteAccount`
         + `&accountId=${accountId}`
@@ -103,16 +111,22 @@ async function deleteAccount(accountId) {
     const result = await response.json();
 
     if (!result.success) {
-    showStatus(
-        "Delete failed",
-        "error"
-    );
+
+        showStatus(
+            "Delete failed",
+            "error"
+        );
+
         return;
     }
 
     await loadData();
-
     loadAccounts();
+
+    showStatus(
+        "Account deleted successfully",
+        "success"
+    );
 }
 
 async function editAccount(accountId) {
