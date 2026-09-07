@@ -27,8 +27,18 @@ function doGet(e) {
         return updateTransaction(params);
       case "deleteTransaction":
         return deleteTransaction(params);
-      case "getAccounts":
-        return createJsonResponse(getAccounts());
+      // Add these cases to doGet(e) switch statement:
+      case "addAccount":
+        return addAccount(params);
+
+      case "updateAccount":
+        return updateAccount(params);
+
+      case "archiveAccount":
+        return archiveAccount(params);
+
+      case "deleteAccount":
+        return deleteAccount(params);
       case "getCategories":
         return createJsonResponse(getCategories());
       case "getBudgetPlan":
@@ -166,7 +176,8 @@ function getCategories() {
     budgetType: row["Budget Type"] || "Expense",
     group: row["Group"] || "Other",
     categoryName: row["Category Name"] || "",
-    preferredFundingSource: row["Preferred Funding Source"] || ""
+    preferredFundingSource: row["Preferred Funding Source"] || "",
+    preferredFundingSourceId: row["Preferred Funding Source ID"] || ""
   }));
 }
 
@@ -178,6 +189,10 @@ function getGoals() {
     monthlyContribution: Number(row["Monthly Contribution"] || 0)
   }));
 }
+
+/* ===================================================
+    ACCOUNT CRUD OPERATIONS
+=================================================== */
 
 function getAccounts() {
   return getSheetObjects(SHEET_ACCOUNTS)
@@ -192,6 +207,7 @@ function getAccounts() {
         accountName: row["Account Name"] || "",
         name: row["Account Name"] || "",
         type: row["Type"] || "",
+        assetClass: row["Asset Class"] || "",
         openingBalance: Number(row["Opening Balance"] || 0),
         currentBalance: currentBalance,
         balance: currentBalance,
@@ -202,7 +218,153 @@ function getAccounts() {
         reconciled: currentBalance === reconciledBalance
       };
     })
-    .filter(acc => acc.accountName !== "" && acc.active === true);
+  .filter(acc =>
+      acc.accountName !== "" &&
+      acc.active === true
+  );
+}
+
+/** CREATE: Add new account */
+function addAccount(data) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_ACCOUNTS);
+  if (!sheet) return createJsonResponse({ success: false, error: "Accounts sheet not found" });
+
+  const cols = getColumnIndexMap(SHEET_ACCOUNTS);
+  const accountId = "ACC" + Date.now();
+  const row = new Array(sheet.getLastColumn()).fill("");
+
+  if (cols["Account ID"]) row[cols["Account ID"] - 1] = accountId;
+  if (cols["Account Name"]) row[cols["Account Name"] - 1] = data.name || data.accountName || "";
+  if (cols["Net Worth Type"]) row[cols["Net Worth Type"] - 1] = data.netWorthType || "Asset";
+  if (cols["Type"]) row[cols["Type"] - 1] = data.type || data.assetClass || "Cash";
+  if (cols["Asset Class"]) row[cols["Asset Class"] - 1] = data.assetClass || "Cash";
+  if (cols["Opening Balance"]) row[cols["Opening Balance"] - 1] = Number(data.currentBalance || data.openingBalance || 0);
+  if (cols["Current Balance"]) row[cols["Current Balance"] - 1] = Number(data.currentBalance || data.openingBalance || 0);
+  if (cols["Active"]) row[cols["Active"] - 1] = "Yes";
+
+  sheet.appendRow(row);
+  return createJsonResponse({ success: true, accountId: accountId });
+}
+
+/** UPDATE: Edit account details or balance */
+function updateAccount(data) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_ACCOUNTS);
+  if (!sheet) return createJsonResponse({ success: false, error: "Accounts sheet not found" });
+
+  const accountId = String(data.accountId || data.id).trim();
+  if (!accountId) return createJsonResponse({ success: false, error: "Missing Account ID" });
+
+  const cols = getColumnIndexMap(SHEET_ACCOUNTS);
+  const idColIndex = cols["Account ID"] - 1;
+  const values = sheet.getDataRange().getValues();
+
+  let rowIndex = -1;
+  for (let i = 1; i < values.length; i++) {
+    if (String(values[i][idColIndex]).trim() === accountId) {
+      rowIndex = i + 1;
+      break;
+    }
+  }
+
+  if (rowIndex === -1) return createJsonResponse({ success: false, error: "Account not found" });
+
+  if (cols["Account Name"] && data.name) sheet.getRange(rowIndex, cols["Account Name"]).setValue(data.name);
+  if (cols["Net Worth Type"] && data.netWorthType) sheet.getRange(rowIndex, cols["Net Worth Type"]).setValue(data.netWorthType);
+  if (cols["Type"] && data.type) sheet.getRange(rowIndex, cols["Type"]).setValue(data.type);
+  if (cols["Asset Class"] && data.assetClass) sheet.getRange(rowIndex, cols["Asset Class"]).setValue(data.assetClass);
+  if (cols["Current Balance"] && data.currentBalance !== undefined) sheet.getRange(rowIndex, cols["Current Balance"]).setValue(Number(data.currentBalance));
+
+  return createJsonResponse({ success: true });
+}
+
+/** DELETE: Soft delete (set Active = No) or delete row */
+function deleteAccount(data) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_ACCOUNTS);
+  if (!sheet) return createJsonResponse({ success: false, error: "Accounts sheet not found" });
+
+  const accountId = String(data.accountId || data.id).trim();
+  if (!accountId) return createJsonResponse({ success: false, error: "Missing Account ID" });
+
+  const cols = getColumnIndexMap(SHEET_ACCOUNTS);
+  const idColIndex = cols["Account ID"] - 1;
+  const values = sheet.getDataRange().getValues();
+
+  for (let i = 1; i < values.length; i++) {
+    if (String(values[i][idColIndex]).trim() === accountId) {
+      if (cols["Active"]) {
+        sheet.getRange(i + 1, cols["Active"]).setValue("No"); // Soft delete
+      } else {
+        sheet.deleteRow(i + 1); // Hard delete fallback
+      }
+      return createJsonResponse({ success: true });
+    }
+  }
+
+  return createJsonResponse({ success: false, error: "Account ID not found" });
+}
+
+function archiveAccount(params) {
+  if (!params.accountId) return { success: false, message: "Missing Account ID" };
+
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_ACCOUNTS);
+  const cols = getColumnIndexMap(SHEET_ACCOUNTS);
+  const data = sheet.getDataRange().getValues();
+  const idCol = cols["Account ID"] - 1;
+
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][idCol]).trim() === String(params.accountId).trim()) {
+      sheet.getRange(i + 1, cols["Active"]).setValue(false);
+      return createJsonResponse({
+        success: true, message: "Account archived successfully"
+        });
+    }
+  }
+
+  return { success: false, message: "Account ID not found" };
+}
+
+function adjustAccountBalance(accountId, amount) {
+
+  const sheet =
+    SpreadsheetApp
+      .getActiveSpreadsheet()
+      .getSheetByName(SHEET_ACCOUNTS);
+
+  const cols =
+    getColumnIndexMap(SHEET_ACCOUNTS);
+
+  const data =
+    sheet.getDataRange().getValues();
+
+  const idCol =
+    cols["Account ID"] - 1;
+
+  const balanceCol =
+    cols["Current Balance"];
+
+  for (let i = 1; i < data.length; i++) {
+
+    if (
+      String(data[i][idCol]).trim() ===
+      String(accountId).trim()
+    ) {
+
+      const currentBalance =
+        Number(
+          data[i][balanceCol - 1] || 0
+        );
+
+      sheet
+        .getRange(i + 1, balanceCol)
+        .setValue(
+          currentBalance + amount
+        );
+
+      return true;
+    }
+  }
+
+  return false;
 }
 
 function getBudgetPlan() {
@@ -286,6 +448,12 @@ function addTransaction(data) {
       newRow[cols["Transfer To Account ID"] - 1] = txTransferToId;
 
   sheet.appendRow(newRow);
+  applyTransactionImpact({
+  budgetType: txBudgetType,
+  amount: Number(txAmount),
+  accountId: txAccountId,
+  transferToAccountId: txTransferToId
+});
   return createJsonResponse({ success: true, id: id });
 }
 
@@ -390,47 +558,189 @@ function deleteTransaction(data) {
   return createJsonResponse({ success: false, error: "Transaction ID not found: " + searchId });
 }
 
+function applyTransactionImpact(tx) {
+
+  const amount =
+    Number(tx.amount || 0);
+
+  const accountId =
+    tx.accountId;
+
+  const transferToAccountId =
+    tx.transferToAccountId;
+
+  const type =
+    tx.budgetType;
+
+  if (!accountId) return;
+
+  switch (type) {
+
+    case "Income":
+
+      adjustAccountBalance(
+        accountId,
+        amount
+      );
+
+      break;
+
+    case "Expense":
+
+      adjustAccountBalance(
+        accountId,
+        -amount
+      );
+
+      break;
+
+    case "Savings":
+
+      adjustAccountBalance(
+        accountId,
+        -amount
+      );
+
+      break;
+
+    case "Debt":
+
+        adjustAccountBalance(
+            accountId,
+            -amount
+        );
+
+        if (transferToAccountId) {
+
+            adjustAccountBalance(
+                transferToAccountId,
+                -amount
+            );
+
+        }
+
+        break;
+
+    case "Transfer":
+
+      if (!transferToAccountId) return;
+
+      adjustAccountBalance(
+        accountId,
+        -amount
+      );
+
+      adjustAccountBalance(
+        transferToAccountId,
+        amount
+      );
+
+      break;
+
+  }
+
+}
+
 function copyJanuaryToWholeYear() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_BUDGET);
-  if (!sheet) return createJsonResponse({ success: false });
 
-  const cols = getColumnIndexMap(SHEET_BUDGET);
-  const range = sheet.getDataRange();
-  const data = range.getValues();
-  if (data.length <= 1) return createJsonResponse({ success: true });
+  const sheet =
+      SpreadsheetApp.getActiveSpreadsheet()
+      .getSheetByName(SHEET_BUDGET);
 
-  const yearCol = cols["Year"] - 1;
-  const monthCol = cols["Month"] - 1;
-  const categoryCol = cols["Category"] - 1;
-  const amountCol = cols["Planned Amount"] - 1;
+  if (!sheet)
+      return createJsonResponse({ success: false });
 
-  const januaryValues = {};
+  const cols =
+      getColumnIndexMap(SHEET_BUDGET);
+
+  const data =
+      sheet.getDataRange().getValues();
+
+  const yearCol =
+      cols["Year"] - 1;
+
+  const monthCol =
+      cols["Month"] - 1;
+
+  const categoryCol =
+      cols["Category"] - 1;
+
+  const amountCol =
+      cols["Planned Amount"] - 1;
+
+  const months = [
+      "Jan","Feb","Mar","Apr",
+      "May","Jun","Jul","Aug",
+      "Sep","Oct","Nov","Dec"
+  ];
+
+  const newRows = [];
+
   for (let i = 1; i < data.length; i++) {
-    const year = data[i][yearCol];
-    const month = data[i][monthCol];
-    const category = data[i][categoryCol];
-    const amount = data[i][amountCol];
 
-    if (month === "Jan") {
-      januaryValues[`${year}|${category}`] = amount;
-    }
+      const year =
+          data[i][yearCol];
+
+      const month =
+          data[i][monthCol];
+
+      const category =
+          data[i][categoryCol];
+
+      const amount =
+          data[i][amountCol];
+
+      if (month !== "Jan")
+          continue;
+
+      months.forEach(targetMonth => {
+
+          if (targetMonth === "Jan")
+              return;
+
+          const existingRow =
+              data.find(row =>
+                  row[yearCol] === year &&
+                  row[monthCol] === targetMonth &&
+                  row[categoryCol] === category
+              );
+
+          if (existingRow) {
+
+              existingRow[amountCol] =
+                  amount;
+
+          } else {
+
+              const row =
+                  new Array(sheet.getLastColumn())
+                  .fill("");
+
+              row[yearCol] = year;
+              row[monthCol] = targetMonth;
+              row[categoryCol] = category;
+              row[amountCol] = amount;
+
+              newRows.push(row);
+          }
+      });
   }
 
-  for (let i = 1; i < data.length; i++) {
-    const year = data[i][yearCol];
-    const month = data[i][monthCol];
-    const category = data[i][categoryCol];
+  if (newRows.length > 0) {
 
-    if (month === "Jan") continue;
-
-    const key = `${year}|${category}`;
-    if (januaryValues[key] !== undefined) {
-      data[i][amountCol] = januaryValues[key];
-    }
+      sheet.getRange(
+          sheet.getLastRow() + 1,
+          1,
+          newRows.length,
+          newRows[0].length
+      ).setValues(newRows);
   }
 
-  range.setValues(data);
-  return createJsonResponse({ success: true });
+  sheet.getDataRange().setValues(data);
+
+  return createJsonResponse({
+      success: true
+  });
 }
 
 function copyCurrentYearToNextYear(request) {
@@ -536,7 +846,21 @@ function addCategory(request) {
   row[cols["Budget Type"] - 1] = request.budgetType;
   row[cols["Group"] - 1] = request.group;
   row[cols["Category Name"] - 1] = request.categoryName;
-  row[cols["Preferred Funding Source"] - 1] = request.preferredFundingSource;
+  const fundingSourceId =
+      request.preferredFundingSource || "";
+
+  const fundingSourceName =
+      getAccountNameById(fundingSourceId);
+
+  if (cols["Preferred Funding Source"]) {
+      row[cols["Preferred Funding Source"] - 1] =
+          fundingSourceName;
+  }
+
+  if (cols["Preferred Funding Source ID"]) {
+      row[cols["Preferred Funding Source ID"] - 1] =
+          fundingSourceId;
+  }
 
   sheet.appendRow(row);
   return createJsonResponse({ success: true });
@@ -842,50 +1166,6 @@ function getSheetObjects(sheetName) {
   });
 }
 
-function showInputDialog(title, message, value = "") {
-  return new Promise(resolve => {
-    const modal = document.getElementById("inputModal");
-    const titleEl = document.getElementById("inputTitle");
-    const messageEl = document.getElementById("inputMessage");
-    const inputEl = document.getElementById("inputValue");
-    const saveBtn = document.getElementById("inputSave");
-    const cancelBtn = document.getElementById("inputCancel");
-
-    titleEl.textContent = title;
-    messageEl.textContent = message;
-    inputEl.value = value;
-
-    modal.classList.add("show");
-
-    const cleanup = () => {
-      modal.classList.remove("show");
-      inputEl.removeEventListener("keydown", handleKeyDown);
-    };
-
-    const handleSave = () => {
-      cleanup();
-      resolve(inputEl.value);
-    };
-
-    const handleCancel = () => {
-      cleanup();
-      resolve(null);
-    };
-
-    const handleKeyDown = (e) => {
-      if (e.key === "Enter") handleSave();
-      if (e.key === "Escape") handleCancel();
-    };
-
-    saveBtn.onclick = handleSave;
-    cancelBtn.onclick = handleCancel;
-    inputEl.addEventListener("keydown", handleKeyDown);
-
-    inputEl.focus();
-    inputEl.select();
-  });
-}
-
 function getAccountById(accountId) {
   const accounts = getAccounts();
 
@@ -901,4 +1181,14 @@ function getAccountNameById(accountId) {
   return account
     ? account.accountName
     : "";
+}
+
+
+// Global entry points exposed to Apps Script UI & Execution Menu
+function resetAndSeedGoldenDataset() {
+  GoldenDatasetSeederModule.resetAndSeed();
+}
+
+function seedGoldenData() {
+  GoldenDatasetSeederModule.seed();
 }
