@@ -16,16 +16,21 @@ async function handleAddAccount(event) {
     const name = document.getElementById("accountName").value.trim();
     const netWorthType = document.getElementById("netWorthType").value;
     const assetClass = document.getElementById("accountType").value;
-    const currentBalance = document.getElementById("openingBalance").value;
+    const openingBalance =
+        document.getElementById("openingBalance").value;
+    
+    const currentBalance =
+        openingBalance;
 
     try {
 
-        const url =
-            `${BASE_URL}?action=addAccount`
-            + `&name=${encodeURIComponent(name)}`
-            + `&netWorthType=${encodeURIComponent(netWorthType)}`
-            + `&assetClass=${encodeURIComponent(assetClass)}`
-            + `&currentBalance=${encodeURIComponent(currentBalance)}`;
+    const url =
+        `${BASE_URL}?action=addAccount`
+        + `&name=${encodeURIComponent(name)}`
+        + `&netWorthType=${encodeURIComponent(netWorthType)}`
+        + `&assetClass=${encodeURIComponent(assetClass)}`
+        + `&openingBalance=${encodeURIComponent(openingBalance)}`
+        + `&currentBalance=${encodeURIComponent(currentBalance)}`;
 
         console.log("REQUEST:", url);
 
