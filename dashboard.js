@@ -79,6 +79,15 @@ function loadAssetAllocationAdvisor() {
     `;
 }
 
+console.log("NETWORTH ACCOUNTS");
+console.table(
+    appData.accounts.map(a => ({
+        name: a.accountName,
+        type: a.netWorthType,
+        balance: a.currentBalance
+    }))
+);
+
 async function loadNetWorth() {
     let assets = 0,
         liabilities = 0;
@@ -89,6 +98,15 @@ async function loadNetWorth() {
     });
     const netWorth = assets - liabilities;
     const isNegative = netWorth < 0;
+
+        
+    console.log({
+        assets,
+        liabilities,
+        netWorth
+    });
+
+    
     document.getElementById("networth").innerHTML = `
     <div class="networth-banner ${isNegative ? 'negative' : 'positive'}">
     <div class="card-header">
