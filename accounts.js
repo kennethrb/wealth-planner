@@ -31,8 +31,6 @@ function loadAccountTypes() {
             "accountType"
         );
 
-    if (!dropdown) return;
-
     dropdown.innerHTML = "";
 
     ACCOUNT_TYPES[netWorthType]
@@ -46,6 +44,7 @@ function loadAccountTypes() {
 
         });
 
+    dropdown.selectedIndex = 0;
 }
 
 document.addEventListener(
