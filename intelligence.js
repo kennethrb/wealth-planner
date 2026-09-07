@@ -1077,9 +1077,9 @@ async function loadPurchaseEvaluator(testAmount = null) {
               monthlyObligations
             : null;
     const monthsCoveredDisplay =
-    monthsCovered === null
-        ? "N/A"
-        : monthsCovered.toFixed(1);
+        Number.isFinite(monthsCovered)
+            ? monthsCovered.toFixed(1)
+            : "N/A";
 
 
 
@@ -1099,7 +1099,7 @@ async function loadPurchaseEvaluator(testAmount = null) {
         bufferTarget,
         cashAfterPurchase,
         bufferRemaining,
-        monthsCovered: Number(monthsCovered.toFixed(2)),
+        monthsCovered:Number((monthsCovered ?? 0).toFixed(2)),
         recommendation
     };
 
