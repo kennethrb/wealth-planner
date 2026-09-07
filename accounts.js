@@ -70,32 +70,81 @@ async function handleAddAccount(event) {
 
 function loadAccounts() {
 
-    console.log("LOAD ACCOUNTS RUNNING");
+    const container =
+        document.getElementById("accounts");
 
-    try {
+    if (!container) return;
 
-        const container =
-            document.getElementById("accounts");
+    if (
+        !appData.accounts ||
+        appData.accounts.length === 0
+    ) {
 
-        console.log("CONTAINER:", container);
-        console.log("DATA:", appData.accounts);
+        container.innerHTML = `
+            <div class="goal-item">
+                No accounts found
+            </div>
+        `;
 
-        if (!container) {
-            console.error("Accounts container not found");
-            return;
-        }
-
-        container.innerHTML =
-            "<h3 style='color:lime'>TEST RENDER WORKING</h3>";
-
-    } catch (err) {
-
-        console.error(
-            "LOAD ACCOUNTS ERROR:",
-            err
-        );
-
+        return;
     }
+
+    container.innerHTML =
+        appData.accounts.map(account => `
+
+            <div class="goal-item">
+
+                <div class="item-header">
+                    <strong>
+                        ${account.accountName}
+                    </strong>
+
+                    <span>
+                        ${formatCurrency(
+                            account.currentBalance
+                        )}
+                    </span>
+                </div>
+
+                <div class="goal-details">
+
+                    <span>
+                        ${account.netWorthType}
+                    </span>
+
+                    <div
+                        style="
+                            display:flex;
+                            gap:8px;
+                        "
+                    >
+
+                        <button
+                            class="btn-secondary"
+                            onclick="editAccount(
+                                '${account.accountId}'
+                            )"
+                        >
+                            ✏️ Edit
+                        </button>
+
+                        <button
+                            class="btn-danger"
+                            onclick="deleteAccount(
+                                '${account.accountId}'
+                            )"
+                        >
+                            🗑 Delete
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        `).join("");
+
 }
 
 async function deleteAccount(accountId) {
