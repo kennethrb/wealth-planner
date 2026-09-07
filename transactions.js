@@ -87,7 +87,6 @@ async function addTransaction() {
     }
     
     await fetch(url);
-    await loadData();
     
     // Reset state
     editingTransactionId = null;
@@ -100,8 +99,9 @@ async function addTransaction() {
         button.innerHTML = "➕ Add Transaction";
     }
     
-    loadTransactions();
-    await refreshFinancialViews();
+    await loadData();
+    
+    await refreshUI();
     showStatus("✅ Transaction recorded", "success");
 }
 
@@ -278,8 +278,8 @@ async function deleteTransactionRecord(transactionId) {
     await fetch(`${BASE_URL}?action=deleteTransaction&id=${transactionId}`);
     
     await loadData();
-    loadTransactions();
-    await refreshFinancialViews();
+    
+    await refreshUI();
     showStatus("🗑 Transaction deleted", "success");
 }
 
