@@ -194,8 +194,13 @@ async function deleteAccount(accountId) {
         + `&accountId=${accountId}`
     );
 
+    const text =
+        await response.text();
+    
+    console.log("DELETE RESPONSE:", text);
+    
     const result =
-        await response.json();
+        JSON.parse(text);
 
     if (!result.success) {
 
@@ -208,6 +213,10 @@ async function deleteAccount(accountId) {
     }
 
     await loadData();
+    console.log(
+        "ACCOUNTS AFTER DELETE:",
+        appData.accounts
+    );
     await refreshUI();
 
     showStatus(
