@@ -399,11 +399,23 @@
                   </select>
       
                   <select id="accountType">
-                      <option value="Cash">Cash</option>
-                      <option value="Checking">Checking</option>
-                      <option value="Savings">Savings</option>
-                      <option value="Investment">Investment</option>
-                      <option value="Credit Card">Credit Card</option>
+                      <optgroup label="Assets">
+                          <option value="Cash">Cash</option>
+                          <option value="Checking">Checking</option>
+                          <option value="Savings">Savings</option>
+                          <option value="Investment">Investment</option>
+                          <option value="Property">Property</option>
+                          <option value="Vehicle">Vehicle</option>
+                      </optgroup>
+                  
+                      <optgroup label="Liabilities">
+                          <option value="Credit Card">Credit Card</option>
+                          <option value="Housing Loan">Housing Loan</option>
+                          <option value="Car Loan">Car Loan</option>
+                          <option value="Personal Loan">Personal Loan</option>
+                          <option value="Student Loan">Student Loan</option>
+                          <option value="Other Debt">Other Debt</option>
+                      </optgroup>
                   </select>
       
                   <input
