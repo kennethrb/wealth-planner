@@ -5,21 +5,43 @@ async function loadGoals() {
     appData.goals.forEach(goal => {
         const current = Number(goal.current || 0);
         const target = Number(goal.target || 1);
-        const monthlyContribution =
-            Number(goal.monthlyContribution);
-        
-        if (monthlyContribution <= 0) {
-            // Show N/A forecast
-        }
+
         const progress = ((current / target) * 100).toFixed(1);
         const remainingAmount = target - current;
-        const monthsRemaining = Math.ceil(remainingAmount / monthlyContribution);
-        const completionDate = new Date();
-        completionDate.setMonth(completionDate.getMonth() + monthsRemaining);
-        const forecast = completionDate.toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short"
-        });
+        const monthlyContribution =
+            Number(goal.monthlyContribution || 0);
+        
+        let forecast = "N/A";
+        let monthsRemaining = "N/A";
+        
+        if (monthlyContribution > 0) {
+        
+            const remainingAmount =
+                target - current;
+        
+            monthsRemaining =
+                Math.ceil(
+                    remainingAmount /
+                    monthlyContribution
+                );
+        
+            const completionDate =
+                new Date();
+        
+            completionDate.setMonth(
+                completionDate.getMonth() +
+                monthsRemaining
+            );
+        
+            forecast =
+                completionDate.toLocaleDateString(
+                    "en-US",
+                    {
+                        year: "numeric",
+                        month: "short"
+                    }
+                );
+        }
         html += `
       <div class="goal-item">
         <div class="item-header">
