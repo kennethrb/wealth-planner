@@ -14,18 +14,21 @@ function loadAccountTypes() {
 
     dropdown.innerHTML = "";
 
-    ACCOUNT_TYPES[netWorthType]
+    Object.values(ACCOUNT_TYPES)
+        .filter(
+            type =>
+                type.netWorthType ===
+                netWorthType
+        )
         .forEach(type => {
 
             dropdown.innerHTML += `
-                <option value="${type}">
-                    ${type}
+                <option value="${type.name}">
+                    ${type.name}
                 </option>
             `;
 
         });
-
-    dropdown.selectedIndex = 0;
 }
 
 document.addEventListener(
