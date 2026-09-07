@@ -75,15 +75,10 @@ function loadAccounts() {
 
     if (!container) return;
 
-    if (
-        !appData.accounts ||
-        appData.accounts.length === 0
-    ) {
+    if (!appData.accounts?.length) {
 
         container.innerHTML = `
-            <div class="goal-item">
-                No accounts found
-            </div>
+            <p>No accounts found</p>
         `;
 
         return;
@@ -92,48 +87,45 @@ function loadAccounts() {
     container.innerHTML =
         appData.accounts.map(account => `
 
-            <div class="goal-item">
+            <div class="card" style="margin-bottom:12px;">
 
-                <div class="item-header">
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    margin-bottom:10px;
+                ">
                     <strong>
                         ${account.accountName}
                     </strong>
 
-                    <span>
-                        ${formatCurrency(
-                            account.currentBalance
-                        )}
-                    </span>
+                    <strong>
+                        ${formatCurrency(account.currentBalance)}
+                    </strong>
                 </div>
 
-                <div class="goal-details">
-
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                ">
                     <span>
                         ${account.netWorthType}
                     </span>
 
-                    <div
-                        style="
-                            display:flex;
-                            gap:8px;
-                        "
-                    >
+                    <div style="
+                        display:flex;
+                        gap:8px;
+                    ">
 
                         <button
-                            class="btn-secondary"
-                            onclick="editAccount(
-                                '${account.accountId}'
-                            )"
-                        >
+                            onclick="editAccount('${account.accountId}')">
                             ✏️ Edit
                         </button>
 
                         <button
                             class="btn-danger"
-                            onclick="deleteAccount(
-                                '${account.accountId}'
-                            )"
-                        >
+                            onclick="deleteAccount('${account.accountId}')">
                             🗑 Delete
                         </button>
 
@@ -144,7 +136,6 @@ function loadAccounts() {
             </div>
 
         `).join("");
-
 }
 
 async function deleteAccount(accountId) {
