@@ -9,6 +9,7 @@
  */
 function isLiquidAccount(account) {
     const type = String(
+        account.assetClass ||
         account.type ||
         account["Type"] ||
         ""
