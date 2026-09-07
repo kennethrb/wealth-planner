@@ -377,39 +377,68 @@ function loadReconciliation() {
         let expectedBalance =
             openingBalance;
 
-        appData.transactions.forEach(tx => {
-
-            const txAccountId =
-                tx.accountId ||
-                tx["Account ID"];
-
-            if (txAccountId !== accountId) return;
-
-            const amount =
-                Number(
-                    tx.Amount ||
-                    tx.amount ||
-                    0
-                );
-
-            const type =
-                tx["Budget Type"] ||
-                tx.budgetType ||
-                "";
-
-            if (type === "Income") {
-                expectedBalance += amount;
+    appData.transactions.forEach(tx => {
+    
+        const sourceAccountId =
+            tx.accountId ||
+            tx["Account ID"];
+    
+        const destinationAccountId =
+            tx.transferToAccountId ||
+            tx["Transfer To Account ID"];
+    
+        const amount =
+            Number(
+                tx.Amount ||
+                tx.amount ||
+                0
+            );
+    
+        const type =
+            tx["Budget Type"] ||
+            tx.budgetType ||
+            "";
+    
+        //
+        // Source Account
+        //
+        if (sourceAccountId === accountId) {
+    
+            switch (type) {
+    
+                case "Income":
+                    expectedBalance += amount;
+                    break;
+    
+                case "Expense":
+                case "Savings":
+                case "Debt":
+                case "Transfer":
+                    expectedBalance -= amount;
+                    break;
             }
-
-            if (
-                type === "Expense" ||
-                type === "Savings" ||
-                type === "Debt"
-            ) {
-                expectedBalance -= amount;
+    
+        }
+    
+        //
+        // Destination Account
+        //
+        if (destinationAccountId === accountId) {
+    
+            switch (type) {
+    
+                case "Transfer":
+                    expectedBalance += amount;
+                    break;
+    
+                case "Debt":
+                    expectedBalance -= amount;
+                    break;
             }
-
-        });
+    
+        }
+    
+    });
 
         const difference =
             currentBalance - expectedBalance;
