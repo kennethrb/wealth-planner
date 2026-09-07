@@ -178,7 +178,10 @@ async function deleteCategory() {
 // Single aggregated API call to prevent fetch bottlenecks
 async function loadData() {
     try {
-        const response = await fetch(`${BASE_URL}?action=getAllData`);
+        const response =
+          await fetch(
+            `${BASE_URL}?action=getAllData&mode=${appMode}`
+          );
         const result = await response.json();
         appData.accounts = result.accounts || [];
         appData.budget = result.budget || [];
