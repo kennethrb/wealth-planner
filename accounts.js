@@ -194,7 +194,8 @@ async function deleteAccount(accountId) {
         + `&accountId=${accountId}`
     );
 
-    const result = await response.json();
+    const result =
+        await response.json();
 
     if (!result.success) {
 
@@ -207,12 +208,13 @@ async function deleteAccount(accountId) {
     }
 
     await loadData();
-    loadAccounts();
+    await refreshUI();
 
     showStatus(
-        "Account deleted successfully",
+        "🗑 Account deleted successfully",
         "success"
     );
+
 }
 
 async function editAccount(accountId) {
@@ -225,30 +227,44 @@ async function editAccount(accountId) {
     if (!account) return;
 
     const newBalance =
-        prompt(
-            "New Balance",
+        await showInputDialog(
+            "Edit Account Balance",
+            account.accountName,
             account.currentBalance
         );
 
-    if (newBalance === null) return;
+    if (
+        newBalance === null ||
+        newBalance === ""
+    ) {
+        return;
+    }
 
     const response = await fetch(
         `${BASE_URL}?action=updateAccount`
         + `&accountId=${accountId}`
-        + `&currentBalance=${newBalance}`
+        + `&currentBalance=${encodeURIComponent(newBalance)}`
     );
 
-    const result = await response.json();
+    const result =
+        await response.json();
 
     if (!result.success) {
-    showStatus(
-        "Update failed",
-        "error"
-    );
+
+        showStatus(
+            "Update failed",
+            "error"
+        );
+
         return;
     }
 
     await loadData();
+    await refreshUI();
 
-    loadAccounts();
+    showStatus(
+        "✅ Account updated successfully",
+        "success"
+    );
+
 }
