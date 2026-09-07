@@ -27,23 +27,60 @@ function loadTransactionPositions() {
 }
 
 function toggleTransactionFields() {
-    const type = document.getElementById("txBudgetType")?.value;
-    const positionContainer = document.getElementById("txBudgetPosition")?.closest(".form-group");
-    const transferContainer = document.getElementById("txTransferContainer");
+
+    const type =
+        document.getElementById(
+            "txBudgetType"
+        )?.value;
+
+    const positionContainer =
+        document.getElementById(
+            "txBudgetPosition"
+        )?.closest(".form-group");
+
+    const transferContainer =
+        document.getElementById(
+            "txTransferContainer"
+        );
+
     if (type === "Transfer") {
+
         if (positionContainer) {
-            positionContainer.style.display = "none";
+            positionContainer.style.display =
+                "none";
         }
+
         if (transferContainer) {
-            transferContainer.style.display = "flex";
+            transferContainer.style.display =
+                "flex";
         }
+
+    } else if (type === "Debt") {
+
+        if (positionContainer) {
+            positionContainer.style.display =
+                "flex";
+        }
+
+        if (transferContainer) {
+            transferContainer.style.display =
+                "flex";
+        }
+
+        loadTransactionPositions();
+
     } else {
+
         if (positionContainer) {
-            positionContainer.style.display = "flex";
+            positionContainer.style.display =
+                "flex";
         }
+
         if (transferContainer) {
-            transferContainer.style.display = "none";
+            transferContainer.style.display =
+                "none";
         }
+
         loadTransactionPositions();
     }
 }
@@ -56,7 +93,17 @@ async function addTransaction() {
     const account = document.getElementById("txAccount")?.value;
     const budgetType = document.getElementById("txBudgetType")?.value;
     let budgetPosition = document.getElementById("txBudgetPosition")?.value || "";
-    const transferToAccount = budgetType === "Transfer" ? (document.getElementById("txToAccount")?.value || "") : "";
+    const transferToAccount =
+    (
+        budgetType === "Transfer" ||
+        budgetType === "Debt"
+    )
+        ? (
+            document.getElementById(
+                "txToAccount"
+            )?.value || ""
+          )
+        : "";
     
     if (budgetType === "Transfer") {
         budgetPosition = "";
