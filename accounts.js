@@ -1,13 +1,82 @@
 // ==================== FILE: accounts.js ====================
-document.addEventListener("DOMContentLoaded", () => {
 
-    const form = document.getElementById("addAccountForm");
+const ACCOUNT_TYPES = {
+    Asset: [
+        "Cash",
+        "Checking",
+        "Savings",
+        "Investment",
+        "Property",
+        "Vehicle"
+    ],
+    Liability: [
+        "Credit Card",
+        "Housing Loan",
+        "Car Loan",
+        "Personal Loan",
+        "Student Loan",
+        "Other Debt"
+    ]
+};
 
-    if (!form) return;
+function loadAccountTypes() {
 
-    form.addEventListener("submit", handleAddAccount);
+    const netWorthType =
+        document.getElementById(
+            "netWorthType"
+        ).value;
 
-});
+    const dropdown =
+        document.getElementById(
+            "accountType"
+        );
+
+    if (!dropdown) return;
+
+    dropdown.innerHTML = "";
+
+    ACCOUNT_TYPES[netWorthType]
+        .forEach(type => {
+
+            dropdown.innerHTML += `
+                <option value="${type}">
+                    ${type}
+                </option>
+            `;
+
+        });
+
+}
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        const form =
+            document.getElementById(
+                "addAccountForm"
+            );
+
+        if (!form) return;
+
+        form.addEventListener(
+            "submit",
+            handleAddAccount
+        );
+
+        document
+            .getElementById(
+                "netWorthType"
+            )
+            .addEventListener(
+                "change",
+                loadAccountTypes
+            );
+
+        loadAccountTypes();
+
+    }
+);
 
 async function handleAddAccount(event) {
 
