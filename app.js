@@ -187,8 +187,6 @@ async function loadData() {
             `${BASE_URL}?action=getAllData&mode=${appMode}`
           );
         const result = await response.json();
-        console.log("MODE:", appMode);
-        console.log("RESULT:", result);
         appData.accounts = result.accounts || [];
         appData.budget = result.budget || [];
         appData.categories = result.categories || [];
