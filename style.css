@@ -49,6 +49,25 @@ html {
     scroll-behavior: smooth;
 }
 
+.item-title {
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.item-value {
+    font-weight: 700;
+    color: #34d399;
+    font-variant-numeric: tabular-nums;
+}
+
+.goal-item:hover {
+    background: rgba(255,255,255,.03);
+    border-radius: 10px;
+    padding-left: 12px;
+    padding-right: 12px;
+    transition: .2s ease;
+}
+
 /* Date picker dark theme */
 input[type="date"] {
     width: 100%;
