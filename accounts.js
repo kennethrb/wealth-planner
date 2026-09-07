@@ -78,7 +78,7 @@ function loadAccounts() {
 
     if (!container) return;
 
-    if (!appData.accounts?.length) {
+    if (!appData.accounts || appData.accounts.length === 0) {
 
         container.innerHTML = `
             <div class="goal-item">
@@ -132,7 +132,11 @@ function loadAccounts() {
 
                             <span>
                                 Type:
-                                <strong>
+                                <strong class="${
+                                    type === "Asset"
+                                        ? "text-success"
+                                        : "text-danger"
+                                }">
                                     ${type}
                                 </strong>
                             </span>
@@ -148,6 +152,7 @@ function loadAccounts() {
                                 <button
                                     class="btn-secondary"
                                     onclick="editAccount('${account.accountId}')"
+                                    title="Edit Account"
                                 >
                                     ✏️
                                 </button>
@@ -155,8 +160,9 @@ function loadAccounts() {
                                 <button
                                     class="btn-danger"
                                     onclick="deleteAccount('${account.accountId}')"
+                                    title="Delete Account"
                                 >
-                                    🗑️
+                                    🗑
                                 </button>
 
                             </div>
