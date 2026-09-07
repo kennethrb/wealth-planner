@@ -9,15 +9,54 @@ const ASSET_CLASSES = {
 };
 
 const ACCOUNT_TYPES = {
-  SAVINGS: { name: "Savings Account", assetClass: ASSET_CLASSES.CASH_EQUIVALENT, netWorthType: "Asset" },
-  CHECKING: { name: "Checking Account", assetClass: ASSET_CLASSES.CASH_EQUIVALENT, netWorthType: "Asset" },
-  MONEY_MARKET: { name: "Money Market", assetClass: ASSET_CLASSES.CASH_EQUIVALENT, netWorthType: "Asset" },
-  STOCKS: { name: "Individual Stocks", assetClass: ASSET_CLASSES.INVESTMENTS, netWorthType: "Asset" },
-  ETF: { name: "Exchange Traded Funds", assetClass: ASSET_CLASSES.INVESTMENTS, netWorthType: "Asset" },
-  BONDS: { name: "Fixed Income / Bonds", assetClass: ASSET_CLASSES.INVESTMENTS, netWorthType: "Asset" },
-  CRYPTO: { name: "Cryptocurrency", assetClass: ASSET_CLASSES.INVESTMENTS, netWorthType: "Asset" },
-  CREDIT_CARD: { name: "Credit Card", assetClass: ASSET_CLASSES.DEBT, netWorthType: "Liability" },
-  PERSONAL_LOAN: { name: "Personal/Car Loan", assetClass: ASSET_CLASSES.DEBT, netWorthType: "Liability" }
+    CASH: {
+        name: "Cash",
+        netWorthType: "Asset"
+    },
+    CHECKING: {
+        name: "Checking",
+        netWorthType: "Asset"
+    },
+    SAVINGS: {
+        name: "Savings",
+        netWorthType: "Asset"
+    },
+    INVESTMENT: {
+        name: "Investment",
+        netWorthType: "Asset"
+    },
+    PROPERTY: {
+        name: "Property",
+        netWorthType: "Asset"
+    },
+    VEHICLE: {
+        name: "Vehicle",
+        netWorthType: "Asset"
+    },
+    CREDIT_CARD: {
+        name: "Credit Card",
+        netWorthType: "Liability"
+    },
+    HOUSING_LOAN: {
+        name: "Housing Loan",
+        netWorthType: "Liability"
+    },
+    CAR_LOAN: {
+        name: "Car Loan",
+        netWorthType: "Liability"
+    },
+    PERSONAL_LOAN: {
+        name: "Personal Loan",
+        netWorthType: "Liability"
+    },
+    STUDENT_LOAN: {
+        name: "Student Loan",
+        netWorthType: "Liability"
+    },
+    OTHER_DEBT: {
+        name: "Other Debt",
+        netWorthType: "Liability"
+    }
 };
 
 
