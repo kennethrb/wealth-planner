@@ -73,6 +73,15 @@ function getCategoryTypeMap() {
 
 let editingRowNumber = null;
 
+const APP_MODE = {
+    PERSONAL: "PERSONAL",
+    TEST: "TEST"
+};
+
+let appMode =
+    localStorage.getItem("appMode")
+    || APP_MODE.PERSONAL;
+
 let appData = {
     accounts: [],
     budget: [],
@@ -181,6 +190,30 @@ async function loadData() {
         console.error("Failed to load application data:", error);
     }
 }
+
+
+// THIS IS FOR SWITCHING FROM PERSONAL TO TEST DATA //
+async function setAppMode(mode) {
+    appMode = mode;
+    localStorage.setItem("appMode", mode);
+    await loadData();
+    await refreshUI();
+    updateEnvironmentBanner();
+}
+
+function updateEnvironmentBanner() {
+    const banner = document.getElementById("environmentBanner");
+    if (!banner) return;
+    if (appMode === APP_MODE.TEST) {
+        banner.innerHTML = "🧪 TEST DATA MODE";
+        banner.className = "environment-banner test";
+    } else {
+        banner.innerHTML = "👤 PERSONAL DATA MODE";
+        banner.className = "environment-banner personal";
+    }
+}
+
+
 async function loadScenarioCategories() {
     const dropdown = document.getElementById("scenarioCategory");
     if (!dropdown) return;
@@ -491,6 +524,15 @@ async function refreshUI() {
 }
 async function initializeApp() {
     await loadData();
+
+    // THIS IS FOR SWITCHING FROM PERSONAL TO TEST DATA //
+    document.getElementById(
+        "environmentSelector"
+    ).value = appMode;
+    
+    updateEnvironmentBanner();    
+
+
     loadViewYearDropdown();
     await refreshUI();
     // Default Add Budget Item year to latest budget year
