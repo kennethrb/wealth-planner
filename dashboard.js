@@ -79,16 +79,18 @@ function loadAssetAllocationAdvisor() {
     `;
 }
 
-console.log("NETWORTH ACCOUNTS");
-console.table(
-    appData.accounts.map(a => ({
-        name: a.accountName,
-        type: a.netWorthType,
-        balance: a.currentBalance
-    }))
-);
+
 
 async function loadNetWorth() {
+
+    console.log("NETWORTH ACCOUNTS");
+    console.table(
+        appData.accounts.map(a => ({
+            name: a.accountName,
+            type: a.netWorthType,
+            balance: a.currentBalance
+        }))
+    );
     let assets = 0,
         liabilities = 0;
     appData.accounts.forEach(account => {
