@@ -48,11 +48,14 @@ async function handleAddAccount(event) {
         console.error(result);
             return;
         }
-
+        await loadData();
+        await refreshUI();
+        
         showStatus(
             "Account added successfully",
             "success"
         );
+        
 
     } catch (error) {
 
@@ -78,64 +81,96 @@ function loadAccounts() {
     if (!appData.accounts?.length) {
 
         container.innerHTML = `
-            <p>No accounts found</p>
+            <div class="goal-item">
+                <span class="label">
+                    No accounts found
+                </span>
+            </div>
         `;
 
         return;
     }
 
-    container.innerHTML =
-        appData.accounts.map(account => `
+    container.innerHTML = `
+        <div class="goals-container">
 
-            <div class="card" style="margin-bottom:12px;">
+            ${appData.accounts.map(account => {
 
-                <div style="
-                    display:flex;
-                    justify-content:space-between;
-                    align-items:center;
-                    margin-bottom:10px;
-                ">
-                    <strong>
-                        ${account.accountName}
-                    </strong>
+                const name =
+                    account.name ||
+                    account.accountName ||
+                    "Unnamed Account";
 
-                    <strong>
-                        ${formatCurrency(account.currentBalance)}
-                    </strong>
-                </div>
+                const balance =
+                    Number(
+                        account.currentBalance ||
+                        account.balance ||
+                        0
+                    );
 
-                <div style="
-                    display:flex;
-                    justify-content:space-between;
-                    align-items:center;
-                ">
-                    <span>
-                        ${account.netWorthType}
-                    </span>
+                const type =
+                    account.netWorthType ||
+                    "Asset";
 
-                    <div style="
-                        display:flex;
-                        gap:8px;
-                    ">
+                return `
 
-                        <button
-                            onclick="editAccount('${account.accountId}')">
-                            ✏️ Edit
-                        </button>
+                    <div class="goal-item">
 
-                        <button
-                            class="btn-danger"
-                            onclick="deleteAccount('${account.accountId}')">
-                            🗑 Delete
-                        </button>
+                        <div class="item-header">
+
+                            <span class="item-title">
+                                💳 ${name}
+                            </span>
+
+                            <span class="item-value">
+                                ${formatCurrency(balance)}
+                            </span>
+
+                        </div>
+
+                        <div class="goal-details">
+
+                            <span>
+                                Type:
+                                <strong>
+                                    ${type}
+                                </strong>
+                            </span>
+
+                            <div
+                                style="
+                                    display:flex;
+                                    gap:8px;
+                                    align-items:center;
+                                "
+                            >
+
+                                <button
+                                    class="btn-secondary"
+                                    onclick="editAccount('${account.accountId}')"
+                                >
+                                    ✏️
+                                </button>
+
+                                <button
+                                    class="btn-danger"
+                                    onclick="deleteAccount('${account.accountId}')"
+                                >
+                                    🗑️
+                                </button>
+
+                            </div>
+
+                        </div>
 
                     </div>
 
-                </div>
+                `;
 
-            </div>
+            }).join("")}
 
-        `).join("");
+        </div>
+    `;
 }
 
 async function deleteAccount(accountId) {
