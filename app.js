@@ -30,6 +30,12 @@ function loadViewYearDropdown() {
         .filter(Boolean)
         .sort();
 
+    if (years.length === 0) {
+        years.push(
+            new Date().getFullYear()
+        );
+    }
+
     dropdown.innerHTML =
         years.map(year =>
             `<option value="${year}">
@@ -38,10 +44,8 @@ function loadViewYearDropdown() {
         ).join("");
 
     if (!viewState.year) {
-
         viewState.year =
             Math.max(...years);
-
     }
 
     dropdown.value =
