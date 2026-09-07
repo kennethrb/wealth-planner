@@ -60,7 +60,7 @@ html {
     font-variant-numeric: tabular-nums;
 }
 
-.goal-item:hover {
+#accounts .goal-item:hover {
     background: rgba(255,255,255,.03);
     border-radius: 10px;
     padding-left: 12px;
