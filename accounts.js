@@ -1,24 +1,5 @@
 // ==================== FILE: accounts.js ====================
 
-const ACCOUNT_TYPES = {
-    Asset: [
-        "Cash",
-        "Checking",
-        "Savings",
-        "Investment",
-        "Property",
-        "Vehicle"
-    ],
-    Liability: [
-        "Credit Card",
-        "Housing Loan",
-        "Car Loan",
-        "Personal Loan",
-        "Student Loan",
-        "Other Debt"
-    ]
-};
-
 function loadAccountTypes() {
 
     const netWorthType =
