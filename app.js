@@ -190,6 +190,85 @@ async function deleteCategory() {
     showStatus(`🗑 Category deleted`, "success");
 }
 
+function recalculateAccountBalances() {
+
+    const balances = {};
+
+    appData.accounts.forEach(account => {
+
+        balances[account.accountId] =
+            Number(account.openingBalance || 0);
+
+    });
+
+    appData.transactions.forEach(tx => {
+
+        const accountId =
+            tx.accountId ||
+            tx["Account ID"];
+
+        const transferToId =
+            tx.transferToAccountId ||
+            tx["Transfer To Account ID"];
+
+        const amount = Number(
+            tx.Amount ||
+            tx.amount ||
+            0
+        );
+
+        const budgetType =
+            tx.budgetType ||
+            tx["Budget Type"] ||
+            "";
+
+        if (budgetType === "Transfer") {
+
+            if (accountId && balances[accountId] !== undefined) {
+                balances[accountId] -= amount;
+            }
+
+            if (transferToId && balances[transferToId] !== undefined) {
+                balances[transferToId] += amount;
+            }
+
+            return;
+        }
+
+        if (
+            budgetType === "Expense" ||
+            budgetType === "Savings" ||
+            budgetType === "Debt"
+        ) {
+
+            if (accountId && balances[accountId] !== undefined) {
+                balances[accountId] -= amount;
+            }
+
+            return;
+        }
+
+        if (budgetType === "Income") {
+
+            if (accountId && balances[accountId] !== undefined) {
+                balances[accountId] += amount;
+            }
+        }
+
+    });
+
+    appData.accounts.forEach(account => {
+
+        account.currentBalance =
+            balances[account.accountId] || 0;
+
+        account.balance =
+            account.currentBalance;
+
+    });
+
+}
+
 // Single aggregated API call to prevent fetch bottlenecks
 async function loadData() {
     try {
@@ -204,6 +283,7 @@ async function loadData() {
         appData.goals = result.goals || [];
         appData.transactions = result.transactions || [];
         appData.recurringBills = result.recurringBills || [];
+        recalculateAccountBalances();
     } catch (error) {
         console.error("Failed to load application data:", error);
     }
