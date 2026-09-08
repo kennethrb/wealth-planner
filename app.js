@@ -272,49 +272,20 @@ function recalculateAccountBalances() {
 // Single aggregated API call to prevent fetch bottlenecks
 async function loadData() {
     try {
-
-        console.time("loadData");
-
         const response =
           await fetch(
             `${BASE_URL}?action=getAllData&mode=${appMode}`
           );
-
-        console.time("jsonParse");
-
         const result = await response.json();
-
-        console.timeEnd("jsonParse");
-
         appData.accounts = result.accounts || [];
         appData.budget = result.budget || [];
         appData.categories = result.categories || [];
         appData.goals = result.goals || [];
         appData.transactions = result.transactions || [];
         appData.recurringBills = result.recurringBills || [];
-
-        console.time("recalculateAccountBalances");
-
         recalculateAccountBalances();
-
-        console.timeEnd("recalculateAccountBalances");
-
-        console.timeEnd("loadData");
-
-        console.log({
-            accounts: appData.accounts.length,
-            budget: appData.budget.length,
-            categories: appData.categories.length,
-            goals: appData.goals.length,
-            transactions: appData.transactions.length,
-            recurringBills: appData.recurringBills.length
-        });
-
     } catch (error) {
-        console.error(
-            "Failed to load application data:",
-            error
-        );
+        console.error("Failed to load application data:", error);
     }
 }
 
