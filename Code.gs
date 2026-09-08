@@ -16,6 +16,22 @@ Future:
 /* ===================================================
     1. CONFIGURATION & CONSTANTS
 =================================================== */
+const TEST_SPREADSHEET_ID =
+    "1pztW52iVx1h6VuP-sXEDFmF2dIpt3tJDw2Q1MrZl-r4";
+
+const PERSONAL_SPREADSHEET_ID =
+    "1Sddj-gfNj06zPdOqW_WGPEtNWb13hiQa-3WG2TzLiL4";
+
+function getSpreadsheet(mode) {
+
+  const id =
+    mode === "PERSONAL"
+      ? PERSONAL_SPREADSHEET_ID
+      : TEST_SPREADSHEET_ID;
+
+  return SpreadsheetApp.openById(id);
+}
+
 const SHEET_TRANSACTIONS = "Transactions";
 const SHEET_ACCOUNTS = "Accounts";
 const SHEET_CATEGORIES = "Categories";
@@ -33,7 +49,7 @@ function doGet(e) {
 
     switch (action) {
       case "getAllData":
-        return getAllData();
+        return getAllData(params.mode);
       case "getTransactions":
         return createJsonResponse(getTransactions());
       case "addTransaction":
@@ -55,11 +71,11 @@ function doGet(e) {
       case "deleteAccount":
         return deleteAccount(params);
       case "getCategories":
-        return createJsonResponse(getCategories());
+        return createJsonResponse(getCategories(params.mode));
       case "getBudgetPlan":
-        return createJsonResponse(getBudgetPlan());
+        return createJsonResponse(getBudgetPlan(params.mode));
       case "getGoals":
-        return createJsonResponse(getGoals());
+        return createJsonResponse(getGoals(params.mode));
       case "copyJanuaryToWholeYear":
         return copyJanuaryToWholeYear();
       case "copyCurrentYearToNextYear":
@@ -141,19 +157,19 @@ function doPost(e) {
 /* ===================================================
     3. READ OPERATIONS
 =================================================== */
-function getAllData() {
+function getAllData(mode) {
   return createJsonResponse({
-    accounts: getAccounts(),
-    budget: getBudgetPlan(),
-    categories: getCategories(),
-    goals: getGoals(),
-    transactions: getTransactions(),
-    recurringBills: getRecurringBills()
+  accounts: getAccounts(mode),
+  budget: getBudgetPlan(mode),
+  categories: getCategories(mode),
+  goals: getGoals(mode),
+  transactions: getTransactions(mode),
+  recurringBills: getRecurringBills(mode)
   });
 }
 
-function getTransactions() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_TRANSACTIONS);
+function getTransactions(mode) {
+  const sheet = getSpreadsheet(mode).getSheetByName(SHEET_TRANSACTIONS);
   if (!sheet) return [];
   const data = sheet.getDataRange().getValues();
   if (data.length <= 1) return [];
@@ -185,8 +201,8 @@ function getTransactions() {
   });
 }
 
-function getCategories() {
-  return getSheetObjects(SHEET_CATEGORIES).map(row => ({
+function getCategories(mode) {
+  return getSheetObjects(SHEET_CATEGORIES,mode).map(row => ({
     categoryId: row["Category ID"] || "",
     budgetType: row["Budget Type"] || "Expense",
     group: row["Group"] || "Other",
@@ -196,8 +212,8 @@ function getCategories() {
   }));
 }
 
-function getGoals() {
-  return getSheetObjects(SHEET_GOALS).map(row => ({
+function getGoals(mode) {
+  return getSheetObjects(SHEET_GOALS,mode).map(row => ({
     goal: row["Goal"] || "",
     target: Number(row["Target"] || 0),
     current: Number(row["Current"] || 0),
@@ -209,8 +225,8 @@ function getGoals() {
     ACCOUNT CRUD OPERATIONS
 =================================================== */
 
-function getAccounts() {
-  return getSheetObjects(SHEET_ACCOUNTS)
+function getAccounts(mode) {
+  return getSheetObjects(SHEET_ACCOUNTS,mode)
     .map(row => {
       const activeRaw = String(row["Active"] || "").trim().toLowerCase();
       const isActive = activeRaw === "yes" || activeRaw === "true" || row["Active"] === true;
@@ -335,8 +351,8 @@ function archiveAccount(params) {
   return { success: false, message: "Account ID not found" };
 }
 
-function getBudgetPlan() {
-  return getSheetObjects(SHEET_BUDGET).map(row => ({
+function getBudgetPlan(mode) {
+  return getSheetObjects(SHEET_BUDGET,mode).map(row => ({
     year: Number(row["Year"] || new Date().getFullYear()),
     month: row["Month"] || "",
     category: row["Category"] || "",
@@ -344,8 +360,8 @@ function getBudgetPlan() {
   }));
 }
 
-function getRecurringBills() {
-  return getSheetObjects(SHEET_RECURRING).map(row => ({
+function getRecurringBills(mode) {
+  return getSheetObjects(SHEET_RECURRING,mode).map(row => ({
     billId: row["Bill ID"] || "",
     billName: row["Bill Name"] || "",
     budgetType: row["Budget Type"] || "",
@@ -363,7 +379,12 @@ function getRecurringBills() {
     4. WRITE & UPDATE OPERATIONS
 =================================================== */
 function addTransaction(data) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_TRANSACTIONS);
+
+  const sheet =
+      getModeSheet(
+          SHEET_TRANSACTIONS,
+          data.mode
+      );
   if (!sheet) return createJsonResponse({ success: false, error: "Sheet not found" });
 
   const lastCol = sheet.getLastColumn();
@@ -372,7 +393,11 @@ function addTransaction(data) {
   }
 
   const id = generateUUID();
-  const cols = getColumnIndexMap(SHEET_TRANSACTIONS);
+  const cols =
+      getColumnIndexMap(
+          SHEET_TRANSACTIONS,
+          data.mode
+      );
   
   const newRow = new Array(lastCol).fill("");
 
@@ -420,7 +445,12 @@ function addTransaction(data) {
 }
 
 function updateTransaction(data) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_TRANSACTIONS);
+
+  const sheet =
+      getModeSheet(
+          SHEET_TRANSACTIONS,
+          data.mode
+      );
   const txAccountId =
       data.account || "";
 
@@ -438,7 +468,11 @@ function updateTransaction(data) {
     return createJsonResponse({ success: false, error: "Missing Transaction ID" });
   }
 
-  const cols = getColumnIndexMap(SHEET_TRANSACTIONS);
+  const cols =
+      getColumnIndexMap(
+          SHEET_TRANSACTIONS,
+          data.mode
+      );
   const idColIndex = cols["Transaction ID"] - 1;
 
   if (idColIndex === undefined || idColIndex < 0) {
@@ -493,14 +527,23 @@ function updateTransaction(data) {
 }
 
 function deleteTransaction(data) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_TRANSACTIONS);
+
+  const sheet =
+      getModeSheet(
+          SHEET_TRANSACTIONS,
+          data.mode
+      );
   if (!sheet) return createJsonResponse({ success: false, error: "Sheet not found" });
 
   if (!data.id) {
     return createJsonResponse({ success: false, error: "Missing Transaction ID" });
   }
 
-  const cols = getColumnIndexMap(SHEET_TRANSACTIONS);
+  const cols =
+      getColumnIndexMap(
+          SHEET_TRANSACTIONS,
+          data.mode
+      );
   const idColIndex = cols["Transaction ID"] - 1;
 
   if (idColIndex === undefined || idColIndex < 0) {
@@ -930,9 +973,13 @@ function deleteRecurringBill(request) {
   return { success: false };
 }
 
-function generateBills() {
-  const recurringBills = getRecurringBills();
-  const transactions = getTransactions();
+function generateBills(mode) {
+
+  const recurringBills =
+      getRecurringBills(mode);
+
+  const transactions =
+      getTransactions(mode);
 
   if (!recurringBills.length) {
     return { success: true, count: 0 };
@@ -1005,48 +1052,94 @@ function createJsonResponse(data) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
-function getColumnIndexMap(sheetName) {
-  const sheet = SpreadsheetApp
-    .getActiveSpreadsheet()
-    .getSheetByName(sheetName);
+function getColumnIndexMap(
+    sheetName,
+    mode
+) {
+
+  const sheet =
+      getModeSheet(
+          sheetName,
+          mode
+      );
 
   if (!sheet) return {};
 
-  const headers = sheet
-    .getRange(1, 1, 1, sheet.getLastColumn())
-    .getValues()[0];
+  const headers =
+      sheet
+          .getRange(
+              1,
+              1,
+              1,
+              sheet.getLastColumn()
+          )
+          .getValues()[0];
 
   const map = {};
-  headers.forEach((header, index) => {
-    map[String(header).trim()] = index + 1;
-  });
+
+  headers.forEach(
+      (header, index) => {
+
+          map[
+              String(header).trim()
+          ] = index + 1;
+
+      }
+  );
 
   return map;
 }
 
-function getSheetObjects(sheetName) {
-  const sheet = SpreadsheetApp
-    .getActiveSpreadsheet()
-    .getSheetByName(sheetName);
+function getSheetObjects(
+    sheetName,
+    mode
+) {
+
+  const sheet =
+      getModeSheet(
+          sheetName,
+          mode
+      );
 
   if (!sheet) return [];
 
-  const data = sheet.getDataRange().getValues();
-  if (data.length <= 1) return [];
+  const data =
+      sheet
+          .getDataRange()
+          .getValues();
 
-  const headers = data.shift();
+  if (data.length <= 1)
+      return [];
+
+  const headers =
+      data.shift();
 
   return data.map(row => {
-    const obj = {};
-    headers.forEach((header, index) => {
-      obj[String(header).trim()] = row[index];
-    });
-    return obj;
+
+      const obj = {};
+
+      headers.forEach(
+          (header, index) => {
+
+              obj[
+                  String(header).trim()
+              ] = row[index];
+
+          }
+      );
+
+      return obj;
+
   });
 }
 
-function getAccountById(accountId) {
-  const accounts = getAccounts();
+function getAccountById(
+      accountId,
+      mode
+  ) {
+
+  const accounts =
+      getAccounts(mode);
 
   return accounts.find(acc =>
     String(acc.accountId).trim() ===
@@ -1054,12 +1147,24 @@ function getAccountById(accountId) {
   );
 }
 
-function getAccountNameById(accountId) {
-  const account = getAccountById(accountId);
+function getAccountNameById(accountId,mode) {
+  const account = getAccountById(accountId,mode);
 
   return account
     ? account.accountName
     : "";
+}
+
+function getModeSheet(
+    sheetName,
+    mode
+) {
+
+    return getSpreadsheet(
+        mode
+    ).getSheetByName(
+        sheetName
+    );
 }
 
 
