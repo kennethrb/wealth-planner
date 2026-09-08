@@ -173,7 +173,14 @@ async function addBudgetItem() {
     }
     const confirmed = await showConfirmDialog("Add Budget Item", `Add budget item "${category}" for ${month} ${year}?`);
     if (!confirmed) return;
-    const response = await fetch(`${BASE_URL}?action=addBudgetItem` + `&year=${year}` + `&month=${month}` + `&category=${encodeURIComponent(category)}` + `&amount=${amount}`);
+    const response = await fetch(
+        `${BASE_URL}?action=addBudgetItem`
+        + `&mode=${appMode}`
+        + `&year=${year}`
+        + `&month=${month}`
+        + `&category=${encodeURIComponent(category)}`
+        + `&amount=${amount}`
+    );
     const result = await response.json();
     if (!result.success) {
         showStatus(`⚠ ${result.message || "Unable to add budget item"}`, "warning");
@@ -202,7 +209,12 @@ async function deleteBudgetItem(category) {
     const selectedYear = getSelectedYear();
     const confirmed = await showConfirmDialog("Delete Budget Item", `Delete "${category}" from ${selectedYear}?`);
     if (!confirmed) return;
-    await fetch(`${BASE_URL}?action=deleteBudgetItem` + `&year=${selectedYear}` + `&category=${encodeURIComponent(category)}`);
+    await fetch(
+        `${BASE_URL}?action=deleteBudgetItem`
+        + `&mode=${appMode}`
+        + `&year=${selectedYear}`
+        + `&category=${encodeURIComponent(category)}`
+    );
     await loadData();
     await Promise.all([
         loadBudgetPlanner(),
@@ -238,10 +250,11 @@ async function saveBudgetChanges(silent = false) {
             headers: {
                 "Content-Type": "text/plain;charset=utf-8"
             },
-            body: JSON.stringify({
-                action: "saveAllBudgets",
-                budgetItems: budgetItems
-            })
+        body: JSON.stringify({
+            action: "saveAllBudgets",
+            mode: appMode,
+            budgetItems: budgetItems
+        })
         });
         const result = await response.json();
         if (result.success) {
@@ -271,7 +284,10 @@ async function copyJanuaryToWholeYear() {
     }
     const confirmed = await showConfirmDialog("Copy Budget", "Copy January budget amounts to all other months?");
     if (!confirmed) return;
-    await fetch(`${BASE_URL}?action=copyJanuaryToWholeYear`);
+    await fetch(
+        `${BASE_URL}?action=copyJanuaryToWholeYear`
+        + `&mode=${appMode}`
+    );
     await loadData();
     await refreshUI();
     showStatus("✅ January copied to all months", "success");
@@ -281,7 +297,11 @@ async function copyCurrentYearToNextYear() {
     const confirmed = await showConfirmDialog("Create Budget Year", "Generate next year's budget?");
     if (!confirmed) return;
     const selectedYear = getSelectedYear();
-    const response = await fetch(`${BASE_URL}?action=copyCurrentYearToNextYear` + `&year=${selectedYear}`);
+    const response = await fetch(
+        `${BASE_URL}?action=copyCurrentYearToNextYear`
+        + `&mode=${appMode}`
+        + `&year=${selectedYear}`
+    );
     const result = await response.json();
     await loadData();
     loadYearDropdown();
