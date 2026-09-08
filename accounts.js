@@ -78,6 +78,7 @@ async function handleAddAccount(event) {
 
     const url =
         `${BASE_URL}?action=addAccount`
+        + `&mode=${appMode}`
         + `&name=${encodeURIComponent(name)}`
         + `&netWorthType=${encodeURIComponent(netWorthType)}`
         + `&assetClass=${encodeURIComponent(assetClass)}`
@@ -248,6 +249,7 @@ async function deleteAccount(accountId) {
 
     const response = await fetch(
         `${BASE_URL}?action=deleteAccount`
+        + `&mode=${appMode}`
         + `&accountId=${accountId}`
     );
 
@@ -308,6 +310,7 @@ async function editAccount(accountId) {
 
     const response = await fetch(
         `${BASE_URL}?action=updateAccount`
+        + `&mode=${appMode}`
         + `&accountId=${accountId}`
         + `&currentBalance=${encodeURIComponent(newBalance)}`
     );
