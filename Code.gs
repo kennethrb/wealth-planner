@@ -1,3 +1,18 @@
+/*
+TODO:
+Refactor spreadsheet access to support
+TEST and PERSONAL mode for WRITE operations.
+
+Current status:
+- Reads support mode switching
+- Writes use ActiveSpreadsheet
+
+Future:
+- Implement getModeSheet()
+- Pass mode from frontend
+- Update CRUD functions
+*/
+
 /* ===================================================
     1. CONFIGURATION & CONSTANTS
 =================================================== */
@@ -218,10 +233,7 @@ function getAccounts() {
         reconciled: currentBalance === reconciledBalance
       };
     })
-  .filter(acc =>
-      acc.accountName !== "" &&
-      acc.active === true
-  );
+    .filter(acc => acc.accountName !== "");
 }
 
 /** CREATE: Add new account */
@@ -323,50 +335,6 @@ function archiveAccount(params) {
   return { success: false, message: "Account ID not found" };
 }
 
-function adjustAccountBalance(accountId, amount) {
-
-  const sheet =
-    SpreadsheetApp
-      .getActiveSpreadsheet()
-      .getSheetByName(SHEET_ACCOUNTS);
-
-  const cols =
-    getColumnIndexMap(SHEET_ACCOUNTS);
-
-  const data =
-    sheet.getDataRange().getValues();
-
-  const idCol =
-    cols["Account ID"] - 1;
-
-  const balanceCol =
-    cols["Current Balance"];
-
-  for (let i = 1; i < data.length; i++) {
-
-    if (
-      String(data[i][idCol]).trim() ===
-      String(accountId).trim()
-    ) {
-
-      const currentBalance =
-        Number(
-          data[i][balanceCol - 1] || 0
-        );
-
-      sheet
-        .getRange(i + 1, balanceCol)
-        .setValue(
-          currentBalance + amount
-        );
-
-      return true;
-    }
-  }
-
-  return false;
-}
-
 function getBudgetPlan() {
   return getSheetObjects(SHEET_BUDGET).map(row => ({
     year: Number(row["Year"] || new Date().getFullYear()),
@@ -448,12 +416,6 @@ function addTransaction(data) {
       newRow[cols["Transfer To Account ID"] - 1] = txTransferToId;
 
   sheet.appendRow(newRow);
-  applyTransactionImpact({
-  budgetType: txBudgetType,
-  amount: Number(txAmount),
-  accountId: txAccountId,
-  transferToAccountId: txTransferToId
-});
   return createJsonResponse({ success: true, id: id });
 }
 
@@ -556,89 +518,6 @@ function deleteTransaction(data) {
   }
 
   return createJsonResponse({ success: false, error: "Transaction ID not found: " + searchId });
-}
-
-function applyTransactionImpact(tx) {
-
-  const amount =
-    Number(tx.amount || 0);
-
-  const accountId =
-    tx.accountId;
-
-  const transferToAccountId =
-    tx.transferToAccountId;
-
-  const type =
-    tx.budgetType;
-
-  if (!accountId) return;
-
-  switch (type) {
-
-    case "Income":
-
-      adjustAccountBalance(
-        accountId,
-        amount
-      );
-
-      break;
-
-    case "Expense":
-
-      adjustAccountBalance(
-        accountId,
-        -amount
-      );
-
-      break;
-
-    case "Savings":
-
-      adjustAccountBalance(
-        accountId,
-        -amount
-      );
-
-      break;
-
-    case "Debt":
-
-        adjustAccountBalance(
-            accountId,
-            -amount
-        );
-
-        if (transferToAccountId) {
-
-            adjustAccountBalance(
-                transferToAccountId,
-                -amount
-            );
-
-        }
-
-        break;
-
-    case "Transfer":
-
-      if (!transferToAccountId) return;
-
-      adjustAccountBalance(
-        accountId,
-        -amount
-      );
-
-      adjustAccountBalance(
-        transferToAccountId,
-        amount
-      );
-
-      break;
-
-  }
-
 }
 
 function copyJanuaryToWholeYear() {
