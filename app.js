@@ -272,20 +272,65 @@ function recalculateAccountBalances() {
 // Single aggregated API call to prevent fetch bottlenecks
 async function loadData() {
     try {
+
+        console.time("loadData");
+
         const response =
-          await fetch(
-            `${BASE_URL}?action=getAllData&mode=${appMode}`
-          );
-        const result = await response.json();
-        appData.accounts = result.accounts || [];
-        appData.budget = result.budget || [];
-        appData.categories = result.categories || [];
-        appData.goals = result.goals || [];
-        appData.transactions = result.transactions || [];
-        appData.recurringBills = result.recurringBills || [];
+            await fetch(
+                `${BASE_URL}?action=getAllData&mode=${appMode}`
+            );
+
+        const text =
+            await response.text();
+
+        console.log(
+            "Payload Size:",
+            (text.length / 1024).toFixed(2),
+            "KB"
+        );
+
+        console.time("jsonParse");
+
+        const result =
+            JSON.parse(text);
+
+        console.timeEnd("jsonParse");
+
+        appData.accounts =
+            result.accounts || [];
+
+        appData.budget =
+            result.budget || [];
+
+        appData.categories =
+            result.categories || [];
+
+        appData.goals =
+            result.goals || [];
+
+        appData.transactions =
+            result.transactions || [];
+
+        appData.recurringBills =
+            result.recurringBills || [];
+
+        console.time("recalculateAccountBalances");
+
         recalculateAccountBalances();
+
+        console.timeEnd(
+            "recalculateAccountBalances"
+        );
+
+        console.timeEnd("loadData");
+
     } catch (error) {
-        console.error("Failed to load application data:", error);
+
+        console.error(
+            "Failed to load application data:",
+            error
+        );
+
     }
 }
 
