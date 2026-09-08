@@ -22,14 +22,28 @@ const TEST_SPREADSHEET_ID =
 const PERSONAL_SPREADSHEET_ID =
     "1Sddj-gfNj06zPdOqW_WGPEtNWb13hiQa-3WG2TzLiL4";
 
+const SPREADSHEET_CACHE = {};
+
 function getSpreadsheet(mode) {
+
+  const cacheKey =
+    mode === "PERSONAL"
+      ? "PERSONAL"
+      : "TEST";
+
+  if (SPREADSHEET_CACHE[cacheKey]) {
+    return SPREADSHEET_CACHE[cacheKey];
+  }
 
   const id =
     mode === "PERSONAL"
       ? PERSONAL_SPREADSHEET_ID
       : TEST_SPREADSHEET_ID;
 
-  return SpreadsheetApp.openById(id);
+  SPREADSHEET_CACHE[cacheKey] =
+    SpreadsheetApp.openById(id);
+
+  return SPREADSHEET_CACHE[cacheKey];
 }
 
 const SHEET_TRANSACTIONS = "Transactions";
