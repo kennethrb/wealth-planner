@@ -21,6 +21,7 @@ async function addRecurringBill() {
     }
 
     await fetch(`${BASE_URL}?action=addRecurringBill` + 
+        `&mode=${appMode}` +
         `&billName=${encodeURIComponent(billName)}` + 
         `&budgetType=${encodeURIComponent(budgetType)}` + 
         `&budgetPosition=${encodeURIComponent(budgetPosition)}` + 
@@ -45,7 +46,11 @@ async function addRecurringBill() {
 async function deleteRecurringBill(billId) {
     const confirmed = await showConfirmDialog("Delete Recurring Bill", "Delete this recurring bill?");
     if (!confirmed) return;
-    await fetch(`${BASE_URL}?action=deleteRecurringBill` + `&billId=${billId}`);
+    await fetch(
+        `${BASE_URL}?action=deleteRecurringBill`
+        + `&mode=${appMode}`
+        + `&billId=${billId}`
+    );
     await loadData();
     loadRecurringBills();
     await refreshFinancialViews();
@@ -70,9 +75,10 @@ async function editRecurringBill(billId) {
     }
   
     await fetch(
-      `${BASE_URL}?action=updateRecurringBill` +
-      `&billId=${billId}` +
-      `&amount=${newAmount}`
+        `${BASE_URL}?action=updateRecurringBill`
+        + `&mode=${appMode}`
+        + `&billId=${billId}`
+        + `&amount=${newAmount}`
     );
   
     await loadData();
@@ -88,7 +94,11 @@ async function generateBills() {
   const confirmed = await showConfirmDialog("Generate Bills","Generate transactions from all active recurring bills?");
   if (!confirmed) return;
 
-  const response = await fetch(`${BASE_URL}?action=generateBills`);
+    const response =
+        await fetch(
+            `${BASE_URL}?action=generateBills`
+            + `&mode=${appMode}`
+        );
   const result = await response.json();
 
   await loadData();
