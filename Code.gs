@@ -77,46 +77,69 @@ function doGet(e) {
       case "getGoals":
         return createJsonResponse(getGoals(params.mode));
       case "copyJanuaryToWholeYear":
-        return copyJanuaryToWholeYear();
+          return copyJanuaryToWholeYear({
+              mode: params.mode
+          });
       case "copyCurrentYearToNextYear":
-        return copyCurrentYearToNextYear({ year: params.year });
+          return copyCurrentYearToNextYear({
+              mode: params.mode,
+              year: params.year
+          });
       case "saveBudget":
-        return saveBudget({
-          year: params.year,
-          month: params.month,
-          category: params.category,
-          amount: params.amount
-        });
+          return saveBudget({
+              mode: params.mode,
+              year: params.year,
+              month: params.month,
+              category: params.category,
+              amount: params.amount
+          });
       case "addCategory":
-        return addCategory({
+      return addCategory({
+          mode: params.mode,
           budgetType: params.budgetType,
           group: params.group,
           categoryName: params.categoryName,
           preferredFundingSource: params.preferredFundingSource
-        });
+      });
       case "deleteCategory":
-        return deleteCategory({categoryId: params.categoryId});
+          return deleteCategory({
+              mode: params.mode,
+              categoryId: params.categoryId
+          });
       case "addBudgetItem":
-        return addBudgetItem({
-          year: params.year,
-          month: params.month,
-          category: params.category,
-          amount: params.amount
-        });
+          return addBudgetItem({
+              mode: params.mode,
+              year: params.year,
+              month: params.month,
+              category: params.category,
+              amount: params.amount
+          });
       case "deleteBudgetItem":
-        return deleteBudgetItem({
-          year: params.year,
-          category: params.category
-        });
+          return deleteBudgetItem({
+              mode: params.mode,
+              year: params.year,
+              category: params.category
+          });
       case "addRecurringBill":
         return createJsonResponse(addRecurringBill(params));
       case "deleteRecurringBill":
-        return createJsonResponse(deleteRecurringBill({ billId: params.billId }));
+        return createJsonResponse(
+            deleteRecurringBill({
+                mode: params.mode,
+                billId: params.billId
+            })
+        );
       case "updateRecurringBill":
-        return createJsonResponse(updateRecurringBill({ billId: params.billId, amount: params.amount }));
+        return createJsonResponse(
+            updateRecurringBill({
+                mode: params.mode,
+                billId: params.billId,
+                amount: params.amount
+            })
+        );
       case "generateBills":
         return createJsonResponse(
-            generateBills()
+            generateBills(params.mode)
         );
       default:
         return createJsonResponse({ error: "Invalid Action: " + action });
@@ -132,12 +155,16 @@ function doPost(e) {
     const action = contents.action;
 
     if (action === "saveAllBudgets") {
-      return saveAllBudgets(contents.budgetItems);
+      return saveAllBudgets(
+          contents.budgetItems,
+          contents.mode
+      );
     }
 
     if (action === "deleteCategory") {
       return deleteCategory({
-        categoryId: contents.categoryId
+          mode: contents.mode,
+          categoryId: contents.categoryId
       });
     }
 
@@ -230,8 +257,11 @@ function getAccounts(mode) {
     .map(row => {
       const activeRaw = String(row["Active"] || "").trim().toLowerCase();
       const isActive = activeRaw === "yes" || activeRaw === "true" || row["Active"] === true;
-      const currentBalance = Number(row["Current Balance"] || 0);
-      const reconciledBalance = Number(row["Last Reconciled Balance"] || 0);
+      const reconciledBalance =
+          Number(
+              row["Last Reconciled Balance"] || 0
+          );
+
 
       return {
         accountId: row["Account ID"] || "",
@@ -240,24 +270,36 @@ function getAccounts(mode) {
         type: row["Type"] || "",
         assetClass: row["Asset Class"] || "",
         openingBalance: Number(row["Opening Balance"] || 0),
-        currentBalance: currentBalance,
-        balance: currentBalance,
+        currentBalance: 0,
+        balance: 0,
         active: isActive,
         netWorthType: row["Net Worth Type"] || "Asset",
         lastReconciledDate: row["Last Reconciled Date"] || "",
         lastReconciledBalance: reconciledBalance,
-        reconciled: currentBalance === reconciledBalance
+        reconciled: false
       };
     })
-    .filter(acc => acc.accountName !== "");
+    .filter(acc =>
+        acc.accountName !== "" &&
+        acc.active === true
+    );
 }
 
 /** CREATE: Add new account */
 function addAccount(data) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_ACCOUNTS);
+  const sheet =
+      getModeSheet(
+          SHEET_ACCOUNTS,
+          data.mode
+      );
   if (!sheet) return createJsonResponse({ success: false, error: "Accounts sheet not found" });
 
-  const cols = getColumnIndexMap(SHEET_ACCOUNTS);
+  const cols =
+      getColumnIndexMap(
+          SHEET_ACCOUNTS,
+          data.mode
+      );
+
   const accountId = "ACC" + Date.now();
   const row = new Array(sheet.getLastColumn()).fill("");
 
@@ -267,7 +309,6 @@ function addAccount(data) {
   if (cols["Type"]) row[cols["Type"] - 1] = data.type || data.assetClass || "Cash";
   if (cols["Asset Class"]) row[cols["Asset Class"] - 1] = data.assetClass || "Cash";
   if (cols["Opening Balance"]) row[cols["Opening Balance"] - 1] = Number(data.currentBalance || data.openingBalance || 0);
-  if (cols["Current Balance"]) row[cols["Current Balance"] - 1] = Number(data.currentBalance || data.openingBalance || 0);
   if (cols["Active"]) row[cols["Active"] - 1] = "Yes";
 
   sheet.appendRow(row);
@@ -276,13 +317,22 @@ function addAccount(data) {
 
 /** UPDATE: Edit account details or balance */
 function updateAccount(data) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_ACCOUNTS);
+  const sheet =
+      getModeSheet(
+          SHEET_ACCOUNTS,
+          data.mode
+      );
   if (!sheet) return createJsonResponse({ success: false, error: "Accounts sheet not found" });
 
   const accountId = String(data.accountId || data.id).trim();
   if (!accountId) return createJsonResponse({ success: false, error: "Missing Account ID" });
 
-  const cols = getColumnIndexMap(SHEET_ACCOUNTS);
+  const cols =
+      getColumnIndexMap(
+          SHEET_ACCOUNTS,
+          data.mode
+      );
+
   const idColIndex = cols["Account ID"] - 1;
   const values = sheet.getDataRange().getValues();
 
@@ -300,20 +350,28 @@ function updateAccount(data) {
   if (cols["Net Worth Type"] && data.netWorthType) sheet.getRange(rowIndex, cols["Net Worth Type"]).setValue(data.netWorthType);
   if (cols["Type"] && data.type) sheet.getRange(rowIndex, cols["Type"]).setValue(data.type);
   if (cols["Asset Class"] && data.assetClass) sheet.getRange(rowIndex, cols["Asset Class"]).setValue(data.assetClass);
-  if (cols["Current Balance"] && data.currentBalance !== undefined) sheet.getRange(rowIndex, cols["Current Balance"]).setValue(Number(data.currentBalance));
+
 
   return createJsonResponse({ success: true });
 }
 
 /** DELETE: Soft delete (set Active = No) or delete row */
 function deleteAccount(data) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_ACCOUNTS);
+  const sheet =
+      getModeSheet(
+          SHEET_ACCOUNTS,
+          data.mode
+      );
   if (!sheet) return createJsonResponse({ success: false, error: "Accounts sheet not found" });
 
   const accountId = String(data.accountId || data.id).trim();
   if (!accountId) return createJsonResponse({ success: false, error: "Missing Account ID" });
+  const cols =
+      getColumnIndexMap(
+          SHEET_ACCOUNTS,
+          data.mode
+      );
 
-  const cols = getColumnIndexMap(SHEET_ACCOUNTS);
   const idColIndex = cols["Account ID"] - 1;
   const values = sheet.getDataRange().getValues();
 
@@ -334,8 +392,16 @@ function deleteAccount(data) {
 function archiveAccount(params) {
   if (!params.accountId) return { success: false, message: "Missing Account ID" };
 
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_ACCOUNTS);
-  const cols = getColumnIndexMap(SHEET_ACCOUNTS);
+  const sheet =
+      getModeSheet(
+          SHEET_ACCOUNTS,
+          params.mode
+      );
+  const cols =
+      getColumnIndexMap(
+          SHEET_ACCOUNTS,
+          params.mode
+      );
   const data = sheet.getDataRange().getValues();
   const idCol = cols["Account ID"] - 1;
 
@@ -411,7 +477,10 @@ function addTransaction(data) {
       data.account || data.Account || "";
 
   const txAccountName =
-      getAccountNameById(txAccountId);
+      getAccountNameById(
+          txAccountId,
+          data.mode
+      );
 
   const txTransferToId =
       data.transferToAccount ||
@@ -419,7 +488,10 @@ function addTransaction(data) {
       "";
 
   const txTransferToName =
-      getAccountNameById(txTransferToId);
+      getAccountNameById(
+          txTransferToId,
+          data.mode
+      );
 
   if (cols["Transaction ID"]) newRow[cols["Transaction ID"] - 1] = id;
   if (cols["Date"]) newRow[cols["Date"] - 1] = txDate;
@@ -455,13 +527,19 @@ function updateTransaction(data) {
       data.account || "";
 
   const txAccountName =
-      getAccountNameById(txAccountId);
+      getAccountNameById(
+          txAccountId,
+          data.mode
+      );
 
   const txTransferToId =
       data.transferToAccount || "";
 
   const txTransferToName =
-      getAccountNameById(txTransferToId);
+      getAccountNameById(
+          txTransferToId,
+          data.mode
+      );
   if (!sheet) return createJsonResponse({ success: false, error: "Sheet not found" });
 
   if (!data.id) {
@@ -563,17 +641,22 @@ function deleteTransaction(data) {
   return createJsonResponse({ success: false, error: "Transaction ID not found: " + searchId });
 }
 
-function copyJanuaryToWholeYear() {
+function copyJanuaryToWholeYear(request) {
 
   const sheet =
-      SpreadsheetApp.getActiveSpreadsheet()
-      .getSheetByName(SHEET_BUDGET);
+      getModeSheet(
+          SHEET_BUDGET,
+          request.mode
+      );
 
   if (!sheet)
       return createJsonResponse({ success: false });
 
   const cols =
-      getColumnIndexMap(SHEET_BUDGET);
+      getColumnIndexMap(
+          SHEET_BUDGET,
+          request.mode
+      );
 
   const data =
       sheet.getDataRange().getValues();
@@ -600,17 +683,10 @@ function copyJanuaryToWholeYear() {
 
   for (let i = 1; i < data.length; i++) {
 
-      const year =
-          data[i][yearCol];
-
-      const month =
-          data[i][monthCol];
-
-      const category =
-          data[i][categoryCol];
-
-      const amount =
-          data[i][amountCol];
+      const year = data[i][yearCol];
+      const month = data[i][monthCol];
+      const category = data[i][categoryCol];
+      const amount = data[i][amountCol];
 
       if (month !== "Jan")
           continue;
@@ -629,14 +705,13 @@ function copyJanuaryToWholeYear() {
 
           if (existingRow) {
 
-              existingRow[amountCol] =
-                  amount;
+              existingRow[amountCol] = amount;
 
           } else {
 
               const row =
                   new Array(sheet.getLastColumn())
-                  .fill("");
+                      .fill("");
 
               row[yearCol] = year;
               row[monthCol] = targetMonth;
@@ -656,6 +731,7 @@ function copyJanuaryToWholeYear() {
           newRows.length,
           newRows[0].length
       ).setValues(newRows);
+
   }
 
   sheet.getDataRange().setValues(data);
@@ -666,10 +742,18 @@ function copyJanuaryToWholeYear() {
 }
 
 function copyCurrentYearToNextYear(request) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_BUDGET);
+  const sheet =
+      getModeSheet(
+          SHEET_BUDGET,
+          request.mode
+      );
   if (!sheet) return createJsonResponse({ success: false });
 
-  const cols = getColumnIndexMap(SHEET_BUDGET);
+  const cols =
+      getColumnIndexMap(
+          SHEET_BUDGET,
+          request.mode
+      );
   const data = sheet.getDataRange().getValues();
 
   const currentYear = Number(request.year);
@@ -702,11 +786,19 @@ function copyCurrentYearToNextYear(request) {
   return createJsonResponse({ success: true, nextYear: nextYear });
 }
 
-function saveAllBudgets(budgetItems) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_BUDGET);
+function saveAllBudgets(budgetItems,mode) {
+  const sheet =
+      getModeSheet(
+          SHEET_BUDGET,
+          mode
+      );
   if (!sheet) return createJsonResponse({ success: false });
 
-  const cols = getColumnIndexMap(SHEET_BUDGET);
+  const cols =
+      getColumnIndexMap(
+          SHEET_BUDGET,
+          mode
+      );
   const range = sheet.getDataRange();
   const data = range.getValues();
 
@@ -733,10 +825,18 @@ function saveAllBudgets(budgetItems) {
 }
 
 function saveBudget(request) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_BUDGET);
+  const sheet =
+      getModeSheet(
+          SHEET_BUDGET,
+          request.mode
+      );
   if (!sheet) return createJsonResponse({ success: false });
 
-  const cols = getColumnIndexMap(SHEET_BUDGET);
+  const cols =
+      getColumnIndexMap(
+          SHEET_BUDGET,
+          request.mode
+      );
   const data = sheet.getDataRange().getValues();
 
   const yearCol = cols["Year"] - 1;
@@ -758,8 +858,17 @@ function saveBudget(request) {
 }
 
 function addCategory(request) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_CATEGORIES);
-  const cols = getColumnIndexMap(SHEET_CATEGORIES);
+  const sheet =
+      getModeSheet(
+          SHEET_CATEGORIES,
+          request.mode
+      );
+
+  const cols =
+      getColumnIndexMap(
+          SHEET_CATEGORIES,
+          request.mode
+      );
 
   const row = new Array(sheet.getLastColumn()).fill("");
   const categoryId = "CAT" + Date.now();
@@ -772,7 +881,10 @@ function addCategory(request) {
       request.preferredFundingSource || "";
 
   const fundingSourceName =
-      getAccountNameById(fundingSourceId);
+      getAccountNameById(
+          fundingSourceId,
+          request.mode
+      );
 
   if (cols["Preferred Funding Source"]) {
       row[cols["Preferred Funding Source"] - 1] =
@@ -795,9 +907,17 @@ function deleteCategory(request) {
   let categoryName = "";
 
   // 1. Find and remove category from Categories sheet, and capture categoryName for BudgetPlan cleanup
-  const categorySheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_CATEGORIES);
+  const categorySheet =
+    getModeSheet(
+        SHEET_CATEGORIES,
+        request.mode
+    );
   if (categorySheet) {
-    const cols = getColumnIndexMap(SHEET_CATEGORIES);
+    const cols =
+    getColumnIndexMap(
+        SHEET_CATEGORIES,
+        request.mode
+    );
     const catData = categorySheet.getDataRange().getValues();
 
     if (catData.length > 1) {
@@ -818,9 +938,17 @@ function deleteCategory(request) {
   }
 
   // 2. Remove matching rows from BudgetPlan sheet using the retrieved categoryName
-  const budgetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_BUDGET);
+  const budgetSheet =
+    getModeSheet(
+        SHEET_BUDGET,
+        request.mode
+    );
   if (budgetSheet && categoryName) {
-    const cols = getColumnIndexMap(SHEET_BUDGET);
+    const cols =
+    getColumnIndexMap(
+        SHEET_BUDGET,
+        request.mode
+    );
     const budgetData = budgetSheet.getDataRange().getValues();
 
     if (budgetData.length > 1) {
@@ -838,10 +966,18 @@ function deleteCategory(request) {
 }
 
 function addBudgetItem(request) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_BUDGET);
+  const sheet =
+      getModeSheet(
+          SHEET_BUDGET,
+          request.mode
+      );
   if (!sheet) return createJsonResponse({ success: false, message: "Budget sheet not found" });
 
-  const cols = getColumnIndexMap(SHEET_BUDGET);
+  const cols =
+      getColumnIndexMap(
+          SHEET_BUDGET,
+          request.mode
+      );
   const data = sheet.getDataRange().getValues();
 
   const yearCol = cols["Year"] - 1;
@@ -877,10 +1013,18 @@ function addBudgetItem(request) {
 }
 
 function deleteBudgetItem(request) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_BUDGET);
+  const sheet =
+      getModeSheet(
+          SHEET_BUDGET,
+          request.mode
+      );
   if (!sheet) return createJsonResponse({ success: false });
 
-  const cols = getColumnIndexMap(SHEET_BUDGET);
+  const cols =
+      getColumnIndexMap(
+          SHEET_BUDGET,
+          request.mode
+      );
   const data = sheet.getDataRange().getValues();
   if (data.length <= 1) return createJsonResponse({ success: true });
 
@@ -902,8 +1046,17 @@ function deleteBudgetItem(request) {
 }
 
 function addRecurringBill(params) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_RECURRING);
-  const cols = getColumnIndexMap(SHEET_RECURRING);
+  const sheet =
+      getModeSheet(
+          SHEET_RECURRING,
+          params.mode
+      );
+
+  const cols =
+      getColumnIndexMap(
+          SHEET_RECURRING,
+          params.mode
+      );
 
   const row = new Array(sheet.getLastColumn()).fill("");
   const billId = `RB${String(sheet.getLastRow()).padStart(3, "0")}`;
@@ -916,7 +1069,11 @@ function addRecurringBill(params) {
   row[cols["Default Amount"] - 1] = Number(params.amount);
   row[cols["Due Day"] - 1] = Number(params.dueDay);
   const accountId = params.account || "";
-  const accountName = getAccountNameById(accountId);
+  const accountName =
+      getAccountNameById(
+          accountId,
+          params.mode
+      );
 
   if (cols["Account"])
       row[cols["Account"] - 1] = accountName;
@@ -939,10 +1096,19 @@ function updateRecurringBill(request) {
     return { success: false, message: "Invalid amount value" };
   }
 
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_RECURRING);
+  const sheet =
+      getModeSheet(
+          SHEET_RECURRING,
+          request.mode
+      );
+
   if (!sheet) return { success: false, message: "Sheet not found" };
 
-  const cols = getColumnIndexMap(SHEET_RECURRING);
+  const cols =
+      getColumnIndexMap(
+          SHEET_RECURRING,
+          request.mode
+      );
   const data = sheet.getDataRange().getValues();
   const billIdCol = cols["Bill ID"] - 1;
 
@@ -957,8 +1123,17 @@ function updateRecurringBill(request) {
 }
 
 function deleteRecurringBill(request) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_RECURRING);
-  const cols = getColumnIndexMap(SHEET_RECURRING);
+  const sheet =
+      getModeSheet(
+          SHEET_RECURRING,
+          request.mode
+      );
+
+  const cols =
+      getColumnIndexMap(
+          SHEET_RECURRING,
+          request.mode
+      );
   const data = sheet.getDataRange().getValues();
 
   const billIdCol = cols["Bill ID"] - 1;
@@ -1011,15 +1186,20 @@ function generateBills(mode) {
     if (alreadyExists) return;
 
     addTransaction({
-      date: Utilities.formatDate(today, Session.getScriptTimeZone(), "yyyy-MM-dd"),
-      amount: bill.defaultAmount,
-      details: billName,
-      account: bill.accountId,
-      budgetType: bill.budgetType,
-      budgetPosition: bill.budgetPosition,
-      transferToAccount: "",
-      recurringBillId: bill.billId
-      });
+        mode: mode,
+        date: Utilities.formatDate(
+            today,
+            Session.getScriptTimeZone(),
+            "yyyy-MM-dd"
+        ),
+        amount: bill.defaultAmount,
+        details: billName,
+        account: bill.accountId,
+        budgetType: bill.budgetType,
+        budgetPosition: bill.budgetPosition,
+        transferToAccount: "",
+        recurringBillId: bill.billId
+    });
 
     count++;
   });
