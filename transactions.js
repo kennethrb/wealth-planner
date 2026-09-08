@@ -120,6 +120,7 @@ async function addTransaction() {
     const action = editingTransactionId ? "updateTransaction" : "addTransaction";
     
     let url = `${BASE_URL}?action=${action}`
+        + `&mode=${appMode}`
         + `&date=${encodeURIComponent(date)}`
         + `&amount=${amount}`
         + `&details=${encodeURIComponent(details)}`
@@ -322,7 +323,11 @@ async function deleteTransactionRecord(transactionId) {
     if (!confirmed) return;
     
     // Updated 'transactionId=' to 'id='
-    await fetch(`${BASE_URL}?action=deleteTransaction&id=${transactionId}`);
+    await fetch(
+        `${BASE_URL}?action=deleteTransaction`
+        + `&mode=${appMode}`
+        + `&id=${transactionId}`
+    );
     
     await loadData();
     
