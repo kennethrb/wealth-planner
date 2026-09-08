@@ -127,7 +127,14 @@ async function addCategory() {
     }
     const confirmed = await showConfirmDialog("Add Category", `Add category "${categoryName}"?`);
     if (!confirmed) return;
-    await fetch(`${BASE_URL}?action=addCategory` + `&categoryName=${encodeURIComponent(categoryName)}` + `&budgetType=${encodeURIComponent(budgetType)}` + `&group=${encodeURIComponent(group)}` + `&preferredFundingSource=${encodeURIComponent(preferredFundingSource)}`);
+    await fetch(
+        `${BASE_URL}?action=addCategory`
+        + `&mode=${appMode}`
+        + `&categoryName=${encodeURIComponent(categoryName)}`
+        + `&budgetType=${encodeURIComponent(budgetType)}`
+        + `&group=${encodeURIComponent(group)}`
+        + `&preferredFundingSource=${encodeURIComponent(preferredFundingSource)}`
+    );
     await loadData();
     await loadCategoryDropdown();
     await loadScenarioCategories();
@@ -172,7 +179,11 @@ async function deleteCategory() {
     const confirmDelete = await showConfirmDialog("Delete Category", `Delete this category?`);
     if (!confirmDelete) return;
 
-    await fetch(`${BASE_URL}?action=deleteCategory&categoryId=${encodeURIComponent(categoryId)}`);
+    await fetch(
+        `${BASE_URL}?action=deleteCategory`
+        + `&mode=${appMode}`
+        + `&categoryId=${encodeURIComponent(categoryId)}`
+    );
 
     await loadData();
     await refreshUI();
