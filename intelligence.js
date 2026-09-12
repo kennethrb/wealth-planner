@@ -1421,13 +1421,6 @@ async function loadCashFlowCommandCenter() {
             appData.accounts
         );
 
-    const availableCash =
-        liquidAccounts.reduce(
-            (sum, account) =>
-                sum + Number(account.currentBalance || 0),
-            0
-        );
-
     const remainingBills =
         appData.recurringBills
             .filter(b => b.active !== false)
