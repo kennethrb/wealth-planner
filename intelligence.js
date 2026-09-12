@@ -1286,6 +1286,7 @@ async function loadMonthlyWealthActionPlan() {
     await loadFinancialHealthAdvisor();
     await loadFundingOptimizationAdvisor();
     await loadWealthSweep();
+    await loadGoalFundingOptimizer();
 
     const actions = [];
 
@@ -1338,6 +1339,27 @@ async function loadMonthlyWealthActionPlan() {
                 "Available cash is insufficient for upcoming obligations.",
             impact:
                 "Prevents overdrafts and missed payments"
+        });
+    
+    }
+
+    if (window.qaGoalFundingOptimizer) {
+    
+        actions.push({
+    
+            priority: 2,
+    
+            badge: "🎯 Goal Funding",
+    
+            title:
+                window.qaGoalFundingOptimizer.priorityAction,
+    
+            detail:
+                window.qaGoalFundingOptimizer.reason,
+    
+            impact:
+                "Accelerates goal completion and improves wealth momentum"
+    
         });
     
     }
@@ -1659,16 +1681,26 @@ async function loadGoalFundingOptimizer() {
                             1
                         );
 
+                    const completable =
+                        remaining <= opportunity;
+                    
                     const score =
-                        (completion * 0.6) +
-                        ((1 / Math.max(monthsToFinish, 1)) * 0.4);
+                        (completable ? 1000 : 0) +
+                        (completion * 100);
 
+                    const reason =
+                        completable
+                            ? "Can be completed immediately"
+                            : "Highest progress toward completion";
+                    
                     return {
                         ...goal,
                         remaining,
                         completion,
                         monthsToFinish,
-                        score
+                        completable,
+                        score,
+                        reason
                     };
 
                 })
@@ -1708,20 +1740,13 @@ async function loadGoalFundingOptimizer() {
             suggestedFunding;
 
         window.qaGoalFundingOptimizer = {
-
-            goal:
-                bestGoal.goal,
-
+            goal: bestGoal.goal,
             opportunity,
-
             suggestedFunding,
-
-            remaining:
-                bestGoal.remaining,
-
-            completion:
-                bestGoal.completion
-
+            remaining: bestGoal.remaining,
+            completion: bestGoal.completion,
+            reason: bestGoal.reason,
+            completable: bestGoal.completable
         };
 
         window.qaGoalFundingOptimizer.priorityAction =
@@ -1826,6 +1851,11 @@ async function loadGoalFundingOptimizer() {
                         to accelerate completion and free future cash flow for other goals.
                     </p>
                 
+                </div>
+
+                <div class="metric-row">
+                    <span>Reason</span>
+                    <strong>${bestGoal.reason}</strong>
                 </div>
 
 
