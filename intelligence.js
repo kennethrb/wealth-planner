@@ -1459,15 +1459,6 @@ async function loadCashFlowCommandCenter() {
         ? surplus * .70
         : 0;
 
-    window.qaCashFlow = {
-            availableCash,
-            remainingBills,
-            surplus,
-            coverage,
-            status,
-            recommendation
-        };
-
     let status;
     let recommendation;
     
@@ -1496,6 +1487,32 @@ async function loadCashFlowCommandCenter() {
         recommendation =
             `You have ${formatCurrency(surplus)} available for wealth building. Prioritize goals, investments, and Wealth Sweep execution.`;
     }
+
+    
+    window.qaCashFlow = {
+            availableCash,
+            remainingBills,
+            surplus,
+            coverage,
+            status,
+            recommendation
+        };
+    
+    logQATrace(
+        "DI-009",
+        "loadCashFlowCommandCenter",
+        {
+            availableCash,
+            remainingBills
+        },
+        {
+            surplus,
+            opportunity,
+            coverage,
+            status
+        },
+        coverage >= 0
+    );
 
         container.innerHTML = `
         <div class="card">
