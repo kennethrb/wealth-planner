@@ -1405,3 +1405,102 @@ async function loadScenarioWorkbench() {
 
     await loadScenarioCategories();
 }
+
+
+async function loadCashFlowCommandCenter() {
+
+    const container =
+        document.getElementById(
+            "cashFlowCommandCenter"
+        );
+
+    if (!container) return;
+
+    const availableCash =
+        getTotalLiquidAssets(
+            appData.accounts
+        );
+
+    const remainingBills =
+        (appData.recurringBills || [])
+        .filter(bill => bill.active !== false)
+        .reduce((sum, bill) =>
+            sum + Number(
+                bill.defaultAmount || 0
+            ),
+            0
+        );
+
+    const coverage =
+        remainingBills === 0
+            ? 999
+            : availableCash / remainingBills;
+
+    const surplus =
+        availableCash -
+        remainingBills;
+
+    let status = "";
+    let recommendation = "";
+
+    if (coverage < 1) {
+
+        status =
+            "🚨 Shortfall Risk";
+
+        recommendation =
+            "Reduce discretionary spending and preserve liquidity.";
+
+    } else if (coverage < 3) {
+
+        status =
+            "⚠ Tight Cash Flow";
+
+        recommendation =
+            "Avoid major purchases and monitor upcoming bills.";
+
+    } else {
+
+        status =
+            "✅ Healthy Position";
+
+        recommendation =
+            `Deploy ${formatCurrency(surplus)} through goals, investing, or Wealth Sweep.`;
+    }
+
+    container.innerHTML = `
+        <div class="advisor-action priority">
+
+            <div class="action-title">
+                💰 Cash Flow Command Center
+            </div>
+
+            <div class="metric-row">
+                <span>Available Cash</span>
+                <strong>${formatCurrency(availableCash)}</strong>
+            </div>
+
+            <div class="metric-row">
+                <span>Remaining Bills</span>
+                <strong>${formatCurrency(remainingBills)}</strong>
+            </div>
+
+            <div class="metric-row">
+                <span>Coverage Ratio</span>
+                <strong>${coverage.toFixed(1)}x</strong>
+            </div>
+
+            <div class="metric-row">
+                <span>Status</span>
+                <strong>${status}</strong>
+            </div>
+
+            <hr>
+
+            <div class="advisor-insight">
+                ${recommendation}
+            </div>
+
+        </div>
+    `;
+}
