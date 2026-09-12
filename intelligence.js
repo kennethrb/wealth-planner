@@ -1416,20 +1416,28 @@ async function loadCashFlowCommandCenter() {
 
     if (!container) return;
 
+    const liquidAccounts =
+        appData.accounts.filter(a =>
+            a.netWorthType === "Asset"
+        );
+
     const availableCash =
-        getTotalLiquidAssets(
-            appData.accounts
+        liquidAccounts.reduce(
+            (sum, account) =>
+                sum + Number(account.currentBalance || 0),
+            0
         );
 
     const remainingBills =
-        (appData.recurringBills || [])
-        .filter(bill => bill.active !== false)
-        .reduce((sum, bill) =>
-            sum + Number(
-                bill.defaultAmount || 0
-            ),
-            0
-        );
+        appData.recurringBills
+            .filter(b => b.active !== false)
+            .reduce(
+                (sum, bill) =>
+                    sum + Number(
+                        bill.defaultAmount || 0
+                    ),
+                0
+            );
 
     const coverage =
         remainingBills === 0
@@ -1437,11 +1445,10 @@ async function loadCashFlowCommandCenter() {
             : availableCash / remainingBills;
 
     const surplus =
-        availableCash -
-        remainingBills;
+        availableCash - remainingBills;
 
-    let status = "";
-    let recommendation = "";
+    let status;
+    let recommendation;
 
     if (coverage < 1) {
 
@@ -1449,7 +1456,7 @@ async function loadCashFlowCommandCenter() {
             "🚨 Shortfall Risk";
 
         recommendation =
-            "Reduce discretionary spending and preserve liquidity.";
+            "Preserve cash and reduce discretionary spending.";
 
     } else if (coverage < 3) {
 
@@ -1465,10 +1472,11 @@ async function loadCashFlowCommandCenter() {
             "✅ Healthy Position";
 
         recommendation =
-            `Deploy ${formatCurrency(surplus)} through goals, investing, or Wealth Sweep.`;
+            `Deploy ${formatCurrency(surplus)} toward goals, investing, or Wealth Sweep.`;
     }
 
     container.innerHTML = `
+
         <div class="advisor-action priority">
 
             <div class="action-title">
