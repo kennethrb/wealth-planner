@@ -1305,7 +1305,7 @@ async function loadMonthlyWealthActionPlan() {
     if (window.qaFinancialHealthAdvisor?.savingsRate < 20) {
         const gap = window.qaFinancialHealthAdvisor.wealthImpact;
         actions.push({
-            priority: 2,
+            priority: 3,
             badge: "🎯 Savings Gap",
             title: "Increase Monthly Savings Rate",
             detail: "Current savings rate is under 20%. Increase monthly contribution toward savings goals.",
@@ -1321,7 +1321,7 @@ async function loadMonthlyWealthActionPlan() {
         const benefit = window.qaSweep.total3YrBenefit;
 
         actions.push({
-            priority: 3,
+            priority: 2,
             badge: "🧹 Wealth Sweep",
             title: `Deploy ${formatCurrency(excess)} Excess Cash`,
             detail: `Allocate ${formatCurrency(invest)} to investments & ${formatCurrency(debt)} to debt payoff.`,
@@ -1347,7 +1347,7 @@ async function loadMonthlyWealthActionPlan() {
     
         actions.push({
     
-            priority: 2,
+            priority: 1,
     
             badge: "🎯 Goal Funding",
     
