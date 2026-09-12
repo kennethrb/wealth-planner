@@ -653,7 +653,7 @@ async function refreshUI() {
         loadPersonalInflation(),           // DI-005
         loadPurchaseEvaluator(),           // DI-006
         loadWealthSweep(),                 // DI-007
-        loadCashFlowCommandCenter(); // DI-009
+        loadCashFlowCommandCenter(), // DI-009
         loadMonthlyWealthActionPlan(),     // DI-008
         loadScenarioWorkbench(),
         loadBufferVsInvest(),
