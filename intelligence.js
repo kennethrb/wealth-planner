@@ -1436,7 +1436,7 @@ async function loadCashFlowCommandCenter() {
         );
 
     const remainingBills =
-        appData.recurringBills
+        (appData.recurringBills || [])
             .filter(b => b.active !== false)
             .reduce(
                 (sum, bill) =>
