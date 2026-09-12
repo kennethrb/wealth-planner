@@ -1531,7 +1531,10 @@ async function loadCashFlowCommandCenter() {
             "✅ Healthy Position";
 
         recommendation =
-            `You have ${formatCurrency(surplus)} available for wealth building. Prioritize goals, investments, and Wealth Sweep execution.`;
+        `You can safely deploy
+        ${formatCurrency(opportunity)}
+        today without impacting
+        upcoming obligations.`;
     }
 
     
@@ -1590,31 +1593,57 @@ async function loadCashFlowCommandCenter() {
         
             <hr>
         
-            <div class="metric-row">
-                <span>Available Cash</span>
-                <strong>${formatCurrency(availableCash)}</strong>
-            </div>
+            <div class="hero-metric">
             
-            <div class="metric-row">
-                <span>Upcoming Obligations</span>
-                <strong>${formatCurrency(remainingBills)}</strong>
-            </div>
+                <div class="hero-label">
+                    Available Wealth Opportunity
+                </div>
             
-            <div class="metric-row">
-                <span>Available Surplus</span>
-                <strong>${formatCurrency(surplus)}</strong>
-            </div>
-            
-            <div class="metric-row">
-                <span>Wealth Opportunity</span>
-                <strong style="color:#10b981;">
+                <div class="hero-value">
                     ${formatCurrency(opportunity)}
+                </div>
+            
+            </div>
+            
+            <hr>
+            
+            <h3>Recommended Deployment Plan</h3>
+            
+            <div class="metric-row">
+                <span>🎯 Goals</span>
+                <strong>
+                    ${formatCurrency(opportunity * 0.30)}
                 </strong>
             </div>
             
             <div class="metric-row">
+                <span>📈 Investments</span>
+                <strong>
+                    ${formatCurrency(opportunity * 0.50)}
+                </strong>
+            </div>
+            
+            <div class="metric-row">
+                <span>💳 Debt Reduction</span>
+                <strong>
+                    ${formatCurrency(opportunity * 0.20)}
+                </strong>
+            </div>
+
+            <hr>
+            
+            <div class="metric-row">
                 <span>Coverage Ratio</span>
-                <strong>${coverage.toFixed(1)}x</strong>
+                <strong>
+                    ${coverage.toFixed(1)}x
+                </strong>
+            </div>
+            
+            <div class="metric-row">
+                <span>Upcoming Bills</span>
+                <strong>
+                    ${formatCurrency(remainingBills)}
+                </strong>
             </div>
         
         </div>
