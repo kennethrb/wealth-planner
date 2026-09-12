@@ -1598,3 +1598,205 @@ async function loadCashFlowCommandCenter() {
         </div>
         `;
 }
+
+async function loadGoalFundingOptimizer() {
+
+    try {
+
+        const container =
+            document.getElementById(
+                "goalFundingOptimizer"
+            );
+
+        if (!container) return;
+
+        const goals =
+            appData.goals || [];
+
+        const opportunity =
+            window.qaCashFlow?.opportunity || 0;
+
+        if (
+            goals.length === 0 ||
+            opportunity <= 0
+        ) {
+
+            container.innerHTML = "";
+            return;
+
+        }
+
+        const rankedGoals =
+            goals
+                .map(goal => {
+
+                    const current =
+                        Number(goal.current || 0);
+
+                    const target =
+                        Number(goal.target || 0);
+
+                    const monthlyContribution =
+                        Number(
+                            goal.monthlyContribution || 1
+                        );
+
+                    const remaining =
+                        Math.max(
+                            0,
+                            target - current
+                        );
+
+                    const completion =
+                        target > 0
+                            ? current / target
+                            : 0;
+
+                    const monthsToFinish =
+                        remaining /
+                        Math.max(
+                            monthlyContribution,
+                            1
+                        );
+
+                    const score =
+                        (completion * 0.6) +
+                        ((1 / Math.max(monthsToFinish, 1)) * 0.4);
+
+                    return {
+                        ...goal,
+                        remaining,
+                        completion,
+                        monthsToFinish,
+                        score
+                    };
+
+                })
+                .filter(goal =>
+                    goal.remaining > 0
+                )
+                .sort(
+                    (a, b) =>
+                        b.score - a.score
+                );
+
+        const bestGoal =
+            rankedGoals[0];
+
+        if (!bestGoal) {
+
+            container.innerHTML = "";
+            return;
+
+        }
+
+        const suggestedFunding =
+            Math.min(
+                opportunity,
+                bestGoal.remaining
+            );
+
+        window.qaGoalFundingOptimizer = {
+
+            goal:
+                bestGoal.goal,
+
+            opportunity,
+
+            suggestedFunding,
+
+            remaining:
+                bestGoal.remaining,
+
+            completion:
+                bestGoal.completion
+
+        };
+
+        logQATrace(
+            "DI-010",
+            "loadGoalFundingOptimizer",
+            {
+                goals: goals.length,
+                opportunity
+            },
+            {
+                selectedGoal:
+                    bestGoal.goal,
+                suggestedFunding
+            },
+            true
+        );
+
+        container.innerHTML = `
+
+            <div class="card">
+
+                <h2>
+                    🎯 Goal Funding Optimizer
+                </h2>
+
+                <div class="advisor-action priority">
+
+                    <div class="action-title">
+                        Recommended Goal
+                    </div>
+
+                    <p>
+                        <strong>
+                            ${bestGoal.goal}
+                        </strong>
+                    </p>
+
+                </div>
+
+                <div class="metric-row">
+                    <span>Progress</span>
+                    <strong>
+                        ${(bestGoal.completion * 100).toFixed(1)}%
+                    </strong>
+                </div>
+
+                <div class="metric-row">
+                    <span>Remaining</span>
+                    <strong>
+                        ${formatCurrency(bestGoal.remaining)}
+                    </strong>
+                </div>
+
+                <div class="metric-row">
+                    <span>Available Capital</span>
+                    <strong style="color:#10b981;">
+                        ${formatCurrency(opportunity)}
+                    </strong>
+                </div>
+
+                <div class="metric-row">
+                    <span>Suggested Funding</span>
+                    <strong>
+                        ${formatCurrency(suggestedFunding)}
+                    </strong>
+                </div>
+
+                <hr>
+
+                <p>
+                    Funding this goal will
+                    accelerate completion and
+                    improve wealth progress.
+                </p>
+
+            </div>
+
+        `;
+
+    } catch(error) {
+
+        console.error(
+            "DI-010 Failed",
+            error
+        );
+
+    }
+
+}
