@@ -2,26 +2,73 @@
  * Wealth Planner Intelligence Engine
  */
 /**
- * Determines if an account is liquid.
- *
- * @param {Object} account
- * @returns {boolean}
- */
-function isLiquidAccount(account) {
-    const type = String(
-        account.assetClass ||
-        account.type ||
-        account["Type"] ||
-        ""
-    )
-    .trim()
-    .toLowerCase();
+getBudgetSummary()
+        ↓
+loadFinancialHealthAdvisor()
 
-    return [
-        "cash",
-        "checking",
-        "savings"
-    ].includes(type);
+loadNetWorthVelocity()
+
+loadWealthProjectionAccelerator()
+
+        ↓
+
+getCapitalPosition()
+        ↓
+loadBufferVsInvest()
+
+loadPurchaseEvaluator()
+
+loadWealthSweep()
+ */
+
+//Create Budget Summary Engine
+function getBudgetSummary(year = getViewYear(), month = getViewMonth()) {
+    const categoryTypes = {};
+    (appData.categories || []).forEach(cat => {
+        categoryTypes[cat.categoryName] = cat.budgetType;
+    });
+    let income = 0;
+    let expense = 0;
+    let savings = 0;
+    let debt = 0;
+    (appData.budget || []).forEach(item => {
+        if (Number(item.year) !== year) return;
+        if (item.month !== month) return;
+        const amount = Number(item.plannedAmount || 0);
+        const type = categoryTypes[item.category];
+        if (type === "Income") income += amount;
+        if (type === "Expense") expense += amount;
+        if (type === "Savings") savings += amount;
+        if (type === "Debt") debt += amount;
+    });
+    return {
+        income,
+        expense,
+        savings,
+        debt,
+        monthlyObligations: expense + debt,
+        monthlySurplus: income - expense - savings - debt
+    };
+}
+
+//Create Capital Position Engine
+function getCapitalPosition() {
+    const budget = getBudgetSummary();
+    const availableCash = getTotalLiquidAssets(appData.accounts || []);
+    const bufferTarget = budget.monthlyObligations * 3;
+    const excessCash = Math.max(0, availableCash - bufferTarget);
+    return {
+        availableCash,
+        monthlyObligations: budget.monthlyObligations,
+        bufferTarget,
+        excessCash
+    };
+}
+
+
+function isLiquidAccount(account) {
+    const type = String(account.assetClass || account.type || account["Type"] || "").trim().toLowerCase();
+    return ["cash", "checking", "savings"].includes(type);
 }
 
 /**
@@ -31,21 +78,8 @@ function isLiquidAccount(account) {
  * @returns {number}
  */
 function getTotalLiquidAssets(accounts = []) {
-    return accounts
-        .filter(account =>
-            account.netWorthType === "Asset" &&
-            isLiquidAccount(account)
-        )
-        .reduce(
-            (total, account) =>
-                total +
-                Number(
-                    account.currentBalance ??
-                    account.balance ??
-                    0
-                ),
-            0
-        );
+    return accounts.filter(account => account.netWorthType === "Asset" && isLiquidAccount(account)).reduce(
+        (total, account) => total + Number(account.currentBalance ?? account.balance ?? 0), 0);
 }
 
 function roundMoney(value) {
@@ -80,36 +114,11 @@ async function loadBufferVsInvest() {
     const selectedYear = getViewYear();
     const selectedMonth = getViewMonth();
 
-    const budgetData = (appData.budget || []).filter(
-        item => Number(item.year) === selectedYear
-    );
-
-    const categoryTypes = {};
-    (appData.categories || []).forEach(cat => {
-        categoryTypes[cat.categoryName] = cat.budgetType;
-    });
-
-    let monthlyExpense = 0;
-    let monthlyDebt = 0;
-
-    budgetData.forEach(item => {
-        if (item.month !== selectedMonth) return;
-        const type = categoryTypes[item.category];
-        const amount = Number(item.plannedAmount || item.amount || 0);
-
-        if (type === "Expense") monthlyExpense += amount;
-        if (type === "Debt") monthlyDebt += amount;
-    });
-
-    const monthlyObligations = monthlyExpense + monthlyDebt;
-    const bufferTarget = monthlyObligations * 3;
-
-    const availableCash =
-        getTotalLiquidAssets(
-            appData.accounts || []
-        );
-
-    const excessCash = availableCash - bufferTarget;
+    const capital = getCapitalPosition();
+    const availableCash = capital.availableCash;
+    const monthlyObligations = capital.monthlyObligations;
+    const bufferTarget = capital.bufferTarget;
+    const excessCash = capital.excessCash;
 
     // Expose QA Metrics
     window.qaBuffer = {
@@ -219,23 +228,12 @@ async function loadNetWorthVelocity() {
         categoryTypes[cat.categoryName] = cat.budgetType;
     });
 
-    let income = 0;
-    let expense = 0;
-    let savings = 0;
-    let debt = 0;
-
-    appData.budget.forEach(item => {
-        if (Number(item.year) !== selectedYear) return;
-        if (item.month !== selectedMonth) return;
-
-        const amount = Number(item.plannedAmount || 0);
-        const type = categoryTypes[item.category];
-
-        if (type === "Income") income += amount;
-        if (type === "Expense") expense += amount;
-        if (type === "Savings") savings += amount;
-        if (type === "Debt") debt += amount;
-    });
+    const budget = getBudgetSummary();
+    
+    const income = budget.income;
+    const expense = budget.expense;
+    const savings = budget.savings;
+    const debt = budget.debt;
 
     const monthlyVelocity = savings + debt;
     const annualVelocity = monthlyVelocity * 12;
@@ -316,41 +314,14 @@ async function loadFinancialHealthAdvisor() {
         categoryTypes[cat.categoryName] = cat.budgetType;
     });
 
-    let income = 0;
-    let expenses = 0;
-    let savings = 0;
-    let debt = 0;
-
-    appData.budget.forEach(item => {
-
-        if (Number(item.year) !== selectedYear) return;
-        if (item.month !== selectedMonth) return;
-
-        const amount =
-            Number(item.plannedAmount || 0);
-
-        const type =
-            categoryTypes[item.category];
-
-        if (type === "Income") income += amount;
-        if (type === "Expense") expenses += amount;
-        if (type === "Savings") savings += amount;
-        if (type === "Debt") debt += amount;
-
-    });
-
-    const monthlySurplus =
-        income - expenses - savings - debt;
-
-    const savingsRate =
-        income > 0
-            ? (savings / income) * 100
-            : 0;
-
-    const debtRate =
-        income > 0
-            ? (debt / income) * 100
-            : 0;
+    const budget = getBudgetSummary();
+    const income = budget.income;
+    const expenses = budget.expense;
+    const savings = budget.savings;
+    const debt = budget.debt;
+    const monthlySurplus = budget.monthlySurplus;
+    const savingsRate = income > 0 ? (savings / income) * 100 : 0;
+    const debtRate = income > 0 ? (debt / income) * 100 : 0;
     
     let status = "Healthy";
     
@@ -547,33 +518,12 @@ async function loadFundingOptimizationAdvisor() {
     const container = document.getElementById("fundingOptimizationAdvisor");
     if (!container) return;
 
-    const selectedYear = getViewYear();
-    const selectedMonth = getViewMonth();
-
-    // Map budget categories for reference
-    const categoryTypes = {};
-    appData.categories.forEach(cat => {
-        categoryTypes[cat.categoryName] = cat.budgetType;
-    });
-
-    // Calculate total monthly obligations across all accounts
-    let totalObligations = 0;
-    appData.budget.forEach(item => {
-        if (Number(item.year) !== selectedYear) return;
-        if (item.month !== selectedMonth) return;
-
-        const amount = Number(item.plannedAmount || 0);
-        const type = categoryTypes[item.category];
-
-        if (type === "Expense" || type === "Debt") {
-            totalObligations += amount;
-        }
-    });
-
-    const bufferTarget = totalObligations * 3;
+    const capital = getCapitalPosition();
+    const totalObligations = capital.monthlyObligations;
+    const bufferTarget = capital.bufferTarget;
+    const totalAvailableCash = capital.availableCash;
+    const excessCash = capital.excessCash;
     const insights = [];
-
-    // Rule 1: Detect Individual Account Deficits
     const accounts = appData.accounts || [];
     accounts.forEach(account => {
         const balance = Number(account.currentBalance || account.balance || 0);
@@ -608,11 +558,6 @@ async function loadFundingOptimizationAdvisor() {
     });
 
     // Rule 2: Detect Global Idle Cash
-    const totalAvailableCash =
-        getTotalLiquidAssets(accounts);
-
-    const excessCash = totalAvailableCash - bufferTarget;
-
     if (excessCash > 0) {
         insights.push({
             type: "IDLE_CASH",
@@ -796,38 +741,12 @@ async function loadAssetAllocationAdvisor() {
 }
 
 async function loadWealthProjectionAccelerator() {
-    const container = document.getElementById("wealthProjectionAccelerator");
-    if (!container) return;
-
-    const selectedYear = getViewYear();
-    const selectedMonth = getViewMonth();
-
-    const categoryTypes = {};
-    (appData.categories || []).forEach(cat => {
-        categoryTypes[cat.categoryName] = cat.budgetType;
-    });
-
-    let income = 0;
-    let expense = 0;
-    let savings = 0;
-    let debt = 0;
-
-    (appData.budget || []).forEach(item => {
-        if (Number(item.year) !== selectedYear) return;
-        if (item.month !== selectedMonth) return;
-
-        const amount = Number(item.plannedAmount || 0);
-        const type = categoryTypes[item.category];
-
-        if (type === "Income") income += amount;
-        if (type === "Expense") expense += amount;
-        if (type === "Savings") savings += amount;
-        if (type === "Debt") debt += amount;
-    });
-
-    const monthlySurplus = income - expense - savings - debt;
-    const investableAmount = Math.max(0, monthlySurplus * 0.70); // Assume 70% sweep into investments
-    const annualReturnRate = 0.07; // Assumed 7% conservative annual return
+        const container = document.getElementById("wealthProjectionAccelerator");
+        if (!container) return;
+        const budget = getBudgetSummary();
+        const monthlySurplus = budget.monthlySurplus;
+        const investableAmount = Math.max(0, monthlySurplus * 0.70); // Assume 70% sweep into investments
+        const annualReturnRate = 0.07; // Assumed 7% conservative annual return
 
     // Future Value Formula: FV = P * (((1 + r/n)^(n*t) - 1) / (r/n))
     const calculateFV = (years) => {
@@ -850,22 +769,19 @@ async function loadWealthProjectionAccelerator() {
     };
 
     logQATrace(
-    "DI-003",
-    "loadWealthProjectionAccelerator",
-    {
-        income,
-        expense,
-        savings,
-        debt
-    },
-    {
-        investableAmount,
-        fv5,
-        fv10,
-        fv20
-    },
-    fv20 >= fv10 && fv10 >= fv5
-);
+        "DI-003",
+        "loadWealthProjectionAccelerator",
+        {
+            monthlySurplus
+        },
+        {
+            investableAmount,
+            fv5,
+            fv10,
+            fv20
+        },
+        fv20 >= fv10 && fv10 >= fv5
+    );
 
     container.innerHTML = `
         <div class="card">
@@ -1071,27 +987,10 @@ async function loadPurchaseEvaluator(testAmount = null) {
         categoryTypes[cat.categoryName] = cat.budgetType;
     });
 
-    let monthlyExpense = 0;
-    let monthlyDebt = 0;
-
-    appData.budget.forEach(item => {
-        if (Number(item.year) !== selectedYear) return;
-        if (item.month !== selectedMonth) return;
-
-        const amount = Number(item.plannedAmount || 0);
-        const type = categoryTypes[item.category];
-
-        if (type === "Expense") monthlyExpense += amount;
-        if (type === "Debt") monthlyDebt += amount;
-    });
-
-    const monthlyObligations = monthlyExpense + monthlyDebt;
-    const bufferTarget = monthlyObligations * 3;
-
-    const availableCash =
-        getTotalLiquidAssets(
-            appData.accounts || []
-        );
+    const capital = getCapitalPosition();
+    const availableCash = capital.availableCash;
+    const monthlyObligations = capital.monthlyObligations;
+    const bufferTarget = capital.bufferTarget;
 
     const cashAfterPurchase = availableCash - purchaseAmount;
     const bufferRemaining = cashAfterPurchase - bufferTarget;
@@ -1197,9 +1096,10 @@ async function loadWealthSweep() {
     const container = document.getElementById("wealthSweep");
 
     // Retrieve excess cash from DI-002/Buffer calculation
-    const availableCash = window.qaBuffer?.availableCash || 0;
-    const bufferTarget = window.qaBuffer?.bufferTarget || 0;
-    const excessCash = Math.max(0, availableCash - bufferTarget);
+    const capital = getCapitalPosition();
+    const availableCash = capital.availableCash;
+    const bufferTarget = capital.bufferTarget;
+    const excessCash = capital.excessCash;
 
     // Default Allocation Ratios: 20% Debt Payoff, 10% Emergency Top-up, 70% Investment
     const debtSweep = roundMoney(excessCash * 0.20);
