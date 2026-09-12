@@ -1531,8 +1531,10 @@ async function loadCashFlowCommandCenter() {
             "✅ Healthy Position";
 
         recommendation =
-            `today without impacting
-            upcoming obligations.`;
+        `You can safely deploy
+        ${formatCurrency(opportunity)}
+        today without impacting
+        upcoming obligations.`;
     }
 
     
@@ -1602,15 +1604,6 @@ async function loadCashFlowCommandCenter() {
                 </div>
             
             </div>
-
-            <p>
-                You can safely deploy
-                <strong style="color:#10b981;">
-                    ${formatCurrency(opportunity)}
-                </strong>
-                today without impacting
-                upcoming obligations.
-            </p>
             
             <hr>
             
