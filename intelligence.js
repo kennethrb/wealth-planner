@@ -1473,28 +1473,6 @@ async function loadCashFlowCommandCenter() {
         
             <h2>💰 Cash Flow Command Center</h2>
         
-            <div class="metric-row">
-                <span>Available Cash</span>
-                <strong>${formatCurrency(availableCash)}</strong>
-            </div>
-        
-            <div class="metric-row">
-                <span>Remaining Bills</span>
-                <strong>${formatCurrency(remainingBills)}</strong>
-            </div>
-        
-            <div class="metric-row">
-                <span>Available Surplus</span>
-                <strong>${formatCurrency(surplus)}</strong>
-            </div>
-        
-            <div class="metric-row">
-                <span>Coverage Ratio</span>
-                <strong>${coverage.toFixed(1)}x</strong>
-            </div>
-        
-            <hr>
-        
             <div class="advisor-status ${
                 coverage < 1
                     ? "danger"
@@ -1502,9 +1480,7 @@ async function loadCashFlowCommandCenter() {
                     ? "warning"
                     : "success"
             }">
-        
                 ${status}
-        
             </div>
         
             <div class="advisor-action priority">
@@ -1517,6 +1493,28 @@ async function loadCashFlowCommandCenter() {
                     ${recommendation}
                 </p>
         
+            </div>
+        
+            <hr>
+        
+            <div class="metric-row">
+                <span>Available Cash</span>
+                <strong>${formatCurrency(availableCash)}</strong>
+            </div>
+        
+            <div class="metric-row">
+                <span>Bills Due</span>
+                <strong>${formatCurrency(remainingBills)}</strong>
+            </div>
+        
+            <div class="metric-row">
+                <span>Available Surplus</span>
+                <strong>${formatCurrency(surplus)}</strong>
+            </div>
+        
+            <div class="metric-row">
+                <span>Coverage Ratio</span>
+                <strong>${coverage.toFixed(1)}x</strong>
             </div>
         
         </div>
