@@ -1416,9 +1416,9 @@ async function loadCashFlowCommandCenter() {
 
     if (!container) return;
 
-    const liquidAccounts =
-        appData.accounts.filter(a =>
-            a.netWorthType === "Asset"
+    const availableCash =
+        getTotalLiquidAssets(
+            appData.accounts
         );
 
     const availableCash =
@@ -1475,40 +1475,57 @@ async function loadCashFlowCommandCenter() {
             `Deploy ${formatCurrency(surplus)} toward goals, investing, or Wealth Sweep.`;
     }
 
-    container.innerHTML = `
-
-        <div class="advisor-action priority">
-
-            <div class="action-title">
-                💰 Cash Flow Command Center
-            </div>
-
+        container.innerHTML = `
+        <div class="card">
+        
+            <h2>💰 Cash Flow Command Center</h2>
+        
             <div class="metric-row">
                 <span>Available Cash</span>
                 <strong>${formatCurrency(availableCash)}</strong>
             </div>
-
+        
             <div class="metric-row">
                 <span>Remaining Bills</span>
                 <strong>${formatCurrency(remainingBills)}</strong>
             </div>
-
+        
+            <div class="metric-row">
+                <span>Available Surplus</span>
+                <strong>${formatCurrency(surplus)}</strong>
+            </div>
+        
             <div class="metric-row">
                 <span>Coverage Ratio</span>
                 <strong>${coverage.toFixed(1)}x</strong>
             </div>
-
-            <div class="metric-row">
-                <span>Status</span>
-                <strong>${status}</strong>
-            </div>
-
+        
             <hr>
-
-            <div class="advisor-insight">
-                ${recommendation}
+        
+            <div class="advisor-status ${
+                coverage < 1
+                    ? "danger"
+                    : coverage < 3
+                    ? "warning"
+                    : "success"
+            }">
+        
+                ${status}
+        
             </div>
-
+        
+            <div class="advisor-action priority">
+        
+                <div class="action-title">
+                    🎯 Recommended Next Action
+                </div>
+        
+                <p>
+                    ${recommendation}
+                </p>
+        
+            </div>
+        
         </div>
-    `;
+        `;
 }
