@@ -576,24 +576,22 @@ async function loadFundingOptimizationAdvisor() {
         excessCash,
         insightsCount: insights.length
     };
-    logQATrace(
-    "DI-002",
-    "loadFundingOptimizationAdvisor",
-    {
-        selectedYear,
-        selectedMonth,
-        totalObligations,
-        totalAvailableCash
-    },
-    {
-        bufferTarget,
-        excessCash,
-        insightsCount: insights.length
-    },
-    !isNaN(totalAvailableCash) &&
-    !isNaN(bufferTarget) &&
-    !isNaN(excessCash)
-);
+        logQATrace(
+            "DI-002",
+            "loadFundingOptimizationAdvisor",
+            {
+                totalObligations,
+                totalAvailableCash
+            },
+            {
+                bufferTarget,
+                excessCash,
+                insightsCount: insights.length
+            },
+            !isNaN(totalAvailableCash) &&
+            !isNaN(bufferTarget) &&
+            !isNaN(excessCash)
+        );
     
     if (insights.length === 0) {
     
