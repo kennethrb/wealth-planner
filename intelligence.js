@@ -749,6 +749,12 @@ async function loadAssetAllocationAdvisor() {
     const container = document.getElementById("assetAllocationAdvisor");
     if (!container) return;
     const rec = getAssetAllocationRecommendation();
+    if (rec.status === "good") {
+    
+        container.innerHTML = "";
+        return;
+    
+    }
     container.innerHTML = `
         <div class="card">
             <h2>🎯 Asset Allocation Advisor</h2>
