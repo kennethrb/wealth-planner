@@ -65,6 +65,22 @@ function getCapitalPosition() {
     };
 }
 
+function getOpportunityCapital() {
+    const availableCash = getTotalLiquidAssets(appData.accounts || []);
+    const remainingBills = (appData.recurringBills || []).filter(b => b.active !== false).reduce(
+        (sum, bill) => sum + Number(bill.defaultAmount || 0), 0);
+    const coverage = remainingBills === 0 ? 999 : availableCash / remainingBills;
+    const surplus = availableCash - remainingBills;
+    const opportunity = surplus > 0 ? surplus * 0.70 : 0;
+    return {
+        availableCash,
+        remainingBills,
+        coverage,
+        surplus,
+        opportunity
+    };
+}
+
 
 function isLiquidAccount(account) {
     const type = String(account.assetClass || account.type || account["Type"] || "").trim().toLowerCase();
@@ -1374,34 +1390,12 @@ async function loadCashFlowCommandCenter() {
 
     if (!container) return;
 
-    const availableCash =
-        getTotalLiquidAssets(
-            appData.accounts
-        );
-
-    const remainingBills =
-        (appData.recurringBills || [])
-            .filter(b => b.active !== false)
-            .reduce(
-                (sum, bill) =>
-                    sum + Number(
-                        bill.defaultAmount || 0
-                    ),
-                0
-            );
-
-    const coverage =
-        remainingBills === 0
-            ? 999
-            : availableCash / remainingBills;
-
-    const surplus =
-        availableCash - remainingBills;
-   
-    const opportunity =
-    surplus > 0
-        ? surplus * .70
-        : 0;
+const capital = getOpportunityCapital();
+const availableCash = capital.availableCash;
+const remainingBills = capital.remainingBills;
+const coverage = capital.coverage;
+const surplus = capital.surplus;
+const opportunity = capital.opportunity;
 
     let status;
     let recommendation;
@@ -1563,7 +1557,7 @@ async function loadGoalFundingOptimizer() {
             appData.goals || [];
 
         const opportunity =
-            window.qaCashFlow?.opportunity || 0;
+            getOpportunityCapital().opportunity;
 
         if (
             goals.length === 0 ||
