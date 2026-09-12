@@ -409,6 +409,17 @@ async function loadFinancialHealthAdvisor() {
     const wealthImpact =
         monthlySurplus * 12 * 10;
 
+    const isHealthy =
+        savingsRate >= 20 &&
+        debtRate <= 30;
+    
+    if (isHealthy) {
+    
+        container.innerHTML = "";
+        return;
+    
+    }
+
     window.qaFinancialHealthAdvisor = {
         income,
         expenses,
@@ -638,6 +649,13 @@ async function loadFundingOptimizationAdvisor() {
     !isNaN(bufferTarget) &&
     !isNaN(excessCash)
 );
+    
+    if (insights.length === 0) {
+    
+        container.innerHTML = "";
+        return;
+    
+    }
 
     container.innerHTML = `
         <div class="card">
