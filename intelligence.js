@@ -1696,6 +1696,17 @@ async function loadGoalFundingOptimizer() {
                 bestGoal.remaining
             );
 
+        const newRemaining =
+            bestGoal.remaining -
+            suggestedFunding;
+        
+        const completed =
+            newRemaining <= 0;
+
+        const remainingOpportunity =
+            opportunity -
+            suggestedFunding;
+
         window.qaGoalFundingOptimizer = {
 
             goal:
@@ -1712,6 +1723,9 @@ async function loadGoalFundingOptimizer() {
                 bestGoal.completion
 
         };
+
+        window.qaGoalFundingOptimizer.priorityAction =
+            `Fund ${bestGoal.goal} with ${formatCurrency(suggestedFunding)}`;
 
         logQATrace(
             "DI-010",
@@ -1778,13 +1792,42 @@ async function loadGoalFundingOptimizer() {
                     </strong>
                 </div>
 
-                <hr>
+                <div class="metric-row">
+                    <span>Outcome</span>
+                    <strong>
+                        ${
+                            completed
+                                ? "✅ Goal Complete"
+                                : formatCurrency(newRemaining) + " Remaining"
+                        }
+                    </strong>
+                </div>
 
-                <p>
-                    Funding this goal will
-                    accelerate completion and
-                    improve wealth progress.
-                </p>
+                <div class="metric-row">
+                    <span>Capital Remaining</span>
+                    <strong style="color:#10b981;">
+                        ${formatCurrency(remainingOpportunity)}
+                    </strong>
+                </div>
+                
+                <hr>
+                
+                <div class="advisor-action priority">
+                
+                    <div class="action-title">
+                        🎯 Recommended Action
+                    </div>
+                
+                    <p>
+                        Fully fund this goal using
+                        <strong style="color:#10b981;">
+                            ${formatCurrency(suggestedFunding)}
+                        </strong>
+                        to accelerate completion and free future cash flow for other goals.
+                    </p>
+                
+                </div>
+
 
             </div>
 
