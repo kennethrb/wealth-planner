@@ -1490,13 +1490,14 @@ async function loadCashFlowCommandCenter() {
 
     
     window.qaCashFlow = {
-            availableCash,
-            remainingBills,
-            surplus,
-            coverage,
-            status,
-            recommendation
-        };
+        availableCash,
+        remainingBills,
+        surplus,
+        opportunity,
+        coverage,
+        status,
+        recommendation
+    };
     
     logQATrace(
         "DI-009",
@@ -1549,7 +1550,7 @@ async function loadCashFlowCommandCenter() {
             </div>
             
             <div class="metric-row">
-                <span>Bills Due</span>
+                <span>Upcoming Obligations</span>
                 <strong>${formatCurrency(remainingBills)}</strong>
             </div>
             
