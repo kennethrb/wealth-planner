@@ -585,6 +585,7 @@ async function refreshFinancialViews() {
         loadPersonalInflation(),           // DI-005
         loadPurchaseEvaluator(),           // DI-006
         loadWealthSweep(),                 // DI-007
+        loadCashFlowCommandCenter(); // DI-009 - DI-009 becomes the operational bridge between Wealth Sweep and Action Plan.
         loadMonthlyWealthActionPlan(),      // DI-008
         loadScenarioWorkbench()
         
@@ -652,6 +653,7 @@ async function refreshUI() {
         loadPersonalInflation(),           // DI-005
         loadPurchaseEvaluator(),           // DI-006
         loadWealthSweep(),                 // DI-007
+        loadCashFlowCommandCenter(); // DI-009
         loadMonthlyWealthActionPlan(),     // DI-008
         loadScenarioWorkbench(),
         loadBufferVsInvest(),
