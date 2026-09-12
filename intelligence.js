@@ -1304,6 +1304,20 @@ async function loadMonthlyWealthActionPlan() {
         });
     }
 
+    if (window.qaCashFlow?.coverage < 1) {
+    
+        actions.unshift({
+            priority: 0,
+            badge: "🚨 Cash Flow Risk",
+            title: "Resolve Immediate Cash Flow Shortfall",
+            detail:
+                "Available cash is insufficient for upcoming obligations.",
+            impact:
+                "Prevents overdrafts and missed payments"
+        });
+    
+    }
+
     // Sort actions by priority
     actions.sort((a, b) => a.priority - b.priority);
 
@@ -1439,17 +1453,32 @@ async function loadCashFlowCommandCenter() {
 
     const surplus =
         availableCash - remainingBills;
+   
+    const opportunity =
+    surplus > 0
+        ? surplus * .70
+        : 0;
+
+    window.qaCashFlow = {
+            availableCash,
+            remainingBills,
+            surplus,
+            coverage,
+            status,
+            recommendation
+        };
 
     let status;
     let recommendation;
-
+    
+    
     if (coverage < 1) {
 
         status =
             "🚨 Shortfall Risk";
 
         recommendation =
-            "Preserve cash and reduce discretionary spending.";
+            "Protect liquidity immediately. Delay discretionary purchases and transfer additional cash into spending accounts.";
 
     } else if (coverage < 3) {
 
@@ -1457,7 +1486,7 @@ async function loadCashFlowCommandCenter() {
             "⚠ Tight Cash Flow";
 
         recommendation =
-            "Avoid major purchases and monitor upcoming bills.";
+            "Maintain liquidity. Avoid major purchases until upcoming obligations are covered.";
 
     } else {
 
@@ -1465,7 +1494,7 @@ async function loadCashFlowCommandCenter() {
             "✅ Healthy Position";
 
         recommendation =
-            `Deploy ${formatCurrency(surplus)} toward goals, investing, or Wealth Sweep.`;
+            `You have ${formatCurrency(surplus)} available for wealth building. Prioritize goals, investments, and Wealth Sweep execution.`;
     }
 
         container.innerHTML = `
@@ -1501,17 +1530,24 @@ async function loadCashFlowCommandCenter() {
                 <span>Available Cash</span>
                 <strong>${formatCurrency(availableCash)}</strong>
             </div>
-        
+            
             <div class="metric-row">
                 <span>Bills Due</span>
                 <strong>${formatCurrency(remainingBills)}</strong>
             </div>
-        
+            
             <div class="metric-row">
                 <span>Available Surplus</span>
                 <strong>${formatCurrency(surplus)}</strong>
             </div>
-        
+            
+            <div class="metric-row">
+                <span>Wealth Opportunity</span>
+                <strong style="color:#10b981;">
+                    ${formatCurrency(opportunity)}
+                </strong>
+            </div>
+            
             <div class="metric-row">
                 <span>Coverage Ratio</span>
                 <strong>${coverage.toFixed(1)}x</strong>
