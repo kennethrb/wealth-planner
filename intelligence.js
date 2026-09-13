@@ -408,6 +408,44 @@ function loadWealthAdvisor() {
     return advisor;
 }
 
+function getMonthlyWealthBrief() {
+    const advisor = getWealthAdvisorSummary();
+    const opportunity = getOpportunityCapital().opportunity;
+    return {
+        generatedAt: new Date().toISOString(),
+        headline: advisor.topAction?.action || "No action required",
+        summary: `You currently have ${formatCurrency(opportunity)} available for wealth deployment.`,
+        topActions: advisor.actions.slice(0, 3),
+        warnings: advisor.warnings,
+        opportunities: advisor.opportunities
+    };
+}
+
+function loadMonthlyWealthBrief() {
+    const brief = getMonthlyWealthBrief();
+    window.qaWealthBrief = brief;
+    logQATrace("DI-015", "loadMonthlyWealthBrief", {}, {
+        headline: brief.headline,
+        topActions: brief.topActions.length,
+        warnings: brief.warnings.length,
+        opportunities: brief.opportunities.length
+    }, true);
+    return brief;
+}
+
+function getMonthlyWealthBrief() {
+    const advisor = getWealthAdvisorSummary();
+    const opportunity = getOpportunityCapital().opportunity;
+    return {
+        generatedAt: new Date().toISOString(),
+        headline: advisor.topAction?.action || "No action required",
+        summary: `You currently have ${formatCurrency(opportunity)} available for wealth deployment.`,
+        topActions: advisor.actions.slice(0, 3),
+        warnings: advisor.warnings,
+        opportunities: advisor.opportunities
+    };
+}
+
 /**
  * ============================================================
  * EMERGENCY FUND GAP ENGINE
