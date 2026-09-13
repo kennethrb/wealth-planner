@@ -330,6 +330,7 @@ function getTopWealthAction() {
  */
 function getWealthAdvisorSummary() {
     const actions = getWealthAdvisorActions();
+    const topAction = actions[0] || null;
     const warnings = [];
     const opportunities = [];
     // Cash Flow Warning
