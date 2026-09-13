@@ -494,9 +494,17 @@ function loadReconciliation() {
 }
 
 function loadAdvisorDashboard() {
-    const container = document.getElementById("wealthAdvisor");
+
+    const container =
+        document.getElementById(
+            "wealthAdvisor"
+        );
+
     if (!container) return;
-    const advisor = loadMonthlyWealthBrief();
+
+    const advisor =
+        loadMonthlyWealthBrief();
+
     container.innerHTML = `
 
         <div class="card">
@@ -504,6 +512,10 @@ function loadAdvisorDashboard() {
             <h2>
                 🧠 Wealth Advisor
             </h2>
+
+            <div class="advisor-headline">
+                ${advisor.headline}
+            </div>
 
             <div class="advisor-status ${
                 advisor.confidenceLevel === "HIGH"
@@ -513,26 +525,50 @@ function loadAdvisorDashboard() {
                     : "danger"
             }">
 
-            <div class="metric-row">
-                <span>Confidence</span>
-                <strong>
-                    ${advisor.confidenceLevel}
-                    (${advisor.confidenceScore}%)
-                </strong>
+                ${advisor.confidenceLevel}
+                (${advisor.confidenceScore}%)
+
             </div>
 
-            <div class="metric-row">
-                <span>Projected Impact</span>
-                <strong>
+            <div class="advisor-summary">
+
+                ${advisor.summary}
+
+            </div>
+
+            <div class="advisor-impact">
+
+                <div class="impact-label">
+
+                    Potential Wealth Impact
+
+                </div>
+
+                <div class="impact-value">
+
                     ${advisor.projectedImpact}
-                </strong>
+
+                </div>
+
             </div>
 
             <hr>
 
-            <p>
-                ${advisor.advisorReason}
-            </p>
+            <div class="advisor-action">
+
+                <div class="action-title">
+
+                    Why This Matters
+
+                </div>
+
+                <p>
+
+                    ${advisor.advisorReason}
+
+                </p>
+
+            </div>
 
             <hr>
 
@@ -544,7 +580,9 @@ function loadAdvisorDashboard() {
                 <div class="advisor-action priority">
 
                     <div class="action-title">
+
                         ${action.action}
+
                     </div>
 
                     <div class="allocation-row">
