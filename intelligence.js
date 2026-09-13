@@ -2458,31 +2458,30 @@ async function loadGoalFundingOptimizer() {
  * DI-016 Conversational Wealth Advisor
  * ============================================================
  */
+
+const ADVISOR_ROUTES = {
+    // DI-015 Wealth Advisor
+    advisor: ["next", "focus", "priority", "recommend", "best action", "should i do", "top action"],
+    // DI-012 Opportunities
+    opportunity: ["opportunity", "opportunities", "missing", "improve", "optimize", "optimization"],
+    // DI-010 Goals
+    goal: ["goal", "fund", "target", "save for"],
+    // DI-011 Investments
+    investment: ["invest", "investment", "allocation", "portfolio"],
+    // DI-006 Purchase
+    purchase: ["purchase", "afford", "buy", "spender"],
+    // DI-009 Cash Flow
+    cashflow: ["cash flow", "cashflow", "liquidity", "cash position"]
+};
+
+
 function routeAdvisorQuestion(question) {
     const q = String(question || "").toLowerCase();
-    // DI-015 Wealth Advisor
-    if (q.includes("next") || q.includes("focus") || q.includes("priority") || q.includes("recommend") || q.includes("best action") || q.includes("should i do")) {
-        return "advisor";
-    }
-    // DI-012 Opportunities
-    if (q.includes("opportunity") || q.includes("opportunities") || q.includes("missing") || q.includes("improve") || q.includes("optimize")) {
-        return "opportunity";
-    }
-    // DI-010 Goals
-    if (q.includes("goal") || q.includes("fund") || q.includes("target")) {
-        return "goal";
-    }
-    // DI-011 Investments
-    if (q.includes("invest") || q.includes("allocation") || q.includes("portfolio")) {
-        return "investment";
-    }
-    // DI-006 Purchase
-    if (q.includes("purchase") || q.includes("afford") || q.includes("buy")) {
-        return "purchase";
-    }
-    // DI-009 Cash Flow
-    if (q.includes("cash flow") || q.includes("liquidity") || q.includes("cash")) {
-        return "cashflow";
+    for (const [route, keywords] of Object.entries(ADVISOR_ROUTES)) {
+        const matched = keywords.some(keyword => q.includes(keyword));
+        if (matched) {
+            return route;
+        }
     }
     return "advisor";
 }
