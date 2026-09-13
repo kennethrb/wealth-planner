@@ -586,8 +586,10 @@ async function refreshFinancialViews() {
         loadPurchaseEvaluator(),           // DI-006
         loadWealthSweep(),                 // DI-007
         loadCashFlowCommandCenter(), // DI-009 - DI-009 becomes the operational bridge between Wealth Sweep and Action Plan.
-        loadGoalFundingOptimizer(), // DI-010
-        loadMonthlyWealthActionPlan(),      // DI-008
+        loadGoalFundingOptimizer(),      // DI-010
+        loadCapitalAllocationOptimizer(), // DI-011
+        loadAdvisorDashboard(),           // DI-015
+        loadMonthlyWealthActionPlan(),    // DI-008
         loadScenarioWorkbench()
         
     ]);
@@ -616,6 +618,10 @@ async function changeViewPeriod() {
         loadPersonalInflation(),           // DI-005
         loadPurchaseEvaluator(),           // DI-006
         loadWealthSweep(),                 // DI-007
+        loadCashFlowCommandCenter(),       // DI-009
+        loadGoalFundingOptimizer(),        // DI-010
+        loadCapitalAllocationOptimizer(),  // DI-011
+        loadAdvisorDashboard(),            // DI-015
         loadMonthlyWealthActionPlan(),     // DI-008
         loadBufferVsInvest(),
         loadSummary(),
@@ -657,6 +663,7 @@ async function refreshUI() {
         loadCashFlowCommandCenter(), // DI-009
         loadGoalFundingOptimizer(), // DI-010
         loadCapitalAllocationOptimizer(), // DI-011
+        loadAdvisorDashboard(),
         loadMonthlyWealthActionPlan(),     // DI-008
         loadScenarioWorkbench(),
         loadBufferVsInvest(),
