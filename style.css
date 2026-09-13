@@ -115,6 +115,7 @@ html {
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, .1);
     background: var(--card-bg);
+}
 
 .impact-label {
     font-size: .8rem;
