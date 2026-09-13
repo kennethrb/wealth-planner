@@ -93,6 +93,15 @@ html {
     margin-bottom: 16px;
 }
 
+.advisor-confidence-note {
+    font-size: 0.85rem;
+    opacity: 0.85;
+    text-align: center;
+    margin-top: 8px;
+    margin-bottom: 16px;
+    color: var(--text-muted);
+}
+
 .impact-label {
     font-size: .8rem;
     text-transform: uppercase;
