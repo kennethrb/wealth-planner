@@ -530,6 +530,12 @@ function loadAdvisorDashboard() {
 
             </div>
 
+            <div class="advisor-confidence-note">
+            
+                ${advisor.confidenceReason}
+            
+            </div>
+
             <div class="advisor-summary">
 
                 ${advisor.summary}
