@@ -75,13 +75,64 @@ function getCapitalAllocationPlan() {
     };
 }
 
+/**
+ * ============================================================
+ * CAPITAL ALLOCATION RECOMMENDATION ENGINE
+ * ============================================================
+ */
+function getCapitalAllocationRecommendation() {
+    const plan = getCapitalAllocationPlan();
+    const recommendations = [];
+    if (plan.emergencyAllocation > 0) {
+        recommendations.push({
+            priority: 1,
+            category: "Emergency Fund",
+            amount: plan.emergencyAllocation,
+            action: `Allocate ₱${formatCurrency(plan.emergencyAllocation)} to Emergency Fund`
+        });
+    }
+    if (plan.debtAllocation > 0) {
+        recommendations.push({
+            priority: 2,
+            category: "Debt Reduction",
+            amount: plan.debtAllocation,
+            action: `Pay ₱${formatCurrency(plan.debtAllocation)} toward debt`
+        });
+    }
+    if (plan.goalAllocation > 0) {
+        recommendations.push({
+            priority: 3,
+            category: "Goals",
+            amount: plan.goalAllocation,
+            action: `Fund goals with ₱${formatCurrency(plan.goalAllocation)}`
+        });
+    }
+    if (plan.investmentAllocation > 0) {
+        recommendations.push({
+            priority: 4,
+            category: "Investments",
+            amount: plan.investmentAllocation,
+            action: `Invest ₱${formatCurrency(plan.investmentAllocation)}`
+        });
+    }
+    return recommendations;
+}
+
 function loadCapitalAllocationOptimizer() {
     const plan = getCapitalAllocationPlan();
+    const recommendations = getCapitalAllocationRecommendation();
     logQATrace("DI-011", "loadCapitalAllocationOptimizer", {
         opportunity: plan.opportunity
-    }, plan, plan.opportunity >= 0);
+    }, {
+        plan,
+        recommendations
+    }, plan.opportunity >= 0);
     window.qaCapitalAllocation = plan;
-    return plan;
+    window.qaCapitalAllocationRecommendations = recommendations;
+    return {
+        plan,
+        recommendations
+    };
 }
 
 function isLiquidAccount(account) {
