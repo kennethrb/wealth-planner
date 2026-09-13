@@ -505,9 +505,13 @@ function loadAdvisorDashboard() {
                 🧠 Wealth Advisor
             </h2>
 
-            <div class="advisor-status success">
-                ${advisor.headline}
-            </div>
+            <div class="advisor-status ${
+                advisor.confidenceLevel === "HIGH"
+                    ? "success"
+                    : advisor.confidenceLevel === "MEDIUM"
+                    ? "warning"
+                    : "danger"
+            }">
 
             <div class="metric-row">
                 <span>Confidence</span>
