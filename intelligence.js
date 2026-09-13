@@ -225,19 +225,60 @@ function getCapitalAllocationRecommendation() {
 
 /**
  * ============================================================
- * CAPITAL PRIORITY ENGINE
+ * DI-011 SMART PRIORITY ENGINE
  * ============================================================
  *
  * PURPOSE
- * Determine the most important wealth action.
+ * Determine the highest-priority wealth action
+ * based on the user's current financial position.
  *
- * DI-011 Smart Prioritization Layer
+ * Priority Hierarchy:
+ *
+ * 0 = Cash Flow Protection
+ * 1 = Emergency Fund Protection
+ * 2 = Goal Acceleration
+ * 3 = Wealth Growth
+ *
+ * Future:
+ * - Debt-aware prioritization
+ * - Goal-aware prioritization
+ * - Wealth Advisor Copilot integration
  *
  * ============================================================
  */
 function getCapitalAllocationPriority() {
-    const recommendations = getCapitalAllocationRecommendation();
-    return recommendations[0] || null;
+    const cashFlow = getOpportunityCapital();
+    const emergency = getEmergencyFundGap();
+
+    if (cashFlow.coverage < CONFIG.cashFlow.minimumCoverage) {
+        return {
+            priority: 0,
+            category: "Cash Flow Protection",
+            action: "Pause capital deployment and cover upcoming obligations"
+        };
+    }
+
+    if (!emergency.fullyFunded) {
+        return {
+            priority: 1,
+            category: "Emergency Fund",
+            action: "Increase emergency fund reserves"
+        };
+    }
+
+    if (window.qaGoalFundingOptimizer && window.qaGoalFundingOptimizer.completable) {
+        return {
+            priority: 2,
+            category: "Goal Completion",
+            action: window.qaGoalFundingOptimizer.priorityAction
+        };
+    }
+
+    return {
+        priority: 3,
+        category: "Investments",
+        action: "Deploy available capital into growth assets"
+    };
 }
 
 /**
