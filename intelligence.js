@@ -2452,3 +2452,114 @@ async function loadGoalFundingOptimizer() {
     }
 
 }
+
+/**
+ * ============================================================
+ * DI-016 Conversational Wealth Advisor
+ * ============================================================
+ */
+function routeAdvisorQuestion(question) {
+    const q = String(question || "").toLowerCase();
+    if (q.includes("opportunity") || q.includes("opportunities")) {
+        return "opportunity";
+    }
+    if (q.includes("goal") || q.includes("fund")) {
+        return "goal";
+    }
+    if (q.includes("purchase") || q.includes("afford")) {
+        return "purchase";
+    }
+    if (q.includes("invest") || q.includes("allocation")) {
+        return "investment";
+    }
+    if (q.includes("cash flow")) {
+        return "cashflow";
+    }
+    return "advisor";
+}
+
+function askWealthAdvisor(question) {
+    const route = routeAdvisorQuestion(question);
+    switch (route) {
+        case "opportunity":
+            return buildOpportunityResponse();
+        case "goal":
+            return buildGoalResponse();
+        case "purchase":
+            return buildPurchaseResponse();
+        case "investment":
+            return buildInvestmentResponse();
+        case "cashflow":
+            return buildCashFlowResponse();
+        default:
+            return buildAdvisorResponse();
+    }
+}
+
+function buildAdvisorResponse() {
+    const brief = getMonthlyWealthBrief();
+    return {
+        answer: brief.headline,
+        confidence: brief.confidenceScore,
+        source: "DI-015",
+        generatedAt: new Date().toISOString()
+    };
+}
+
+function buildOpportunityResponse() {
+    const result = getWealthOpportunities();
+    const item = result.opportunities[0];
+    return {
+        answer: item ? item.action : "No opportunities detected",
+        confidence: 90,
+        source: "DI-012",
+        generatedAt: new Date().toISOString()
+    };
+}
+
+function buildGoalResponse() {
+    const goal = window.qaGoalFundingOptimizer;
+    return {
+        answer: goal ? goal.priorityAction : "No goal recommendation available",
+        confidence: 85,
+        source: "DI-010",
+        generatedAt: new Date().toISOString()
+    };
+}
+
+function buildInvestmentResponse() {
+    const priority = getCapitalAllocationPriority();
+    return {
+        answer: priority.action,
+        confidence: 85,
+        source: "DI-011",
+        generatedAt: new Date().toISOString()
+    };
+}
+
+function buildCashFlowResponse() {
+    const cash = window.qaCashFlow;
+    return {
+        answer: cash?.recommendation || "Cash flow analysis unavailable",
+        confidence: 80,
+        source: "DI-009",
+        generatedAt: new Date().toISOString()
+    };
+}
+
+function buildPurchaseResponse() {
+    const purchase = window.qaPurchase;
+    return {
+        answer: purchase?.recommendation || "Run Purchase Evaluator first",
+        confidence: 80,
+        source: "DI-006",
+        generatedAt: new Date().toISOString()
+    };
+}
+
+function loadConversationalAdvisorQA(question) {
+    const result = askWealthAdvisor(question);
+    window.qaConversationalAdvisor = result;
+    console.log("🧪 DI-016", question, result);
+    return result;
+}
