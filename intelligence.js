@@ -156,6 +156,33 @@ function getTopWealthAction() {
     return getCapitalAllocationPriority();
 }
 
+/**
+ * ============================================================
+ * EMERGENCY FUND GAP ENGINE
+ * ============================================================
+ *
+ * PURPOSE
+ * Determine how much emergency funding is still needed.
+ *
+ * Formula:
+ * Target Emergency Fund
+ * minus
+ * Existing Emergency Savings
+ *
+ * ============================================================
+ */
+function getEmergencyFundGap() {
+    const targetEmergencyFund = 300000; // temporary placeholder
+    const currentEmergencyFund = 0; // temporary placeholder
+    const gap = Math.max(0, targetEmergencyFund - currentEmergencyFund);
+    return {
+        targetEmergencyFund,
+        currentEmergencyFund,
+        gap,
+        fullyFunded: gap === 0
+    };
+}
+
 
 function loadCapitalAllocationOptimizer() {
     const plan = getCapitalAllocationPlan();
