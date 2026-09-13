@@ -589,6 +589,7 @@ async function refreshFinancialViews() {
         loadGoalFundingOptimizer(),      // DI-010
         loadCapitalAllocationOptimizer(), // DI-011
         loadAdvisorDashboard(),           // DI-015
+        loadWealthOpportunityEngine(), // DI-012
         loadMonthlyWealthActionPlan(),    // DI-008
         loadScenarioWorkbench()
         
@@ -622,6 +623,7 @@ async function changeViewPeriod() {
         loadGoalFundingOptimizer(),        // DI-010
         loadCapitalAllocationOptimizer(),  // DI-011
         loadAdvisorDashboard(),            // DI-015
+        loadWealthOpportunityEngine(), // DI-012
         loadMonthlyWealthActionPlan(),     // DI-008
         loadBufferVsInvest(),
         loadSummary(),
@@ -664,6 +666,7 @@ async function refreshUI() {
         loadGoalFundingOptimizer(), // DI-010
         loadCapitalAllocationOptimizer(), // DI-011
         loadAdvisorDashboard(),
+        loadWealthOpportunityEngine(), // DI-012
         loadMonthlyWealthActionPlan(),     // DI-008
         loadScenarioWorkbench(),
         loadBufferVsInvest(),
