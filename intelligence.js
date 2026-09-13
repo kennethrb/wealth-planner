@@ -382,13 +382,29 @@ function getWealthAdvisorActions() {
 function loadWealthAdvisor() {
     const advisor = getWealthAdvisorSummary();
     window.qaWealthAdvisor = advisor;
-    logQATrace("DI-015", "loadWealthAdvisor", {}, 
-    {
-        topAction: advisor.topAction.category,
-        totalActions: advisor.actions.length,
-        warnings: advisor.warnings.length,
-        opportunities: advisor.opportunities.length
-    }, true);
+    logQATrace(
+        "DI-015",
+        "loadWealthAdvisor",
+        {},
+        {
+            topAction:
+                advisor.topAction.category,
+    
+            totalActions:
+                advisor.actions.length,
+    
+            topActionMatches:
+                advisor.topAction.category ===
+                advisor.actions[0].category,
+    
+            warnings:
+                advisor.warnings.length,
+    
+            opportunities:
+                advisor.opportunities.length
+        },
+        true
+    );
     return advisor;
 }
 
