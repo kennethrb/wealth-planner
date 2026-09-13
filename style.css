@@ -68,6 +68,14 @@ html {
     transition: .2s ease;
 }
 
+#wealthAdvisor .card {
+    border-left: 4px solid #10b981;
+}
+
+#wealthAdvisor h2 {
+    color: #34d399;
+}
+
 /* Date picker dark theme */
 input[type="date"] {
     width: 100%;
