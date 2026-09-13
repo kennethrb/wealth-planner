@@ -501,7 +501,7 @@ function loadAdvisorDashboard() {
     <h2> 🧠 Wealth Advisor </h2>
     <div class="advisor-headline"> ${advisor.headline} </div>
     <div class="advisor-status ${
-                advisor.confidenceLevel === " HIGH" ? "success" : advisor.confidenceLevel==="MEDIUM" ? "warning" : "danger" }"> ${advisor.confidenceLevel} (${advisor.confidenceScore}%) </div>
+                advisor.confidenceLevel === "HIGH" ? "success" : advisor.confidenceLevel==="MEDIUM" ? "warning" : "danger" }"> ${advisor.confidenceLevel} (${advisor.confidenceScore}%) </div>
     <div class="advisor-confidence-note"> ${advisor.confidenceReason} </div>
     <div class="advisor-summary"> ${advisor.summary} </div>
     <div class="advisor-impact">
