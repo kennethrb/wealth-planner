@@ -408,35 +408,35 @@ function loadWealthAdvisor() {
     return advisor;
 }
 
-function getAdvisorConfidence() {
-    const priority = getCapitalAllocationPriority();
-    switch (priority.category) {
-        case "Cash Flow Protection":
-            return {
-                level: "HIGH",
-                    score: 100
-            };
-        case "Emergency Fund":
-            return {
-                level: "HIGH",
-                    score: 95
-            };
-        case "Goal Completion":
-            return {
-                level: "MEDIUM",
-                    score: 80
-            };
-        case "Investments":
-            return {
-                level: "MEDIUM",
-                    score: 75
-            };
-        default:
-            return {
-                level: "LOW",
-                    score: 50
-            };
-    }
+function getAdvisorConfidence(action) {
+    const opportunity = getOpportunityCapital();
+    const capitalPlan = getCapitalAllocationPlan();
+    const emergencyGap = getEmergencyFundGap();
+    const liquidity = opportunity.coverageRatio || 0;
+    let score = 50;
+    // Liquidity Strength
+    if (liquidity >= 12) score += 20;
+    else if (liquidity >= 6) score += 10;
+    else score -= 10;
+    // Emergency Fund Position
+    if (emergencyGap <= 0) score += 15;
+    else if (emergencyGap <= 50000) score += 5;
+    // Opportunity Capital
+    if (opportunity.opportunityCapital > 100000) score += 10;
+    else if (opportunity.opportunityCapital > 50000) score += 5;
+    // Priority Action Bonus
+    if (action?.category === "Emergency Fund") score += 10;
+    score = Math.max(0, Math.min(score, 100));
+    return {
+        score,
+        level: score >= 90 ? "HIGH" : score >= 70 ? "MEDIUM" : "LOW"
+    };
+}
+
+function getConfidenceReason(score) {
+    if (score >= 90) return "Strong financial data supports this recommendation.";
+    if (score >= 70) return "Recommendation is supported by current wealth indicators.";
+    return "Recommendation is based on limited supporting indicators.";
 }
 
 function getMonthlyWealthBrief() {
@@ -448,6 +448,7 @@ function getMonthlyWealthBrief() {
         window.qaSweep?.total3YrBenefit || 0;
     const advisorReason = getAdvisorExplanation();
     const confidence = getAdvisorConfidence();
+    
     return {
     
         generatedAt:
@@ -461,6 +462,11 @@ function getMonthlyWealthBrief() {
         
         confidenceScore:
             confidence.score,
+        
+        confidenceReason:
+            getConfidenceReason(
+                confidence.score
+            ),
     
         advisorReason,
     
