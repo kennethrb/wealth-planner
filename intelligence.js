@@ -410,14 +410,36 @@ function loadWealthAdvisor() {
 
 function getMonthlyWealthBrief() {
     const advisor = getWealthAdvisorSummary();
-    const opportunity = getOpportunityCapital().opportunity;
+    const opportunity =
+        getOpportunityCapital().opportunity;
+    
+    const projectedBenefit =
+        window.qaSweep?.total3YrBenefit || 0;
+    const advisorReason = getAdvisorExplanation();
     return {
-        generatedAt: new Date().toISOString(),
-        headline: advisor.topAction?.action || "No action required",
-        summary: `You currently have ${formatCurrency(opportunity)} available for wealth deployment.`,
-        topActions: advisor.actions.slice(0, 3),
-        warnings: advisor.warnings,
-        opportunities: advisor.opportunities
+    
+        generatedAt:
+            new Date().toISOString(),
+    
+        headline:
+            advisor.topAction?.action,
+    
+        advisorReason,
+    
+        summary:
+            `You currently have ${formatCurrency(opportunity)} available for wealth deployment.`,
+    
+        projectedImpact:
+            `Potential 3-Year Wealth Benefit: ${formatCurrency(projectedBenefit)}`,
+    
+        topActions:
+            advisor.actions.slice(0, 3),
+    
+        warnings:
+            advisor.warnings,
+    
+        opportunities:
+            advisor.opportunities
     };
 }
 
@@ -426,24 +448,40 @@ function loadMonthlyWealthBrief() {
     window.qaWealthBrief = brief;
     logQATrace("DI-015", "loadMonthlyWealthBrief", {}, {
         headline: brief.headline,
+        advisorReason: brief.advisorReason,
+        summary: brief.summary,
+        projectedImpact: brief.projectedImpact,
         topActions: brief.topActions.length,
         warnings: brief.warnings.length,
         opportunities: brief.opportunities.length
+        
     }, true);
     return brief;
 }
 
-function getMonthlyWealthBrief() {
-    const advisor = getWealthAdvisorSummary();
-    const opportunity = getOpportunityCapital().opportunity;
-    return {
-        generatedAt: new Date().toISOString(),
-        headline: advisor.topAction?.action || "No action required",
-        summary: `You currently have ${formatCurrency(opportunity)} available for wealth deployment.`,
-        topActions: advisor.actions.slice(0, 3),
-        warnings: advisor.warnings,
-        opportunities: advisor.opportunities
-    };
+function getAdvisorExplanation() {
+
+    const priority =
+        getCapitalAllocationPriority();
+
+    switch (priority.category) {
+
+        case "Cash Flow Protection":
+            return "Available cash is insufficient to safely cover upcoming obligations. Capital preservation is currently the highest priority.";
+
+        case "Emergency Fund":
+            return "Emergency reserves remain below target levels. Strengthening liquidity improves resilience before deploying capital into growth opportunities.";
+
+        case "Goal Completion":
+            return window.qaGoalFundingOptimizer?.reason ||
+                "This goal offers the fastest path to measurable progress.";
+
+        case "Investments":
+            return "Core protections are satisfied. Available capital can now be directed toward long-term wealth growth.";
+
+        default:
+            return "No explanation available.";
+    }
 }
 
 /**
