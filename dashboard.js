@@ -494,171 +494,68 @@ function loadReconciliation() {
 }
 
 function loadAdvisorDashboard() {
-
-    const container =
-        document.getElementById(
-            "wealthAdvisor"
-        );
-
+    const container = document.getElementById("wealthAdvisor");
     if (!container) return;
-
-    const advisor =
-        loadMonthlyWealthBrief();
-
-    container.innerHTML = `
-
-        <div class="card">
-
-            <h2>
-                🧠 Wealth Advisor
-            </h2>
-
-            <div class="advisor-headline">
-                ${advisor.headline}
-            </div>
-
-            <div class="advisor-status ${
-                advisor.confidenceLevel === "HIGH"
-                    ? "success"
-                    : advisor.confidenceLevel === "MEDIUM"
-                    ? "warning"
-                    : "danger"
-            }">
-
-                ${advisor.confidenceLevel}
-                (${advisor.confidenceScore}%)
-
-            </div>
-
-            <div class="advisor-confidence-note">
-            
-                ${advisor.confidenceReason}
-            
-            </div>
-
-            <div class="advisor-summary">
-
-                ${advisor.summary}
-
-            </div>
-
-            <div class="advisor-impact">
-
-                <div class="impact-label">
-
-                    Potential Wealth Impact
-
-                </div>
-
-                <div class="impact-value">
-
-                    ${advisor.projectedImpact}
-
-                </div>
-
-            </div>
-
-            <hr>
-
-            <div class="advisor-action">
-
-                <div class="action-title">
-
-                    Why This Matters
-
-                </div>
-
-                <p>
-
-                    ${advisor.advisorReason}
-
-                </p>
-
-            </div>
-
-            <hr>
-
-            <h3>
-                Top Actions
-            </h3>
-
-            ${advisor.topActions.map(action => `
-                <div class="advisor-action priority">
-
-                    <div class="action-title">
-
-                        ${action.action}
-
-                    </div>
-
-                    <div class="allocation-row">
-
-                        <span>
-                            Source
-                        </span>
-
-                        <strong>
-                            ${action.source}
-                        </strong>
-
-                    </div>
-
-                </div>
-            `).join("")}
-
-            ${
-                advisor.warnings.length
-                ? `
-                <hr>
-
-                <h3>
-                    Warnings
-                </h3>
-
-                ${advisor.warnings.map(w => `
-                    <div class="advisor-action deficit">
-
-                        <strong>
-                            ${w.category}
-                        </strong>
-
-                        <p>
-                            ${w.message}
-                        </p>
-
-                    </div>
-                `).join("")}
-                `
-                : ""
-            }
-
-            ${
-                advisor.opportunities.length
-                ? `
-                <hr>
-
-                <h3>
-                    Opportunities
-                </h3>
-
-                ${advisor.opportunities.map(o => `
-                    <div class="advisor-action opportunity">
-
-                        <strong>
-                            ${o.category}
-                        </strong>
-
-                        <p>
-                            ${o.action}
-                        </p>
-
-                    </div>
-                `).join("")}
-                `
-                : ""
-            }
-
+    const advisor = loadMonthlyWealthBrief();
+    container.innerHTML = ` <div class="card">
+    <h2> 🧠 Wealth Advisor </h2>
+    <div class="advisor-headline"> ${advisor.headline} </div>
+    <div class="advisor-status ${
+                advisor.confidenceLevel === " HIGH" ? "success" : advisor.confidenceLevel==="MEDIUM" ? "warning" : "danger" }"> ${advisor.confidenceLevel} (${advisor.confidenceScore}%) </div>
+    <div class="advisor-confidence-note"> ${advisor.confidenceReason} </div>
+    <div class="advisor-summary"> ${advisor.summary} </div>
+    <div class="advisor-impact">
+        <div class="impact-label"> Potential Wealth Impact </div>
+        <div class="impact-value"> ${advisor.projectedImpact} </div>
+    </div>
+    <hr>
+    <div class="advisor-action">
+        <div class="action-title"> Why This Matters </div>
+        <p> ${advisor.advisorReason} </p>
+    </div>
+    <hr>
+    <h3> Top Actions </h3> ${advisor.topActions.map(action => ` <div class="advisor-action priority">
+        <div class="action-title"> ${action.action} </div>
+        <div class="allocation-row">
+            <span> Source </span>
+            <strong> ${action.source} </strong>
         </div>
+    </div> `).join("")} ${ advisor.warnings.length ? `
+    <hr>
+    <h3> Warnings </h3> ${advisor.warnings.map(w => ` <div class="advisor-action deficit">
+        <strong> ${w.category} </strong>
+        <p> ${w.message} </p>
+    </div> `).join("")} ` : "" } ${ advisor.opportunities.length ? `
+    <hr>
+    <h3> Opportunities </h3> ${advisor.opportunities.map(o => ` <div class="advisor-action opportunity">
+        <strong> ${o.category} </strong>
+        <p> ${o.action} </p>
+    </div> `).join("")} ` : "" }
+    <hr>
+    <h3> Ask Wealth Advisor </h3>
+    <div class="advisor-chat">
+        <input type="text" id="advisorQuestion" placeholder="What should I do next?" class="advisor-input">
+        <button onclick="askAdvisorQuestion()" class="advisor-button"> Ask </button>
+    </div>
+    <div id="advisorResponse">
+    </div>
+</div> `;
+}
 
-    `;
+function askAdvisorQuestion() {
+    const question = document.getElementById("advisorQuestion")?.value || "";
+    if (!question) return;
+    const response = askWealthAdvisor(question);
+    document.getElementById("advisorResponse").innerHTML = ` <div class="advisor-action priority">
+    <div class="action-title"> ${response.answer} </div>
+    <div class="allocation-row">
+        <span> Confidence </span>
+        <strong> ${response.confidence}% </strong>
+    </div>
+    <div class="allocation-row">
+        <span> Source </span>
+        <strong> ${response.source} </strong>
+    </div>
+</div> 
+`;
 }
