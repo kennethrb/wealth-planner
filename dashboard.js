@@ -494,9 +494,10 @@ function loadReconciliation() {
 }
 
 function loadAdvisorDashboard() {
+    const container = document.getElementById("wealthAdvisor");
+    if (!container) return;
     const advisor = loadMonthlyWealthBrief();
-    if (!advisor) return;
-    document.getElementById("wealthAdvisor").innerHTML = `
+    container.innerHTML = `
 
         <div class="card">
 
@@ -512,6 +513,7 @@ function loadAdvisorDashboard() {
                 <span>Confidence</span>
                 <strong>
                     ${advisor.confidenceLevel}
+                    (${advisor.confidenceScore}%)
                 </strong>
             </div>
 
@@ -527,6 +529,86 @@ function loadAdvisorDashboard() {
             <p>
                 ${advisor.advisorReason}
             </p>
+
+            <hr>
+
+            <h3>
+                Top Actions
+            </h3>
+
+            ${advisor.topActions.map(action => `
+                <div class="advisor-action priority">
+
+                    <div class="action-title">
+                        ${action.action}
+                    </div>
+
+                    <div class="allocation-row">
+
+                        <span>
+                            Source
+                        </span>
+
+                        <strong>
+                            ${action.source}
+                        </strong>
+
+                    </div>
+
+                </div>
+            `).join("")}
+
+            ${
+                advisor.warnings.length
+                ? `
+                <hr>
+
+                <h3>
+                    Warnings
+                </h3>
+
+                ${advisor.warnings.map(w => `
+                    <div class="advisor-action deficit">
+
+                        <strong>
+                            ${w.category}
+                        </strong>
+
+                        <p>
+                            ${w.message}
+                        </p>
+
+                    </div>
+                `).join("")}
+                `
+                : ""
+            }
+
+            ${
+                advisor.opportunities.length
+                ? `
+                <hr>
+
+                <h3>
+                    Opportunities
+                </h3>
+
+                ${advisor.opportunities.map(o => `
+                    <div class="advisor-action opportunity">
+
+                        <strong>
+                            ${o.category}
+                        </strong>
+
+                        <p>
+                            ${o.action}
+                        </p>
+
+                    </div>
+                `).join("")}
+                `
+                : ""
+            }
 
         </div>
 
