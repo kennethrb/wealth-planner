@@ -2460,6 +2460,7 @@ async function loadGoalFundingOptimizer() {
  */
 
 const ADVISOR_ROUTES = {
+    explanation: ["why", "why should", "why is", "explain", "reason"],
     // DI-015 Wealth Advisor
     advisor: ["next", "focus", "priority", "recommend", "best action", "should i do", "top action"],
     // DI-012 Opportunities
@@ -2478,8 +2479,7 @@ const ADVISOR_ROUTES = {
 function routeAdvisorQuestion(question) {
     const q = String(question || "").toLowerCase();
     for (const [route, keywords] of Object.entries(ADVISOR_ROUTES)) {
-        const matched = keywords.some(keyword => q.includes(keyword));
-        if (matched) {
+        if (keywords.some(keyword => q.includes(keyword))) {
             return route;
         }
     }
@@ -2499,6 +2499,8 @@ function askWealthAdvisor(question) {
             return buildInvestmentResponse();
         case "cashflow":
             return buildCashFlowResponse();
+        case "explanation":
+            return buildExplanationResponse();
         default:
             return buildAdvisorResponse();
     }
@@ -2570,4 +2572,15 @@ function loadConversationalAdvisorQA(question) {
     window.qaConversationalAdvisor = result;
     console.log("🧪 DI-016", question, result);
     return result;
+}
+
+function buildExplanationResponse() {
+    const advisor = getWealthAdvisorSummary();
+    const explanation = getAdvisorExplanation();
+    return {
+        answer: explanation,
+        confidence: getAdvisorConfidence(advisor.topAction).score,
+        source: "DI-015",
+        generatedAt: new Date().toISOString()
+    };
 }
