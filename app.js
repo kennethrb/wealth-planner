@@ -656,6 +656,7 @@ async function refreshUI() {
         loadWealthSweep(),                 // DI-007
         loadCashFlowCommandCenter(), // DI-009
         loadGoalFundingOptimizer(), // DI-010
+        loadCapitalAllocationOptimizer(); // DI-011
         loadMonthlyWealthActionPlan(),     // DI-008
         loadScenarioWorkbench(),
         loadBufferVsInvest(),
