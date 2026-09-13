@@ -102,6 +102,20 @@ html {
     color: var(--text-muted);
 }
 
+.advisor-chat {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+
+.advisor-input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, .1);
+    background: var(--card-bg);
+
 .impact-label {
     font-size: .8rem;
     text-transform: uppercase;
