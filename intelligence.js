@@ -83,7 +83,8 @@ function getCapitalAllocationPlan() {
 function getCapitalAllocationRecommendation() {
     const plan = getCapitalAllocationPlan();
     const recommendations = [];
-    if (plan.emergencyAllocation > 0) {
+    const emergencyStatus = getEmergencyFundGap();
+    if (!emergencyStatus.fullyFunded && plan.emergencyAllocation > 0) {
         recommendations.push({
             priority: 1,
             category: "Emergency Fund",
