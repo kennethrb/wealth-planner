@@ -1870,7 +1870,7 @@ async function loadGoalFundingOptimizer() {
                 </div>
 
                 <div class="metric-row">
-                    <span>Capital Remaining</span>
+                    <span>Remaining Opportunity</span>
                     <strong style="color:#10b981;">
                         ${formatCurrency(remainingOpportunity)}
                     </strong>
