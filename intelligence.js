@@ -139,6 +139,24 @@ function getCapitalAllocationPriority() {
     return recommendations[0] || null;
 }
 
+/**
+ * ============================================================
+ * TOP WEALTH ACTION
+ * ============================================================
+ *
+ * PURPOSE
+ * Returns the highest priority wealth action available.
+ *
+ * Future Consumer:
+ * DI-015 Wealth Advisor Copilot
+ *
+ * ============================================================
+ */
+function getTopWealthAction() {
+    return getCapitalAllocationPriority();
+}
+
+
 function loadCapitalAllocationOptimizer() {
     const plan = getCapitalAllocationPlan();
     const recommendations = getCapitalAllocationRecommendation();
