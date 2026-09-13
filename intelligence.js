@@ -410,21 +410,16 @@ function loadWealthAdvisor() {
 
 function getAdvisorConfidence(action) {
     const opportunity = getOpportunityCapital();
-    const capitalPlan = getCapitalAllocationPlan();
     const emergencyGap = getEmergencyFundGap();
-    const liquidity = opportunity.coverageRatio || 0;
+    const liquidity = opportunity.coverage || 0;
     let score = 50;
-    // Liquidity Strength
     if (liquidity >= 12) score += 20;
     else if (liquidity >= 6) score += 10;
     else score -= 10;
-    // Emergency Fund Position
-    if (emergencyGap <= 0) score += 15;
-    else if (emergencyGap <= 50000) score += 5;
-    // Opportunity Capital
-    if (opportunity.opportunityCapital > 100000) score += 10;
-    else if (opportunity.opportunityCapital > 50000) score += 5;
-    // Priority Action Bonus
+    if (emergencyGap.gap <= 0) score += 15;
+    else if (emergencyGap.gap <= 50000) score += 5;
+    if (opportunity.opportunity > 100000) score += 10;
+    else if (opportunity.opportunity > 50000) score += 5;
     if (action?.category === "Emergency Fund") score += 10;
     score = Math.max(0, Math.min(score, 100));
     return {
