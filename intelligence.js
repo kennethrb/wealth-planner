@@ -2460,19 +2460,28 @@ async function loadGoalFundingOptimizer() {
  */
 function routeAdvisorQuestion(question) {
     const q = String(question || "").toLowerCase();
-    if (q.includes("opportunity") || q.includes("opportunities")) {
+    // DI-015 Wealth Advisor
+    if (q.includes("next") || q.includes("focus") || q.includes("priority") || q.includes("recommend") || q.includes("best action") || q.includes("should i do")) {
+        return "advisor";
+    }
+    // DI-012 Opportunities
+    if (q.includes("opportunity") || q.includes("opportunities") || q.includes("missing") || q.includes("improve") || q.includes("optimize")) {
         return "opportunity";
     }
-    if (q.includes("goal") || q.includes("fund")) {
+    // DI-010 Goals
+    if (q.includes("goal") || q.includes("fund") || q.includes("target")) {
         return "goal";
     }
-    if (q.includes("purchase") || q.includes("afford")) {
-        return "purchase";
-    }
-    if (q.includes("invest") || q.includes("allocation")) {
+    // DI-011 Investments
+    if (q.includes("invest") || q.includes("allocation") || q.includes("portfolio")) {
         return "investment";
     }
-    if (q.includes("cash flow")) {
+    // DI-006 Purchase
+    if (q.includes("purchase") || q.includes("afford") || q.includes("buy")) {
+        return "purchase";
+    }
+    // DI-009 Cash Flow
+    if (q.includes("cash flow") || q.includes("liquidity") || q.includes("cash")) {
         return "cashflow";
     }
     return "advisor";
