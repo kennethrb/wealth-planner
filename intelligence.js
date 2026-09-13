@@ -442,7 +442,11 @@ function getMonthlyWealthBrief() {
     const projectedBenefit =
         window.qaSweep?.total3YrBenefit || 0;
     const advisorReason = getAdvisorExplanation();
-    const confidence = getAdvisorConfidence();
+    const confidence =
+        getAdvisorConfidence(
+            advisor.topAction
+        );
+
     
     return {
     
