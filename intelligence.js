@@ -206,32 +206,32 @@ function getCapitalAllocationRecommendation() {
         recommendations.push({
             eligible: true,
             category: "Emergency Fund",
-            amount: plan.emergencyAllocation,
-            action: `Allocate ₱${formatCurrency(plan.emergencyAllocation)} to Emergency Fund`
+            amount: Number(plan.emergencyAllocation.toFixed(2)),
+            action: `Allocate ${formatCurrency(plan.emergencyAllocation)} to Emergency Fund`
         });
     }
     if (plan.debtAllocation > 0) {
         recommendations.push({
             eligible: true,
             category: "Debt Reduction",
-            amount: plan.debtAllocation,
-            action: `Pay ₱${formatCurrency(plan.debtAllocation)} toward debt`
+            amount: Number(plan.debtAllocation.toFixed(2)),
+            action: `Pay ${formatCurrency(plan.debtAllocation)} toward debt`
         });
     }
     if (plan.goalAllocation > 0) {
         recommendations.push({
             eligible: true,
             category: "Goals",
-            amount: plan.goalAllocation,
-            action: `Fund goals with ₱${formatCurrency(plan.goalAllocation)}`
+            amount: Number(plan.goalAllocation.toFixed(2)),
+            action: `Fund goals with ${formatCurrency(plan.goalAllocation)}`
         });
     }
     if (plan.investmentAllocation > 0) {
         recommendations.push({
             eligible: true,
             category: "Investments",
-            amount: plan.investmentAllocation,
-            action: `Invest ₱${formatCurrency(plan.investmentAllocation)}`
+            amount: Number(plan.investmentAllocation.toFixed(2)),
+            action: `Invest ${formatCurrency(plan.investmentAllocation)}`
         });
     }
 
