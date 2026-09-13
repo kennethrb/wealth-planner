@@ -262,7 +262,12 @@ function getRecommendationScores() {
     //
     let goalScore = 0;
     if (goal && goal.completable) {
-        goalScore += 70;
+    goalScore += Math.min(
+        goal.suggestedFunding / 5000,
+        40
+    );
+    
+    goalScore += 30;
     }
     scores.push({
         category: "Goal Completion",
@@ -282,6 +287,32 @@ function getRecommendationScores() {
         score: investScore,
         action: "Deploy available capital into growth assets"
     });
+    //
+    // Debt Reduction
+    //
+    let debtScore = 0;
+    if (sweep && sweep.debtSweep > 0) {
+        debtScore += 25;
+        debtScore += Math.min(sweep.debtSweep / 5000, 40);
+    }
+    scores.push({
+        category: "Debt Reduction",
+        score: debtScore,
+        action: `Apply ${formatCurrency(
+                sweep.debtSweep
+            )} toward debt`
+    });
+
+    let cashFlowScore = 0;
+    if (cashFlow.coverage < CONFIG.cashFlow.minimumCoverage) {
+        cashFlowScore = 999;
+    }
+    scores.push({
+        category: "Cash Flow Protection",
+        score: cashFlowScore,
+        action: "Protect liquidity"
+    });
+    
     scores.sort(
         (a, b) => b.score - a.score);
     return scores;
@@ -304,7 +335,7 @@ function getCapitalAllocationPriority() {
         priority: 1,
         category: winner.category,
         action: winner.action,
-        score: winner.score
+        priorityScore: winner.score
     };
 }
 
@@ -496,7 +527,7 @@ function getWealthAdvisorActions() {
         action: priorityAction.action,
         source: "DI-011"
     });
-    if (window.qaGoalFundingOptimizer) {
+    if (window.qaGoalFundingOptimizer && priorityAction.category !== "Goal Completion") {
         actions.push({
             priority: 2,
             category: "Goal Funding",
@@ -655,6 +686,9 @@ function getAdvisorExplanation() {
 
         case "Investments":
             return "Core protections are satisfied. Available capital can now be directed toward long-term wealth growth.";
+
+        case "Debt Reduction":
+            return "Reducing debt improves financial flexibility and lowers future cash obligations.";
 
         default:
             return "No explanation available.";
