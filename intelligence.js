@@ -408,6 +408,37 @@ function loadWealthAdvisor() {
     return advisor;
 }
 
+function getAdvisorConfidence() {
+    const priority = getCapitalAllocationPriority();
+    switch (priority.category) {
+        case "Cash Flow Protection":
+            return {
+                level: "HIGH",
+                    score: 100
+            };
+        case "Emergency Fund":
+            return {
+                level: "HIGH",
+                    score: 95
+            };
+        case "Goal Completion":
+            return {
+                level: "MEDIUM",
+                    score: 80
+            };
+        case "Investments":
+            return {
+                level: "MEDIUM",
+                    score: 75
+            };
+        default:
+            return {
+                level: "LOW",
+                    score: 50
+            };
+    }
+}
+
 function getMonthlyWealthBrief() {
     const advisor = getWealthAdvisorSummary();
     const opportunity =
@@ -416,6 +447,7 @@ function getMonthlyWealthBrief() {
     const projectedBenefit =
         window.qaSweep?.total3YrBenefit || 0;
     const advisorReason = getAdvisorExplanation();
+    const confidence = getAdvisorConfidence();
     return {
     
         generatedAt:
@@ -423,6 +455,12 @@ function getMonthlyWealthBrief() {
     
         headline:
             advisor.topAction?.action,
+        
+        confidenceLevel:
+            confidence.level,
+        
+        confidenceScore:
+            confidence.score,
     
         advisorReason,
     
@@ -448,6 +486,8 @@ function loadMonthlyWealthBrief() {
     window.qaWealthBrief = brief;
     logQATrace("DI-015", "loadMonthlyWealthBrief", {}, {
         headline: brief.headline,
+        confidenceLevel: brief.confidenceLevel,
+        confidenceScore: brief.confidenceScore,
         advisorReason: brief.advisorReason,
         summary: brief.summary,
         projectedImpact: brief.projectedImpact,
@@ -483,6 +523,8 @@ function getAdvisorExplanation() {
             return "No explanation available.";
     }
 }
+
+
 
 /**
  * ============================================================
