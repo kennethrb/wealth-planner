@@ -1,25 +1,6 @@
 /**
  * Wealth Planner Intelligence Engine
  */
-/**
-getBudgetSummary()
-        ↓
-loadFinancialHealthAdvisor()
-
-loadNetWorthVelocity()
-
-loadWealthProjectionAccelerator()
-
-        ↓
-
-getCapitalPosition()
-        ↓
-loadBufferVsInvest()
-
-loadPurchaseEvaluator()
-
-loadWealthSweep()
- */
 
 //Create Budget Summary Engine
 function getBudgetSummary(year = getViewYear(), month = getViewMonth()) {
@@ -81,6 +62,27 @@ function getOpportunityCapital() {
     };
 }
 
+
+function getCapitalAllocationPlan() {
+    const opportunity = getOpportunityCapital().opportunity;
+    const allocationBase = Math.max(0, opportunity);
+    return {
+        opportunity: allocationBase,
+        emergencyAllocation: allocationBase * 0.25,
+        debtAllocation: allocationBase * 0.15,
+        goalAllocation: allocationBase * 0.20,
+        investmentAllocation: allocationBase * 0.40
+    };
+}
+
+function loadCapitalAllocationOptimizer() {
+    const plan = getCapitalAllocationPlan();
+    logQATrace("DI-011", "loadCapitalAllocationOptimizer", {
+        opportunity: plan.opportunity
+    }, plan, plan.opportunity >= 0);
+    window.qaCapitalAllocation = plan;
+    return plan;
+}
 
 function isLiquidAccount(account) {
     const type = String(account.assetClass || account.type || account["Type"] || "").trim().toLowerCase();
