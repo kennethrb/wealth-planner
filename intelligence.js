@@ -177,7 +177,25 @@ function getCapitalAllocationPlan() {
 
 /**
  * ============================================================
- * CAPITAL ALLOCATION RECOMMENDATION ENGINE
+ * DI-011 CAPITAL RECOMMENDATION ENGINE
+ * ============================================================
+ *
+ * PURPOSE
+ * Generate all available capital deployment opportunities.
+ *
+ * This engine does NOT determine priority.
+ *
+ * Priority selection is handled by:
+ *
+ * getCapitalAllocationPriority()
+ *
+ * Output:
+ * Available Wealth Opportunities
+ *
+ * Future Consumer:
+ * - DI-011 Smart Priority Rules
+ * - DI-015 Wealth Advisor Copilot
+ *
  * ============================================================
  */
 function getCapitalAllocationRecommendation() {
@@ -186,7 +204,7 @@ function getCapitalAllocationRecommendation() {
     const emergencyStatus = getEmergencyFundGap();
     if (!emergencyStatus.fullyFunded && plan.emergencyAllocation > 0) {
         recommendations.push({
-            priority: 1,
+            eligible: true,
             category: "Emergency Fund",
             amount: plan.emergencyAllocation,
             action: `Allocate ₱${formatCurrency(plan.emergencyAllocation)} to Emergency Fund`
@@ -194,7 +212,7 @@ function getCapitalAllocationRecommendation() {
     }
     if (plan.debtAllocation > 0) {
         recommendations.push({
-            priority: 2,
+            eligible: true,
             category: "Debt Reduction",
             amount: plan.debtAllocation,
             action: `Pay ₱${formatCurrency(plan.debtAllocation)} toward debt`
@@ -202,7 +220,7 @@ function getCapitalAllocationRecommendation() {
     }
     if (plan.goalAllocation > 0) {
         recommendations.push({
-            priority: 3,
+            eligible: true,
             category: "Goals",
             amount: plan.goalAllocation,
             action: `Fund goals with ₱${formatCurrency(plan.goalAllocation)}`
@@ -210,16 +228,13 @@ function getCapitalAllocationRecommendation() {
     }
     if (plan.investmentAllocation > 0) {
         recommendations.push({
-            priority: 4,
+            eligible: true,
             category: "Investments",
             amount: plan.investmentAllocation,
             action: `Invest ₱${formatCurrency(plan.investmentAllocation)}`
         });
     }
 
-    recommendations.sort(
-        (a, b) => a.priority - b.priority
-    );
     return recommendations;
 }
 
