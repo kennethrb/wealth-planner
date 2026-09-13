@@ -313,48 +313,166 @@ function getTopWealthAction() {
     return getCapitalAllocationPriority();
 }
 
-/**
- * ============================================================
- * DI-015 WEALTH ADVISOR FOUNDATION
- * ============================================================
+/*******************************************************
+ * DI-015 Wealth Advisor
  *
- * Aggregates all intelligence engines into a
- * unified wealth recommendation.
+ * Purpose:
+ * Aggregate all intelligence engines into a single
+ * advisor view.
  *
- * Future:
- * - Advisor Chat
- * - Advisor Dashboard
- * - Monthly Wealth Brief
+ * Consumes:
+ * DI-009 Cash Flow Command Center
+ * DI-010 Goal Funding Optimizer
+ * DI-011 Capital Allocation Optimizer
+ * DI-012 Wealth Opportunity Engine
  *
- * ============================================================
- */
+ * Outputs:
+ * Top Action
+ * Action Queue
+ * Warnings
+ * Opportunities
+ *******************************************************/
 function getWealthAdvisorSummary() {
+    // Advisor recommendation queue
     const actions = getWealthAdvisorActions();
     const topAction = actions[0] || null;
+    // Advisor warnings
     const warnings = [];
-    const opportunities = [];
-    // Cash Flow Warning
+    // DI-012 Wealth Opportunity Engine
+    const opportunityEngine = getWealthOpportunities();
+    /**
+     * Cash Flow Warning
+     *
+     * Detect insufficient coverage
+     * for upcoming obligations.
+     */
     if (window.qaCashFlow && window.qaCashFlow.coverage < CONFIG.cashFlow.minimumCoverage) {
         warnings.push({
             category: "Cash Flow",
             message: "Available cash is insufficient for upcoming obligations"
         });
     }
-    // Goal Opportunity
-    if (window.qaGoalFundingOptimizer) {
-        opportunities.push({
-            category: "Goal Funding",
-            action: window.qaGoalFundingOptimizer.priorityAction
-        });
-    }
     return {
         generatedAt: new Date().toISOString(),
         status: "ACTIVE",
+        // Highest-priority recommendation
         topAction,
+        // Full advisor queue
         actions,
+        // Risk alerts
         warnings,
+        // DI-012 opportunities
+        opportunities: opportunityEngine.opportunities
+    };
+}
+
+/**
+ * =========================================================
+ * DI-012 Wealth Opportunity Engine
+ * =========================================================
+ *
+ * Purpose:
+ * Detect wealth-building opportunities using existing
+ * Decision Intelligence outputs.
+ *
+ * Goal:
+ * Answer:
+ * "What opportunities am I currently missing?"
+ *
+ * Dependencies:
+ * DI-009 Cash Flow Command Center
+ * DI-010 Goal Funding Optimizer
+ * DI-011 Capital Allocation Optimizer
+ * DI-007 Wealth Sweep
+ *
+ * Output:
+ * {
+ *     opportunities: [],
+ *     estimatedImpact: number
+ * }
+ *
+ */
+function getWealthOpportunities() {
+    const opportunities = [];
+    const cashFlow = getOpportunityCapital();
+    const goalPlan = window.qaGoalFundingOptimizer;
+    const sweep = window.qaSweep;
+    /**
+     * Idle Cash Opportunity
+     *
+     * Detect deployable cash that is
+     * currently generating no return.
+     */
+    if (cashFlow.opportunity > 50000) {
+        opportunities.push({
+            category: "Idle Cash",
+            priority: "HIGH",
+            action: `Deploy ₱${cashFlow.opportunity.toLocaleString()} of idle cash`,
+            impact: cashFlow.opportunity
+        });
+    }
+    /**
+     * Goal Completion Opportunity
+     *
+     * Detect goals that can be
+     * completed immediately.
+     */
+    if (goalPlan && goalPlan.completable) {
+        opportunities.push({
+            category: "Goal Completion",
+            priority: "HIGH",
+            action: goalPlan.priorityAction,
+            impact: goalPlan.suggestedFunding
+        });
+    }
+    /**
+     * Investment Growth Opportunity
+     */
+    if (sweep && sweep.investmentSweep > 0) {
+        opportunities.push({
+            category: "Investment Growth",
+            priority: "MEDIUM",
+            action: `Invest ₱${sweep.investmentSweep.toLocaleString()}`,
+            impact: sweep.total3YrBenefit
+        });
+    }
+    /**
+     * Debt Optimization Opportunity
+     */
+    if (sweep && sweep.debtSweep > 0) {
+        opportunities.push({
+            category: "Debt Optimization",
+            priority: "MEDIUM",
+            action: `Apply ₱${sweep.debtSweep.toLocaleString()} toward debt reduction`,
+            impact: sweep.debtSweep
+        });
+    }
+    opportunities.sort(
+        (a, b) => b.impact - a.impact);
+    return {
+        count: opportunities.length,
+        estimatedImpact: opportunities.reduce(
+            (sum, item) => sum + item.impact, 0),
         opportunities
     };
+}
+
+
+/*******************************************************
+ * DI-012 Wealth Opportunity Engine
+ *
+ * Purpose:
+ * Detect missed wealth opportunities.
+ *
+ * Answers:
+ *
+ * "What opportunities am I missing?"
+ *
+ *******************************************************/
+function loadWealthOpportunityEngine() {
+    const output = getWealthOpportunities();
+    logQATrace("DI-012", "loadWealthOpportunityEngine", {}, output, true);
+    return output;
 }
 
 function getWealthAdvisorActions() {
@@ -446,6 +564,8 @@ function getMonthlyWealthBrief() {
         getAdvisorConfidence(
             advisor.topAction
         );
+    const opportunityEngine =
+        getWealthOpportunities();
 
     
     return {
@@ -482,7 +602,7 @@ function getMonthlyWealthBrief() {
             advisor.warnings,
     
         opportunities:
-            advisor.opportunities
+            opportunityEngine.opportunities
     };
 }
 
