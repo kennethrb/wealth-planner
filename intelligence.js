@@ -115,7 +115,28 @@ function getCapitalAllocationRecommendation() {
             action: `Invest ₱${formatCurrency(plan.investmentAllocation)}`
         });
     }
+
+    recommendations.sort(
+        (a, b) => a.priority - b.priority
+    );
     return recommendations;
+}
+
+/**
+ * ============================================================
+ * CAPITAL PRIORITY ENGINE
+ * ============================================================
+ *
+ * PURPOSE
+ * Determine the most important wealth action.
+ *
+ * DI-011 Smart Prioritization Layer
+ *
+ * ============================================================
+ */
+function getCapitalAllocationPriority() {
+    const recommendations = getCapitalAllocationRecommendation();
+    return recommendations[0] || null;
 }
 
 function loadCapitalAllocationOptimizer() {
