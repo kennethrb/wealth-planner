@@ -315,6 +315,59 @@ function getTopWealthAction() {
 
 /**
  * ============================================================
+ * DI-015 WEALTH ADVISOR FOUNDATION
+ * ============================================================
+ *
+ * Aggregates all intelligence engines into a
+ * unified wealth recommendation.
+ *
+ * Future:
+ * - Advisor Chat
+ * - Advisor Dashboard
+ * - Monthly Wealth Brief
+ *
+ * ============================================================
+ */
+function getWealthAdvisorSummary() {
+    const topAction = getCapitalAllocationPriority();
+    const warnings = [];
+    const opportunities = [];
+    // Cash Flow Warning
+    if (window.qaCashFlow && window.qaCashFlow.coverage < CONFIG.cashFlow.minimumCoverage) {
+        warnings.push({
+            category: "Cash Flow",
+            message: "Available cash is insufficient for upcoming obligations"
+        });
+    }
+    // Goal Opportunity
+    if (window.qaGoalFundingOptimizer) {
+        opportunities.push({
+            category: "Goal Funding",
+            action: window.qaGoalFundingOptimizer.priorityAction
+        });
+    }
+    return {
+        generatedAt: new Date().toISOString(),
+        status: "ACTIVE",
+        topAction,
+        warnings,
+        opportunities
+    };
+}
+
+function loadWealthAdvisor() {
+    const advisor = getWealthAdvisorSummary();
+    window.qaWealthAdvisor = advisor;
+    logQATrace("DI-015", "loadWealthAdvisor", {}, {
+        topAction: advisor.topAction.category,
+        warnings: advisor.warnings.length,
+        opportunities: advisor.opportunities.length
+    }, true);
+    return advisor;
+}
+
+/**
+ * ============================================================
  * EMERGENCY FUND GAP ENGINE
  * ============================================================
  *
