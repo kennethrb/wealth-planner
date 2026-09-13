@@ -329,7 +329,7 @@ function getTopWealthAction() {
  * ============================================================
  */
 function getWealthAdvisorSummary() {
-    const topAction = getCapitalAllocationPriority();
+    const actions = getWealthAdvisorActions();
     const warnings = [];
     const opportunities = [];
     // Cash Flow Warning
@@ -350,16 +350,41 @@ function getWealthAdvisorSummary() {
         generatedAt: new Date().toISOString(),
         status: "ACTIVE",
         topAction,
+        actions,
         warnings,
         opportunities
     };
 }
 
+function getWealthAdvisorActions() {
+    const actions = [];
+    const priorityAction = getCapitalAllocationPriority();
+    actions.push({
+        priority: priorityAction.priority,
+        category: priorityAction.category,
+        action: priorityAction.action,
+        source: "DI-011"
+    });
+    if (window.qaGoalFundingOptimizer) {
+        actions.push({
+            priority: 2,
+            category: "Goal Funding",
+            action: window.qaGoalFundingOptimizer.priorityAction,
+            source: "DI-010"
+        });
+    }
+    actions.sort(
+        (a, b) => a.priority - b.priority);
+    return actions;
+}
+
 function loadWealthAdvisor() {
     const advisor = getWealthAdvisorSummary();
     window.qaWealthAdvisor = advisor;
-    logQATrace("DI-015", "loadWealthAdvisor", {}, {
+    logQATrace("DI-015", "loadWealthAdvisor", {}, 
+    {
         topAction: advisor.topAction.category,
+        totalActions: advisor.actions.length,
         warnings: advisor.warnings.length,
         opportunities: advisor.opportunities.length
     }, true);
