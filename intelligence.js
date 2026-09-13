@@ -238,6 +238,55 @@ function getCapitalAllocationRecommendation() {
     return recommendations;
 }
 
+function getRecommendationScores() {
+    const scores = [];
+    const cashFlow = getOpportunityCapital();
+    const emergency = getEmergencyFundGap();
+    const goal = window.qaGoalFundingOptimizer;
+    const sweep = window.qaSweep;
+    //
+    // Emergency Fund
+    //
+    let emergencyScore = 0;
+    if (!emergency.fullyFunded) {
+        emergencyScore += 50;
+        emergencyScore += Math.min(emergency.gap / 10000, 30);
+    }
+    scores.push({
+        category: "Emergency Fund",
+        score: emergencyScore,
+        action: "Increase emergency fund reserves"
+    });
+    //
+    // Goal Completion
+    //
+    let goalScore = 0;
+    if (goal && goal.completable) {
+        goalScore += 70;
+    }
+    scores.push({
+        category: "Goal Completion",
+        score: goalScore,
+        action: goal?.priorityAction
+    });
+    //
+    // Investment Growth
+    //
+    let investScore = 0;
+    if (sweep && sweep.total3YrBenefit > 0) {
+        investScore += 40;
+        investScore += Math.min(sweep.total3YrBenefit / 100000, 20);
+    }
+    scores.push({
+        category: "Investments",
+        score: investScore,
+        action: "Deploy available capital into growth assets"
+    });
+    scores.sort(
+        (a, b) => b.score - a.score);
+    return scores;
+}
+
 /**
  * ============================================================
  * DI-011 SMART PRIORITY ENGINE
@@ -246,53 +295,16 @@ function getCapitalAllocationRecommendation() {
  * PURPOSE
  * Determine the highest-priority wealth action
  * based on the user's current financial position.
- *
- * Priority Hierarchy:
- *
- * 0 = Cash Flow Protection
- * 1 = Emergency Fund Protection
- * 2 = Goal Acceleration
- * 3 = Wealth Growth
- *
- * Future:
- * - Debt-aware prioritization
- * - Goal-aware prioritization
- * - Wealth Advisor Copilot integration
- *
  * ============================================================
  */
 function getCapitalAllocationPriority() {
-    const cashFlow = getOpportunityCapital();
-    const emergency = getEmergencyFundGap();
-
-    if (cashFlow.coverage < CONFIG.cashFlow.minimumCoverage) {
-        return {
-            priority: 0,
-            category: "Cash Flow Protection",
-            action: "Pause capital deployment and cover upcoming obligations"
-        };
-    }
-
-    if (!emergency.fullyFunded) {
-        return {
-            priority: 1,
-            category: "Emergency Fund",
-            action: "Increase emergency fund reserves"
-        };
-    }
-
-    if (window.qaGoalFundingOptimizer && window.qaGoalFundingOptimizer.completable) {
-        return {
-            priority: 2,
-            category: "Goal Completion",
-            action: window.qaGoalFundingOptimizer.priorityAction
-        };
-    }
-
+    const scores = getRecommendationScores();
+    const winner = scores[0];
     return {
-        priority: 3,
-        category: "Investments",
-        action: "Deploy available capital into growth assets"
+        priority: 1,
+        category: winner.category,
+        action: winner.action,
+        score: winner.score
     };
 }
 
