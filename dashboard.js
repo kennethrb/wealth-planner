@@ -374,121 +374,65 @@ function loadFundingPlan() {
 }
 
 function loadReconciliation() {
-
-    const container =
-        document.getElementById("reconciliation");
-
+    const container = document.getElementById("reconciliation");
     if (!container) return;
-
     let reconciledCount = 0;
     let exceptionAccounts = [];
-
     appData.accounts.forEach(account => {
-
-        const accountId =
-            account.accountId;
-
-        const openingBalance =
-            Number(account.openingBalance || 0);
-
-        const currentBalance =
-            Number(account.currentBalance || 0);
-
-        let expectedBalance =
-            openingBalance;
-
-    appData.transactions.forEach(tx => {
-    
-        const sourceAccountId =
-            tx.accountId ||
-            tx["Account ID"];
-    
-        const destinationAccountId =
-            tx.transferToAccountId ||
-            tx["Transfer To Account ID"];
-    
-        const amount =
-            Number(
-                tx.Amount ||
-                tx.amount ||
-                0
-            );
-    
-        const type =
-            tx["Budget Type"] ||
-            tx.budgetType ||
-            "";
-    
-        //
-        // Source Account
-        //
-        if (sourceAccountId === accountId) {
-    
-            switch (type) {
-    
-                case "Income":
-                    expectedBalance += amount;
-                    break;
-    
-                case "Expense":
-                case "Savings":
-                case "Debt":
-                case "Transfer":
-                    expectedBalance -= amount;
-                    break;
+        const accountId = account.accountId;
+        const openingBalance = Number(account.openingBalance || 0);
+        const currentBalance = Number(account.currentBalance || 0);
+        let expectedBalance = openingBalance;
+        appData.transactions.forEach(tx => {
+            const sourceAccountId = tx.accountId || tx["Account ID"];
+            const destinationAccountId = tx.transferToAccountId || tx["Transfer To Account ID"];
+            const amount = Number(tx.Amount || tx.amount || 0);
+            const type = tx["Budget Type"] || tx.budgetType || "";
+            //
+            // Source Account
+            //
+            if (sourceAccountId === accountId) {
+                switch (type) {
+                    case "Income":
+                        expectedBalance += amount;
+                        break;
+                    case "Expense":
+                    case "Savings":
+                    case "Debt":
+                    case "Transfer":
+                        expectedBalance -= amount;
+                        break;
+                }
             }
-    
-        }
-    
-        //
-        // Destination Account
-        //
-        if (destinationAccountId === accountId) {
-    
-            switch (type) {
-    
-                case "Transfer":
-                    expectedBalance += amount;
-                    break;
-    
-                case "Debt":
-                    expectedBalance -= amount;
-                    break;
+            //
+            // Destination Account
+            //
+            if (destinationAccountId === accountId) {
+                switch (type) {
+                    case "Transfer":
+                        expectedBalance += amount;
+                        break;
+                    case "Debt":
+                        expectedBalance -= amount;
+                        break;
+                }
             }
-    
-        }
-    
-    });
-
-        const difference =
-            currentBalance - expectedBalance;
-
-        const reconciled =
-            Math.abs(difference) < 0.01;
-
+        });
+        const difference = currentBalance - expectedBalance;
+        const reconciled = Math.abs(difference) < 0.01;
         if (reconciled) {
-
             reconciledCount++;
-
         } else {
-
             exceptionAccounts.push({
                 name: account.accountName,
                 variance: Math.abs(difference),
                 difference
             });
-
         }
-
     });
-
     exceptionAccounts.sort(
-        (a, b) => b.variance - a.variance
-    );
-
-    const reviewCount =
-        exceptionAccounts.length;
-
+        (a, b) => b.variance - a.variance);
+    const reviewCount = exceptionAccounts.length;
     container.innerHTML = `
         <div class="card">
             <h2>✅ Account Reconciliation</h2>
@@ -547,5 +491,44 @@ function loadReconciliation() {
         }
 
     `;
+}
 
+function loadAdvisorDashboard() {
+    const advisor = loadMonthlyWealthBrief();
+    if (!advisor) return;
+    document.getElementById("wealthAdvisor").innerHTML = `
+
+        <div class="card">
+
+            <h2>
+                🧠 Wealth Advisor
+            </h2>
+
+            <div class="advisor-status success">
+                ${advisor.headline}
+            </div>
+
+            <div class="metric-row">
+                <span>Confidence</span>
+                <strong>
+                    ${advisor.confidenceLevel}
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>Projected Impact</span>
+                <strong>
+                    ${advisor.projectedImpact}
+                </strong>
+            </div>
+
+            <hr>
+
+            <p>
+                ${advisor.advisorReason}
+            </p>
+
+        </div>
+
+    `;
 }
