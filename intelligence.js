@@ -2,6 +2,91 @@
  * Wealth Planner Intelligence Engine
  */
 
+/**
+ * ============================================================
+ * WEALTH PLANNER CONFIGURATION
+ * ============================================================
+ *
+ * Centralized advisor constants.
+ * Removes magic numbers from intelligence engines.
+ *
+ * ============================================================
+ */
+const CONFIG = {
+    emergencyFundMonths: 6,
+    capitalAllocation: {
+        emergencyFund: 0.25,
+        debtReduction: 0.15,
+        goals: 0.20,
+        investments: 0.40
+    },
+    
+    opportunityAllocation: {
+        reserveRatio: 0.70
+    },
+    
+    wealthProjection: {
+        annualReturn: 0.07
+    },
+    buffer: {
+        months: 3
+    },
+    
+    financialHealth: {
+        savingsTargetRate: 20,
+        maxDebtRate: 30
+    },
+    
+    cashFlow: {
+        minimumCoverage: 1,
+        healthyCoverage: 3,
+        unlimitedCoverage: 999
+    },
+    
+    assetAllocation: {
+        targetCashPercent: 20,
+        warningCashPercent: 40
+    },
+    
+    idleCashAllocation: {
+        goals: 0.50,
+        investments: 0.50
+    },
+    
+    bufferVsInvest: {
+    invest: 0.80,
+    debt: 0.20
+    },
+    
+    surplusDeployment: {
+    invest: 0.70,
+    debt: 0.20,
+    emergency: 0.10
+    },
+    
+    cashFlowDeployment: {
+    goals: 0.30,
+    investments: 0.50,
+    debtReduction: 0.20
+    },
+
+    projection: {
+    investableRatio: 0.70
+    },
+
+    wealthSweep: {
+    debt: 0.20,
+    emergency: 0.10,
+    investment: 0.70,
+    projectedReturn: 0.08
+    },
+
+    inflation: {
+    warning: 5,
+    critical: 10
+    }
+};
+
 //Create Budget Summary Engine
 function getBudgetSummary(year = getViewYear(), month = getViewMonth()) {
     const categoryTypes = {};
@@ -36,7 +121,7 @@ function getBudgetSummary(year = getViewYear(), month = getViewMonth()) {
 function getCapitalPosition() {
     const budget = getBudgetSummary();
     const availableCash = getTotalLiquidAssets(appData.accounts || []);
-    const bufferTarget = budget.monthlyObligations * 3;
+    const bufferTarget = budget.monthlyObligations * CONFIG.buffer.months;
     const excessCash = Math.max(0, availableCash - bufferTarget);
     return {
         availableCash,
@@ -50,9 +135,13 @@ function getOpportunityCapital() {
     const availableCash = getTotalLiquidAssets(appData.accounts || []);
     const remainingBills = (appData.recurringBills || []).filter(b => b.active !== false).reduce(
         (sum, bill) => sum + Number(bill.defaultAmount || 0), 0);
-    const coverage = remainingBills === 0 ? 999 : availableCash / remainingBills;
+    const coverage = remainingBills === 0 ? CONFIG.cashFlow.unlimitedCoverage : availableCash / remainingBills;
     const surplus = availableCash - remainingBills;
-    const opportunity = surplus > 0 ? surplus * 0.70 : 0;
+    const opportunity =
+        surplus > 0
+            ? surplus *
+              CONFIG.opportunityAllocation.reserveRatio
+            : 0;
     return {
         availableCash,
         remainingBills,
@@ -68,10 +157,21 @@ function getCapitalAllocationPlan() {
     const allocationBase = Math.max(0, opportunity);
     return {
         opportunity: allocationBase,
-        emergencyAllocation: allocationBase * 0.25,
-        debtAllocation: allocationBase * 0.15,
-        goalAllocation: allocationBase * 0.20,
-        investmentAllocation: allocationBase * 0.40
+        emergencyAllocation:
+            allocationBase *
+            CONFIG.capitalAllocation.emergencyFund,
+        
+        debtAllocation:
+            allocationBase *
+            CONFIG.capitalAllocation.debtReduction,
+        
+        goalAllocation:
+            allocationBase *
+            CONFIG.capitalAllocation.goals,
+        
+        investmentAllocation:
+            allocationBase *
+            CONFIG.capitalAllocation.investments
     };
 }
 
@@ -173,8 +273,11 @@ function getTopWealthAction() {
  * ============================================================
  */
 function getEmergencyFundGap() {
-    const targetEmergencyFund = 300000; // temporary placeholder
-    const currentEmergencyFund = 0; // temporary placeholder
+    const monthlyObligations = getBudgetSummary().monthlyObligations;
+    const targetEmergencyFund = monthlyObligations * CONFIG.emergencyFundMonths;
+    const emergencyGoals = (appData.goals || []).filter(goal => String(goal.goal || "").toLowerCase().includes("emergency"));
+    const currentEmergencyFund = emergencyGoals.reduce(
+        (sum, goal) => sum + Number(goal.current || 0), 0);
     const gap = Math.max(0, targetEmergencyFund - currentEmergencyFund);
     return {
         targetEmergencyFund,
@@ -295,8 +398,14 @@ async function loadBufferVsInvest() {
             </div>
         `;
     } else {
-        const investAmount = excessCash * 0.8;
-        const debtAmount = excessCash * 0.2;
+        const investAmount =
+            excessCash *
+            CONFIG.bufferVsInvest.invest;
+        
+        const debtAmount =
+            excessCash *
+            CONFIG.bufferVsInvest.debt;
+
 
         recommendationHtml = `
             <div class="metric-row">
@@ -329,7 +438,7 @@ async function loadBufferVsInvest() {
                 <strong>${formatCurrency(monthlyObligations)}</strong>
             </div>
             <div class="metric-row">
-                <span>Buffer Target (3x)</span>
+                <span>Buffer Target (${CONFIG.buffer.months}x)</span>
                 <strong>${formatCurrency(bufferTarget)}</strong>
             </div>
             <div class="metric-row">
@@ -462,8 +571,8 @@ async function loadFinancialHealthAdvisor() {
     let status = "Healthy";
     
     if (
-        savingsRate < 20 ||
-        debtRate > 30
+        savingsRate < CONFIG.financialHealth.savingsTargetRate ||
+        debtRate > CONFIG.financialHealth.maxDebtRate
     ) {
         status = "Needs Improvement";
     }
@@ -471,13 +580,13 @@ async function loadFinancialHealthAdvisor() {
     const problems = [];
     const actions = [];
 
-    if (savingsRate < 20) {
+    if (savingsRate < CONFIG.financialHealth.savingsTargetRate) {
 
-        problems.push(
-            "Savings rate is below recommended 20%"
-        );
+    problems.push(
+        `Savings rate is below recommended ${CONFIG.financialHealth.savingsTargetRate}%`
+    );
 
-    const targetSavingsRate = 20;
+    const targetSavingsRate = CONFIG.financialHealth.savingsTargetRate;
     
     const savingsGap =
         income * (targetSavingsRate / 100) - savings;
@@ -489,7 +598,10 @@ async function loadFinancialHealthAdvisor() {
     });
     }
 
-    if (debtRate > 30) {
+    if (
+        debtRate >
+        CONFIG.financialHealth.maxDebtRate
+    ) {
 
         problems.push(
             "Debt payments consume too much income"
@@ -505,9 +617,17 @@ async function loadFinancialHealthAdvisor() {
         actions.push({
             priority: 2,
             title: "Deploy Monthly Surplus",
-            invest: monthlySurplus * 0.70,
-            debt: monthlySurplus * 0.20,
-            emergency: monthlySurplus * 0.10
+        invest:
+            monthlySurplus *
+            CONFIG.surplusDeployment.invest,
+        
+        debt:
+            monthlySurplus *
+            CONFIG.surplusDeployment.debt,
+        
+        emergency:
+            monthlySurplus *
+            CONFIG.surplusDeployment.emergency
         });
     
     }
@@ -517,8 +637,10 @@ async function loadFinancialHealthAdvisor() {
         monthlySurplus * 12 * 10;
 
     const isHealthy =
-        savingsRate >= 20 &&
-        debtRate <= 30;
+        savingsRate >=
+            CONFIG.financialHealth.savingsTargetRate &&
+        debtRate <=
+            CONFIG.financialHealth.maxDebtRate;
     
     if (isHealthy) {
     
@@ -699,8 +821,13 @@ async function loadFundingOptimizationAdvisor() {
             type: "IDLE_CASH",
             title: "Idle Cash Detected",
             excessAmount: excessCash,
-            goalAllocation: excessCash * 0.50,
-            investAllocation: excessCash * 0.50
+            goalAllocation:
+                excessCash *
+                CONFIG.idleCashAllocation.goals,
+            
+            investAllocation:
+                excessCash *
+                CONFIG.idleCashAllocation.investments
         });
     }
 
@@ -788,11 +915,11 @@ async function loadFundingOptimizationAdvisor() {
                                 <strong>${formatCurrency(item.excessAmount)}</strong>
                             </div>
                             <div class="allocation-row">
-                                <span>🎯 Goal Reserve (50%)</span>
+                                <span>🎯 Goal Reserve (${CONFIG.idleCashAllocation.goals * 100}%)</span>
                                 <strong>${formatCurrency(item.goalAllocation)}</strong>
                             </div>
                             <div class="allocation-row">
-                                <span>📈 Investment Sweep (50%)</span>
+                                <span>📈 Investment Sweep (${CONFIG.idleCashAllocation.investments * 100}%)</span>
                                 <strong>${formatCurrency(item.investAllocation)}</strong>
                             </div>
                         </div>
@@ -811,12 +938,12 @@ function getAssetAllocationRecommendation() {
     const cashPercent = allocation.Cash?.percent || 0;
     const totalAssets = Object.values(allocation).reduce(
         (sum, item) => sum + item.amount, 0);
-    const targetCashPercent = 20;
+    const targetCashPercent = CONFIG.assetAllocation.targetCashPercent;
     const targetCashAmount = totalAssets * (targetCashPercent / 100);
     const excessCash = Math.max(0, cashAmount - targetCashAmount);
     return {
-        status: cashPercent > 40 ? "warning" : "good",
-        title: cashPercent > 40 ? "High Cash Allocation" : "Asset Allocation Healthy",
+        status: cashPercent > CONFIG.assetAllocation.warningCashPercent ? "warning" : "good",
+        title: cashPercent > CONFIG.assetAllocation.warningCashPercent ? "High Cash Allocation" : "Asset Allocation Healthy",
         currentPercent: cashPercent,
         targetPercent: targetCashPercent,
         cashAmount,
@@ -879,8 +1006,9 @@ async function loadWealthProjectionAccelerator() {
         if (!container) return;
         const budget = getBudgetSummary();
         const monthlySurplus = budget.monthlySurplus;
-        const investableAmount = Math.max(0, monthlySurplus * 0.70); // Assume 70% sweep into investments
-        const annualReturnRate = 0.07; // Assumed 7% conservative annual return
+        const investableAmount = Math.max(0, monthlySurplus * CONFIG.projection.investableRatio); // Assume 70% sweep into investments
+        const annualReturnRate =
+            CONFIG.wealthProjection.annualReturn; // Assumed 7% conservative annual return
 
     // Future Value Formula: FV = P * (((1 + r/n)^(n*t) - 1) / (r/n))
     const calculateFV = (years) => {
@@ -926,7 +1054,7 @@ async function loadWealthProjectionAccelerator() {
             </div>
             <div class="metric-row">
                 <span>Assumed Return (CAGR)</span>
-                <strong>7.0%</strong>
+                <strong>${(CONFIG.wealthProjection.annualReturn * 100).toFixed(1)}%</strong>
             </div>
 
             <hr>
@@ -1077,8 +1205,8 @@ async function loadPersonalInflation() {
     }
 
     let status = "✅ Spending Stable";
-    if (inflationRate > 5) status = "⚠️ Lifestyle Inflation";
-    if (inflationRate > 10) status = "🚨 Expense Growth High";
+    if (inflationRate > CONFIG.inflation.warning) status = "⚠️ Lifestyle Inflation";
+    if (inflationRate > CONFIG.inflation.critical) status = "🚨 Expense Growth High";
 
     container.innerHTML = `
         <div class="card">
@@ -1236,12 +1364,12 @@ async function loadWealthSweep() {
     const excessCash = capital.excessCash;
 
     // Default Allocation Ratios: 20% Debt Payoff, 10% Emergency Top-up, 70% Investment
-    const debtSweep = roundMoney(excessCash * 0.20);
-    const emergencySweep = roundMoney(excessCash * 0.10);
-    const investmentSweep = roundMoney(excessCash * 0.70);
+    const debtSweep = roundMoney(excessCash * CONFIG.wealthSweep.debt);
+    const emergencySweep = roundMoney(excessCash * CONFIG.wealthSweep.emergency);
+    const investmentSweep = roundMoney(excessCash * CONFIG.wealthSweep.investment);
 
     // Projected 3-Year Investment Return @ 8% CAGR
-    const estimated3YrReturn = investmentSweep * (Math.pow(1 + 0.08, 3) - 1);
+    const estimated3YrReturn = investmentSweep * (Math.pow(1 + CONFIG.wealthSweep.projectedReturn, 3) - 1);
     const total3YrBenefit = debtSweep + investmentSweep + estimated3YrReturn;
 
     // Expose QA Metrics for qa.js
@@ -1288,15 +1416,24 @@ async function loadWealthSweep() {
                 <hr>
                 <h3>Recommended Action Plan</h3>
                 <div class="metric-row">
-                    <span>💳 Debt Payoff Allocation (20%)</span>
+                <span>
+                    💳 Debt Payoff Allocation
+                    (${CONFIG.wealthSweep.debt * 100}%)
+                </span>
                     <strong>${formatCurrency(debtSweep)}</strong>
                 </div>
                 <div class="metric-row">
-                    <span>🛡️ Emergency Buffer Cushion (10%)</span>
+                <span>
+                    🛡️ Emergency Buffer Cushion
+                    (${CONFIG.wealthSweep.emergency * 100}%)
+                </span>
                     <strong>${formatCurrency(emergencySweep)}</strong>
                 </div>
                 <div class="metric-row">
-                    <span>📈 Wealth Investment Sweep (70%)</span>
+                <span>
+                    📈 Wealth Investment Sweep
+                    (${CONFIG.wealthSweep.investment * 100}%)
+                </span>
                     <strong>${formatCurrency(investmentSweep)}</strong>
                 </div>
                 <hr>
@@ -1310,6 +1447,10 @@ async function loadWealthSweep() {
         </div>
     `;
 }
+
+
+
+
 
 // intelligence.js -> DI-008: Monthly Wealth Action Plan
 async function loadMonthlyWealthActionPlan() {
@@ -1336,13 +1477,13 @@ async function loadMonthlyWealthActionPlan() {
     }
 
     // 2. High Priority: Savings Gap
-    if (window.qaFinancialHealthAdvisor?.savingsRate < 20) {
+    if (window.qaFinancialHealthAdvisor?.savingsRate < CONFIG.financialHealth.savingsTargetRate) {
         const gap = window.qaFinancialHealthAdvisor.wealthImpact;
         actions.push({
             priority: 3,
             badge: "🎯 Savings Gap",
             title: "Increase Monthly Savings Rate",
-            detail: "Current savings rate is under 20%. Increase monthly contribution toward savings goals.",
+            detail: `Current savings rate is under ${CONFIG.financialHealth.savingsTargetRate}%.`,
             impact: `10-Year Net Worth Impact: +${formatCurrency(gap)}`
         });
     }
@@ -1363,7 +1504,10 @@ async function loadMonthlyWealthActionPlan() {
         });
     }
 
-    if (window.qaCashFlow?.coverage < 1) {
+    if (
+        window.qaCashFlow?.coverage <
+        CONFIG.cashFlow.minimumCoverage
+    ) {
     
         actions.unshift({
             priority: 0,
@@ -1521,7 +1665,7 @@ const opportunity = capital.opportunity;
     let recommendation;
     
     
-    if (coverage < 1) {
+    if (coverage < CONFIG.cashFlow.minimumCoverage) {
 
         status =
             "🚨 Shortfall Risk";
@@ -1529,7 +1673,7 @@ const opportunity = capital.opportunity;
         recommendation =
             "Protect liquidity immediately. Delay discretionary purchases and transfer additional cash into spending accounts.";
 
-    } else if (coverage < 3) {
+    } else if (coverage < CONFIG.cashFlow.healthyCoverage) {
 
         status =
             "⚠ Tight Cash Flow";
@@ -1582,9 +1726,9 @@ const opportunity = capital.opportunity;
             <h2>💰 Cash Flow Command Center</h2>
         
             <div class="advisor-status ${
-                coverage < 1
+             coverage < CONFIG.cashFlow.minimumCoverage
                     ? "danger"
-                    : coverage < 3
+                    : coverage < CONFIG.cashFlow.healthyCoverage
                     ? "warning"
                     : "success"
             }">
@@ -1624,21 +1768,21 @@ const opportunity = capital.opportunity;
             <div class="metric-row">
                 <span>🎯 Goals</span>
                 <strong>
-                    ${formatCurrency(opportunity * 0.30)}
+                    ${formatCurrency(opportunity * CONFIG.cashFlowDeployment.goals)}
                 </strong>
             </div>
             
             <div class="metric-row">
                 <span>📈 Investments</span>
                 <strong>
-                    ${formatCurrency(opportunity * 0.50)}
+                    ${formatCurrency(opportunity * CONFIG.cashFlowDeployment.investments)}
                 </strong>
             </div>
             
             <div class="metric-row">
                 <span>💳 Debt Reduction</span>
                 <strong>
-                    ${formatCurrency(opportunity * 0.20)}
+                    ${formatCurrency(opportunity * CONFIG.cashFlowDeployment.debtReduction)}
                 </strong>
             </div>
 
