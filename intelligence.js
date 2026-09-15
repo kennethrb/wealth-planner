@@ -1758,11 +1758,14 @@ async function loadPurchaseEvaluator(testAmount = null) {
     });
 
     const capital = getCapitalPosition();
+    // DI-017 Safe-To-Spend
+    const safeSpend = getSafeToSpend();
     const availableCash = capital.availableCash;
     const monthlyObligations = capital.monthlyObligations;
     const bufferTarget = capital.bufferTarget;
 
     const cashAfterPurchase = availableCash - purchaseAmount;
+    const safeSpendAfterPurchase = safeSpend.safeToSpend - purchaseAmount;
     const bufferRemaining = cashAfterPurchase - bufferTarget;
     const monthsCovered =
         monthlyObligations > 0
@@ -1776,11 +1779,11 @@ async function loadPurchaseEvaluator(testAmount = null) {
 
 
 
-    let recommendation = "✅ Affordable";
-    if (cashAfterPurchase < bufferTarget) {
-        recommendation = "⚠️ Impacts Emergency Buffer";
+    let recommendation = "✅ Within Safe-To-Spend";
+    if (purchaseAmount > safeSpend.safeToSpend) {
+        recommendation = "⚠️ Exceeds Safe-To-Spend";
     }
-    if (cashAfterPurchase <= 0) {
+    if (safeSpendAfterPurchase < 0) {
         recommendation = "🚨 Not Recommended";
     }
 
