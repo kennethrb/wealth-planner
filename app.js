@@ -591,6 +591,7 @@ async function refreshFinancialViews() {
         loadAdvisorDashboard(),           // DI-015
         loadWealthOpportunityEngine(), // DI-012
         loadMonthlyWealthActionPlan(),    // DI-008
+        loadPayCycleCard(),
         loadScenarioWorkbench()
         
     ]);
