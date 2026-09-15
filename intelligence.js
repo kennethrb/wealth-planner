@@ -775,6 +775,7 @@ function getPaydayPlan() {
         debtReduction: allocation.debtAllocation,
         goals: allocation.goalAllocation,
         investments: allocation.investmentAllocation,
+        opportunityCapital: allocation.opportunity,
         topAction
     };
 }
