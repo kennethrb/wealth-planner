@@ -630,6 +630,7 @@ async function changeViewPeriod() {
         loadMonthlyWealthActionPlan(),     // DI-008
         loadPayCycleCard(),
         loadSafeToSpendCard(),
+        loadPaydayPlan(),
         loadBufferVsInvest(),
         loadSummary(),
         loadScenarioWorkbench()
