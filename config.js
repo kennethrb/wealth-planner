@@ -10,7 +10,6 @@
  */
 const CONFIG = {
     emergencyFundMonths: 6,
-    investmentReturnRate: 0.07,
     capitalAllocation: {
         emergencyFund: 0.25,
         debtReduction: 0.15,
