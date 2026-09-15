@@ -524,6 +524,8 @@ function getMonthlyWealthBrief() {
     const advisor = getWealthAdvisorSummary();
     const opportunity =
         getOpportunityCapital().opportunity;
+    const safeSpend =
+        getSafeToSpend();
     
     const projectedBenefit =
         window.qaSweep?.total3YrBenefit || 0;
@@ -558,7 +560,12 @@ function getMonthlyWealthBrief() {
         advisorReason,
     
         summary:
-            `You currently have ${formatCurrency(opportunity)} available for wealth deployment.`,
+        `You can safely spend
+        ${formatCurrency(
+            safeSpend.safeToSpend
+        )}
+        before your next payday while
+        keeping obligations and reserves protected.`,
     
         projectedImpact:
             `Potential 3-Year Wealth Benefit: ${formatCurrency(projectedBenefit)}`,
