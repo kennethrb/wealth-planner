@@ -1847,6 +1847,10 @@ async function loadPurchaseEvaluator(testAmount = null) {
                     <strong>${formatCurrency(bufferRemaining)}</strong>
                 </div>
                 <div class="metric-row">
+                    <span>Safe-To-Spend Remaining</span>
+                    <strong> ${formatCurrency(safeSpendAfterPurchase)} </strong>
+                </div>
+                <div class="metric-row">
                     <span>Months Covered</span>
                     <strong>${monthsCoveredDisplay}</strong>
                 </div>
