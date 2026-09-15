@@ -871,7 +871,7 @@ function loadPaydayPlan() {
 
             <hr>
             
-            <h3>✅ Action Queue</h3>
+            <h3>⭐ Recommended Execution Order</h3>
             
             <div class="advisor-action">
                 <div class="action-title">
