@@ -726,6 +726,37 @@ function getCycleBills() {
     return (appData.recurringBills || []).filter(bill => bill.active !== false);
 }
 
+/**
+ * WPOS-001
+ * Pay cycle dashboard card.
+ */
+function loadPayCycleCard() {
+    const cycle = getCurrentPayCycle();
+    const container = document.getElementById("payCycleCard");
+    if (!container) return;
+    container.innerHTML = `
+        <div class="card">
+
+            <h2>📅 Pay Cycle</h2>
+
+            <div class="metric-row">
+                <span>Next Payday</span>
+                <strong>
+                    ${cycle.nextPayday.toLocaleDateString()}
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>Days Remaining</span>
+                <strong>
+                    ${cycle.daysRemaining}
+                </strong>
+            </div>
+
+        </div>
+    `;
+}
+
 function roundMoney(value) {
     return Number(value.toFixed(2));
 }
