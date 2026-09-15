@@ -65,8 +65,6 @@ function getOpportunityCapital() {
             ? surplus *
               CONFIG.opportunityAllocation.reserveRatio
             : 0;
-    const safeSpend =
-        getSafeToSpend();
     return {
         availableCash,
         remainingBills,
