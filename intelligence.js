@@ -786,6 +786,7 @@ function getPaydayPlan() {
  */
 function loadPaydayPlan() {
     const plan = getPaydayPlan();
+    const cycle = getCurrentPayCycle();
     const container = document.getElementById("paydayPlan");
     if (!container) return;
     container.innerHTML = `
@@ -793,7 +794,16 @@ function loadPaydayPlan() {
         <div class="card">
 
             <h2>💰 Payday Plan</h2>
-
+            
+            <div class="metric-row">
+                <span>Current Cycle</span>
+                <strong>
+                    ${cycle.cycleStart.toLocaleDateString()}
+                    →
+                    ${cycle.cycleEnd.toLocaleDateString()}
+                </strong>
+            </div>
+            
             <div class="metric-row">
                 <span>Next Payday</span>
                 <strong>
@@ -807,7 +817,7 @@ function loadPaydayPlan() {
                     ${plan.daysRemaining}
                 </strong>
             </div>
-            
+
             <hr>
             
             <div class="metric-row">
@@ -860,17 +870,66 @@ function loadPaydayPlan() {
             </div>
 
             <hr>
-
-            <div class="advisor-action priority">
-
+            
+            <h3>✅ Action Queue</h3>
+            
+            <div class="advisor-action">
                 <div class="action-title">
-                    🎯 Recommended Action
+                    1️⃣ Fund Emergency Reserve
                 </div>
-
+                <div class="allocation-row">
+                    <span>Amount</span>
+                    <strong>
+                        ${formatCurrency(plan.emergencyFund)}
+                    </strong>
+                </div>
+            </div>
+            
+            <div class="advisor-action">
+                <div class="action-title">
+                    2️⃣ Reduce Debt
+                </div>
+                <div class="allocation-row">
+                    <span>Amount</span>
+                    <strong>
+                        ${formatCurrency(plan.debtReduction)}
+                    </strong>
+                </div>
+            </div>
+            
+            <div class="advisor-action">
+                <div class="action-title">
+                    3️⃣ Fund Goals
+                </div>
+                <div class="allocation-row">
+                    <span>Amount</span>
+                    <strong>
+                        ${formatCurrency(plan.goals)}
+                    </strong>
+                </div>
+            </div>
+            
+            <div class="advisor-action">
+                <div class="action-title">
+                    4️⃣ Invest Remaining Capital
+                </div>
+                <div class="allocation-row">
+                    <span>Amount</span>
+                    <strong>
+                        ${formatCurrency(plan.investments)}
+                    </strong>
+                </div>
+            </div>
+            
+            <hr>
+            
+            <div class="advisor-action priority">
+                <div class="action-title">
+                    🎯 Highest Priority
+                </div>
                 <p>
                     ${plan.topAction.action}
                 </p>
-
             </div>
 
         </div>
