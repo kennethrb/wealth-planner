@@ -81,5 +81,10 @@ const CONFIG = {
     inflation: {
     warning: 5,
     critical: 10
+    },
+
+    payCycle: {
+    paydayDay: 15,
+    bufferReserveRatio: 0.20
     }
 };
