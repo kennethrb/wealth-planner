@@ -306,6 +306,9 @@ function getWealthAdvisorSummary() {
     const warnings = [];
     // DI-012 Wealth Opportunity Engine
     const opportunityEngine = getWealthOpportunities();
+    const safeSpend =
+        getSafeToSpend();
+
     /**
      * Cash Flow Warning
      *
@@ -327,6 +330,7 @@ function getWealthAdvisorSummary() {
         actions,
         // Risk alerts
         warnings,
+        safeToSpend: safeSpend.safeToSpend,
         // DI-012 opportunities
         opportunities: opportunityEngine.opportunities
     };
@@ -483,6 +487,8 @@ function loadWealthAdvisor() {
     
             warnings:
                 advisor.warnings.length,
+            safeToSpend: 
+                advisor.safeToSpend,
     
             opportunities:
                 advisor.opportunities.length
