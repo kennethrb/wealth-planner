@@ -2304,6 +2304,8 @@ async function loadCashFlowCommandCenter() {
     if (!container) return;
 
 const capital = getOpportunityCapital();
+// DI-017 Safe-To-Spend
+const safeSpend = getSafeToSpend();
 const availableCash = capital.availableCash;
 const remainingBills = capital.remainingBills;
 const coverage = capital.coverage;
@@ -2445,6 +2447,15 @@ const safeSpend = getSafeToSpend();
                 </strong>
             </div>
             <hr>
+            
+            <div class="metric-row">
+                <span>Safe-To-Spend</span>
+                <strong>
+                    ${formatCurrency(
+                        safeSpend.safeToSpend
+                    )}
+                </strong>
+            </div>    
             
             <div class="metric-row">
                 <span>Coverage Ratio</span>
