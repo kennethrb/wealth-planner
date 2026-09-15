@@ -306,6 +306,8 @@ function getWealthAdvisorSummary() {
     const warnings = [];
     // DI-012 Wealth Opportunity Engine
     const opportunityEngine = getWealthOpportunities();
+    const graduation =
+        getGoalGraduationRecommendation();
     const safeSpend =
         getSafeToSpend();
 
@@ -331,6 +333,7 @@ function getWealthAdvisorSummary() {
         // Risk alerts
         warnings,
         safeToSpend: safeSpend.safeToSpend,
+        goalGraduation: graduation,
         // DI-012 opportunities
         opportunities: opportunityEngine.opportunities
     };
