@@ -807,11 +807,23 @@ function loadPaydayPlan() {
                     ${plan.daysRemaining}
                 </strong>
             </div>
-
+            
             <hr>
-
+            
+            <div class="metric-row">
+                <span>Opportunity Capital</span>
+                <strong>
+                    ${formatCurrency(
+                        plan.opportunityCapital
+                    )}
+                </strong>
+            </div>
+            
+            <hr>
+            
             <div class="metric-row">
                 <span>🛡️ Emergency Fund</span>
+
                 <strong>
                     ${formatCurrency(plan.emergencyFund)}
                 </strong>
