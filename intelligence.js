@@ -781,6 +781,27 @@ function getPaydayPlan() {
 }
 
 /**
+ * DI-019
+ * Detect completed goals and
+ * released contribution capacity.
+ */
+function getGraduatedGoals() {
+    const goals = appData.goals || [];
+    const graduated = goals.filter(goal => {
+        const current = Number(goal.current || 0);
+        const target = Number(goal.target || 0);
+        return (target > 0 && current >= target);
+    });
+    const releasedMonthlyContribution = graduated.reduce(
+        (sum, goal) => sum + Number(goal.monthlyContribution || 0), 0);
+    return {
+        graduatedCount: graduated.length,
+        releasedMonthlyContribution,
+        goals: graduated
+    };
+}
+
+/**
  * P3 Payday Engine Phase 2
  * Render payday allocation plan.
  */
