@@ -780,6 +780,92 @@ function getPaydayPlan() {
 }
 
 /**
+ * P3 Payday Engine Phase 2
+ * Render payday allocation plan.
+ */
+function loadPaydayPlan() {
+    const plan = getPaydayPlan();
+    const container = document.getElementById("paydayPlan");
+    if (!container) return;
+    container.innerHTML = `
+
+        <div class="card">
+
+            <h2>💰 Payday Plan</h2>
+
+            <div class="metric-row">
+                <span>Next Payday</span>
+                <strong>
+                    ${plan.nextPayday.toLocaleDateString()}
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>Days Remaining</span>
+                <strong>
+                    ${plan.daysRemaining}
+                </strong>
+            </div>
+
+            <hr>
+
+            <div class="metric-row">
+                <span>🛡️ Emergency Fund</span>
+                <strong>
+                    ${formatCurrency(plan.emergencyFund)}
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>💳 Debt Reduction</span>
+                <strong>
+                    ${formatCurrency(plan.debtReduction)}
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>🎯 Goals</span>
+                <strong>
+                    ${formatCurrency(plan.goals)}
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>📈 Investments</span>
+                <strong>
+                    ${formatCurrency(plan.investments)}
+                </strong>
+            </div>
+
+            <hr>
+
+            <div class="metric-row">
+                <span>Safe-To-Spend</span>
+                <strong>
+                    ${formatCurrency(plan.safeToSpend)}
+                </strong>
+            </div>
+
+            <hr>
+
+            <div class="advisor-action priority">
+
+                <div class="action-title">
+                    🎯 Recommended Action
+                </div>
+
+                <p>
+                    ${plan.topAction.action}
+                </p>
+
+            </div>
+
+        </div>
+
+    `;
+}
+
+/**
  * WPOS-001
  * Pay cycle dashboard card.
  */
