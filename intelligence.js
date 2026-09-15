@@ -758,6 +758,28 @@ function getSafeToSpend() {
 }
 
 /**
+ * P3 Payday Engine Phase 1
+ * Generates recommended allocation plan
+ * for the current pay cycle.
+ */
+function getPaydayPlan() {
+    const cycle = getCurrentPayCycle();
+    const safeSpend = getSafeToSpend();
+    const allocation = getCapitalAllocationPlan();
+    const topAction = getCapitalAllocationPriority();
+    return {
+        nextPayday: cycle.nextPayday,
+        daysRemaining: cycle.daysRemaining,
+        safeToSpend: safeSpend.safeToSpend,
+        emergencyFund: allocation.emergencyAllocation,
+        debtReduction: allocation.debtAllocation,
+        goals: allocation.goalAllocation,
+        investments: allocation.investmentAllocation,
+        topAction
+    };
+}
+
+/**
  * WPOS-001
  * Pay cycle dashboard card.
  */
