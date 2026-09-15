@@ -802,6 +802,28 @@ function getGraduatedGoals() {
 }
 
 /**
+ * DI-019
+ * Recommend where released goal
+ * contributions should go next.
+ */
+function getGoalGraduationRecommendation() {
+    const graduation = getGraduatedGoals();
+    if (graduation.graduatedCount === 0) {
+        return {
+            status: "NONE"
+        };
+    }
+    return {
+        status: "ACTIVE",
+        releasedMonthlyContribution: graduation.releasedMonthlyContribution,
+        recommendedDestination: "Investments",
+        action: `Redirect ${formatCurrency(
+                graduation.releasedMonthlyContribution
+            )} per month to Investments.`
+    };
+}
+
+/**
  * P3 Payday Engine Phase 2
  * Render payday allocation plan.
  */
