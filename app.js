@@ -592,6 +592,7 @@ async function refreshFinancialViews() {
         loadWealthOpportunityEngine(), // DI-012
         loadMonthlyWealthActionPlan(),    // DI-008
         loadPayCycleCard(),
+        loadSafeToSpendCard(),
         loadScenarioWorkbench()
         
     ]);
@@ -670,6 +671,7 @@ async function refreshUI() {
         loadWealthOpportunityEngine(), // DI-012
         loadMonthlyWealthActionPlan(),     // DI-008
         loadPayCycleCard(),
+        loadSafeToSpendCard(),
         loadScenarioWorkbench(),
         loadBufferVsInvest(),
         loadReconciliation(),
