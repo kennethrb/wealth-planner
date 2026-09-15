@@ -832,6 +832,8 @@ function getGoalGraduationRecommendation() {
  */
 function loadPaydayPlan() {
     const plan = getPaydayPlan();
+    const graduation =
+        getGoalGraduationRecommendation();
     const cycle = getCurrentPayCycle();
     const container = document.getElementById("paydayPlan");
     if (!container) return;
@@ -977,6 +979,18 @@ function loadPaydayPlan() {
                     ${plan.topAction.action}
                 </p>
             </div>
+
+            ${ graduation.status === "ACTIVE" ? `
+            <hr>
+            <div class="advisor-action success">
+                <div class="action-title"> 🎓 Goal Graduated </div>
+                <p> ${graduation.action} </p>
+                <div class="allocation-row">
+                    <span> Released Monthly Contribution </span>
+                    <strong> ${formatCurrency( graduation.releasedMonthlyContribution )} </strong>
+                </div>
+            </div> ` : 
+              "" }
 
         </div>
 
