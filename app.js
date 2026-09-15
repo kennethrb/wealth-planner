@@ -668,6 +668,7 @@ async function refreshUI() {
         loadAdvisorDashboard(),
         loadWealthOpportunityEngine(), // DI-012
         loadMonthlyWealthActionPlan(),     // DI-008
+        loadPayCycleCard(),
         loadScenarioWorkbench(),
         loadBufferVsInvest(),
         loadReconciliation(),
