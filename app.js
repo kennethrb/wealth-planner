@@ -593,6 +593,7 @@ async function refreshFinancialViews() {
         loadMonthlyWealthActionPlan(),    // DI-008
         loadPayCycleCard(),
         loadSafeToSpendCard(),
+        loadPaydayPlan(),
         loadScenarioWorkbench()
         
     ]);
@@ -674,6 +675,7 @@ async function refreshUI() {
         loadMonthlyWealthActionPlan(),     // DI-008
         loadPayCycleCard(),
         loadSafeToSpendCard(),
+        loadPaydayPlan(),
         loadScenarioWorkbench(),
         loadBufferVsInvest(),
         loadReconciliation(),
