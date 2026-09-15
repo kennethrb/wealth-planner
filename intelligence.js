@@ -2615,7 +2615,20 @@ const ADVISOR_ROUTES = {
     // DI-006 Purchase
     purchase: ["purchase", "afford", "buy", "spender"],
     // DI-009 Cash Flow
-    cashflow: ["cash flow", "cashflow", "liquidity", "cash position"]
+    cashflow: [
+        "cash flow",
+        "cashflow",
+        "liquidity",
+        "cash position",
+    
+        "how much can i spend",
+        "safe to spend",
+        "safe-to-spend",
+        "spend",
+        "spending",
+        "available cash",
+        "how much available"
+    ]
 };
 
 
@@ -2691,11 +2704,18 @@ function buildInvestmentResponse() {
 }
 
 function buildCashFlowResponse() {
-    const cash = window.qaCashFlow;
+    const safeSpend = getSafeToSpend();
+    const payCycle = getCurrentPayCycle();
     return {
-        answer: cash?.recommendation || "Cash flow analysis unavailable",
-        confidence: 80,
-        source: "DI-009",
+        answer: `You can safely spend
+        ${formatCurrency(
+            safeSpend.safeToSpend
+        )}
+        before your next payday
+        in ${payCycle.daysRemaining}
+        days.`,
+        confidence: 95,
+        source: "DI-017",
         generatedAt: new Date().toISOString()
     };
 }
