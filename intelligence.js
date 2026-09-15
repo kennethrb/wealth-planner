@@ -48,8 +48,16 @@ function getCapitalPosition() {
 
 function getOpportunityCapital() {
     const availableCash = getTotalLiquidAssets(appData.accounts || []);
-    const remainingBills = (appData.recurringBills || []).filter(b => b.active !== false).reduce(
-        (sum, bill) => sum + Number(bill.defaultAmount || 0), 0);
+    const remainingBills =
+    getCycleBills()
+    .reduce(
+        (sum, bill) =>
+            sum +
+            Number(
+                bill.defaultAmount || 0
+            ),
+        0
+    );
     const coverage = remainingBills === 0 ? CONFIG.cashFlow.unlimitedCoverage : availableCash / remainingBills;
     const surplus = availableCash - remainingBills;
     const opportunity =
@@ -674,6 +682,48 @@ function isLiquidAccount(account) {
 function getTotalLiquidAssets(accounts = []) {
     return accounts.filter(account => account.netWorthType === "Asset" && isLiquidAccount(account)).reduce(
         (total, account) => total + Number(account.currentBalance ?? account.balance ?? 0), 0);
+}
+
+/**
+ * WPOS-001
+ * Calculate current pay cycle boundaries.
+ */
+function getCurrentPayCycle() {
+    const paydayDay = CONFIG.payCycle.paydayDay;
+    const today = new Date();
+    const currentDay = today.getDate();
+    let cycleStart;
+    let cycleEnd;
+    let nextPayday;
+    if (currentDay >= paydayDay) {
+        cycleStart = new Date(today.getFullYear(), today.getMonth(), paydayDay);
+        nextPayday = new Date(today.getFullYear(), today.getMonth() + 1, paydayDay);
+    } else {
+        cycleStart = new Date(today.getFullYear(), today.getMonth() - 1, paydayDay);
+        nextPayday = new Date(today.getFullYear(), today.getMonth(), paydayDay);
+    }
+    cycleEnd = new Date(nextPayday);
+    cycleEnd.setDate(cycleEnd.getDate() - 1);
+    const daysRemaining = Math.ceil(
+        (nextPayday - today) / (1000 * 60 * 60 * 24));
+    return {
+        cycleStart,
+        cycleEnd,
+        nextPayday,
+        daysRemaining
+    };
+}
+
+/**
+ * WPOS-001
+ * Returns active bills for pay cycle analysis.
+ *
+ * NOTE:
+ * Due day logic will be enhanced
+ * in Phase 2.
+ */
+function getCycleBills() {
+    return (appData.recurringBills || []).filter(bill => bill.active !== false);
 }
 
 function roundMoney(value) {
