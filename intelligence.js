@@ -727,6 +727,24 @@ function getCycleBills() {
 }
 
 /**
+ * DI-017
+ * Safe spendable cash before next payday.
+ */
+function getSafeToSpend() {
+    const availableCash = getTotalLiquidAssets(appData.accounts || []);
+    const protectedBills = getCycleBills().reduce(
+        (sum, bill) => sum + Number(bill.defaultAmount || 0), 0);
+    const protectedBuffer = availableCash * CONFIG.payCycle.bufferReserveRatio;
+    const safeToSpend = Math.max(0, availableCash - protectedBills - protectedBuffer);
+    return {
+        availableCash,
+        protectedBills,
+        protectedBuffer,
+        safeToSpend
+    };
+}
+
+/**
  * WPOS-001
  * Pay cycle dashboard card.
  */
@@ -762,6 +780,51 @@ function loadPayCycleCard() {
                 </strong>
             </div>
     
+        </div>
+    `;
+}
+
+/**
+ * DI-017
+ * Safe-To-Spend card.
+ */
+function loadSafeToSpendCard() {
+    const result = getSafeToSpend();
+    const container = document.getElementById("safeToSpendCard");
+    if (!container) return;
+    container.innerHTML = `
+        <div class="card">
+
+            <h2>💵 Safe To Spend</h2>
+
+            <div class="hero-metric">
+
+                <div class="hero-value">
+                    ${formatCurrency(
+                        result.safeToSpend
+                    )}
+                </div>
+
+            </div>
+
+            <div class="metric-row">
+                <span>Protected Bills</span>
+                <strong>
+                    ${formatCurrency(
+                        result.protectedBills
+                    )}
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>Protected Buffer</span>
+                <strong>
+                    ${formatCurrency(
+                        result.protectedBuffer
+                    )}
+                </strong>
+            </div>
+
         </div>
     `;
 }
