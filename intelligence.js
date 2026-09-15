@@ -65,6 +65,8 @@ function getOpportunityCapital() {
             ? surplus *
               CONFIG.opportunityAllocation.reserveRatio
             : 0;
+    const safeSpend =
+        getSafeToSpend();
     return {
         availableCash,
         remainingBills,
@@ -2175,6 +2177,8 @@ const remainingBills = capital.remainingBills;
 const coverage = capital.coverage;
 const surplus = capital.surplus;
 const opportunity = capital.opportunity;
+// DI-017 Safe-To-Spend
+const safeSpend = getSafeToSpend();
 
     let status;
     let recommendation;
@@ -2300,7 +2304,14 @@ const opportunity = capital.opportunity;
                     ${formatCurrency(opportunity * CONFIG.cashFlowDeployment.debtReduction)}
                 </strong>
             </div>
-
+            <div class="metric-row">
+                <span>Safe-To-Spend</span>
+                <strong>
+                    ${formatCurrency(
+                        safeSpend.safeToSpend
+                    )}
+                </strong>
+            </div>
             <hr>
             
             <div class="metric-row">
