@@ -11,6 +11,16 @@ async function loadGoals() {
         const monthlyContribution =
             Number(goal.monthlyContribution || 0);
         
+        const status =
+            goal.status || "ACTIVE";
+        
+        const statusBadge =
+            status === "GRADUATED"
+                ? "✅ Graduated"
+                : status === "ARCHIVED"
+                ? "📦 Archived"
+                : "🎯 Active";
+        
         let forecast = "N/A";
         let monthsRemaining = "N/A";
         
@@ -52,8 +62,23 @@ async function loadGoals() {
           <div class="progress-bar-fill" style="width: ${Math.min(progress, 100)}%;"></div>
         </div>
         <div class="goal-details">
-          <span>Target: ${formatCurrency(target)} (${progress}%)</span>
-          <span>Est: <strong>${forecast}</strong> (${monthsRemaining} mos)</span>
+        
+          <span>
+              ${statusBadge}
+          </span>
+        
+          <span>
+              Target:
+              ${formatCurrency(target)}
+              (${progress}%)
+          </span>
+        
+          <span>
+              Est:
+              <strong>${forecast}</strong>
+              (${monthsRemaining} mos)
+          </span>
+        
         </div>
       </div>
     `;
