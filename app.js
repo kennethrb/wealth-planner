@@ -693,9 +693,8 @@ async function initializeApp() {
     await loadData();
 
     // THIS IS FOR SWITCHING FROM PERSONAL TO TEST DATA //
-    document.getElementById(
-        "environmentSelector"
-    ).value = appMode;
+    // AFTER
+    document.getElementById("environmentSelector")?.value = appMode;
     
     updateEnvironmentBanner();    
 
