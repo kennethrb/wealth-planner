@@ -1,3 +1,37 @@
+document.addEventListener("DOMContentLoaded",
+    () => {
+        const form = document.getElementById("addGoalForm");
+        if (!form) return;
+        form.addEventListener("submit", handleAddGoal);
+    });
+
+async function handleAddGoal(event) {
+    event.preventDefault();
+    const goal = document.getElementById("goalName").value.trim();
+    const target = document.getElementById("goalTarget").value;
+    const monthlyContribution = document.getElementById("goalContribution").value;
+    const response =
+        await fetch(
+            `${BASE_URL}?action=addGoal`
+            + `&mode=${appMode}`
+            + `&goal=${encodeURIComponent(goal)}`
+            + `&target=${target}`
+            + `&current=0`
+            + `&monthlyContribution=${monthlyContribution}`
+        );
+    const result = await response.json();
+    if (!result.success) {
+        showStatus("Goal creation failed", "error");
+        return;
+    }
+    document.getElementById("goalName").value = "";
+    document.getElementById("goalTarget").value = "";
+    document.getElementById("goalContribution").value = "";
+    await loadData();
+    await refreshUI();
+    showStatus("✅ Goal added successfully", "success");
+}
+
 async function loadGoals() {
     const container = document.getElementById("financialGoals");
     if (!container) return;
