@@ -232,3 +232,61 @@ async function archiveGoal(goalId) {
     );
 }
 
+async function editGoal(goalId) {
+
+    const goal =
+        appData.goals.find(
+            g => g.goalId === goalId
+        );
+
+    if (!goal)
+        return;
+
+    const newTarget =
+        await showInputDialog(
+            "Edit Goal Target",
+            goal.goal,
+            goal.target
+        );
+
+    if (
+        newTarget === null ||
+        newTarget === ""
+    ) {
+        return;
+    }
+
+    const response =
+        await fetch(
+            `${BASE_URL}?action=updateGoal`
+            + `&mode=${appMode}`
+            + `&goalId=${goalId}`
+            + `&goal=${encodeURIComponent(goal.goal)}`
+            + `&target=${encodeURIComponent(newTarget)}`
+            + `&current=${goal.current}`
+            + `&monthlyContribution=${goal.monthlyContribution}`
+            + `&status=${goal.status}`
+        );
+
+    const result =
+        await response.json();
+
+    if (!result.success) {
+
+        showStatus(
+            "Update failed",
+            "error"
+        );
+
+        return;
+    }
+
+    await loadData();
+    await refreshUI();
+
+    showStatus(
+        "✅ Goal updated",
+        "success"
+    );
+}
+
