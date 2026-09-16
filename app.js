@@ -802,3 +802,48 @@ function showIntelTab(tab) {
         .getElementById(`btn-${tab}`)
         .classList.add("active");
 }
+
+// Bind click handler during app initialization
+function initEnvironmentSwitcher() {
+  const banner = document.getElementById('environmentBanner');
+  if (!banner) return;
+
+  banner.addEventListener('click', promptEnvironmentSwitch);
+  banner.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      promptEnvironmentSwitch();
+    }
+  });
+}
+
+function promptEnvironmentSwitch() {
+  const currentMode = state.mode || 'personal';
+  const targetMode = currentMode === 'personal' ? 'demo' : 'personal';
+  const targetLabel = targetMode === 'demo' ? 'DEMO MODE' : 'PERSONAL DATA MODE';
+
+  if (confirm(`Switch environment dataset to ${targetLabel}?`)) {
+    toggleEnvironment(targetMode);
+  }
+}
+
+function toggleEnvironment(newMode) {
+  state.mode = newMode;
+  const banner = document.getElementById('environmentBanner');
+
+  if (banner) {
+    banner.className = `environment-banner ${newMode}`;
+    banner.innerHTML = newMode === 'personal'
+      ? '<span class="env-icon">👤</span><span class="env-label">PERSONAL DATA MODE</span>'
+      : '<span class="env-icon">🧪</span><span class="env-label">DEMO MODE</span>';
+  }
+
+  // Reload application dataset based on active mode context
+  if (newMode === 'demo') {
+    state.data = getMockDataSet(); // qa-utils.js
+  } else {
+    loadPersonalData(); // Code.gs backend driver
+  }
+
+  renderAll();
+}
