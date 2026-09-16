@@ -439,10 +439,20 @@
           <div id="accounts"></div>
       
       </div>
-        <div class="card">
-          <div class="card-title">🎯 Goals</div>
+      <div class="card">
+          <div class="card-title"> 🎯 Goals </div>
+          <form id="addGoalForm">
+              <h2> ➕ Add Goal </h2>
+              <div class="form-row">
+                  <input type="text" id="goalName" placeholder="Goal Name" required>
+                  <input type="number" id="goalTarget" placeholder="Target Amount" required>
+                  <input type="number" id="goalContribution" placeholder="Monthly Contribution" required>
+                  <button type="submit"> ➕ Add Goal </button>
+              </div>
+          </form>
+          <hr class="divider">
           <div id="financialGoals"></div>
-        </div>
+      </div>
       </section>
 
       <footer class="app-footer">
