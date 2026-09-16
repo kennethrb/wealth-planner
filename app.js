@@ -693,8 +693,10 @@ async function initializeApp() {
     await loadData();
 
     // THIS IS FOR SWITCHING FROM PERSONAL TO TEST DATA //
-    // AFTER
-    document.getElementById("environmentSelector")?.value = appMode;
+    const envSelector = document.getElementById("environmentSelector");
+    if (envSelector) {
+        envSelector.value = appMode;
+    }
     
     updateEnvironmentBanner();    
 
@@ -817,12 +819,11 @@ function initEnvironmentSwitcher() {
 }
 
 function promptEnvironmentSwitch() {
-  const currentMode = state.mode || 'personal';
-  const targetMode = currentMode === 'personal' ? 'demo' : 'personal';
-  const targetLabel = targetMode === 'demo' ? 'DEMO MODE' : 'PERSONAL DATA MODE';
+  const targetMode = appMode === APP_MODE.PERSONAL ? APP_MODE.TEST : APP_MODE.PERSONAL;
+  const targetLabel = targetMode === APP_MODE.TEST ? "TEST DATA MODE" : "PERSONAL DATA MODE";
 
   if (confirm(`Switch environment dataset to ${targetLabel}?`)) {
-    toggleEnvironment(targetMode);
+    setAppMode(targetMode);
   }
 }
 
