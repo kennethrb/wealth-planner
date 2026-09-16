@@ -79,11 +79,122 @@ async function loadGoals() {
               (${monthsRemaining} mos)
           </span>
         
+          <div
+              style="
+                  display:flex;
+                  gap:8px;
+                  margin-top:8px;
+              "
+          >
+        
+              <button
+                  class="btn-secondary"
+                  onclick="editGoal('${goal.goalId}')"
+              >
+                  ✏️
+              </button>
+        
+              <button
+                  class="btn-secondary"
+                  onclick="archiveGoal('${goal.goalId}')"
+              >
+                  📦
+              </button>
+        
+              <button
+                  class="btn-danger"
+                  onclick="deleteGoal('${goal.goalId}')"
+              >
+                  🗑
+              </button>
+        
+          </div>
+        
         </div>
       </div>
     `;
     });
     html += `</div>`;
     container.innerHTML = html;
+}
+
+async function deleteGoal(goalId) {
+
+    const confirmed =
+        await showConfirmDialog(
+            "Delete Goal",
+            "Delete this goal?"
+        );
+
+    if (!confirmed)
+        return;
+
+    const response =
+        await fetch(
+            `${BASE_URL}?action=deleteGoal`
+            + `&mode=${appMode}`
+            + `&goalId=${goalId}`
+        );
+
+    const result =
+        await response.json();
+
+    if (!result.success) {
+
+        showStatus(
+            "Delete failed",
+            "error"
+        );
+
+        return;
+    }
+
+    await loadData();
+    await refreshUI();
+
+    showStatus(
+        "Goal deleted",
+        "success"
+    );
+}
+
+async function archiveGoal(goalId) {
+
+    const confirmed =
+        await showConfirmDialog(
+            "Archive Goal",
+            "Archive this goal?"
+        );
+
+    if (!confirmed)
+        return;
+
+    const response =
+        await fetch(
+            `${BASE_URL}?action=archiveGoal`
+            + `&mode=${appMode}`
+            + `&goalId=${goalId}`
+        );
+
+    const result =
+        await response.json();
+
+    if (!result.success) {
+
+        showStatus(
+            "Archive failed",
+            "error"
+        );
+
+        return;
+    }
+
+    await loadData();
+    await refreshUI();
+
+    showStatus(
+        "Goal archived",
+        "success"
+    );
 }
 
