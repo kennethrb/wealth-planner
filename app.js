@@ -693,10 +693,9 @@ async function initializeApp() {
     await loadData();
 
     // THIS IS FOR SWITCHING FROM PERSONAL TO TEST DATA //
-    const envSelector = document.getElementById("environmentSelector");
-    if (envSelector) {
-        envSelector.value = appMode;
-    }
+    document.getElementById(
+        "environmentSelector"
+    ).value = appMode;
     
     updateEnvironmentBanner();    
 
@@ -802,48 +801,4 @@ function showIntelTab(tab) {
     document
         .getElementById(`btn-${tab}`)
         .classList.add("active");
-}
-
-// Bind click handler during app initialization
-function initEnvironmentSwitcher() {
-  const banner = document.getElementById('environmentBanner');
-  if (!banner) return;
-
-  banner.addEventListener('click', promptEnvironmentSwitch);
-  banner.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      promptEnvironmentSwitch();
-    }
-  });
-}
-
-function promptEnvironmentSwitch() {
-  const targetMode = appMode === APP_MODE.PERSONAL ? APP_MODE.TEST : APP_MODE.PERSONAL;
-  const targetLabel = targetMode === APP_MODE.TEST ? "TEST DATA MODE" : "PERSONAL DATA MODE";
-
-  if (confirm(`Switch environment dataset to ${targetLabel}?`)) {
-    setAppMode(targetMode);
-  }
-}
-
-function toggleEnvironment(newMode) {
-  state.mode = newMode;
-  const banner = document.getElementById('environmentBanner');
-
-  if (banner) {
-    banner.className = `environment-banner ${newMode}`;
-    banner.innerHTML = newMode === 'personal'
-      ? '<span class="env-icon">👤</span><span class="env-label">PERSONAL DATA MODE</span>'
-      : '<span class="env-icon">🧪</span><span class="env-label">DEMO MODE</span>';
-  }
-
-  // Reload application dataset based on active mode context
-  if (newMode === 'demo') {
-    state.data = getMockDataSet(); // qa-utils.js
-  } else {
-    loadPersonalData(); // Code.gs backend driver
-  }
-
-  renderAll();
 }
