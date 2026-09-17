@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Financial Dashboard</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="data:,">
 </head>
 <body>
 
@@ -16,7 +15,14 @@
   <!-- App Title Header -->
   <header class="hero-header">
     <h1>Wealth Planner</h1>
-    <p>💎 Personal Wealth Operating System</p>  
+    <p>💎 Personal Wealth Operating System</p>
+    <!-- THIS IS FOR SWITCHING PERSONAL DATA TO TEST DATA-->
+    <div id="environmentBanner" class="environment-banner">
+    </div>
+    <select id="environmentSelector" onchange="setAppMode(this.value)">
+        <option value="PERSONAL"> 👤 Personal </option>
+        <option value="TEST"> 🧪 Test </option>
+    </select>    
   </header>
 
 
@@ -456,11 +462,6 @@
       </footer>
 
   </main>
-
-<select id="environmentSelector">
-  <option value="PERSONAL">Personal Mode</option>
-  <option value="TEST">Test Mode</option>
-</select>
 
   <!-- Confirmation Modal -->
   <div id="confirmModal" class="confirm-modal">
