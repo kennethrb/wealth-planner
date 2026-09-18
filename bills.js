@@ -135,7 +135,7 @@ function loadUpcomingBills() {
     return (appData.transactions || []).some(tx => {
       const txDate = new Date(tx.Date || tx.date);
       const details = tx.Details || tx.details || "";
-      return details === billName &&
+      return tx.budgetPosition === bill.budgetPosition &&
         txDate.getMonth() === currentMonth &&
         txDate.getFullYear() === currentYear;
     });
@@ -177,6 +177,7 @@ function loadUpcomingBills() {
 
     if (isPaid) {
         paidCount++;
+        paidAmount += amount;
     } else {
         dueCount++;
     }
