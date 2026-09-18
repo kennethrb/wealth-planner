@@ -95,10 +95,9 @@ async function addTransaction() {
     let budgetPosition = document.getElementById("txBudgetPosition")?.value || "";
     const transferToAccount =
     (
-    budgetType === "Transfer" ||
-    budgetType === "Debt" ||
-    budgetType === "Savings"
-
+        budgetType === "Transfer" ||
+        budgetType === "Debt" ||
+        budgetType === "Savings"
     )
         ? (
             document.getElementById(
