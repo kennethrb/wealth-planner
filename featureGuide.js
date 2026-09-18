@@ -29,6 +29,14 @@ const FEATURE_GUIDES = {
         interpretation: () => "A value of ₱0 means all available money is currently required for bills and reserves.",
         why: "Helps prevent overspending before the next payday."
     },
+    cashFlow: {
+        title: "Cash Flow Command Center",
+        what: "Measures whether current deployable cash can safely cover all obligations due before the next payday.",
+        formula: "Available Cash ÷ Upcoming Bills = Coverage Ratio",
+        example: "₱25,000 ÷ ₱20,000 = 1.25x Coverage",
+        interpretation: () => "Coverage above 1.0x means obligations are funded. Coverage below 1.0x indicates a projected cash shortfall.",
+        why: "This helps prevent missed payments and protects liquidity before the next payday."
+    },
   
 };
 
