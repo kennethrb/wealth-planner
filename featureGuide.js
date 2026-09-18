@@ -1,31 +1,35 @@
 const FEATURE_GUIDES = {
-  networth: {
-  title: "Net Worth",
-  what: "The difference between everything you own and everything you owe.",
-  formula: "Assets − Liabilities",
-  example: "₱789,000 − ₱440,000 = ₱349,000",
-
-  interpretation: () => {
-    const amount =
-      document.querySelector("#networth .big-amount")
-        ?.textContent || "Unavailable";
-
-    return `
+    networth: {
+        title: "Net Worth",
+        what: "The difference between everything you own and everything you owe.",
+        formula: "Assets − Liabilities",
+        example: "₱789,000 − ₱440,000 = ₱349,000",
+        interpretation: () => {
+            const amount = document.querySelector("#networth .big-amount")?.textContent || "Unavailable";
+            return `
       Your current net worth is ${amount}.
       A positive net worth means your assets exceed your liabilities.
     `;
-  },
-
-  why: "Net worth is the most important measure of overall financial health."
-},
+        },
+        why: "Net worth is the most important measure of overall financial health."
+    },
     projection: {
-    title: "Wealth Projection",
-    what: "An estimate of how your current financial plan may affect your future wealth.",
-    formula: "Current Assets + Annual Surplus − Liabilities",
-    example: "₱789,000 + ₱120,000 − ₱440,000 = ₱469,000",
-    interpretation: () => "A higher projected net worth indicates that your income, savings, and debt strategy are helping grow wealth over time.",
-    why: "Projection helps you understand where today's financial decisions may lead in the future."
-}
+        title: "Wealth Projection",
+        what: "An estimate of how your current financial plan may affect your future wealth.",
+        formula: "Current Assets + Annual Surplus − Liabilities",
+        example: "₱789,000 + ₱120,000 − ₱440,000 = ₱469,000",
+        interpretation: () => "A higher projected net worth indicates that your income, savings, and debt strategy are helping grow wealth over time.",
+        why: "Projection helps you understand where today's financial decisions may lead in the future."
+    },
+    safeToSpend: {
+        title: "Safe To Spend",
+        what: "The amount available for discretionary spending after protecting upcoming bills and reserves.",
+        formula: "Available Cash − Protected Bills − Protected Buffer",
+        example: "₱30,000 − ₱20,000 − ₱5,000 = ₱5,000",
+        interpretation: () => "A value of ₱0 means all available money is currently required for bills and reserves.",
+        why: "Helps prevent overspending before the next payday."
+    },
+  
 };
 
 function showFeatureGuide(key) {
