@@ -1571,7 +1571,19 @@ async function loadFundingOptimizationAdvisor() {
     const insights = [];
     const accounts = appData.accounts || [];
     accounts.forEach(account => {
-        const balance = Number(account.currentBalance || account.balance || 0);
+    const balance =
+        Math.max(
+            0,
+            Number(
+                account.currentBalance ||
+                account.balance ||
+                0
+            ) -
+            Number(
+                account.minimumBalance ||
+                0
+            )
+        );
         
         // Skip liabilities
         if (account.netWorthType === "Liability") return;
@@ -1586,7 +1598,22 @@ async function loadFundingOptimizationAdvisor() {
 
             // Find best source account with excess funds
             const sourceAccount = accounts
-                .filter(a => isLiquidAccount(a) && a.id !== account.id)
+                .filter(a =>
+                    isLiquidAccount(a) &&
+                    !a.protected &&
+                    a.id !== account.id &&
+                    (
+                        Number(
+                            a.currentBalance ||
+                            a.balance ||
+                            0
+                        ) >
+                        Number(
+                            a.minimumBalance ||
+                            0
+                        )
+                    )
+                )
                 .sort((a, b) => Number(b.currentBalance || b.balance || 0) - Number(a.currentBalance || a.balance || 0))[0];
 
             insights.push({
