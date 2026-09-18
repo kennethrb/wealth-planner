@@ -73,6 +73,16 @@ async function handleAddAccount(event) {
     
     const currentBalance =
         openingBalance;
+    
+    const protectedAccount =
+        document.getElementById(
+            "accountProtected"
+        ).value;
+    
+    const minimumBalance =
+        document.getElementById(
+            "minimumBalance"
+        ).value || 0;
 
     try {
 
@@ -83,7 +93,9 @@ async function handleAddAccount(event) {
         + `&netWorthType=${encodeURIComponent(netWorthType)}`
         + `&assetClass=${encodeURIComponent(assetClass)}`
         + `&openingBalance=${encodeURIComponent(openingBalance)}`
-        + `&currentBalance=${encodeURIComponent(currentBalance)}`;
+        + `&currentBalance=${encodeURIComponent(currentBalance)}`
+        + `&protected=${encodeURIComponent(protectedAccount)}`
+        + `&minimumBalance=${encodeURIComponent(minimumBalance)}`;
 
         console.log("REQUEST:", url);
 
