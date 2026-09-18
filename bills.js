@@ -142,24 +142,22 @@ function loadUpcomingBills() {
   };
 
   // Helper: calculate raw remaining days for sorting
-  const getDaysRemaining = (bill) => {
-    if (checkIsPaid(bill.billName)) return 999;
-    const dueDate =
-        getNextDueDate(
-            Number(bill.dueDay)
+    const getDaysRemaining = (bill) => {
+    
+        if (checkIsPaid(bill.billName))
+            return 999;
+    
+        const dueDate =
+            getNextDueDate(
+                Number(bill.dueDay)
+            );
+    
+        return Math.ceil(
+            (dueDate - today) /
+            (1000 * 60 * 60 * 24)
         );
     
-    const daysRemaining =
-        Math.ceil(
-            (
-                dueDate - today
-            ) /
-            (
-                1000 * 60 * 60 * 24
-            )
-        );
-    return diff < 0 ? -100 + diff : diff;
-  };
+    };
 
   // Sort by urgency: Overdue -> Due Soon -> Future -> Paid
   activeBills.sort((a, b) => getDaysRemaining(a) - getDaysRemaining(b));
@@ -268,14 +266,15 @@ function loadUpcomingBills() {
                 Number(bill.dueDay)
             );
         
+        const dueDate =
+            getNextDueDate(
+                Number(bill.dueDay)
+            );
+        
         const daysRemaining =
             Math.ceil(
-                (
-                    dueDate - today
-                ) /
-                (
-                    1000 * 60 * 60 * 24
-                )
+                (dueDate - today) /
+                (1000 * 60 * 60 * 24)
             );
         let status = "";
         let statusClass = "";
