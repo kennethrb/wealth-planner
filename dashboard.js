@@ -498,7 +498,15 @@ function loadAdvisorDashboard() {
     if (!container) return;
     const advisor = loadMonthlyWealthBrief();
     container.innerHTML = ` <div class="card">
-    <h2> 🧠 Wealth Advisor </h2>
+    <div class="card-header">
+        <h2>🧠 Wealth Advisor</h2>
+    
+        <button
+            class="info-button"
+            onclick="showFeatureGuide('wealthAdvisor')">
+            ?
+        </button>
+    </div>
     <div class="advisor-headline"> ${advisor.headline} </div>
     <div class="advisor-status ${
                 advisor.confidenceLevel === "HIGH" ? "success" : advisor.confidenceLevel==="MEDIUM" ? "warning" : "danger" }"> ${advisor.confidenceLevel} (${advisor.confidenceScore}%) </div>
