@@ -307,25 +307,37 @@ async function editAccount(accountId) {
     if (!account) return;
 
     const newBalance =
-        await showInputDialog(
-            "Edit Account Balance",
-            account.accountName,
+        prompt(
+            "Current Balance",
             account.currentBalance
         );
 
-    if (
-        newBalance === null ||
-        newBalance === ""
-    ) {
+    if (newBalance === null)
         return;
-    }
 
-    const response = await fetch(
-        `${BASE_URL}?action=updateAccount`
-        + `&mode=${appMode}`
-        + `&accountId=${accountId}`
-        + `&currentBalance=${encodeURIComponent(newBalance)}`
-    );
+    const minimumBalance =
+        prompt(
+            "Minimum Balance",
+            account.minimumBalance || 0
+        );
+
+    if (minimumBalance === null)
+        return;
+
+    const protectedAccount =
+        confirm(
+            "Protected Account?\n\nOK = Yes\nCancel = No"
+        );
+
+    const response =
+        await fetch(
+            `${BASE_URL}?action=updateAccount`
+            + `&mode=${appMode}`
+            + `&accountId=${accountId}`
+            + `&currentBalance=${encodeURIComponent(newBalance)}`
+            + `&minimumBalance=${encodeURIComponent(minimumBalance)}`
+            + `&protected=${protectedAccount}`
+        );
 
     const result =
         await response.json();
@@ -344,8 +356,7 @@ async function editAccount(accountId) {
     await refreshUI();
 
     showStatus(
-        "✅ Account updated successfully",
+        "✅ Account updated",
         "success"
     );
-
 }
