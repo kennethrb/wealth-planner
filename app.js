@@ -743,6 +743,17 @@ async function initializeApp() {
 
 
     loadViewYearDropdown();
+    
+  const monthNames = [
+     "Jan","Feb","Mar","Apr",
+     "May","Jun","Jul","Aug",
+     "Sep","Oct","Nov","Dec"
+    ];
+
+    viewState.month =
+    monthNames[new Date().getMonth()];
+    document.getElementById("viewMonth").value =
+    viewState.month;
     await refreshUI();
     // Default Add Budget Item year to latest budget year
     const years = [...new Set(appData.budget.map(item => Number(item.year)))].filter(Boolean);
@@ -751,16 +762,7 @@ async function initializeApp() {
     if (newYearInput) {
         newYearInput.value = latestYear;
     }
-  const monthNames = [
- "Jan","Feb","Mar","Apr",
- "May","Jun","Jul","Aug",
- "Sep","Oct","Nov","Dec"
-];
 
-    viewState.month =
-    monthNames[new Date().getMonth()];
-    document.getElementById("viewMonth").value =
-    viewState.month;
   
     setupScrollSpy();
     toggleTransactionFields();
