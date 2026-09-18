@@ -235,16 +235,58 @@ function recalculateAccountBalances() {
             return;
         }
 
-        if (
-            budgetType === "Expense" ||
-            budgetType === "Savings" ||
-            budgetType === "Debt"
-        ) {
-
-            if (accountId && balances[accountId] !== undefined) {
+        if (budgetType === "Expense")
+        {
+            if (
+                accountId &&
+                balances[accountId] !== undefined
+            )
+            {
                 balances[accountId] -= amount;
             }
-
+        
+            return;
+        }
+        
+        if (budgetType === "Savings")
+        {
+            if (
+                accountId &&
+                balances[accountId] !== undefined
+            )
+            {
+                balances[accountId] -= amount;
+            }
+        
+            if (
+                transferToId &&
+                balances[transferToId] !== undefined
+            )
+            {
+                balances[transferToId] += amount;
+            }
+        
+            return;
+        }
+        
+        if (budgetType === "Debt")
+        {
+            if (
+                accountId &&
+                balances[accountId] !== undefined
+            )
+            {
+                balances[accountId] -= amount;
+            }
+        
+            if (
+                transferToId &&
+                balances[transferToId] !== undefined
+            )
+            {
+                balances[transferToId] -= amount;
+            }
+        
             return;
         }
 
