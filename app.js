@@ -392,14 +392,6 @@ function updateEnvironmentButton() {
     btn.textContent = appMode === APP_MODE.TEST ? "🧪" : "👤";
 }
 
-const environmentToggle = document.getElementById("environmentToggle");
-if (environmentToggle) {
-    environmentToggle.addEventListener("click", async () => {
-        const nextMode = appMode === APP_MODE.TEST ? APP_MODE.PERSONAL : APP_MODE.TEST;
-        await setAppMode(nextMode);
-    });
-}
-
 function updateEnvironmentBanner() {
     const banner = document.getElementById("environmentBanner");
     if (!banner) return;
