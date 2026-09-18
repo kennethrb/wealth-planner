@@ -780,7 +780,13 @@ function getSafeToSpend() {
     const availableCash = getTotalLiquidAssets(appData.accounts || []);
     const protectedBills = getCycleBills().reduce(
         (sum, bill) => sum + Number(bill.defaultAmount || 0), 0);
-    const protectedBuffer = availableCash * CONFIG.payCycle.bufferReserveRatio;
+    const monthlyObligations =
+        getBudgetSummary()
+            .monthlyObligations;
+    
+    const protectedBuffer =
+        monthlyObligations *
+        CONFIG.payCycle.bufferReserveRatio;
     const safeToSpend = Math.max(0, availableCash - protectedBills - protectedBuffer);
     return {
         availableCash,
