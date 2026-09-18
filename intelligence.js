@@ -1044,7 +1044,15 @@ function loadPayCycleCard() {
     container.innerHTML = `
         <div class="card">
     
+        <div class="card-header">
             <h2>📅 Pay Cycle</h2>
+        
+            <button
+                class="info-button"
+                onclick="showFeatureGuide('payCycle')">
+                ?
+            </button>
+        </div>
     
             <div class="metric-row">
                 <span>Cycle</span>
@@ -1700,7 +1708,15 @@ async function loadFundingOptimizationAdvisor() {
 
     container.innerHTML = `
         <div class="card">
+        <div class="card-header">
             <h2>⚡ Funding Optimization Advisor</h2>
+        
+            <button
+                class="info-button"
+                onclick="showFeatureGuide('fundingOptimization')">
+                ?
+            </button>
+        </div>
             <div class="metric-row">
                 <span>Total Cash Available</span>
                 <strong>${formatCurrency(totalAvailableCash)}</strong>
@@ -2250,7 +2266,15 @@ async function loadWealthSweep() {
 
     container.innerHTML = `
         <div class="card">
+        <div class="card-header">
             <h2>🧹 Wealth Sweep Automation</h2>
+        
+            <button
+                class="info-button"
+                onclick="showFeatureGuide('wealthSweep')">
+                ?
+            </button>
+        </div>
             ${
                 excessCash > 0
                 ? `
@@ -2423,7 +2447,15 @@ logQATrace(
 
     container.innerHTML = `
         <div class="card">
+        <div class="card-header">
             <h2>📋 Monthly Wealth Action Plan</h2>
+        
+            <button
+                class="info-button"
+                onclick="showFeatureGuide('monthlyActionPlan')">
+                ?
+            </button>
+        </div>
             ${actions.length === 0 ? `
                 <div class="advisor-action">
                     <div class="action-title">✅ Everything is Optimized!</div>
@@ -2570,7 +2602,15 @@ const opportunity = capital.opportunity;
         container.innerHTML = `
         <div class="card">
         
-            <h2>💰 Cash Flow Command Center</h2>
+            <div class="card-header">
+                <h2>💰 Cash Flow Command Center</h2>
+            
+                <button
+                    class="info-button"
+                    onclick="showFeatureGuide('cashFlow')">
+                    ?
+                </button>
+            </div>
         
             <div class="advisor-status ${
              coverage < CONFIG.cashFlow.minimumCoverage
@@ -2815,9 +2855,15 @@ async function loadGoalFundingOptimizer() {
 
             <div class="card">
 
-                <h2>
-                    🎯 Goal Funding Optimizer
-                </h2>
+                <div class="card-header">
+                    <h2>🎯 Goal Funding Optimizer</h2>
+                
+                    <button
+                        class="info-button"
+                        onclick="showFeatureGuide('goalFunding')">
+                        ?
+                    </button>
+                </div>
 
                 <div class="advisor-action priority">
 
