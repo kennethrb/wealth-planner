@@ -1672,10 +1672,13 @@ async function loadFundingOptimizationAdvisor() {
     
     if (insights.length === 0) {
     
+        container.style.display = "none";
         container.innerHTML = "";
         return;
     
     }
+    
+    container.style.display = "";
 
     container.innerHTML = `
         <div class="card">
@@ -1771,10 +1774,13 @@ async function loadAssetAllocationAdvisor() {
     const rec = getAssetAllocationRecommendation();
     if (rec.status === "good") {
     
+        container.style.display = "none";
         container.innerHTML = "";
         return;
     
     }
+    
+    container.style.display = "";
     container.innerHTML = `
         <div class="card">
             <h2>🎯 Asset Allocation Advisor</h2>
@@ -2658,10 +2664,12 @@ async function loadGoalFundingOptimizer() {
             opportunity <= 0
         ) {
 
-            container.innerHTML = "";
-            return;
+        container.style.display = "none";
+        container.innerHTML = "";
+        return;
 
         }
+        container.style.display = "";
 
         const rankedGoals =
             goals
@@ -2732,10 +2740,13 @@ async function loadGoalFundingOptimizer() {
 
         if (!bestGoal) {
 
-            container.innerHTML = "";
-            return;
+        container.style.display = "none";
+        container.innerHTML = "";
+        return;
 
         }
+
+        container.style.display = "";
 
         const suggestedFunding =
             Math.min(
