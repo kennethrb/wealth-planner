@@ -131,7 +131,7 @@ function loadUpcomingBills() {
   const currentYear = today.getFullYear();
 
   // Helper: check if paid this month
-  const checkIsPaid = (billName) => {
+  const checkIsPaid = (bill) => {
     return (appData.transactions || []).some(tx => {
       const txDate = new Date(tx.Date || tx.date);
       const details = tx.Details || tx.details || "";
@@ -144,7 +144,7 @@ function loadUpcomingBills() {
   // Helper: calculate raw remaining days for sorting
     const getDaysRemaining = (bill) => {
     
-        if (checkIsPaid(bill.billName))
+        if (checkIsPaid(bill))
             return 999;
     
         const dueDate =
@@ -170,7 +170,7 @@ function loadUpcomingBills() {
   let paidAmount = 0;
 
   activeBills.forEach(bill => {
-    const isPaid = checkIsPaid(bill.billName);
+    const isPaid = checkIsPaid(bill);
     const amount = Number(bill.defaultAmount || 0);
 
     totalBillsAmount += amount;
@@ -189,9 +189,11 @@ function loadUpcomingBills() {
     .filter(bill => !(appData.transactions || []).some(tx => {
       const txDate = new Date(tx.Date || tx.date);
       const details = tx.Details || tx.details || "";
-      return details === bill.billName &&
-        txDate.getMonth() === currentMonth &&
-        txDate.getFullYear() === currentYear;
+        return (
+            tx.budgetPosition === bill.budgetPosition &&
+            txDate.getMonth() === currentMonth &&
+            txDate.getFullYear() === currentYear
+        );
     }))
     .sort((a,b) => a.dueDay - b.dueDay)[0];
   // Calculate bill completion percentage
@@ -258,7 +260,7 @@ function loadUpcomingBills() {
       <hr>
 
       ${activeBills.map(bill => {
-        const isPaid = checkIsPaid(bill.billName);
+        const isPaid = checkIsPaid(bill);
         const dueDate =
             getNextDueDate(
                 Number(bill.dueDay)
