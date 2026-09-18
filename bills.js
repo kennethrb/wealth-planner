@@ -266,11 +266,6 @@ function loadUpcomingBills() {
                 Number(bill.dueDay)
             );
         
-        const dueDate =
-            getNextDueDate(
-                Number(bill.dueDay)
-            );
-        
         const daysRemaining =
             Math.ceil(
                 (dueDate - today) /
