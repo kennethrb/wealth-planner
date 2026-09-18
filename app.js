@@ -386,6 +386,20 @@ async function setAppMode(mode) {
     updateEnvironmentBanner();
 }
 
+function updateEnvironmentButton() {
+    const btn = document.getElementById("environmentToggle");
+    if (!btn) return;
+    btn.textContent = appMode === APP_MODE.TEST ? "🧪" : "👤";
+}
+
+const environmentToggle = document.getElementById("environmentToggle");
+if (environmentToggle) {
+    environmentToggle.addEventListener("click", async () => {
+        const nextMode = appMode === APP_MODE.TEST ? APP_MODE.PERSONAL : APP_MODE.TEST;
+        await setAppMode(nextMode);
+    });
+}
+
 function updateEnvironmentBanner() {
     const banner = document.getElementById("environmentBanner");
     if (!banner) return;
@@ -396,6 +410,7 @@ function updateEnvironmentBanner() {
         banner.innerHTML = "👤 PERSONAL DATA MODE";
         banner.className = "environment-banner personal";
     }
+    updateEnvironmentButton();
 }
 
 
@@ -773,6 +788,7 @@ async function initializeApp() {
     toggleTransactionFields();
 }
 initializeApp();
+
 // Back to Top Button Listener
 const backToTop = document.getElementById("backToTop");
 if (backToTop) {
@@ -790,6 +806,15 @@ if (backToTop) {
         });
     });
 }
+
+const environmentToggle = document.getElementById("environmentToggle");
+if (environmentToggle) {
+    environmentToggle.addEventListener("click", async () => {
+        const nextMode = appMode === APP_MODE.TEST ? APP_MODE.PERSONAL : APP_MODE.TEST;
+        await setAppMode(nextMode);
+    });
+}
+
 // ScrollSpy Navigation
 function setupScrollSpy() {
     const sections = document.querySelectorAll("section[id], div[id]");
