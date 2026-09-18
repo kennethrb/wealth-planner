@@ -765,7 +765,11 @@ function getCurrentPayCycle() {
  * in Phase 2.
  */
 function getCycleBills() {
-    return (appData.recurringBills || []).filter(bill => bill.active !== false);
+    const cycle = getCurrentPayCycle();
+    return (appData.recurringBills || []).filter(bill => bill.active !== false).filter(bill => {
+        const dueDate = getNextDueDate(Number(bill.dueDay));
+        return (dueDate <= cycle.nextPayday);
+    });
 }
 
 /**
