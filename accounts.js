@@ -299,45 +299,40 @@ async function deleteAccount(accountId) {
 
 async function editAccount(accountId) {
 
-    const account =
-        appData.accounts.find(
-            a => a.accountId === accountId
-        );
-
-    if (!account) return;
-
-    const newBalance =
-        prompt(
-            "Current Balance",
-            account.currentBalance
-        );
-
-    if (newBalance === null)
-        return;
-
-    const minimumBalance =
-        prompt(
-            "Minimum Balance",
-            account.minimumBalance || 0
-        );
-
-    if (minimumBalance === null)
-        return;
-
-    const protectedAccount =
-        confirm(
-            "Protected Account?\n\nOK = Yes\nCancel = No"
-        );
-
-    const response =
-        await fetch(
-            `${BASE_URL}?action=updateAccount`
-            + `&mode=${appMode}`
-            + `&accountId=${accountId}`
-            + `&currentBalance=${encodeURIComponent(newBalance)}`
-            + `&minimumBalance=${encodeURIComponent(minimumBalance)}`
-            + `&protected=${protectedAccount}`
-        );
+        const account =
+            appData.accounts.find(
+                a => a.accountId === accountId
+            );
+    
+        if (!account) return;
+    
+        const minimumBalance =
+            prompt(
+                "Minimum Balance",
+                account.minimumBalance || 0
+            );
+    
+        if (minimumBalance === null)
+            return;
+    
+        const protectedAccount =
+            confirm(
+                `Protected Account?
+    
+    Current: ${account.protected ? "YES" : "NO"}
+    
+    OK = YES
+    Cancel = NO`
+            );
+    
+        const response =
+            await fetch(
+                `${BASE_URL}?action=updateAccount`
+                + `&mode=${appMode}`
+                + `&accountId=${accountId}`
+                + `&minimumBalance=${encodeURIComponent(minimumBalance)}`
+                + `&protected=${protectedAccount}`
+            );
 
     const result =
         await response.json();
