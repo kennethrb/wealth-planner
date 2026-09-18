@@ -696,8 +696,34 @@ function isLiquidAccount(account) {
  * @returns {number}
  */
 function getTotalLiquidAssets(accounts = []) {
-    return accounts.filter(account => account.netWorthType === "Asset" && isLiquidAccount(account)).reduce(
-        (total, account) => total + Number(account.currentBalance ?? account.balance ?? 0), 0);
+    return accounts
+        .filter(account =>
+            account.netWorthType === "Asset" &&
+            isLiquidAccount(account) &&
+            !account.protected
+        )
+        .reduce((total, account) => {
+
+            const balance =
+                Number(
+                    account.currentBalance ??
+                    account.balance ??
+                    0
+                );
+
+            const minimumBalance =
+                Number(
+                    account.minimumBalance ??
+                    0
+                );
+
+            return total +
+                Math.max(
+                    0,
+                    balance - minimumBalance
+                );
+
+        }, 0);
 }
 
 /**
