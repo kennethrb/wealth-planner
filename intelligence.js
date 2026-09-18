@@ -1084,7 +1084,15 @@ function loadSafeToSpendCard() {
     container.innerHTML = `
         <div class="card">
 
-            <h2>💵 Safe To Spend</h2>
+            <div class="card-header">
+                <h2>💵 Safe To Spend</h2>
+            
+                <button
+                    class="info-button"
+                    onclick="showFeatureGuide('safeToSpend')">
+                    ?
+                </button>
+            </div>
 
             <div class="hero-metric">
 
