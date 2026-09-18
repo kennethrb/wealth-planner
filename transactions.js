@@ -154,6 +154,39 @@ async function addTransaction() {
     showStatus("✅ Transaction recorded", "success");
 }
 
+function syncSavingsDestination()
+{
+    const budgetType =
+        document.getElementById(
+            "txBudgetType"
+        )?.value;
+
+    if (budgetType !== "Savings")
+        return;
+
+    const category =
+        document.getElementById(
+            "txBudgetPosition"
+        )?.value;
+
+    const destination =
+        appData.accounts.find(
+            a =>
+                a.accountName === category
+        );
+
+    if (
+        destination &&
+        document.getElementById("txToAccount")
+    )
+    {
+        document.getElementById(
+            "txToAccount"
+        ).value =
+        destination.accountId;
+    }
+}
+
 function loadTransactions() {
 
     const container =
