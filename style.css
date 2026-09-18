@@ -1564,13 +1564,13 @@ tr.section-debt td:first-child {
         font-size: 16px;
     }
 
-     #environmentToggle {
-        bottom: 16px;
-        right: 16px;
-        width: 42px;
-        height: 42px;
-        font-size: 16px;
-    }
+   #environmentToggle {
+       bottom: 68px;
+       right: 16px;
+       width: 42px;
+       height: 42px;
+       font-size: 16px;
+   }
    
 
     #transactionsList .action-cell {
