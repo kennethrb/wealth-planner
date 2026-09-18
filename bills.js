@@ -144,7 +144,20 @@ function loadUpcomingBills() {
   // Helper: calculate raw remaining days for sorting
   const getDaysRemaining = (bill) => {
     if (checkIsPaid(bill.billName)) return 999;
-    const diff = bill.dueDay - currentDay;
+    const dueDate =
+        getNextDueDate(
+            Number(bill.dueDay)
+        );
+    
+    const daysRemaining =
+        Math.ceil(
+            (
+                dueDate - today
+            ) /
+            (
+                1000 * 60 * 60 * 24
+            )
+        );
     return diff < 0 ? -100 + diff : diff;
   };
 
@@ -250,22 +263,35 @@ function loadUpcomingBills() {
 
       ${activeBills.map(bill => {
         const isPaid = checkIsPaid(bill.billName);
-        const daysRemaining = bill.dueDay - currentDay;
+        const dueDate =
+            getNextDueDate(
+                Number(bill.dueDay)
+            );
+        
+        const daysRemaining =
+            Math.ceil(
+                (
+                    dueDate - today
+                ) /
+                (
+                    1000 * 60 * 60 * 24
+                )
+            );
         let status = "";
         let statusClass = "";
 
         if (isPaid) {
-          status = "✅ Paid";
-          statusClass = "text-success";
-        } else if (daysRemaining < 0) {
-          status = `🔴 Overdue by ${Math.abs(daysRemaining)} day(s)`;
-          statusClass = "bill-overdue";
+            status = "✅ Paid";
+            statusClass = "text-success";
+        } else if (daysRemaining <= 0) {
+            status = "🔴 Due Today";
+            statusClass = "bill-overdue";
         } else if (daysRemaining <= 7) {
-          status = `🟡 Due in ${daysRemaining} day(s)`;
-          statusClass = "bill-due-soon";
+            status = `🟡 Due in ${daysRemaining} day(s)`;
+            statusClass = "bill-due-soon";
         } else {
-          status = `🟢 Due in ${daysRemaining} day(s)`;
-          statusClass = "bill-upcoming";
+            status = `🟢 Due in ${daysRemaining} day(s)`;
+            statusClass = "bill-upcoming";
         }
 
         return `
@@ -344,4 +370,29 @@ function loadRecurringBillPositions() {
         </option>
       `;
     });
+}
+
+function getNextDueDate(dueDay) {
+
+    const today = new Date();
+
+    let dueDate =
+        new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            dueDay
+        );
+
+    if (dueDate < today) {
+
+        dueDate =
+            new Date(
+                today.getFullYear(),
+                today.getMonth() + 1,
+                dueDay
+            );
+
+    }
+
+    return dueDate;
 }
