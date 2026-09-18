@@ -176,12 +176,9 @@ function loadUpcomingBills() {
     totalBillsAmount += amount;
 
     if (isPaid) {
-      paidCount++;
-      paidAmount += amount;
-    } else if (bill.dueDay < currentDay) {
-      overdueCount++;
+        paidCount++;
     } else {
-      dueCount++;
+        dueCount++;
     }
   });
 
