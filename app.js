@@ -754,6 +754,11 @@ async function initializeApp() {
     monthNames[new Date().getMonth()];
     document.getElementById("viewMonth").value =
     viewState.month;
+
+    viewState.year = new Date().getFullYear();
+    document.getElementById("viewYear").value = 
+    viewState.year;
+    
     await refreshUI();
     // Default Add Budget Item year to latest budget year
     const years = [...new Set(appData.budget.map(item => Number(item.year)))].filter(Boolean);
