@@ -1989,11 +1989,23 @@ async function loadFundingOptimizationAdvisor() {
 
     // Expose QA Metrics
     window.qaFundingAdvisor = {
+    
         totalObligations,
         bufferTarget,
         totalAvailableCash,
         excessCash,
-        insightsCount: insights.length
+    
+        deficitCount:
+    
+            insights.filter(
+                i => i.type === "DEFICIT"
+            ).length,
+    
+        idleCashCount:
+    
+            insights.filter(
+                i => i.type === "IDLE_CASH"
+            ).length
     };
         logQATrace(
             "DI-002",
@@ -2651,7 +2663,7 @@ async function loadMonthlyWealthActionPlan() {
     const actions = [];
 
     // 1. High Priority: Funding Deficits
-    if (window.qaFundingAdvisor?.insightsCount > 0) {
+    if (window.qaFundingAdvisor?.deficitCount > 0){
         actions.push({
             priority: 1,
             badge: "🚨 Critical Deficit",
