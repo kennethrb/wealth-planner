@@ -2831,34 +2831,62 @@ async function loadCashFlowCommandCenter() {
 
     if (!container) return;
 
-const capital = getOpportunityCapital();
-// DI-017 Safe-To-Spend
-const safeSpend = getSafeToSpend();
-const availableCash = capital.availableCash;
-const remainingBills = capital.remainingBills;
-const coverage = capital.coverage;
-const surplus = capital.surplus;
-const opportunity = capital.opportunity;
+    const capital =
+        getOpportunityCapital();
+
+    const safeSpend =
+        getSafeToSpend();
+
+    const availableCash =
+        capital.availableCash;
+
+    const remainingBills =
+        capital.remainingBills;
+
+    const coverage =
+        capital.coverage;
+
+    const surplus =
+        capital.surplus;
+
+    const opportunity =
+        capital.opportunity;
+
+    const requiredProtection =
+        safeSpend.protectedBills +
+        safeSpend.protectedBuffer;
+
+    const protectionGap =
+        Math.max(
+            0,
+            requiredProtection -
+            safeSpend.availableCash
+        );
 
     let status;
     let recommendation;
-    
-    
-    if (coverage < CONFIG.cashFlow.minimumCoverage) {
+
+    if (
+        coverage <
+        CONFIG.cashFlow.minimumCoverage
+    ) {
 
         status =
-            "🚨 Shortfall Risk";
+            "🚨 Liquidity Protection Mode";
 
         recommendation =
-            "Protect liquidity immediately. Delay discretionary purchases and transfer additional cash into spending accounts.";
+            "Protect liquidity before deploying capital.";
 
-    } else if (coverage < CONFIG.cashFlow.healthyCoverage) {
+    } else if (
+        coverage <
+        CONFIG.cashFlow.healthyCoverage
+    ) {
 
         status =
             "⚠ Tight Cash Flow";
 
         recommendation =
-            "Maintain liquidity. Avoid major purchases until upcoming obligations are covered.";
+            "Maintain liquidity and avoid major purchases until obligations are covered.";
 
     } else {
 
@@ -2866,13 +2894,10 @@ const opportunity = capital.opportunity;
             "✅ Healthy Position";
 
         recommendation =
-        `You can safely deploy
-        ${formatCurrency(opportunity)}
-        today without impacting
-        upcoming obligations.`;
+            `You can safely deploy ${formatCurrency(opportunity)} today without impacting upcoming obligations.`;
+
     }
 
-    
     window.qaCashFlow = {
         availableCash,
         remainingBills,
@@ -2882,7 +2907,7 @@ const opportunity = capital.opportunity;
         status,
         recommendation
     };
-    
+
     logQATrace(
         "DI-009",
         "loadCashFlowCommandCenter",
@@ -2899,105 +2924,211 @@ const opportunity = capital.opportunity;
         coverage >= 0
     );
 
+    const protectionMode =
+        opportunity <= 0;
+
+    if (protectionMode) {
+
         container.innerHTML = `
         <div class="card">
-        
+
             <div class="card-header">
-                <h2>💰 Cash Flow Command Center</h2>
-            
+
+                <h2>
+                    💰 Cash Flow Command Center
+                </h2>
+
                 <button
                     class="info-button"
                     onclick="showFeatureGuide('cashFlow')">
                     ?
                 </button>
+
             </div>
-        
-            <div class="advisor-status ${
-             coverage < CONFIG.cashFlow.minimumCoverage
-                    ? "danger"
-                    : coverage < CONFIG.cashFlow.healthyCoverage
-                    ? "warning"
-                    : "success"
-            }">
-                ${status}
+
+            <div class="advisor-status danger">
+                🚨 Liquidity Protection Mode
             </div>
-        
+
             <div class="advisor-action priority">
-        
+
                 <div class="action-title">
-                    🎯 Recommended Next Action
+                    🎯 Recommended Action
                 </div>
-        
+
                 <p>
-                    ${recommendation}
+                    Protect liquidity before deploying capital.
+                    Available cash is currently insufficient
+                    to satisfy protection requirements.
                 </p>
-        
+
             </div>
-        
+
             <hr>
-        
-            <div class="hero-metric">
-            
-                <div class="hero-label">
-                    Available Wealth Opportunity
-                </div>
-            
-                <div class="hero-value">
-                    ${formatCurrency(opportunity)}
-                </div>
-            
-            </div>
-            
-            <hr>
-            
-            <h3>Recommended Deployment Plan</h3>
-            
+
             <div class="metric-row">
-                <span>🎯 Goals</span>
-                <strong>
-                    ${formatCurrency(opportunity * CONFIG.cashFlowDeployment.goals)}
-                </strong>
-            </div>
-            
-            <div class="metric-row">
-                <span>📈 Investments</span>
-                <strong>
-                    ${formatCurrency(opportunity * CONFIG.cashFlowDeployment.investments)}
-                </strong>
-            </div>
-            
-            <div class="metric-row">
-                <span>💳 Debt Reduction</span>
-                <strong>
-                    ${formatCurrency(opportunity * CONFIG.cashFlowDeployment.debtReduction)}
-                </strong>
-            </div>
-            <div class="metric-row">
-                <span>Safe-To-Spend</span>
+                <span>Available Cash</span>
                 <strong>
                     ${formatCurrency(
-                        safeSpend.safeToSpend
+                        availableCash
                     )}
                 </strong>
             </div>
-            <hr>
-            
+
+            <div class="metric-row">
+                <span>Upcoming Bills</span>
+                <strong>
+                    ${formatCurrency(
+                        remainingBills
+                    )}
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>Protected Buffer</span>
+                <strong>
+                    ${formatCurrency(
+                        safeSpend.protectedBuffer
+                    )}
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>Required Protection</span>
+                <strong>
+                    ${formatCurrency(
+                        requiredProtection
+                    )}
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>Protection Gap</span>
+                <strong style="color:#ef4444;">
+                    ${formatCurrency(
+                        protectionGap
+                    )}
+                </strong>
+            </div>
+
             <div class="metric-row">
                 <span>Coverage Ratio</span>
                 <strong>
                     ${coverage.toFixed(1)}x
                 </strong>
             </div>
-            
-            <div class="metric-row">
-                <span>Upcoming Bills</span>
-                <strong>
-                    ${formatCurrency(remainingBills)}
-                </strong>
-            </div>
-        
+
         </div>
         `;
+
+        return;
+    }
+
+    container.innerHTML = `
+    <div class="card">
+
+        <div class="card-header">
+
+            <h2>
+                💰 Cash Flow Command Center
+            </h2>
+
+            <button
+                class="info-button"
+                onclick="showFeatureGuide('cashFlow')">
+                ?
+            </button>
+
+        </div>
+
+        <div class="advisor-status success">
+            ${status}
+        </div>
+
+        <div class="advisor-action priority">
+
+            <div class="action-title">
+                🎯 Recommended Next Action
+            </div>
+
+            <p>
+                ${recommendation}
+            </p>
+
+        </div>
+
+        <hr>
+
+        <div class="hero-metric">
+
+            <div class="hero-label">
+                Available Wealth Opportunity
+            </div>
+
+            <div class="hero-value">
+                ${formatCurrency(
+                    opportunity
+                )}
+            </div>
+
+        </div>
+
+        <hr>
+
+        <h3>
+            Recommended Deployment Plan
+        </h3>
+
+        <div class="metric-row">
+            <span>🎯 Goals</span>
+            <strong>
+                ${formatCurrency(
+                    opportunity *
+                    CONFIG.cashFlowDeployment.goals
+                )}
+            </strong>
+        </div>
+
+        <div class="metric-row">
+            <span>📈 Investments</span>
+            <strong>
+                ${formatCurrency(
+                    opportunity *
+                    CONFIG.cashFlowDeployment.investments
+                )}
+            </strong>
+        </div>
+
+        <div class="metric-row">
+            <span>💳 Debt Reduction</span>
+            <strong>
+                ${formatCurrency(
+                    opportunity *
+                    CONFIG.cashFlowDeployment.debtReduction
+                )}
+            </strong>
+        </div>
+
+        <hr>
+
+        <div class="metric-row">
+            <span>Coverage Ratio</span>
+            <strong>
+                ${coverage.toFixed(1)}x
+            </strong>
+        </div>
+
+        <div class="metric-row">
+            <span>Upcoming Bills</span>
+            <strong>
+                ${formatCurrency(
+                    remainingBills
+                )}
+            </strong>
+        </div>
+
+    </div>
+    `;
 }
 
 async function loadGoalFundingOptimizer() {
