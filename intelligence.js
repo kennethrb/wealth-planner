@@ -1985,7 +1985,7 @@ async function loadFundingOptimizationAdvisor() {
         });
     }
 
-    console.log("Funding Insights", insights);
+    console.table(insights);
 
     // Expose QA Metrics
     window.qaFundingAdvisor = {
