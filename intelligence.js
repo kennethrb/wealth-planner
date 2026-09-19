@@ -1266,17 +1266,122 @@ function loadSafeToSpendCard() {
     const result = getSafeToSpend();
     const container = document.getElementById("safeToSpendCard");
     if (!container) return;
+    const requiredProtection = result.protectedBills + result.protectedBuffer;
+    const protectionGap = Math.max(0, requiredProtection - result.availableCash);
+    const spendingHold = result.safeToSpend <= 0;
+    if (spendingHold) {
+        container.innerHTML = `
+            <div class="card">
+
+                <div class="card-header">
+
+                    <h2>
+                        💵 Safe To Spend
+                    </h2>
+
+                    <button
+                        class="info-button"
+                        onclick="showFeatureGuide('safeToSpend')">
+                        ?
+                    </button>
+
+                </div>
+
+                <div class="advisor-action warning">
+
+                    <div class="action-title">
+                        🛡 Spending Hold
+                    </div>
+
+                    <p>
+                        Available cash is currently
+                        insufficient to safely cover
+                        obligations and protection
+                        targets.
+                    </p>
+
+                </div>
+
+                <div class="metric-row">
+                    <span>Available Cash</span>
+                    <strong>
+                        ${formatCurrency(
+                            result.availableCash
+                        )}
+                    </strong>
+                </div>
+
+                <div class="metric-row">
+                    <span>Protected Bills</span>
+                    <strong>
+                        ${formatCurrency(
+                            result.protectedBills
+                        )}
+                    </strong>
+                </div>
+
+                <div class="metric-row">
+                    <span>Protected Buffer</span>
+                    <strong>
+                        ${formatCurrency(
+                            result.protectedBuffer
+                        )}
+                    </strong>
+                </div>
+
+                <div class="metric-row">
+                    <span>Required Protection</span>
+                    <strong>
+                        ${formatCurrency(
+                            requiredProtection
+                        )}
+                    </strong>
+                </div>
+
+                <div class="metric-row">
+                    <span>Protection Gap</span>
+                    <strong style="color:#ef4444;">
+                        ${formatCurrency(
+                            protectionGap
+                        )}
+                    </strong>
+                </div>
+
+                <hr>
+
+                <div class="advisor-action priority">
+
+                    <div class="action-title">
+                        🎯 Recommended Action
+                    </div>
+
+                    <p>
+                        Preserve liquidity until
+                        obligations are fully protected.
+                        Avoid discretionary spending.
+                    </p>
+
+                </div>
+
+            </div>
+        `;
+        return;
+    }
     container.innerHTML = `
         <div class="card">
 
             <div class="card-header">
-                <h2>💵 Safe To Spend</h2>
-            
+
+                <h2>
+                    💵 Safe To Spend
+                </h2>
+
                 <button
                     class="info-button"
                     onclick="showFeatureGuide('safeToSpend')">
                     ?
                 </button>
+
             </div>
 
             <div class="hero-metric">
@@ -1287,6 +1392,15 @@ function loadSafeToSpendCard() {
                     )}
                 </div>
 
+            </div>
+
+            <div class="metric-row">
+                <span>Available Cash</span>
+                <strong>
+                    ${formatCurrency(
+                        result.availableCash
+                    )}
+                </strong>
             </div>
 
             <div class="metric-row">
@@ -1303,6 +1417,15 @@ function loadSafeToSpendCard() {
                 <strong>
                     ${formatCurrency(
                         result.protectedBuffer
+                    )}
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>Safe-To-Spend</span>
+                <strong style="color:#10b981;">
+                    ${formatCurrency(
+                        result.safeToSpend
                     )}
                 </strong>
             </div>
