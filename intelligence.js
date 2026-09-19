@@ -873,6 +873,16 @@ function loadPaydayPlan() {
     const container = document.getElementById("paydayPlan");
     if (!container) return;
     const safeSpend = getSafeToSpend();
+    const requiredProtection =
+        safeSpend.protectedBills +
+        safeSpend.protectedBuffer;
+    
+    const protectionGap =
+        Math.max(
+            0,
+            requiredProtection -
+            safeSpend.availableCash
+        );
     const protectedCash = (appData.accounts || []).filter(account => account.netWorthType === "Asset" && isLiquidAccount(account) && account.protected).reduce(
         (sum, account) => sum + Number(account.currentBalance || account.balance || 0), 0);
     const preservationMode = plan.opportunityCapital <= 0;
@@ -910,7 +920,7 @@ function loadPaydayPlan() {
                 <div class="advisor-action warning">
 
                     <div class="action-title">
-                        🛡 Capital Preservation Mode
+                        🛡️ Capital Preservation Mode
                     </div>
 
                     <p>
@@ -949,10 +959,28 @@ function loadPaydayPlan() {
                 </div>
 
                 <div class="metric-row">
-                    <span>Operational Cash</span>
+                    <span>Available Cash</span>
                     <strong>
                         ${formatCurrency(
                             safeSpend.availableCash
+                        )}
+                    </strong>
+                </div>
+                
+                <div class="metric-row">
+                    <span>Required Protection</span>
+                    <strong>
+                        ${formatCurrency(
+                            requiredProtection
+                        )}
+                    </strong>
+                </div>
+                
+                <div class="metric-row">
+                    <span>Protection Gap</span>
+                    <strong style="color:#ef4444;">
+                        ${formatCurrency(
+                            protectionGap
                         )}
                     </strong>
                 </div>
