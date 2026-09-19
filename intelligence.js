@@ -3148,15 +3148,110 @@ async function loadGoalFundingOptimizer() {
         const opportunity =
             getOpportunityCapital().opportunity;
 
-        if (
-            goals.length === 0 ||
-            opportunity <= 0
-        ) {
-
-        container.style.display = "none";
-        container.innerHTML = "";
-        return;
-
+        if (goals.length === 0) {
+        
+            container.style.display = "none";
+            container.innerHTML = "";
+        
+            return;
+        }
+        
+        if (opportunity <= 0) {
+        
+            const safeSpend =
+                getSafeToSpend();
+        
+            const requiredProtection =
+                safeSpend.protectedBills +
+                safeSpend.protectedBuffer;
+        
+            const protectionGap =
+                Math.max(
+                    0,
+                    requiredProtection -
+                    safeSpend.availableCash
+                );
+        
+            container.style.display = "";
+        
+            container.innerHTML = `
+        
+                <div class="card">
+        
+                    <div class="card-header">
+        
+                        <h2>
+                            🎯 Goal Funding Optimizer
+                        </h2>
+        
+                        <button
+                            class="info-button"
+                            onclick="showFeatureGuide('goalFunding')">
+                            ?
+                        </button>
+        
+                    </div>
+        
+                    <div class="advisor-action warning">
+        
+                        <div class="action-title">
+                            ⏸ Goal Funding Paused
+                        </div>
+        
+                        <p>
+                            No deployable capital is
+                            currently available for
+                            goal acceleration.
+                        </p>
+        
+                    </div>
+        
+                    <div class="metric-row">
+                        <span>Available Capital</span>
+                        <strong>
+                            ${formatCurrency(opportunity)}
+                        </strong>
+                    </div>
+        
+                    <div class="metric-row">
+                        <span>Required Protection</span>
+                        <strong>
+                            ${formatCurrency(
+                                requiredProtection
+                            )}
+                        </strong>
+                    </div>
+        
+                    <div class="metric-row">
+                        <span>Protection Gap</span>
+                        <strong style="color:#ef4444;">
+                            ${formatCurrency(
+                                protectionGap
+                            )}
+                        </strong>
+                    </div>
+        
+                    <hr>
+        
+                    <div class="advisor-action priority">
+        
+                        <div class="action-title">
+                            🎯 Recommended Action
+                        </div>
+        
+                        <p>
+                            Increase liquidity before
+                            allocating capital toward
+                            goals.
+                        </p>
+        
+                    </div>
+        
+                </div>
+        
+            `;
+        
+            return;
         }
         container.style.display = "";
 
