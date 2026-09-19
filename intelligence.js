@@ -505,6 +505,12 @@ function getAdvisorConfidence(action) {
     const opportunity = getOpportunityCapital();
     const emergencyGap = getEmergencyFundGap();
     const liquidity = opportunity.coverage || 0;
+    if (liquidity < CONFIG.cashFlow.minimumCoverage) {
+        return {
+            score: 90,
+            level: "LIQUIDITY PROTECTION"
+        };
+    }
     let score = 50;
     if (liquidity >= 12) score += 20;
     else if (liquidity >= 6) score += 10;
@@ -1297,7 +1303,7 @@ function loadSafeToSpendCard() {
                 <div class="advisor-action warning">
 
                     <div class="action-title">
-                        🛡 Spending Hold
+                        🛡️ Spending Hold
                     </div>
 
                     <p>
@@ -1807,7 +1813,7 @@ async function loadFinancialHealthAdvisor() {
             <div class="advisor-status ${status === "Healthy" ? "success" : "warning"}">
             ${status === "Healthy"
             ? "✅ Healthy"
-            : "⚠ Needs Improvement"}
+            : "⚠️ Needs Improvement"}
             </div>
 
             <div class="metric-row">
@@ -2890,7 +2896,7 @@ async function loadCashFlowCommandCenter() {
     ) {
 
         status =
-            "⚠ Tight Cash Flow";
+            "⚠️ Tight Cash Flow";
 
         recommendation =
             "Maintain liquidity and avoid major purchases until obligations are covered.";
