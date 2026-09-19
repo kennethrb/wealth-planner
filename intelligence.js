@@ -184,13 +184,14 @@ function getRecommendationScores() {
     // Goal Completion
     //
     let goalScore = 0;
-    if (goal && goal.completable) {
-    goalScore += Math.min(
-        goal.suggestedFunding / 5000,
-        40
-    );
+    if (
+        goal &&
+        goal.completable &&
+        cashFlow.coverage >= CONFIG.cashFlow.healthyCoverage
+    ) {
     
-    goalScore += 30;
+        goalScore += 100;
+    
     }
     scores.push({
         category: "Goal Completion",
