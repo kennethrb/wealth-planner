@@ -534,8 +534,31 @@ function getConfidenceReason(score) {
     return "Recommendation is based on limited supporting indicators.";
 }
 
+function getAdvisorState() {
+    const goal = window.qaGoalFundingOptimizer;
+    const cashFlow = window.qaCashFlow;
+    if (cashFlow && cashFlow.coverage < CONFIG.cashFlow.minimumCoverage) {
+        return {
+            state: "PROTECTION MODE",
+            objective: "Protect Liquidity"
+        };
+    }
+    if (goal && goal.completable) {
+        return {
+            state: "ACCELERATION MODE",
+            objective: "Complete Important Goals"
+        };
+    }
+    return {
+        state: "OPTIMIZATION MODE",
+        objective: "Deploy Capital Efficiently"
+    };
+}
+
 function getMonthlyWealthBrief() {
     const advisor = getWealthAdvisorSummary();
+    const advisorState =
+    getAdvisorState();
     const opportunity =
         getOpportunityCapital().opportunity;
     const safeSpend =
@@ -556,6 +579,12 @@ function getMonthlyWealthBrief() {
     
         generatedAt:
             new Date().toISOString(),
+
+        advisorState:
+            advisorState.state,
+        
+        advisorObjective:
+            advisorState.objective,
     
         headline:
             advisor.topAction?.action,
