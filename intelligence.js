@@ -1985,6 +1985,8 @@ async function loadFundingOptimizationAdvisor() {
         });
     }
 
+    console.log("Funding Insights", insights);
+
     // Expose QA Metrics
     window.qaFundingAdvisor = {
         totalObligations,
