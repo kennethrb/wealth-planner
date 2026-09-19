@@ -866,7 +866,172 @@ function getGoalGraduationRecommendation() {
  * P3 Payday Engine Phase 2
  * Render payday allocation plan.
  */
+function loadPaydayPlan() {
+    const plan = getPaydayPlan();
+    const graduation =
+        getGoalGraduationRecommendation();
+    const cycle = getCurrentPayCycle();
+    const container = document.getElementById("paydayPlan");
+    if (!container) return;
+    container.innerHTML = `
 
+        <div class="card">
+
+            <h2>💰 Payday Plan</h2>
+            
+            <div class="metric-row">
+                <span>Current Cycle</span>
+                <strong>
+                    ${cycle.cycleStart.toLocaleDateString()}
+                    →
+                    ${cycle.cycleEnd.toLocaleDateString()}
+                </strong>
+            </div>
+            
+            <div class="metric-row">
+                <span>Next Payday</span>
+                <strong>
+                    ${plan.nextPayday.toLocaleDateString()}
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>Days Remaining</span>
+                <strong>
+                    ${plan.daysRemaining}
+                </strong>
+            </div>
+
+            <hr>
+            
+            <div class="metric-row">
+                <span>Opportunity Capital</span>
+                <strong>
+                    ${formatCurrency(
+                        plan.opportunityCapital
+                    )}
+                </strong>
+            </div>
+            
+            <hr>
+            
+            <div class="metric-row">
+                <span>🛡️ Emergency Fund</span>
+
+                <strong>
+                    ${formatCurrency(plan.emergencyFund)}
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>💳 Debt Reduction</span>
+                <strong>
+                    ${formatCurrency(plan.debtReduction)}
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>🎯 Goals</span>
+                <strong>
+                    ${formatCurrency(plan.goals)}
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>📈 Investments</span>
+                <strong>
+                    ${formatCurrency(plan.investments)}
+                </strong>
+            </div>
+
+            <hr>
+
+            <div class="metric-row">
+                <span>Safe-To-Spend</span>
+                <strong>
+                    ${formatCurrency(plan.safeToSpend)}
+                </strong>
+            </div>
+
+            <hr>
+            
+            <h3>⭐ Recommended Execution Order</h3>
+            
+            <div class="advisor-action">
+                <div class="action-title">
+                    1️⃣ Fund Emergency Reserve
+                </div>
+                <div class="allocation-row">
+                    <span>Amount</span>
+                    <strong>
+                        ${formatCurrency(plan.emergencyFund)}
+                    </strong>
+                </div>
+            </div>
+            
+            <div class="advisor-action">
+                <div class="action-title">
+                    2️⃣ Reduce Debt
+                </div>
+                <div class="allocation-row">
+                    <span>Amount</span>
+                    <strong>
+                        ${formatCurrency(plan.debtReduction)}
+                    </strong>
+                </div>
+            </div>
+            
+            <div class="advisor-action">
+                <div class="action-title">
+                    3️⃣ Fund Goals
+                </div>
+                <div class="allocation-row">
+                    <span>Amount</span>
+                    <strong>
+                        ${formatCurrency(plan.goals)}
+                    </strong>
+                </div>
+            </div>
+            
+            <div class="advisor-action">
+                <div class="action-title">
+                    4️⃣ Invest Remaining Capital
+                </div>
+                <div class="allocation-row">
+                    <span>Amount</span>
+                    <strong>
+                        ${formatCurrency(plan.investments)}
+                    </strong>
+                </div>
+            </div>
+            
+            <hr>
+            
+            <div class="advisor-action priority">
+                <div class="action-title">
+                    🎯 Highest Priority
+                </div>
+                <p>
+                    ${plan.topAction.action}
+                </p>
+            </div>
+
+            ${ graduation.status === "ACTIVE" ? `
+            <hr>
+            <div class="advisor-action success">
+                <div class="action-title"> 🎓 Goal Graduated </div>
+                <p> ${graduation.action} </p>
+                <div class="allocation-row">
+                    <span> Released Monthly Contribution </span>
+                    <strong> ${formatCurrency( graduation.releasedMonthlyContribution )} </strong>
+                </div>
+            </div> ` : 
+              "" }
+
+        </div>
+
+    `;
+}
 
 /**
  * WPOS-001
@@ -920,74 +1085,38 @@ function loadPayCycleCard() {
  * DI-017
  * Safe-To-Spend card.
  */
-function loadPaydayPlan() {
-    const plan = getPaydayPlan();
-    const graduation = getGoalGraduationRecommendation();
-    const cycle = getCurrentPayCycle();
-    const container = document.getElementById("paydayPlan");
+function loadSafeToSpendCard() {
+    const result = getSafeToSpend();
+    const container = document.getElementById("safeToSpendCard");
     if (!container) return;
-    const safeSpend = getSafeToSpend();
-    const opportunity = getOpportunityCapital();
-    const protectedCash = (appData.accounts || []).filter(account => account.netWorthType === "Asset" && isLiquidAccount(account) && account.protected).reduce(
-        (sum, account) => sum + Number(account.currentBalance || account.balance || 0), 0);
-    const preservationMode = plan.opportunityCapital <= 0;
-    if (preservationMode) {
-        container.innerHTML = `
+    container.innerHTML = `
         <div class="card">
 
-            <h2>💰 Payday Plan</h2>
-
-            <div class="metric-row">
-                <span>Current Cycle</span>
-                <strong>
-                    ${cycle.cycleStart.toLocaleDateString()}
-                    →
-                    ${cycle.cycleEnd.toLocaleDateString()}
-                </strong>
+            <div class="card-header">
+                <h2>💵 Safe To Spend</h2>
+            
+                <button
+                    class="info-button"
+                    onclick="showFeatureGuide('safeToSpend')">
+                    ?
+                </button>
             </div>
 
-            <div class="metric-row">
-                <span>Next Payday</span>
-                <strong>
-                    ${plan.nextPayday.toLocaleDateString()}
-                </strong>
-            </div>
+            <div class="hero-metric">
 
-            <div class="metric-row">
-                <span>Days Remaining</span>
-                <strong>
-                    ${plan.daysRemaining}
-                </strong>
-            </div>
-
-            <hr>
-
-            <div class="advisor-action warning">
-
-                <div class="action-title">
-                    🛡 Capital Preservation Mode
+                <div class="hero-value">
+                    ${formatCurrency(
+                        result.safeToSpend
+                    )}
                 </div>
 
-                <p>
-                    No deployable capital is currently available.
-                    Available cash must remain protected for
-                    upcoming obligations and reserve targets.
-                </p>
-
             </div>
 
             <div class="metric-row">
-                <span>Protected Reserves</span>
-                <strong>
-                    ${formatCurrency(protectedCash)}
-                </strong>
-            </div>
-
-            <div class="metric-row">
-                <span>Upcoming Bills</span>
+                <span>Protected Bills</span>
                 <strong>
                     ${formatCurrency(
-                        safeSpend.protectedBills
+                        result.protectedBills
                     )}
                 </strong>
             </div>
@@ -996,131 +1125,7 @@ function loadPaydayPlan() {
                 <span>Protected Buffer</span>
                 <strong>
                     ${formatCurrency(
-                        safeSpend.protectedBuffer
-                    )}
-                </strong>
-            </div>
-
-            <div class="metric-row">
-                <span>Operational Cash</span>
-                <strong>
-                    ${formatCurrency(
-                        safeSpend.availableCash
-                    )}
-                </strong>
-            </div>
-
-            <hr>
-
-            <div class="advisor-action priority">
-
-                <div class="action-title">
-                    🎯 Recommended Action
-                </div>
-
-                <p>
-                    Maintain liquidity until the next payday.
-                    Avoid additional commitments and preserve
-                    cash for upcoming obligations.
-                </p>
-
-            </div>
-
-            <div class="metric-row">
-                <span>Highest Priority</span>
-                <strong>
-                    ${plan.topAction.action}
-                </strong>
-            </div>
-
-        </div>
-        `;
-        return;
-    }
-    container.innerHTML = `
-        <div class="card">
-
-            <h2>💰 Payday Plan</h2>
-
-            <div class="metric-row">
-                <span>Current Cycle</span>
-                <strong>
-                    ${cycle.cycleStart.toLocaleDateString()}
-                    →
-                    ${cycle.cycleEnd.toLocaleDateString()}
-                </strong>
-            </div>
-
-            <div class="metric-row">
-                <span>Next Payday</span>
-                <strong>
-                    ${plan.nextPayday.toLocaleDateString()}
-                </strong>
-            </div>
-
-            <div class="metric-row">
-                <span>Days Remaining</span>
-                <strong>
-                    ${plan.daysRemaining}
-                </strong>
-            </div>
-
-            <hr>
-
-            <div class="metric-row">
-                <span>Opportunity Capital</span>
-                <strong>
-                    ${formatCurrency(
-                        plan.opportunityCapital
-                    )}
-                </strong>
-            </div>
-
-            <hr>
-
-            <div class="metric-row">
-                <span>🛡️ Emergency Fund</span>
-                <strong>
-                    ${formatCurrency(
-                        plan.emergencyFund
-                    )}
-                </strong>
-            </div>
-
-            <div class="metric-row">
-                <span>💳 Debt Reduction</span>
-                <strong>
-                    ${formatCurrency(
-                        plan.debtReduction
-                    )}
-                </strong>
-            </div>
-
-            <div class="metric-row">
-                <span>🎯 Goals</span>
-                <strong>
-                    ${formatCurrency(
-                        plan.goals
-                    )}
-                </strong>
-            </div>
-
-            <div class="metric-row">
-                <span>📈 Investments</span>
-                <strong>
-                    ${formatCurrency(
-                        plan.investments
-                    )}
-                </strong>
-            </div>
-
-            <hr>
-
-            <div class="metric-row">
-                <span>Safe-To-Spend</span>
-                <strong>
-                    ${formatCurrency(
-                        plan.safeToSpend
+                        result.protectedBuffer
                     )}
                 </strong>
             </div>
