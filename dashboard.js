@@ -408,10 +408,17 @@ function loadReconciliation() {
             // Destination Account
             //
             if (destinationAccountId === accountId) {
+            
                 switch (type) {
+            
                     case "Transfer":
                         expectedBalance += amount;
                         break;
+            
+                    case "Savings":
+                        expectedBalance += amount;
+                        break;
+            
                     case "Debt":
                         expectedBalance -= amount;
                         break;
