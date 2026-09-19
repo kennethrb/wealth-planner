@@ -567,15 +567,22 @@ function getMonthlyWealthBrief() {
         advisorReason,
     
         summary:
-        `You can safely spend
-        ${formatCurrency(
-            safeSpend.safeToSpend
-        )}
-        before your next payday while
-        keeping obligations and reserves protected.`,
+        safeSpend.safeToSpend <= 0
+            ? `Liquidity protection is currently required.
+               Available cash should remain reserved
+               for obligations and protection targets.`
+            : `You can safely spend
+               ${formatCurrency(
+                   safeSpend.safeToSpend
+               )}
+               before your next payday while
+               keeping obligations protected.`,
     
         projectedImpact:
-            `Potential 3-Year Wealth Benefit: ${formatCurrency(projectedBenefit)}`,
+        projectedBenefit <= 0
+            ? "No deployable capital currently available."
+            : `Potential 3-Year Wealth Benefit:
+               ${formatCurrency(projectedBenefit)}`,
     
         topActions:
             advisor.actions.slice(0, 3),
