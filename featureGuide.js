@@ -27,32 +27,32 @@ const FEATURE_GUIDES = {
         formula: "Available Cash − Protected Bills − Protected Buffer",
         example: "₱30,000 − ₱20,000 − ₱5,000 = ₱5,000",
         interpretation: () => "A value of ₱0 means all available money is currently required for bills and reserves.",
-        why: "Helps prevent overspending before the next payday."
+        why: "Allows confident spending while protecting future obligations."
     },
 	cashFlow: {
-        title: "Cash Flow Command Center",
-        what: "Measures whether current deployable cash can safely cover all obligations due before the next payday.",
-        formula: "Available Cash ÷ Upcoming Bills = Coverage Ratio",
-        example: "₱25,000 ÷ ₱20,000 = 1.25x Coverage",
-        interpretation: () => "Coverage above 1.0x means obligations are funded. Coverage below 1.0x indicates a projected cash shortfall.",
-        why: "This helps prevent missed payments and protects liquidity before the next payday."
-    },
-    wealthAdvisor: {
-        title: "Wealth Advisor",
-        what: "Aggregates all intelligence engines into a prioritized recommendation.",
-        formula: "Cash Flow + Goals + Opportunities + Capital Allocation",
-        example: "Protect Liquidity → Fund Goal → Invest Excess Cash",
-        interpretation: () => "Displays the highest-priority financial action available right now.",
-        why: "Simplifies decision-making and focuses attention on the next best action."
-    },
-    goalFunding: {
-        title: "Goal Funding Optimizer",
-        what: "Identifies the goal that would benefit most from available capital.",
-        formula: "Goal Ranking Based On Progress + Completion Opportunity",
-        example: "Emergency Fund receives ₱10,000 to complete the target immediately.",
-        interpretation: () => "A completed goal frees future contribution capacity.",
-        why: "Accelerates progress toward meaningful financial milestones."
-    },
+	    title: "Cash Flow Command Center",
+	    what: "Determines whether current deployable cash can safely cover obligations while identifying opportunity capital.",
+	    formula: "Available Cash ÷ Upcoming Bills = Coverage Ratio",
+	    example: "₱393,000 ÷ ₱32,000 = 12.28x Coverage",
+	    interpretation: () => "Healthy coverage creates Opportunity Capital that can be deployed toward goals, investments, or debt reduction.",
+	    why: "Protects liquidity first before recommending wealth-building actions."
+	},
+	wealthAdvisor: {
+	    title: "Wealth Advisor",
+	    what: "Identifies the highest-impact financial action you should take right now.",
+	    formula: "Cash Flow + Goals + Opportunities + Capital Allocation → Recommended Action",
+	    example: "Fund House Downpayment with ₱30,000",
+	    interpretation: () => "The Wealth Advisor continuously evaluates your liquidity, goals, and opportunities to answer: 'What should I do next?'",
+	    why: "Transforms financial information into actionable wealth decisions."
+	},
+	goalFunding: {
+	    title: "Goal Funding Optimizer",
+	    what: "Identifies which goal creates the highest immediate wealth impact from available capital.",
+	    formula: "Goal Progress + Completion Opportunity + Available Capital",
+	    example: "House Downpayment requires only ₱30,000 to complete immediately.",
+	    interpretation: () => "Goals closest to completion are prioritized because they create immediate progress and release future contribution capacity.",
+	    why: "Accelerates achievement of important financial goals."
+	},
     fundingOptimization: {
         title: "Funding Optimization Advisor",
         what: "Detects account funding deficits and excess idle cash.",
@@ -61,14 +61,14 @@ const FEATURE_GUIDES = {
         interpretation: () => "Highlights accounts at risk of underfunding and recommends transfers.",
         why: "Improves cash allocation efficiency."
     },
-    monthlyActionPlan: {
-        title: "Monthly Wealth Action Plan",
-        what: "Combines all advisor outputs into a prioritized task list.",
-        formula: "Funding + Savings + Cash Flow + Goals",
-        example: "Resolve Shortfall → Increase Savings → Fund Goal",
-        interpretation: () => "Actions are ordered by expected impact on financial outcomes.",
-        why: "Converts analysis into execution."
-    },
+	monthlyActionPlan: {
+	    title: "Monthly Wealth Action Plan",
+	    what: "Converts recommendations into prioritized actions ranked by wealth impact.",
+	    formula: "Advisor Recommendations → Prioritized Actions",
+	    example: "Fund House Downpayment → Deploy Excess Cash → Increase Long-Term Wealth",
+	    interpretation: () => "Actions are sorted by expected impact on future wealth and financial outcomes.",
+	    why: "Turns analysis into execution."
+	},
     wealthSweep: {
         title: "Wealth Sweep",
         what: "Automatically recommends how to deploy excess cash.",
