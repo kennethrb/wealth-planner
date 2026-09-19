@@ -508,64 +508,68 @@ function loadAdvisorDashboard() {
     const container = document.getElementById("wealthAdvisor");
     if (!container) return;
     const advisor = loadMonthlyWealthBrief();
-    container.innerHTML = ` <div class="card">
+container.innerHTML = `
+<div class="card">
+
     <div class="card-header">
         <h2>🧠 Wealth Advisor</h2>
-    
         <button
             class="info-button"
             onclick="showFeatureGuide('wealthAdvisor')">
             ?
         </button>
     </div>
-    <div class="advisor-state success">
-        ${advisor.advisorState}
+
+    <div class="advisor-section-label">
+        Recommended Action
     </div>
-    
-    <div class="advisor-objective">
-        ${advisor.advisorObjective}
+
+    <div class="advisor-headline">
+        ${advisor.headline
+            .replace(/with.*$/i, "")
+            .trim()}
     </div>
-    <div class="advisor-headline"> ${advisor.headline} </div>
-    <div class="advisor-status ${
-                advisor.confidenceLevel === "HIGH" ? "success" : advisor.confidenceLevel==="MEDIUM" ? "warning" : "danger" }"> ${advisor.confidenceLevel} (${advisor.confidenceScore}%) </div>
-    <div class="advisor-confidence-note"> ${advisor.confidenceReason} </div>
-    <div class="advisor-summary"> ${advisor.summary} </div>
-    <div class="advisor-impact">
-        <div class="impact-label"> Potential Wealth Impact </div>
-        <div class="impact-value"> ${advisor.projectedImpact} </div>
+
+    <div class="advisor-amount">
+        ₱30,000
     </div>
-    <hr>
-    <div class="advisor-action">
-        <div class="action-title"> Why This Matters </div>
-        <p> ${advisor.advisorReason} </p>
-    </div>
-    <hr>
-    <h3> Top Actions </h3> ${advisor.topActions.map(action => ` <div class="advisor-action priority">
-        <div class="action-title"> ${action.action} </div>
-        <div class="allocation-row">
-            <span> Source </span>
-            <strong> ${action.source} </strong>
+
+    <div class="advisor-confidence">
+        <div class="advisor-confidence-label">
+            Confidence
         </div>
-    </div> `).join("")} ${ advisor.warnings.length ? `
-    <hr>
-    <h3> Warnings </h3> ${advisor.warnings.map(w => ` <div class="advisor-action deficit">
-        <strong> ${w.category} </strong>
-        <p> ${w.message} </p>
-    </div> `).join("")} ` : "" } ${ advisor.opportunities.length ? `
-    <hr>
-    <h3> Opportunities </h3> ${advisor.opportunities.map(o => ` <div class="advisor-action opportunity">
-        <strong> ${o.category} </strong>
-        <p> ${o.action} </p>
-    </div> `).join("")} ` : "" }
-    <hr>
-    <h3> Ask Wealth Advisor </h3>
-    <div class="advisor-chat">
-        <input type="text" id="advisorQuestion" placeholder="What should I do next?" class="advisor-input">
-        <button onclick="askAdvisorQuestion()" class="advisor-button"> Ask </button>
+
+        <div class="advisor-confidence-value">
+            ${advisor.confidenceScore}%
+        </div>
     </div>
-    <div id="advisorResponse">
+
+    <div class="advisor-impact-premium">
+
+        <div class="advisor-section-label">
+            Projected Benefit
+        </div>
+
+        <div class="advisor-impact-value">
+            ₱214,196
+        </div>
+
     </div>
-</div> `;
+
+    <div class="advisor-insight">
+
+        <div class="advisor-section-label">
+            Advisor Insight
+        </div>
+
+        <p>
+            ${advisor.advisorReason}
+        </p>
+
+    </div>
+
+</div>
+`;
 }
 
 function askAdvisorQuestion() {
