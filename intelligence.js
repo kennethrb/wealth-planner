@@ -530,7 +530,7 @@ function getAdvisorConfidence(action) {
 
 function getConfidenceReason(score) {
     if (score >= 90) return "Strong financial data supports this recommendation.";
-    if (score >= 70) return "Recommendation is supported by current wealth indicators.";
+    if (score >= 70) return "Healthy liquidity and available opportunity capital support this recommendation.";
     return "Recommendation is based on limited supporting indicators.";
 }
 
