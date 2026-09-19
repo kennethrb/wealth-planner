@@ -904,14 +904,34 @@ function loadPaydayPlan() {
 
             <hr>
             
-            <div class="metric-row">
-                <span>Opportunity Capital</span>
-                <strong>
-                    ${formatCurrency(
-                        plan.opportunityCapital
-                    )}
-                </strong>
-            </div>
+            ${
+                plan.opportunityCapital <= 0
+                    ? `
+                    <div class="advisor-action warning">
+            
+                        <div class="action-title">
+                            🛡 Capital Preservation Mode
+                        </div>
+            
+                        <p>
+                            No deployable capital is currently
+                            available. Maintain liquidity until
+                            the next payday.
+                        </p>
+            
+                    </div>
+                    `
+                    : `
+                    <div class="metric-row">
+                        <span>Opportunity Capital</span>
+                        <strong>
+                            ${formatCurrency(
+                                plan.opportunityCapital
+                            )}
+                        </strong>
+                    </div>
+                    `
+            }
             
             <hr>
             
