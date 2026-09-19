@@ -518,6 +518,13 @@ function loadAdvisorDashboard() {
             ?
         </button>
     </div>
+    <div class="advisor-state success">
+        ${advisor.advisorState}
+    </div>
+    
+    <div class="advisor-objective">
+        ${advisor.advisorObjective}
+    </div>
     <div class="advisor-headline"> ${advisor.headline} </div>
     <div class="advisor-status ${
                 advisor.confidenceLevel === "HIGH" ? "success" : advisor.confidenceLevel==="MEDIUM" ? "warning" : "danger" }"> ${advisor.confidenceLevel} (${advisor.confidenceScore}%) </div>
