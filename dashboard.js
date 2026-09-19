@@ -429,38 +429,6 @@ const difference =
     currentBalance -
     expectedBalance;
 
-if (
-    account.accountName === "GoTrade" ||
-    account.accountName === "MP2"
-) {
-
-    console.group(
-        `RECON DEBUG - ${account.accountName}`
-    );
-
-    console.log(
-        "Opening Balance:",
-        openingBalance
-    );
-
-    console.log(
-        "Current Balance:",
-        currentBalance
-    );
-
-    console.log(
-        "Expected Balance:",
-        expectedBalance
-    );
-
-    console.log(
-        "Difference:",
-        difference
-    );
-
-    console.groupEnd();
-}
-
 const reconciled =
     Math.abs(difference) < 0.01;
         if (reconciled) {
