@@ -26,44 +26,22 @@ const FEATURE_GUIDES = {
         what: "The amount available for discretionary spending after protecting upcoming bills and reserves.",
         formula: "Available Cash − Protected Bills − Protected Buffer",
         example: "₱30,000 − ₱20,000 − ₱5,000 = ₱5,000",
-		interpretation: () => `
-		Safe-To-Spend is your operational spending limit before the next payday.
+		interpretation:
+		() => `Money available to spend before your next payday.`,
 		
-		This amount protects:
-		
-		• Unpaid Bills
-		• Short-Term Cash Reserves
-		• Pay-Cycle Buffers
-		
-		Question Answered:
-		
-		Can I spend it?
-		
-		Safe-To-Spend is NOT the same as Deployable Capital.
-		`,
-		why: `
-		Different capital numbers exist because they support different decisions.
-		
-		Safe-To-Spend:
-		Can I spend it?
-		
-		Deployable Capital:
-		Can I strategically allocate it?
-		
-		Wealth Sweep:
-		What exceeds my long-term reserve target?
-		`
+		why:
+		`Prevents overspending.`
     },
 	cashFlow: {
 	    title: "Cash Flow Command Center",
 	    what: "Measures how safely your available cash can support your recurring financial obligations while identifying deployable capital.",
 	    formula: "Available Cash ÷ Monthly Bill Load = Coverage Ratio",
 	    example: "₱393,000 ÷ ₱37,000 = 10.6x Coverage",
-		interpretation: () => `
-		A coverage ratio above 3x generally indicates healthy liquidity.
-		Higher coverage allows Wealth Planner to transition from protection mode into optimization mode.
-		`,
-	    why: "Before investing, funding goals, or reducing debt, Wealth Planner first verifies that recurring obligations are safely covered."
+		interpretation:
+		() => `Measures how safely cash covers recurring bills.`,
+		
+		why:
+		`Protects liquidity before recommending actions.`
 	},
 	wealthAdvisor: {
 	    title: "Wealth Advisor",
@@ -71,17 +49,10 @@ const FEATURE_GUIDES = {
 	    formula: "Cash Flow + Goals + Opportunities + Capital Allocation → Recommended Action",
 	    example: "Fund House Downpayment with ₱30,000",
 		interpretation:
-		() => `
-		The Wealth Advisor combines:
+		() => `Determines the best financial action right now.`,
 		
-		• Cash Flow Command Center
-		• Goal Funding Optimizer
-		• Wealth Opportunities
-		• Capital Allocation
-		
-		to identify the single highest-value action available today.
-		`,
-	    why: "Transforms financial information into actionable wealth decisions."
+		why:
+		`Turns information into action.`
 	},
 	goalFunding: {
 	    title: "Goal Funding Optimizer",
@@ -89,18 +60,11 @@ const FEATURE_GUIDES = {
 	    formula: "Goal Progress + Completion Opportunity + Available Capital",
 		example:
 		"Deployable Capital: ₱271,600 | Goal Gap: ₱30,000",
-		interpretation: () => `
-		Only Deployable Capital is considered for goal acceleration.
+		interpretation:
+		() => `Identifies the goal that creates the fastest progress.`,
 		
-		Deployable Capital represents money available for strategic wealth decisions such as:
-		
-		• funding goals
-		• reducing debt
-		• investing
-		
-		Unlike Safe-To-Spend, this amount is intended for long-term wealth growth rather than discretionary spending.
-		`,
-	    why: "Accelerates achievement of important financial goals."
+		why:
+		`Accelerates goal completion.`
 	},
     fundingOptimization: {
         title: "Funding Optimization Advisor",
@@ -126,14 +90,10 @@ const FEATURE_GUIDES = {
 		example:
 		"₱393,000 Available Cash − ₱195,000 Reserve Target = ₱198,000 Excess Cash",
 		interpretation:
-		() => `
-		Wealth Sweep uses a stricter definition of capital.
+		() => `Uses only cash above your 3‑month reserve target.`,
 		
-		Unlike Deployable Capital, Wealth Sweep only considers money above your 3‑month reserve target.
-		
-		This is why Wealth Sweep Capital is often lower than Deployable Capital.
-		`,
-        why: "Prevents idle cash and increases long-term wealth growth."
+		why:
+		`Prevents idle cash.`
     },
     payCycle: {
         title: "Pay Cycle",
@@ -151,19 +111,11 @@ const FEATURE_GUIDES = {
 		"(Available Cash − Unpaid Bills) × 70% Strategic Allocation Rule",
 		example:
 		"₱388,000 × 70% = ₱271,600",
-	    interpretation: "Deployable Capital powers Goal Funding, Wealth Advisor, Opportunity Engine, and Payday Planning.",
-		why: `
-		Different capital numbers exist because they support different decisions.
+		interpretation:
+		`Money available for goals, investing, and debt reduction.`,
 		
-		Safe-To-Spend:
-		Can I spend it?
-		
-		Deployable Capital:
-		Can I strategically allocate it?
-		
-		Wealth Sweep:
-		What exceeds my long-term reserve target?
-		`
+		why:
+		`Powers Wealth Advisor recommendations.`
 	},
   
 };
