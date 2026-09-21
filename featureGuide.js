@@ -31,12 +31,13 @@ const FEATURE_GUIDES = {
 		
 		This amount protects:
 		
-		• unpaid bills
-		• short-term cash reserves
-		• pay-cycle buffers
+		• Unpaid Bills
+		• Short-Term Cash Reserves
+		• Pay-Cycle Buffers
 		
-		Safe-To-Spend answers:
-		"Can I spend it?"
+		Question Answered:
+		
+		Can I spend it?
 		
 		Safe-To-Spend is NOT the same as Deployable Capital.
 		`,
