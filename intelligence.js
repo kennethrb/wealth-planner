@@ -928,7 +928,10 @@ function getGraduatedGoals() {
  */
 function getGoalGraduationRecommendation() {
     const graduation = getGraduatedGoals();
-    if (graduation.graduatedCount === 0) {
+    if (
+        graduation.graduatedCount === 0 ||
+        graduation.releasedMonthlyContribution <= 0
+    ) {
         return {
             status: "NONE"
         };
