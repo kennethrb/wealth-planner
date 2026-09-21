@@ -1832,10 +1832,14 @@ async function loadFinancialHealthAdvisor() {
     
     if (isHealthy) {
     
+        container.style.display = "none";
         container.innerHTML = "";
+    
         return;
     
     }
+
+    container.style.display = "";
 
     window.qaFinancialHealthAdvisor = {
         income,
