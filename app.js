@@ -764,6 +764,7 @@ async function initializeApp() {
     viewState.year;
     
     await refreshUI();
+    showIntelTab('advisor');
     // Default Add Budget Item year to latest budget year
     const years = [...new Set(appData.budget.map(item => Number(item.year)))].filter(Boolean);
     const latestYear = years.length > 0 ? Math.max(...years) : new Date().getFullYear();
