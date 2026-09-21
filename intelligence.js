@@ -848,12 +848,6 @@ function getProtectionStatus() {
         protectionState = "PROTECTION";
     }
     
-    console.log({
-        requiredProtection,
-        protectionGap,
-        protectionState
-    });
-    
     return {
         availableCash: safe.availableCash,
         protectedBills: safe.protectedBills,
