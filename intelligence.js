@@ -3283,7 +3283,7 @@ async function loadGoalFundingOptimizer() {
                     </div>
         
                     <div class="metric-row">
-                        <span>Available Capital</span>
+                        <span>Deployable Capital</span>
                         <strong>
                             ${formatCurrency(opportunity)}
                         </strong>
