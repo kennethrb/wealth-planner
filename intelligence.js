@@ -49,8 +49,8 @@ function getCapitalPosition() {
 function getOpportunityCapital() {
     const availableCash = getTotalLiquidAssets(appData.accounts || []);
     const remainingBills =
-    getCycleBills()
-    .reduce(
+        getOutstandingCycleBills()
+            .reduce(
         (sum, bill) =>
             sum +
             Number(
@@ -815,14 +815,33 @@ function getCycleBills() {
     });
 }
 
+function getOutstandingCycleBills() {
+
+    return getCycleBills()
+        .filter(
+            bill =>
+                !isBillPaidThisCycle(
+                    bill
+                )
+        );
+}
+
 /**
  * DI-017
  * Safe spendable cash before next payday.
  */
 function getSafeToSpend() {
     const availableCash = getTotalLiquidAssets(appData.accounts || []);
-    const protectedBills = getCycleBills().reduce(
-        (sum, bill) => sum + Number(bill.defaultAmount || 0), 0);
+    const protectedBills =
+        getOutstandingCycleBills()
+            .reduce(
+                (sum, bill) =>
+                    sum +
+                    Number(
+                        bill.defaultAmount || 0
+                    ),
+                0
+            );
     const monthlyObligations =
         getBudgetSummary()
             .monthlyObligations;
