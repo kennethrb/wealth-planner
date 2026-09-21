@@ -176,7 +176,7 @@ function showFeatureGuide(key) {
   document.getElementById("guideWhat").textContent = guide.what || "";
   document.getElementById("guideFormula").textContent = guide.formula || "";
   document.getElementById("guideExample").textContent = guide.example || "";
-  document.getElementById("guideWhy").textContent = guide.why || "";
+  document.getElementById("guideWhy").innerHTML = (guide.why || "").replace(/\n/g, "<br>");
 
   // Dynamic interpretation evaluation
   let interpText = "";
@@ -191,7 +191,7 @@ function showFeatureGuide(key) {
     interpText = guide.interpretation || "";
   }
 
-  document.getElementById("guideInterpretation").textContent = interpText.trim();
+  document.getElementById("guideInterpretation").innerHTML = interpText.trim().replace(/\n/g, "<br>");
 
   // Show Modal
   const modal = document.getElementById("featureGuideModal");
