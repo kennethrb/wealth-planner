@@ -2199,12 +2199,11 @@ async function loadAssetAllocationAdvisor() {
     const container = document.getElementById("assetAllocationAdvisor");
     if (!container) return;
     const rec = getAssetAllocationRecommendation();
-    if (rec.status === "good") {
+    const DEMO_MODE = true;
     
+    if (DEMO_MODE) {
         container.style.display = "none";
-        container.innerHTML = "";
         return;
-    
     }
     
     container.style.display = "";
