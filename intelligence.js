@@ -839,6 +839,31 @@ function getSafeToSpend() {
     };
 }
 
+function getProtectionStatus() {
+    const safe = getSafeToSpend();
+    const requiredProtection = safe.protectedBills + safe.protectedBuffer;
+    const protectionGap = Math.max(0, requiredProtection - safe.availableCash);
+    let protectionState = "ACTIVE";
+    if (protectionGap > 0) {
+        protectionState = "PROTECTION";
+    }
+    
+    console.log({
+        requiredProtection,
+        protectionGap,
+        protectionState
+    });
+    
+    return {
+        availableCash: safe.availableCash,
+        protectedBills: safe.protectedBills,
+        protectedBuffer: safe.protectedBuffer,
+        requiredProtection,
+        protectionGap,
+        protectionState
+    }; 
+}
+
 /**
  * P3 Payday Engine Phase 1
  * Generates recommended allocation plan
@@ -916,16 +941,9 @@ function loadPaydayPlan() {
     const container = document.getElementById("paydayPlan");
     if (!container) return;
     const safeSpend = getSafeToSpend();
-    const requiredProtection =
-        safeSpend.protectedBills +
-        safeSpend.protectedBuffer;
-    
-    const protectionGap =
-        Math.max(
-            0,
-            requiredProtection -
-            safeSpend.availableCash
-        );
+    const protection = getProtectionStatus();
+    const requiredProtection = protection.requiredProtection;
+    const protectionGap = protection.protectionGap;
     const protectedCash = (appData.accounts || []).filter(account => account.netWorthType === "Asset" && isLiquidAccount(account) && account.protected).reduce(
         (sum, account) => sum + Number(account.currentBalance || account.balance || 0), 0);
     const preservationMode = plan.opportunityCapital <= 0;
@@ -1309,8 +1327,9 @@ function loadSafeToSpendCard() {
     const result = getSafeToSpend();
     const container = document.getElementById("safeToSpendCard");
     if (!container) return;
-    const requiredProtection = result.protectedBills + result.protectedBuffer;
-    const protectionGap = Math.max(0, requiredProtection - result.availableCash);
+    const protection = getProtectionStatus();
+    const requiredProtection = protection.requiredProtection;
+    const protectionGap = protection.protectionGap;
     const spendingHold = result.safeToSpend <= 0;
     if (spendingHold) {
         container.innerHTML = `
@@ -2891,9 +2910,6 @@ async function loadCashFlowCommandCenter() {
     const capital =
         getOpportunityCapital();
 
-    const safeSpend =
-        getSafeToSpend();
-
     const availableCash =
         capital.availableCash;
 
@@ -2909,16 +2925,9 @@ async function loadCashFlowCommandCenter() {
     const opportunity =
         capital.opportunity;
 
-    const requiredProtection =
-        safeSpend.protectedBills +
-        safeSpend.protectedBuffer;
-
-    const protectionGap =
-        Math.max(
-            0,
-            requiredProtection -
-            safeSpend.availableCash
-        );
+    const protection = getProtectionStatus();
+    const requiredProtection = protection.requiredProtection;
+    const protectionGap = protection.protectionGap;
 
     let status;
     let recommendation;
@@ -3045,7 +3054,7 @@ async function loadCashFlowCommandCenter() {
                 <span>Protected Buffer</span>
                 <strong>
                     ${formatCurrency(
-                        safeSpend.protectedBuffer
+                        protection.protectedBuffer
                     )}
                 </strong>
             </div>
@@ -3215,19 +3224,10 @@ async function loadGoalFundingOptimizer() {
         
         if (opportunity <= 0) {
         
-            const safeSpend =
-                getSafeToSpend();
         
-            const requiredProtection =
-                safeSpend.protectedBills +
-                safeSpend.protectedBuffer;
-        
-            const protectionGap =
-                Math.max(
-                    0,
-                    requiredProtection -
-                    safeSpend.availableCash
-                );
+            const protection = getProtectionStatus();
+            const requiredProtection = protection.requiredProtection;
+            const protectionGap = protection.protectionGap;
         
             container.style.display = "";
         
