@@ -1686,19 +1686,20 @@ tr.section-debt td:first-child {
         margin-bottom: 12px;
     }
 
-    .goal-details{
+    #financialGoals .goal-details{
         flex-direction: column;
         align-items: flex-start;
         gap: 6px;
     }
 
-    .goal-details > div{
+    #financialGoals .goal-details > div{
         width: 100%;
         display: flex;
         gap: 8px;
     }
 
-    .goal-details button{
+    #financialGoals .goal-details button{
         flex: 1;
     }
+
 }
