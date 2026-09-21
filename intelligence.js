@@ -1052,7 +1052,7 @@ function loadPaydayPlan() {
                 
                 <div class="metric-row">
                     <span>Protection Gap</span>
-                    <strong style="color:#ef4444;">
+                    <strong class="text-danger">
                         ${formatCurrency(
                             protectionGap
                         )}
@@ -1415,7 +1415,7 @@ function loadSafeToSpendCard() {
 
                 <div class="metric-row">
                     <span>Protection Gap</span>
-                    <strong style="color:#ef4444;">
+                    <strong class="text-danger">
                         ${formatCurrency(
                             protectionGap
                         )}
@@ -3083,7 +3083,7 @@ async function loadCashFlowCommandCenter() {
 
             <div class="metric-row">
                 <span>Protection Gap</span>
-                <strong style="color:#ef4444;">
+                <strong class="text-danger">
                     ${formatCurrency(
                         protectionGap
                     )}
@@ -3294,7 +3294,7 @@ async function loadGoalFundingOptimizer() {
         
                     <div class="metric-row">
                         <span>Protection Gap</span>
-                        <strong style="color:#ef4444;">
+                        <strong class="text-danger">
                             ${formatCurrency(
                                 protectionGap
                             )}
