@@ -530,7 +530,7 @@ function getAdvisorConfidence(action) {
 
 function getConfidenceReason(score) {
     if (score >= 90) return "Strong financial data supports this recommendation.";
-    if (score >= 70) return "Healthy liquidity and available opportunity capital support this recommendation.";
+    if (score >= 70) return "Healthy liquidity and available deployable capital support this recommendation.";
     return "Recommendation is based on limited supporting indicators.";
 }
 
@@ -1120,7 +1120,7 @@ function loadPaydayPlan() {
             <hr>
 
             <div class="metric-row">
-                <span>Opportunity Capital</span>
+                <span>Deployable Capital</span>
                 <strong>
                     ${formatCurrency(
                         plan.opportunityCapital
