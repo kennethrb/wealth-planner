@@ -48,26 +48,16 @@ function getCapitalPosition() {
 
 function getOpportunityCapital() {
     const availableCash = getTotalLiquidAssets(appData.accounts || []);
-    const remainingBills =
-        getOutstandingCycleBills()
-            .reduce(
-        (sum, bill) =>
-            sum +
-            Number(
-                bill.defaultAmount || 0
-            ),
-        0
-    );
-    const coverage = remainingBills === 0 ? CONFIG.cashFlow.unlimitedCoverage : availableCash / remainingBills;
+    const totalRecurringBills = getTotalRecurringBills();
+    const remainingBills = getOutstandingCycleBills().reduce(
+        (sum, bill) => sum + Number(bill.defaultAmount || 0), 0);
+    const coverage = totalRecurringBills === 0 ? CONFIG.cashFlow.unlimitedCoverage : availableCash / totalRecurringBills;
     const surplus = availableCash - remainingBills;
-    const opportunity =
-        surplus > 0
-            ? surplus *
-              CONFIG.opportunityAllocation.reserveRatio
-            : 0;
+    const opportunity = surplus > 0 ? surplus * CONFIG.opportunityAllocation.reserveRatio : 0;
     return {
         availableCash,
         remainingBills,
+        totalRecurringBills,
         coverage,
         surplus,
         opportunity
@@ -2938,6 +2928,9 @@ async function loadCashFlowCommandCenter() {
     const coverage =
         capital.coverage;
 
+    const totalRecurringBills =
+        capital.totalRecurringBills;
+
     const surplus =
         capital.surplus;
 
@@ -3202,12 +3195,12 @@ async function loadCashFlowCommandCenter() {
                 ${coverage.toFixed(1)}x
             </strong>
         </div>
-
+        
         <div class="metric-row">
-            <span>Upcoming Bills</span>
+            <span>Monthly Bill Load</span>
             <strong>
                 ${formatCurrency(
-                    remainingBills
+                    totalRecurringBills
                 )}
             </strong>
         </div>
@@ -3716,4 +3709,9 @@ function buildExplanationResponse() {
         source: "DI-015",
         generatedAt: new Date().toISOString()
     };
+}
+
+function getTotalRecurringBills() {
+    return (appData.recurringBills || []).filter(bill => bill.active !== false).reduce(
+        (sum, bill) => sum + Number(bill.defaultAmount || 0), 0);
 }
