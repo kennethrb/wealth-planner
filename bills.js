@@ -130,16 +130,8 @@ function loadUpcomingBills() {
   const currentMonth = today.getMonth();
   const currentYear = today.getFullYear();
 
-  // Helper: check if paid this month
-  const checkIsPaid = (bill) => {
-    return (appData.transactions || []).some(tx => {
-      const txDate = new Date(tx.Date || tx.date);
-      const details = tx.Details || tx.details || "";
-      return tx.budgetPosition === bill.budgetPosition &&
-        txDate.getMonth() === currentMonth &&
-        txDate.getFullYear() === currentYear;
-    });
-  };
+  const checkIsPaid =
+    isBillPaidThisCycle;
 
   // Helper: calculate raw remaining days for sorting
     const getDaysRemaining = (bill) => {
@@ -389,4 +381,14 @@ function getNextDueDate(dueDay) {
     }
 
     return dueDate;
+}
+
+function isBillPaidThisCycle(bill) {
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    return (appData.transactions || []).some(tx => {
+        const txDate = new Date(tx.Date || tx.date);
+        return (tx.budgetPosition === bill.budgetPosition && txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear);
+    });
 }
