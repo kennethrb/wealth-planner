@@ -3888,6 +3888,28 @@ function getAdvisorEffectiveness() {
     };
 }
 
+function getMonthlyWealthReview() {
+    const history = appData.advisorMemory || [];
+    const effectiveness = getAdvisorEffectiveness();
+    const executed = history.filter(item => item.status === "COMPLETED");
+    const deferred = history.filter(item => item.status === "DEFERRED");
+    const ignored = history.filter(item => item.status === "IGNORED");
+    const latestOutcome = executed.length ? executed[executed.length - 1] : null;
+    const currentAdvisor = getMonthlyWealthBrief();
+    return {
+        executed: executed.length,
+        deferred: deferred.length,
+        ignored: ignored.length,
+        successRate: effectiveness.successRate,
+        advisorPerformance: effectiveness.effectivenessLevel,
+        topOutcome: latestOutcome?.outcome || "No outcomes recorded",
+        nextFocus: currentAdvisor.headline || "No recommendation available",
+        wealthImpactCreated:
+            executed.length *
+            5000
+    };
+}
+
 function getRecommendationOutcome(recommendation) {
     if (!recommendation) {
         return {
