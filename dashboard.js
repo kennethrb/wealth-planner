@@ -560,7 +560,7 @@ function loadAdvisorDashboard() {
     <p>${narrative.reason || "No narrative available"}</p>
     
     <h3>Expected Wealth Impact</h3>
-    <<p>${narrative.wealthImpact || "No wealth impact available"}</p>
+    <p>${narrative.wealthImpact || "No wealth impact available"}</p>
     
     <h3>Risk If Ignored</h3>
     <p>${narrative.riskIfIgnored || "No risk information available"}</p>
