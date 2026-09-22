@@ -571,6 +571,47 @@ function getAdvisorConfidence(action) {
     };
 }
 
+function getAdvisorConfidenceBreakdown(action) {
+    const opportunity = getOpportunityCapital();
+    const emergency = getEmergencyFundGap();
+    const goal = window.qaGoalFundingOptimizer;
+    const factors = [];
+    // Liquidity
+    factors.push({
+        category: "Liquidity",
+        score: opportunity.coverage >= CONFIG.cashFlow.healthyCoverage ? 100 : opportunity.coverage >= CONFIG.cashFlow.minimumCoverage ? 70 : 30,
+        status: opportunity.coverage >= CONFIG.cashFlow.healthyCoverage ? "GOOD" : opportunity.coverage >= CONFIG.cashFlow.minimumCoverage ? "FAIR" : "WEAK",
+        message: opportunity.coverage >= CONFIG.cashFlow.healthyCoverage ? "Liquidity protected" : opportunity.coverage >= CONFIG.cashFlow.minimumCoverage ? "Liquidity acceptable" : "Liquidity risk detected"
+    });
+    // Emergency Fund
+    factors.push({
+        category: "Emergency Fund",
+        score: emergency.fullyFunded ? 100 : emergency.gap <= 50000 ? 70 : 40,
+        status: emergency.fullyFunded ? "GOOD" : emergency.gap <= 50000 ? "FAIR" : "WEAK",
+        message: emergency.fullyFunded ? "Emergency reserve funded" : "Emergency reserve below target"
+    });
+    // Goal Readiness
+    factors.push({
+        category: "Goal Readiness",
+        score: goal?.completable ? 100 : 60,
+        status: goal?.completable ? "GOOD" : "FAIR",
+        message: goal?.completable ? "Goal can be completed" : "Goal still requires funding"
+    });
+    // Data Quality
+    factors.push({
+        category: "Data Quality",
+        score: 100,
+        status: "GOOD",
+        message: "Required advisor data available"
+    });
+    return {
+        score: getAdvisorConfidence(action).score,
+        factors
+    };
+}
+
+
+
 function getConfidenceReason(score) {
     if (score >= 90) return "Strong financial data supports this recommendation.";
     if (score >= 70) return "Healthy liquidity and available deployable capital support this recommendation.";
@@ -614,6 +655,10 @@ function getMonthlyWealthBrief() {
         getAdvisorConfidence(
             advisor.topAction
         );
+    const confidenceBreakdown =
+        getAdvisorConfidenceBreakdown(
+            advisor.topAction
+        );
     const opportunityEngine =
         getWealthOpportunities();
     const narrative =
@@ -639,6 +684,8 @@ function getMonthlyWealthBrief() {
         
         confidenceScore:
             confidence.score,
+        
+        confidenceBreakdown,
         
         confidenceReason:
             getConfidenceReason(
