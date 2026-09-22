@@ -514,6 +514,8 @@ function loadAdvisorDashboard() {
         advisor.narrative || {};
     const confidenceBreakdown =
         advisor.confidenceBreakdown;
+    const previousRecommendation =
+        getLatestAdvisorMemory();
     container.innerHTML = ` <div class="card wealth-advisor-premium">
         <div class="card-header">
             <h2>🧠 Wealth Advisor</h2>
@@ -583,6 +585,36 @@ function loadAdvisorDashboard() {
             <div class="impact-label"> Potential Wealth Impact </div>
             <div class="impact-value"> ${advisor.projectedImpact} </div>
         </div>
+        ${previousRecommendation ? `
+        
+        <div class="advisor-section-card">
+        
+            <div class="advisor-section-title">
+                Previous Recommendation
+            </div>
+        
+            <div class="advisor-section-text">
+        
+                ${previousRecommendation.recommendation}
+        
+            </div>
+        
+            <div class="allocation-row">
+        
+                <span>Status</span>
+        
+                <strong>
+        
+                    ${previousRecommendation.status}
+        
+                </strong>
+        
+            </div>
+        
+        </div>
+        
+        ` : ""}
+        
         <div class="advisor-chat-card">
             <div class="advisor-section-title"> Ask Wealth Advisor </div>
             <div class="advisor-chat">
