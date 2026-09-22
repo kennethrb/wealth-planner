@@ -508,6 +508,8 @@ function loadAdvisorDashboard() {
     const container = document.getElementById("wealthAdvisor");
     if (!container) return;
     const advisor = loadMonthlyWealthBrief();
+    const narrative =
+        advisor.narrative || {};
     container.innerHTML = ` <div class="card">
     <div class="card-header">
         <h2>🧠 Wealth Advisor</h2>
@@ -532,7 +534,6 @@ function loadAdvisorDashboard() {
     <div class="action-title">
         Advisor Insight
     </div>
-
         <p> ${advisor.advisorReason} </p>
     </div>
     <hr>
@@ -554,6 +555,28 @@ function loadAdvisorDashboard() {
         <p> ${o.action} </p>
     </div> `).join("")} ` : "" }
     <hr>
+    
+    <h3>Why This Action</h3>
+    <p>${narrative.reason || "No narrative available"}</p>
+    
+    <h3>Expected Wealth Impact</h3>
+    <<p>${narrative.wealthImpact || "No wealth impact available"}</p>
+    
+    <h3>Risk If Ignored</h3>
+    <p>${narrative.riskIfIgnored || "No risk information available"}</p>
+
+    ${narrative.alternativeActions?.length ? `
+    <hr>
+    
+    <h3>Alternative Actions</h3>
+    
+    ${narrative.alternativeActions
+        .map(action => `<p>• ${action}</p>`)
+        .join("")}
+    ` : ""}
+    
+    <hr>
+    
     <h3> Ask Wealth Advisor </h3>
     <div class="advisor-chat">
         <input type="text" id="advisorQuestion" placeholder="What should I do next?" class="advisor-input">
