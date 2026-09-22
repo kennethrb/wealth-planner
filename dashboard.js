@@ -594,23 +594,74 @@ function loadAdvisorDashboard() {
             </div>
         
             <div class="advisor-section-text">
-        
                 ${previousRecommendation.recommendation}
-        
+                ${previousRecommendation.outcome ? `
+                
+                <div class="advisor-outcome">
+                
+                    ${previousRecommendation.outcome}
+                
+                </div>
+                
+                ` : ""}
             </div>
-        
             <div class="allocation-row">
-        
                 <span>Status</span>
-        
-                <strong>
-        
+                <span
+                    class="advisor-status-badge
+                    advisor-status-${
+                        previousRecommendation.status
+                        .toLowerCase()
+                    }">
+                    ${
+                        previousRecommendation.status === "COMPLETED"
+                            ? "✅"
+                            : previousRecommendation.status === "DEFERRED"
+                                ? "⏸"
+                                : previousRecommendation.status === "IGNORED"
+                                    ? "⚠️"
+                                    : "🟡"
+                    }
                     ${previousRecommendation.status}
-        
-                </strong>
-        
+                </span>
             </div>
-        
+            <div class="advisor-action-buttons">
+            
+                <button
+                    onclick="
+                    updateAdvisorStatus(
+                        '${previousRecommendation.recommendationId}',
+                        'COMPLETED',
+                        'Recommendation Completed'
+                    )">
+            
+                    ✅ Complete
+            
+                </button>
+            
+                <button
+                    onclick="
+                    updateAdvisorStatus(
+                        '${previousRecommendation.recommendationId}',
+                        'DEFERRED'
+                    )">
+            
+                    ⏸ Defer
+            
+                </button>
+            
+                <button
+                    onclick="
+                    updateAdvisorStatus(
+                        '${previousRecommendation.recommendationId}',
+                        'IGNORED'
+                    )">
+            
+                    ⚠️ Ignore
+            
+                </button>
+            
+            </div>
         </div>
         
         ` : ""}
