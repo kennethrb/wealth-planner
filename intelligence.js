@@ -3866,3 +3866,20 @@ function getLatestAdvisorMemory() {
     if (!history.length) return null;
     return history[history.length - 1];
 }
+
+async function updateAdvisorStatus(
+    recommendationId,
+    status,
+    outcome = ""
+) {
+    await fetch(
+        `${BASE_URL}?action=updateAdvisorMemory` +
+        `&mode=${appMode}` +
+        `&recommendationId=${recommendationId}` +
+        `&status=${status}` +
+        `&outcome=${encodeURIComponent(
+            outcome
+        )}`
+    );
+    await loadData();
+}
