@@ -92,7 +92,8 @@ let appData = {
     categories: [],
     goals: [],
     transactions: [],
-    recurringBills: []
+    recurringBills: [],
+    advisorMemory: []
 };
 
 function getSelectedYear() {
@@ -355,6 +356,9 @@ async function loadData() {
 
         appData.recurringBills =
             result.recurringBills || [];
+
+        appData.advisorMemory =
+            result.advisorMemory || [];
 
         console.time("recalculateAccountBalances");
 
