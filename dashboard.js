@@ -625,43 +625,56 @@ function loadAdvisorDashboard() {
                     ${previousRecommendation.status}
                 </span>
             </div>
-            <div class="advisor-action-buttons">
-            
-                <button
-                    onclick="
-                    updateAdvisorStatus(
-                        '${previousRecommendation.recommendationId}',
-                        'COMPLETED',
-                        'Recommendation Completed'
-                    )">
-            
-                    ✅ Complete
-            
-                </button>
-            
-                <button
-                    onclick="
-                    updateAdvisorStatus(
-                        '${previousRecommendation.recommendationId}',
-                        'DEFERRED'
-                    )">
-            
-                    ⏸ Defer
-            
-                </button>
-            
-                <button
-                    onclick="
-                    updateAdvisorStatus(
-                        '${previousRecommendation.recommendationId}',
-                        'IGNORED'
-                    )">
-            
-                    ⚠️ Ignore
-            
-                </button>
-            
-            </div>
+                    ${previousRecommendation.status === "PENDING" ? `
+                    
+                    <div class="advisor-outcome-actions">
+                    
+                        <select
+                            class="advisor-outcome-select"
+                    
+                            onchange="
+                    
+                                if(this.value){
+                    
+                                    updateAdvisorStatus(
+                    
+                                        '${previousRecommendation.recommendationId}',
+                    
+                                        this.value,
+                    
+                                        this.value === 'COMPLETED'
+                    
+                                            ? 'Recommendation Completed'
+                    
+                                            : ''
+                    
+                                    );
+                    
+                                }
+                    
+                            ">
+                    
+                            <option value="">
+                                Select Outcome...
+                            </option>
+                    
+                            <option value="COMPLETED">
+                                ✅ Mark Completed
+                            </option>
+                    
+                            <option value="DEFERRED">
+                                ⏸ Deferred
+                            </option>
+                    
+                            <option value="IGNORED">
+                                ⚠ Ignored
+                            </option>
+                    
+                        </select>
+                    
+                    </div>
+                    
+                    ` : ""}
         </div>
         
         ` : ""}
