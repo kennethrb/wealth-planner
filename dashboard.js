@@ -663,9 +663,9 @@ function loadAdvisorDashboard() {
                                         this.value,
                     
                                         this.value === 'COMPLETED'
-                                            ? getRecommendationOutcome(
-                                                previousRecommendation
-                                              ).outcome
+                                        
+                                            ? '${outcomeDetails?.outcome || ""}'
+                                        
                                             : ''
                     
                                     );
