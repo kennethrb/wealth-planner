@@ -319,6 +319,14 @@ html {
     flex: 1;
 }
 
+.advisor-outcome {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    background: rgba(52,211,153,.08);
+    color: #34d399;
+}
+
 .impact-label {
     font-size: .8rem;
     text-transform: uppercase;
