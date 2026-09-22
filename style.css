@@ -279,6 +279,46 @@ html {
     background: var(--card-bg);
 }
 
+.advisor-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.advisor-status-completed {
+    background: rgba(16,185,129,.15);
+    color: #34d399;
+}
+
+.advisor-status-pending {
+    background: rgba(245,158,11,.15);
+    color: #fbbf24;
+}
+
+.advisor-status-deferred {
+    background: rgba(96,165,250,.15);
+    color: #60a5fa;
+}
+
+.advisor-status-ignored {
+    background: rgba(239,68,68,.15);
+    color: #f87171;
+}
+
+.advisor-action-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.advisor-action-buttons button {
+    flex: 1;
+}
+
 .impact-label {
     font-size: .8rem;
     text-transform: uppercase;
