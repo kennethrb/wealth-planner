@@ -510,6 +510,8 @@ function loadAdvisorDashboard() {
     const advisor = loadMonthlyWealthBrief();
     const narrative =
         advisor.narrative || {};
+    const confidenceBreakdown =
+        advisor.confidenceBreakdown;
     container.innerHTML = ` <div class="card wealth-advisor-premium">
         <div class="card-header">
             <h2>🧠 Wealth Advisor</h2>
@@ -528,7 +530,29 @@ function loadAdvisorDashboard() {
                 <div class="advisor-mini-label"> Advisor State </div>
                 <div class="advisor-mini-value"> ${advisor.advisorState} </div>
             </div>
+            <div class="advisor-section-card">
+                <div class="advisor-section-title">
+                    Confidence Drivers
+                </div>            
+                ${confidenceBreakdown.factors.map(factor => `
+                    <div class="allocation-row">
+                        <span>
+                            ${factor.message}
+                        </span>
+                        <strong>
+                            ${
+                                factor.status === "GOOD"
+                                    ? "✅"
+                                    : factor.status === "FAIR"
+                                        ? "🟡"
+                                        : "⚠️"
+                            }
+                        </strong>
+                    </div>
+                `).join("")}
+            </div>
         </div>
+        
         <div class="advisor-section-card">
             <div class="advisor-section-title"> 🎯 Why Now </div>
             <div class="advisor-section-text"> ${narrative.reason || "No explanation available"} </div>
