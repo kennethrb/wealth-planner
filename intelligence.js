@@ -747,6 +747,7 @@ function loadMonthlyWealthBrief() {
     window.qaWealthBrief = brief;
     window.qaExecutiveBrief =
         executiveBrief;
+    saveAdvisorRecommendation(brief);
     logQATrace("DI-015", "loadMonthlyWealthBrief", {}, {
         headline: brief.headline,
         confidenceLevel: brief.confidenceLevel,
@@ -3837,4 +3838,31 @@ function buildExplanationResponse() {
 function getTotalRecurringBills() {
     return (appData.recurringBills || []).filter(bill => bill.active !== false).reduce(
         (sum, bill) => sum + Number(bill.defaultAmount || 0), 0);
+}
+
+async function saveAdvisorRecommendation(brief) {
+    if (!brief.headline) return;
+    const latest = appData.advisorMemory?.slice(-1)[0];
+    if (latest && latest.recommendation === brief.headline) {
+        return;
+    }
+    await fetch(
+    
+        `${BASE_URL}?action=addAdvisorMemory` +
+    
+        `&mode=${appMode}` +
+    
+        `&recommendation=${encodeURIComponent(
+            brief.headline
+        )}` +
+    
+        `&confidence=${brief.confidenceScore}`
+    
+    );
+}
+
+function getLatestAdvisorMemory() {
+    const history = appData.advisorMemory || [];
+    if (!history.length) return null;
+    return history[history.length - 1];
 }
