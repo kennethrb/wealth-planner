@@ -619,7 +619,7 @@ function loadAdvisorDashboard() {
                         previousRecommendation.status === "COMPLETED"
                             ? "✅"
                             : previousRecommendation.status === "DEFERRED"
-                                ? "⏸"
+                                ? "⏸️"
                                 : previousRecommendation.status === "IGNORED"
                                     ? "⚠️"
                                     : "🟡"
@@ -689,7 +689,7 @@ function loadAdvisorDashboard() {
                     <div class="advisor-mini-value"> ${effectiveness.successRate}% </div>
                 </div>
                 <div class="advisor-mini-card">
-                    <div class="advisor-mini-label"> Completed </div>
+                    <div class="advisor-mini-label"> Executed </div>
                     <div class="advisor-mini-value"> ${effectiveness.completed} </div>
                 </div>
                 <div class="advisor-mini-card">
