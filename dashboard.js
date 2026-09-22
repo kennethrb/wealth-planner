@@ -516,6 +516,8 @@ function loadAdvisorDashboard() {
         advisor.confidenceBreakdown;
     const previousRecommendation =
         getLatestAdvisorMemory();
+    const effectiveness =
+        getAdvisorEffectiveness();
     container.innerHTML = ` <div class="card wealth-advisor-premium">
         <div class="card-header">
             <h2>🧠 Wealth Advisor</h2>
@@ -663,11 +665,11 @@ function loadAdvisorDashboard() {
                             </option>
                     
                             <option value="DEFERRED">
-                                ⏸ Deferred
+                                ⏸️ Deferred
                             </option>
                     
                             <option value="IGNORED">
-                                ⚠ Ignored
+                                ⚠️ Ignored
                             </option>
                     
                         </select>
@@ -678,6 +680,28 @@ function loadAdvisorDashboard() {
         </div>
         
         ` : ""}
+
+        <div class="advisor-section-card">
+            <div class="advisor-section-title"> Advisor Effectiveness </div>
+            <div class="advisor-mini-grid">
+                <div class="advisor-mini-card">
+                    <div class="advisor-mini-label"> Success Rate </div>
+                    <div class="advisor-mini-value"> ${effectiveness.successRate}% </div>
+                </div>
+                <div class="advisor-mini-card">
+                    <div class="advisor-mini-label"> Completed </div>
+                    <div class="advisor-mini-value"> ${effectiveness.completed} </div>
+                </div>
+                <div class="advisor-mini-card">
+                    <div class="advisor-mini-label"> Deferred </div>
+                    <div class="advisor-mini-value"> ${effectiveness.deferred} </div>
+                </div>
+                <div class="advisor-mini-card">
+                    <div class="advisor-mini-label"> Ignored </div>
+                    <div class="advisor-mini-value"> ${effectiveness.ignored} </div>
+                </div>
+            </div>
+        </div>
         
         <div class="advisor-chat-card">
             <div class="advisor-section-title"> Ask Wealth Advisor </div>
