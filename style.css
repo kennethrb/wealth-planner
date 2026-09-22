@@ -327,6 +327,24 @@ html {
     color: #34d399;
 }
 
+.advisor-outcome-actions {
+    margin-top: 14px;
+}
+
+.advisor-outcome-select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,.03);
+    color: var(--text-main);
+    font-weight: 600;
+}
+
+.advisor-outcome-select:hover {
+    border-color: rgba(16,185,129,.35);
+}
+
 .impact-label {
     font-size: .8rem;
     text-transform: uppercase;
