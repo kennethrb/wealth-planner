@@ -3867,6 +3867,25 @@ function getLatestAdvisorMemory() {
     return history[history.length - 1];
 }
 
+function getAdvisorEffectiveness() {
+    const history = appData.advisorMemory || [];
+    const total = history.length;
+    const completed = history.filter(item => item.status === "COMPLETED").length;
+    const deferred = history.filter(item => item.status === "DEFERRED").length;
+    const ignored = history.filter(item => item.status === "IGNORED").length;
+    const pending = history.filter(item => item.status === "PENDING").length;
+    const successRate = total > 0 ? Math.round(
+        (completed / total) * 100) : 0;
+    return {
+        total,
+        completed,
+        deferred,
+        ignored,
+        pending,
+        successRate
+    };
+}
+
 async function updateAdvisorStatus(
     recommendationId,
     status,
