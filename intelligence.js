@@ -3876,13 +3876,15 @@ function getAdvisorEffectiveness() {
     const pending = history.filter(item => item.status === "PENDING").length;
     const successRate = total > 0 ? Math.round(
         (completed / total) * 100) : 0;
+    const effectivenessLevel = successRate >= 80 ? "HIGH" : successRate >= 60 ? "MEDIUM" : "LOW";
     return {
         total,
         completed,
         deferred,
         ignored,
         pending,
-        successRate
+        successRate,
+        effectivenessLevel
     };
 }
 
