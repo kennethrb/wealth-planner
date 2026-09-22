@@ -725,9 +725,28 @@ function getMonthlyWealthBrief() {
     };
 }
 
+function getExecutiveWealthBrief() {
+    const brief = getMonthlyWealthBrief();
+    const opportunities = brief.opportunities?.length || 0;
+    const risks = brief.warnings?.length || 0;
+    return {
+        currentMode: brief.advisorState,
+        topAction: brief.headline,
+        confidence: brief.confidenceScore,
+        opportunities,
+        risks,
+        safeToSpend: getSafeToSpend().safeToSpend,
+        projectedBenefit: window.qaSweep?.total3YrBenefit || 0
+    };
+}
+
 function loadMonthlyWealthBrief() {
     const brief = getMonthlyWealthBrief();
+    const executiveBrief =
+        getExecutiveWealthBrief();
     window.qaWealthBrief = brief;
+    window.qaExecutiveBrief =
+        executiveBrief;
     logQATrace("DI-015", "loadMonthlyWealthBrief", {}, {
         headline: brief.headline,
         confidenceLevel: brief.confidenceLevel,
