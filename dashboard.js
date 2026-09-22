@@ -510,81 +510,51 @@ function loadAdvisorDashboard() {
     const advisor = loadMonthlyWealthBrief();
     const narrative =
         advisor.narrative || {};
-    container.innerHTML = ` <div class="card">
-    <div class="card-header">
-        <h2>🧠 Wealth Advisor</h2>
-    
-        <button
-            class="info-button"
-            onclick="showFeatureGuide('wealthAdvisor')">
-            ?
-        </button>
-    </div>
-    <div class="advisor-headline"> ${advisor.headline} </div>
-    <div class="advisor-status ${
-                advisor.confidenceLevel === "HIGH" ? "success" : advisor.confidenceLevel==="MEDIUM" ? "warning" : "danger" }"> ${advisor.confidenceLevel} (${advisor.confidenceScore}%) </div>
-    <div class="advisor-confidence-note"> ${advisor.confidenceReason} </div>
-    <div class="advisor-summary"> ${advisor.summary} </div>
-    <div class="advisor-impact">
-        <div class="impact-label"> Potential Wealth Impact </div>
-        <div class="impact-value"> ${advisor.projectedImpact} </div>
-    </div>
-    <hr>
-    <div class="advisor-action">
-    <div class="action-title">
-        Advisor Insight
-    </div>
-        <p> ${advisor.advisorReason} </p>
-    </div>
-    <hr>
-    <h3> Top Actions </h3> ${advisor.topActions.map(action => ` <div class="advisor-action priority">
-        <div class="action-title"> ${action.action} </div>
-        <div class="allocation-row">
-            <span> Source </span>
-            <strong> ${action.source} </strong>
+    container.innerHTML = ` <div class="card wealth-advisor-premium">
+        <div class="card-header">
+            <h2>🧠 Wealth Advisor</h2>
+            <button class="info-button" onclick="showFeatureGuide('wealthAdvisor')"> ? </button>
         </div>
-    </div> `).join("")} ${ advisor.warnings.length ? `
-    <hr>
-    <h3> Warnings </h3> ${advisor.warnings.map(w => ` <div class="advisor-action deficit">
-        <strong> ${w.category} </strong>
-        <p> ${w.message} </p>
-    </div> `).join("")} ` : "" } ${ advisor.opportunities.length ? `
-    <hr>
-    <h3> Opportunities </h3> ${advisor.opportunities.map(o => ` <div class="advisor-action opportunity">
-        <strong> ${o.category} </strong>
-        <p> ${o.action} </p>
-    </div> `).join("")} ` : "" }
-    <hr>
-    
-    <h3>Why This Action</h3>
-    <p>${narrative.reason || "No narrative available"}</p>
-    
-    <h3>Expected Wealth Impact</h3>
-    <p>${narrative.wealthImpact || "No wealth impact available"}</p>
-    
-    <h3>Risk If Ignored</h3>
-    <p>${narrative.riskIfIgnored || "No risk information available"}</p>
-
-    ${narrative.alternativeActions?.length ? `
-    <hr>
-    
-    <h3>Alternative Actions</h3>
-    
-    ${narrative.alternativeActions
-        .map(action => `<p>• ${action}</p>`)
-        .join("")}
-    ` : ""}
-    
-    <hr>
-    
-    <h3> Ask Wealth Advisor </h3>
-    <div class="advisor-chat">
-        <input type="text" id="advisorQuestion" placeholder="What should I do next?" class="advisor-input">
-        <button onclick="askAdvisorQuestion()" class="advisor-button"> Ask </button>
-    </div>
-    <div id="advisorResponse">
-    </div>
-</div> `;
+        <div class="advisor-recommendation">
+            <div class="advisor-recommendation-label"> Recommended Action </div>
+            <div class="advisor-recommendation-title"> ${advisor.headline} </div>
+        </div>
+        <div class="advisor-mini-grid">
+            <div class="advisor-mini-card">
+                <div class="advisor-mini-label"> Confidence </div>
+                <div class="advisor-mini-value"> ${advisor.confidenceScore}% </div>
+            </div>
+            <div class="advisor-mini-card">
+                <div class="advisor-mini-label"> Advisor State </div>
+                <div class="advisor-mini-value"> ${advisor.advisorState} </div>
+            </div>
+        </div>
+        <div class="advisor-section-card">
+            <div class="advisor-section-title"> 🎯 Why Now </div>
+            <div class="advisor-section-text"> ${narrative.reason || "No explanation available"} </div>
+        </div>
+        <div class="advisor-section-card">
+            <div class="advisor-section-title"> 📈 Wealth Impact </div>
+            <div class="advisor-section-text"> ${narrative.wealthImpact || "No impact available"} </div>
+        </div>
+        <div class="advisor-section-card">
+            <div class="advisor-section-title"> ⚠ Risk If Ignored </div>
+            <div class="advisor-section-text"> ${narrative.riskIfIgnored || "No risk available"} </div>
+        </div> ${narrative.alternativeActions?.length ? ` <div class="advisor-section-card">
+            <div class="advisor-section-title"> Alternative Actions </div> ${narrative.alternativeActions .map(action => ` <div class="advisor-alt-item"> ${action} </div> `) .join("")}
+        </div> ` : ""} <div class="advisor-impact">
+            <div class="impact-label"> Potential Wealth Impact </div>
+            <div class="impact-value"> ${advisor.projectedImpact} </div>
+        </div>
+        <div class="advisor-chat-card">
+            <div class="advisor-section-title"> Ask Wealth Advisor </div>
+            <div class="advisor-chat">
+                <input type="text" id="advisorQuestion" placeholder="What should I do next?" class="advisor-input">
+                <button onclick="askAdvisorQuestion()" class="advisor-button"> Ask </button>
+            </div>
+            <div id="advisorResponse"></div>
+        </div>
+    </div> `;
 }
 
 function askAdvisorQuestion() {
