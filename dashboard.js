@@ -518,6 +518,8 @@ function loadAdvisorDashboard() {
         getLatestAdvisorMemory();
     const effectiveness =
         getAdvisorEffectiveness();
+    const monthlyReview =
+        getMonthlyWealthReview();
     const outcomeDetails =
         previousRecommendation
             ? getRecommendationOutcome(
@@ -721,7 +723,44 @@ function loadAdvisorDashboard() {
             </div>
             <div class="advisor-outcome"> Advisor Performance: ${effectiveness.effectivenessLevel} </div>
         </div>
-        
+        <div class="advisor-section-card">
+            <div class="advisor-section-title"> Monthly Wealth Review </div>
+            <div class="advisor-mini-grid">
+                <div class="advisor-mini-card">
+                    <div class="advisor-mini-label"> Executed </div>
+                    <div class="advisor-mini-value"> ${monthlyReview.executed} </div>
+                </div>
+                <div class="advisor-mini-card">
+                    <div class="advisor-mini-label"> Deferred </div>
+                    <div class="advisor-mini-value"> ${monthlyReview.deferred} </div>
+                </div>
+                <div class="advisor-mini-card">
+                    <div class="advisor-mini-label"> Ignored </div>
+                    <div class="advisor-mini-value"> ${monthlyReview.ignored} </div>
+                </div>
+                <div class="advisor-mini-card">
+                    <div class="advisor-mini-label"> Success Rate </div>
+                    <div class="advisor-mini-value"> ${monthlyReview.successRate}% </div>
+                </div>
+            </div>
+            <div class="advisor-outcome"> Top Outcome <strong> ${monthlyReview.topOutcome} </strong>
+            </div>
+            <div class="advisor-outcome"> Next Focus <strong> ${monthlyReview.nextFocus} </strong>
+            </div>
+            <div class="advisor-outcome">
+            
+                Wealth Impact Created
+            
+                <strong>
+            
+                    ${formatCurrency(
+                        monthlyReview.wealthImpactCreated
+                    )}
+            
+                </strong>
+            
+            </div>
+        </div>
         <div class="advisor-chat-card">
             <div class="advisor-section-title"> Ask Wealth Advisor </div>
             <div class="advisor-chat">
