@@ -508,6 +508,8 @@ function loadAdvisorDashboard() {
     const container = document.getElementById("wealthAdvisor");
     if (!container) return;
     const advisor = loadMonthlyWealthBrief();
+    const executiveBrief =
+        window.qaExecutiveBrief;
     const narrative =
         advisor.narrative || {};
     const confidenceBreakdown =
@@ -521,14 +523,26 @@ function loadAdvisorDashboard() {
             <div class="advisor-recommendation-label"> Recommended Action </div>
             <div class="advisor-recommendation-title"> ${advisor.headline} </div>
         </div>
+        <div class="advisor-impact">
+            <div class="impact-label"> Safe To Spend </div>
+            <div class="impact-value"> ${formatCurrency( executiveBrief.safeToSpend )} </div>
+        </div>
         <div class="advisor-mini-grid">
             <div class="advisor-mini-card">
-                <div class="advisor-mini-label"> Confidence </div>
-                <div class="advisor-mini-value"> ${advisor.confidenceScore}% </div>
+                <div class="advisor-mini-label"> Current Mode </div>
+                <div class="advisor-mini-value"> ${executiveBrief.currentMode} </div>
             </div>
             <div class="advisor-mini-card">
-                <div class="advisor-mini-label"> Advisor State </div>
-                <div class="advisor-mini-value"> ${advisor.advisorState} </div>
+                <div class="advisor-mini-label"> Confidence </div>
+                <div class="advisor-mini-value"> ${executiveBrief.confidence}% </div>
+            </div>
+            <div class="advisor-mini-card">
+                <div class="advisor-mini-label"> Opportunities </div>
+                <div class="advisor-mini-value"> ${executiveBrief.opportunities} </div>
+            </div>
+            <div class="advisor-mini-card">
+                <div class="advisor-mini-label"> Risks </div>
+                <div class="advisor-mini-value"> ${executiveBrief.risks} </div>
             </div>
         </div>
         <div class="advisor-section-card">
@@ -561,7 +575,7 @@ function loadAdvisorDashboard() {
             <div class="advisor-section-text"> ${narrative.wealthImpact || "No impact available"} </div>
         </div>
         <div class="advisor-section-card">
-            <div class="advisor-section-title"> ⚠ Risk If Ignored </div>
+            <div class="advisor-section-title"> ⚠️ Risk If Ignored </div>
             <div class="advisor-section-text"> ${narrative.riskIfIgnored || "No risk available"} </div>
         </div> ${narrative.alternativeActions?.length ? ` <div class="advisor-section-card">
             <div class="advisor-section-title"> Alternative Actions </div> ${narrative.alternativeActions .map(action => ` <div class="advisor-alt-item"> ${action} </div> `) .join("")}
