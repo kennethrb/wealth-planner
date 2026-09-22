@@ -518,6 +518,12 @@ function loadAdvisorDashboard() {
         getLatestAdvisorMemory();
     const effectiveness =
         getAdvisorEffectiveness();
+    const outcomeDetails =
+        previousRecommendation
+            ? getRecommendationOutcome(
+                previousRecommendation
+              )
+            : null;
     container.innerHTML = ` <div class="card wealth-advisor-premium">
         <div class="card-header">
             <h2>🧠 Wealth Advisor</h2>
@@ -599,11 +605,23 @@ function loadAdvisorDashboard() {
                 ${previousRecommendation.recommendation}
                 ${previousRecommendation.outcome ? `
                 
-                <div class="advisor-outcome">
+                    <div class="advisor-outcome">
                 
-                    ${previousRecommendation.outcome}
+                        ${previousRecommendation.outcome}
                 
-                </div>
+                    </div>
+                
+                    <div class="advisor-outcome">
+                
+                        Wealth Impact
+                
+                        <strong>
+                
+                            ${outcomeDetails.wealthImpact}
+                
+                        </strong>
+                
+                    </div>
                 
                 ` : ""}
             </div>
@@ -645,9 +663,9 @@ function loadAdvisorDashboard() {
                                         this.value,
                     
                                         this.value === 'COMPLETED'
-                    
-                                            ? 'Recommendation Completed'
-                    
+                                            ? getRecommendationOutcome(
+                                                previousRecommendation
+                                              ).outcome
                                             : ''
                     
                                     );
