@@ -3888,6 +3888,50 @@ function getAdvisorEffectiveness() {
     };
 }
 
+function getRecommendationOutcome(recommendation) {
+    if (!recommendation) {
+        return {
+            outcome: "Completed",
+            wealthImpact: "No impact recorded"
+        };
+    }
+    const text = String(recommendation.recommendation || "").toLowerCase();
+    if (text.includes("liquidity")) {
+        return {
+            outcome: "Protection Gap Addressed",
+            wealthImpact: "Reduced cash flow risk"
+        };
+    }
+    if (text.includes("emergency")) {
+        return {
+            outcome: "Emergency Fund Strengthened",
+            wealthImpact: "Improved financial resilience"
+        };
+    }
+    if (text.includes("debt")) {
+        return {
+            outcome: "Debt Position Improved",
+            wealthImpact: "Reduced future interest burden"
+        };
+    }
+    if (text.includes("goal")) {
+        return {
+            outcome: "Goal Progress Accelerated",
+            wealthImpact: "Faster goal completion"
+        };
+    }
+    if (text.includes("invest")) {
+        return {
+            outcome: "Capital Deployed",
+            wealthImpact: "Long-term wealth growth potential"
+        };
+    }
+    return {
+        outcome: "Recommendation Executed",
+        wealthImpact: "Positive wealth behavior recorded"
+    };
+}
+
 async function updateAdvisorStatus(
     recommendationId,
     status,
