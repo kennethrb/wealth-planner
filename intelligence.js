@@ -3947,4 +3947,6 @@ async function updateAdvisorStatus(
         )}`
     );
     await loadData();
+
+    loadAdvisorDashboard();
 }
