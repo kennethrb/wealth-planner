@@ -330,6 +330,59 @@ function getWealthAdvisorSummary() {
     };
 }
 
+function getAdvisorNarrative() {
+    const advisor = getWealthAdvisorSummary();
+    const topAction = advisor.topAction;
+    let narrative = {
+        recommendation: topAction?.action || "",
+        reason: "",
+        urgency: "MEDIUM",
+        wealthImpact: "",
+        riskIfIgnored: "",
+        alternativeActions: [],
+        confidenceFactors: []
+    };
+    if (!topAction) {
+        narrative.reason = "No actionable opportunity detected.";
+        narrative.wealthImpact = "Current position appears optimized.";
+        narrative.riskIfIgnored = "No immediate risk detected.";
+        return narrative;
+    }
+    switch (topAction.category) {
+        case "Cash Flow Protection":
+            narrative.reason = "Available cash is insufficient to safely cover upcoming obligations.";
+            narrative.urgency = "HIGH";
+            narrative.wealthImpact = "Prevents overdrafts, missed payments, and liquidity stress.";
+            narrative.riskIfIgnored = "Increased risk of cash shortfall before next payday.";
+            break;
+        case "Emergency Fund":
+            narrative.reason = "Emergency reserves remain below target levels.";
+            narrative.urgency = "HIGH";
+            narrative.wealthImpact = "Improves resilience and protects long-term wealth.";
+            narrative.riskIfIgnored = "Unexpected expenses may require debt or asset liquidation.";
+            break;
+        case "Goal Completion":
+            narrative.reason = window.qaGoalFundingOptimizer?.reason || "Goal can be accelerated immediately.";
+            narrative.urgency = "MEDIUM";
+            narrative.wealthImpact = "Improves goal completion velocity.";
+            narrative.riskIfIgnored = "Goal completion will take longer.";
+            break;
+        case "Investments":
+            narrative.reason = "Protection requirements have been satisfied.";
+            narrative.urgency = "MEDIUM";
+            narrative.wealthImpact = "Potential long-term net worth growth.";
+            narrative.riskIfIgnored = "Idle cash may remain unproductive.";
+            break;
+        case "Debt Reduction":
+            narrative.reason = "Debt reduction improves future cash flow flexibility.";
+            narrative.wealthImpact = "Reduces future financial drag.";
+            narrative.riskIfIgnored = "Additional interest will continue accumulating.";
+            break;
+    }
+    narrative.alternativeActions = advisor.actions.slice(1).map(action => action.action);
+    return narrative;
+}
+
 /**
  * =========================================================
  * DI-012 Wealth Opportunity Engine
@@ -563,6 +616,8 @@ function getMonthlyWealthBrief() {
         );
     const opportunityEngine =
         getWealthOpportunities();
+    const narrative =
+        getAdvisorNarrative();
 
     
     return {
@@ -617,7 +672,9 @@ function getMonthlyWealthBrief() {
             advisor.warnings,
     
         opportunities:
-            opportunityEngine.opportunities
+            opportunityEngine.opportunities,
+        
+        narrative
     };
 }
 
