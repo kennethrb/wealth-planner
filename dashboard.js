@@ -701,6 +701,7 @@ function loadAdvisorDashboard() {
                     <div class="advisor-mini-value"> ${effectiveness.ignored} </div>
                 </div>
             </div>
+            <div class="advisor-outcome"> Advisor Performance: ${effectiveness.effectivenessLevel} </div>
         </div>
         
         <div class="advisor-chat-card">
