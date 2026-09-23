@@ -172,53 +172,6 @@
         <button class="btn-danger" onclick="deleteCategory()">🗑 Delete Category</button>
       </div>
     </section>
-
-    <!-- Add Budget Item Form -->
-    <section class="card">
-      <h2>➕ Add Budget Item</h2>
-      <div class="form-row">
-        <input type="number" id="newYear" placeholder="Year">
-        <select id="newMonth">
-          <option value="Jan">Jan</option>
-          <option value="Feb">Feb</option>
-          <option value="Mar">Mar</option>
-          <option value="Apr">Apr</option>
-          <option value="May">May</option>
-          <option value="Jun">Jun</option>
-          <option value="Jul">Jul</option>
-          <option value="Aug">Aug</option>
-          <option value="Sep">Sep</option>
-          <option value="Oct">Oct</option>
-          <option value="Nov">Nov</option>
-          <option value="Dec">Dec</option>
-        </select>
-        <select id="newCategory"></select>
-        <input type="number" id="newAmount" placeholder="Amount">
-        <button onclick="addBudgetItem()">➕ Add Budget</button>
-      </div>
-    </section>
-
-    <!-- Budget Planner Section -->
-    <section class="card">
-      <h2>📅 Budget Planner</h2>
-      <div class="form-row">
-        <select
-          id="budgetYear"
-          onchange="changeBudgetYear()">
-        </select>
-      </div>
-    
-      <div id="budget"
-           class="table-responsive"></div>
-    
-    </section>
-
-    <!-- Monthly Summary Section -->
-    <section class="card">
-      <h2>📊 Monthly Summary</h2>
-      <!-- Responsive Scroll Container -->
-      <div id="summary" class="table-responsive"></div>
-    </section>
     
     <section class="card">
         <h2>🔁 Recurring Bills</h2>
@@ -365,7 +318,7 @@
 
     <!-- Budget vs Actual -->
     <section id="performance" class="card">
-      <h2>📊 Budget vs Actual</h2>    
+      <h2>📊 Expected vs Actual</h2>  
       <div id="budgetVsActual"></div>
     </section>
 
