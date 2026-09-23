@@ -32,26 +32,6 @@
     <a href="#performance" class="nav-item"><span class="icon">📈</span><span>Performance</span></a>
     <a href="#goals" class="nav-item"><span class="icon">🎯</span><span>Goals</span></a>
   </div>
-
-  <!-- Right / Mobile Bottom: Analytics Selector -->
-  <div class="period-selector">
-      <span class="period-chip"> Analytics View </span>
-      <select id="viewMonth" onchange="changeViewPeriod()">
-          <option value="Jan">Jan</option>
-          <option value="Feb">Feb</option>
-          <option value="Mar">Mar</option>
-          <option value="Apr">Apr</option>
-          <option value="May">May</option>
-          <option value="Jun">Jun</option>
-          <option value="Jul">Jul</option>
-          <option value="Aug">Aug</option>
-          <option value="Sep">Sep</option>
-          <option value="Oct">Oct</option>
-          <option value="Nov">Nov</option>
-          <option value="Dec">Dec</option>
-      </select>
-      <select id="viewYear" onchange="changeViewPeriod()"></select>
-  </div>
 </nav>
 
 
@@ -304,7 +284,7 @@
     <div class="section-header">
   
     <h2>
-      📈 Performance
+      📊 Analytics
     </h2>
   
     <p>
@@ -315,10 +295,19 @@
 
 
     <!-- Budget vs Actual -->
-    <section id="performance" class="card">
-      <h2>📊 Expected vs Actual</h2>  
-      <div id="budgetVsActual"></div>
-    </section>
+      <section id="performance" class="card">
+          <div class="analytics-toolbar">
+              <span class="period-chip"> Analytics Period </span>
+              <select id="viewMonth" onchange="changeViewPeriod()"> ... </select>
+              <select id="viewYear" onchange="changeViewPeriod()">
+              </select>
+          </div>
+          <h2>📊 Expected vs Actual</h2>
+          <div id="performanceSummary"></div>
+          <div id="budgetVsActual"></div>
+          <hr>
+          <div id="personalInflation"></div>
+      </section>
 
   <!-- 🎯 Wealth Goals -->
       <div class="section-header">
