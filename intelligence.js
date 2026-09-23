@@ -2530,22 +2530,6 @@ async function loadPersonalInflation() {
         }
     });
 
-    if (currentExpense === 0 && previousExpense === 0) {
-        sourceUsed = "BudgetPlan";
-        appData.budget.forEach(item => {
-            const type = categoryTypes[item.category];
-            if (type !== "Expense") return;
-            const amount = Number(item.plannedAmount || 0);
-            const itemYear = Number(item.year);
-            if (itemYear === currentYear && item.month === currentMonth) {
-                currentExpense += amount;
-            }
-            if (itemYear === previousYear && item.month === currentMonth) {
-                previousExpense += amount;
-            }
-        });
-    }
-
     if (previousExpense === 0 && appData.transactions && appData.transactions.length > 0) {
         sourceUsed = "Transactions (Fallback)";
         appData.transactions.forEach(tx => {
