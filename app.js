@@ -23,11 +23,18 @@ function loadViewYearDropdown() {
 
     const years =
         [...new Set(
-            appData.budget.map(
-                item => Number(item.year)
-            )
+            (appData.transactions || [])
+                .map(tx => {
+                    const d =
+                        new Date(
+                            tx.Date ||
+                            tx.date
+                        );
+    
+                    return d.getFullYear();
+                })
+                .filter(Boolean)
         )]
-        .filter(Boolean)
         .sort();
 
     if (years.length === 0) {
@@ -52,16 +59,6 @@ function loadViewYearDropdown() {
         viewState.year;
 }
 
-function getBudgetDataForPeriod() {
-
-    const year = getViewYear();
-    const month = getViewMonth();
-
-    return appData.budget.filter(item =>
-        Number(item.year) === Number(year) &&
-        item.month === month
-    );
-}
 
 function getCategoryTypeMap() {
 
@@ -422,10 +419,19 @@ async function loadScenarioCategories() {
 }
 
 function getCurrentAmount(category) {
-    const selectedYear = getViewYear();
-    const selectedMonth = getViewMonth();
-    const item = appData.budget.find(row => Number(row.year) === selectedYear && row.category === category && row.month === selectedMonth);
-    return item ? Number(item.plannedAmount) : 0;
+
+    const bill =
+        (appData.recurringBills || [])
+            .find(
+                b =>
+                    b.budgetPosition === category
+            );
+
+    return bill
+        ? Number(
+            bill.defaultAmount || 0
+          )
+        : 0;
 }
 
 function runScenario() {
@@ -441,7 +447,7 @@ function runScenario() {
         debt = 0;
     const selectedYear = getViewYear();
     const selectedMonth = getViewMonth();
-    appData.budget.filter(item => Number(item.year) === selectedYear && item.month === selectedMonth).forEach(item => {
+    appData.recurringBills.filter(item => Number(item.year) === selectedYear && item.month === selectedMonth).forEach(item => {
         const cat = appData.categories.find(c => c.categoryName === item.category);
         if (!cat) return;
         const amount = Number(item.plannedAmount);
@@ -777,9 +783,6 @@ async function initializeApp() {
     
     await refreshUI();
     showIntelTab('advisor');
-    // Default Add Budget Item year to latest budget year
-    const years = [...new Set(appData.budget.map(item => Number(item.year)))].filter(Boolean);
-    const latestYear = years.length > 0 ? Math.max(...years) : new Date().getFullYear();
 
   
     setupScrollSpy();
