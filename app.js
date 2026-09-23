@@ -97,7 +97,9 @@ let appData = {
 };
 
 function getSelectedYear() {
-    return Number(document.getElementById("budgetYear")?.value) || new Date().getFullYear();
+    return Number(
+        document.getElementById("viewYear")?.value
+    ) || new Date().getFullYear();
 }
 
 function getSelectedMonth() {
@@ -691,7 +693,6 @@ async function changeViewPeriod() {
 }
 
 async function refreshUI() {
-    loadYearDropdown();
     loadViewYearDropdown();
     
     loadCategoryDropdown();
@@ -737,8 +738,6 @@ async function refreshUI() {
         loadRecurringBills(),
         loadGoals(),
         loadAccounts(),
-        loadBudgetPlanner(),
-        loadSummary(),
         loadFundingPlan()
     ]);
 }
@@ -772,10 +771,6 @@ async function initializeApp() {
     // Default Add Budget Item year to latest budget year
     const years = [...new Set(appData.budget.map(item => Number(item.year)))].filter(Boolean);
     const latestYear = years.length > 0 ? Math.max(...years) : new Date().getFullYear();
-    const newYearInput = document.getElementById("newYear");
-    if (newYearInput) {
-        newYearInput.value = latestYear;
-    }
 
   
     setupScrollSpy();
