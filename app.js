@@ -85,7 +85,6 @@ let appMode =
 
 let appData = {
     accounts: [],
-    budget: [],
     categories: [],
     goals: [],
     transactions: [],
@@ -340,9 +339,6 @@ async function loadData() {
 
         appData.accounts =
             result.accounts || [];
-
-        appData.budget =
-            result.budget || [];
 
         appData.categories =
             result.categories || [];
