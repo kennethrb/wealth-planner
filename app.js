@@ -628,7 +628,6 @@ async function refreshFinancialViews() {
         loadUpcomingBills(),
         loadFinancialHealth(),
         loadProjection(),
-        loadSummary(),
         loadFundingPlan(),
         loadBudgetVsActual(),
         loadBufferVsInvest(),
@@ -687,7 +686,6 @@ async function changeViewPeriod() {
         loadSafeToSpendCard(),
         loadPaydayPlan(),
         loadBufferVsInvest(),
-        loadSummary(),
         loadScenarioWorkbench()
     ]);
 }
