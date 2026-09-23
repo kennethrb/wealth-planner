@@ -2,6 +2,59 @@
  * Wealth Planner Intelligence Engine
  */
 
+function getCommitmentSummary() {
+    const activeBills = (appData.recurringBills || []).filter(bill => bill.active !== false);
+    const protectedDebt = activeBills.filter(bill => String(bill.budgetType || "").toLowerCase() === "debt").reduce(
+        (sum, bill) => sum + Number(bill.defaultAmount || 0), 0);
+    const protectedBills = activeBills.filter(bill => String(bill.budgetType || "").toLowerCase() !== "debt").reduce(
+        (sum, bill) => sum + Number(bill.defaultAmount || 0), 0);
+    const goalFunding = (appData.goals || []).filter(goal => getGoalStatus(goal) === "ACTIVE").reduce(
+        (sum, goal) => sum + Number(goal.monthlyContribution || 0), 0);
+    const totalCommitments = protectedBills + protectedDebt + goalFunding;
+    const availableCash = getTotalLiquidAssets(appData.accounts || []);
+    const availableCapital = Math.max(0, availableCash - totalCommitments);
+    return {
+        protectedBills,
+        protectedDebt,
+        goalFunding,
+        totalCommitments,
+        availableCash,
+        availableCapital
+    };
+}
+
+function getWealthFlowSummary() {
+    const transactions = appData.transactions || [];
+    const currentYear = getViewYear();
+    const currentMonth = getViewMonth();
+    let income = 0;
+    let expense = 0;
+    let debt = 0;
+    transactions.forEach(tx => {
+        const txDate = new Date(tx.Date || tx.date);
+        if (txDate.getFullYear() !== currentYear) return;
+        const txMonth = txDate.toLocaleString("en-US", {
+            month: "short"
+        });
+        if (txMonth !== currentMonth) return;
+        const amount = Number(tx.Amount || tx.amount || 0);
+        const type = String(tx["Budget Type"] || tx.budgetType || "");
+        if (type === "Income") income += amount;
+        if (type === "Expense") expense += amount;
+        if (type === "Debt") debt += amount;
+    });
+    const goalFunding = (appData.goals || []).filter(goal => getGoalStatus(goal) === "ACTIVE").reduce(
+        (sum, goal) => sum + Number(goal.monthlyContribution || 0), 0);
+    const monthlySurplus = income - expense - debt - goalFunding;
+    return {
+        income,
+        expense,
+        debt,
+        goalFunding,
+        monthlySurplus
+    };
+}
+
 //Create Budget Summary Engine
 function getBudgetSummary(year = getViewYear(), month = getViewMonth()) {
     const categoryTypes = {};
@@ -34,15 +87,15 @@ function getBudgetSummary(year = getViewYear(), month = getViewMonth()) {
 
 //Create Capital Position Engine
 function getCapitalPosition() {
-    const budget = getBudgetSummary();
-    const availableCash = getTotalLiquidAssets(appData.accounts || []);
-    const bufferTarget = budget.monthlyObligations * CONFIG.buffer.months;
-    const excessCash = Math.max(0, availableCash - bufferTarget);
+    const commitments = getCommitmentSummary();
+    const bufferTarget = commitments.totalCommitments * CONFIG.buffer.months;
+    const excessCash = Math.max(0, commitments.availableCash - bufferTarget);
     return {
-        availableCash,
-        monthlyObligations: budget.monthlyObligations,
+        availableCash: commitments.availableCash,
+        monthlyObligations: commitments.totalCommitments,
         bufferTarget,
-        excessCash
+        excessCash,
+        commitmentDriven: true
     };
 }
 
@@ -809,7 +862,8 @@ function getAdvisorExplanation() {
  * ============================================================
  */
 function getEmergencyFundGap() {
-    const monthlyObligations = getBudgetSummary().monthlyObligations;
+    const commitments = getCommitmentSummary();
+    const monthlyObligations = commitments.totalCommitments;
     const targetEmergencyFund = monthlyObligations * CONFIG.emergencyFundMonths;
     const emergencyGoals = (appData.goals || []).filter(goal => String(goal.goal || "").toLowerCase().includes("emergency"));
     const currentEmergencyFund = emergencyGoals.reduce(
@@ -957,8 +1011,8 @@ function getSafeToSpend() {
                 0
             );
     const monthlyObligations =
-        getBudgetSummary()
-            .monthlyObligations;
+        getCommitmentSummary()
+            .totalCommitments;
     
     const protectedBuffer =
         monthlyObligations *
@@ -1778,13 +1832,11 @@ async function loadNetWorthVelocity() {
         categoryTypes[cat.categoryName] = cat.budgetType;
     });
 
-    const budget = getBudgetSummary();
-    
-    const income = budget.income;
-    const expense = budget.expense;
-    const savings = budget.savings;
-    const debt = budget.debt;
-
+    const flow = getWealthFlowSummary();
+    const income = flow.income;
+    const expense = flow.expense;
+    const debt = flow.debt;
+    const savings = flow.goalFunding;
     const monthlyVelocity = savings + debt;
     const annualVelocity = monthlyVelocity * 12;
     const projectedNetWorth = netWorth + annualVelocity;
@@ -1864,12 +1916,12 @@ async function loadFinancialHealthAdvisor() {
         categoryTypes[cat.categoryName] = cat.budgetType;
     });
 
-    const budget = getBudgetSummary();
-    const income = budget.income;
-    const expenses = budget.expense;
-    const savings = budget.savings;
-    const debt = budget.debt;
-    const monthlySurplus = budget.monthlySurplus;
+    const flow = getWealthFlowSummary();
+    const income = flow.income;
+    const expenses = flow.expense;
+    const debt = flow.debt;
+    const savings = flow.goalFunding;
+    const monthlySurplus = flow.monthlySurplus;
     const savingsRate = income > 0 ? (savings / income) * 100 : 0;
     const debtRate = income > 0 ? (debt / income) * 100 : 0;
     
@@ -2367,8 +2419,8 @@ async function loadAssetAllocationAdvisor() {
 async function loadWealthProjectionAccelerator() {
         const container = document.getElementById("wealthProjectionAccelerator");
         if (!container) return;
-        const budget = getBudgetSummary();
-        const monthlySurplus = budget.monthlySurplus;
+        const flow = getWealthFlowSummary();
+        const monthlySurplus = flow.monthlySurplus;
         const investableAmount = Math.max(0, monthlySurplus * CONFIG.projection.investableRatio); // Assume 70% sweep into investments
         const annualReturnRate =
             CONFIG.wealthProjection.annualReturn; // Assumed 7% conservative annual return
