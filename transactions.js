@@ -252,7 +252,7 @@ function loadTransactions() {
                 "";
             const amountText =
                 budgetType === "Income"
-                    ? `+ ${formatCurrency(tx.Amount || tx.amount)}`
+                    ? `+${formatCurrency(tx.Amount || tx.amount)}`
                     : formatCurrency(tx.Amount || tx.amount);
         
             return `
