@@ -503,7 +503,7 @@ targetContainer.innerHTML = `
 `;
 }
 
-function loadBudgetVsActual() {
+function loadExpectedVsActual() {
     const container = document.getElementById("budgetVsActual");
     if (!container) return;
     const selectedYear = getViewYear();
@@ -511,10 +511,10 @@ function loadBudgetVsActual() {
     const monthMap = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
     const targetMonthIndex = monthMap[selectedMonth] ?? 0;
 
-    const budgetMap = {};
-    (appData.budget || []).filter(row => Number(row.year) === selectedYear && row.month === selectedMonth).forEach(row => {
-        const cat = (row.category || "").trim();
-        if (cat) budgetMap[cat] = Number(row.plannedAmount) || 0;
+    const expectedMap = {};
+    (appData.recurringBills || []).filter(bill => bill.active !== false).forEach(bill => {
+        const position = bill.budgetPosition;
+        expectedMap[position] = (expectedMap[position] || 0) + Number(bill.defaultAmount || 0);
     });
 
     const actualMap = {};
@@ -539,7 +539,7 @@ function loadBudgetVsActual() {
         actualMap[category] = (actualMap[category] || 0) + Math.abs(Number(rawAmount) || 0);
     });
 
-    const categories = [...new Set([...Object.keys(budgetMap), ...Object.keys(actualMap)])];
+    const categories = [...new Set([...Object.keys(expectedMap), ...Object.keys(actualMap)])];
     const categoryTypes = {};
     (appData.categories || []).forEach(cat => {
         const catName = (cat.categoryName || cat.category || cat.name || "").trim();
@@ -553,7 +553,13 @@ function loadBudgetVsActual() {
     let rows = "";
 
     // Track totals per financial category
-    const sectionTotals = { Income: { b: 0, a: 0 }, Expense: { b: 0, a: 0 }, Savings: { b: 0, a: 0 }, Debt: { b: 0, a: 0 }, Other: { b: 0, a: 0 } };
+    const sectionTotals = {
+        Income: { expected: 0, actual: 0 },
+        Expense: { expected: 0, actual: 0 },
+        Savings: { expected: 0, actual: 0 },
+        Debt: { expected: 0, actual: 0 },
+        Other: { expected: 0, actual: 0 }
+    };
 
     sections.forEach(section => {
         const sectionCategories = categories.filter(cat => (categoryTypes[cat] || "Other") === section);
@@ -561,20 +567,20 @@ function loadBudgetVsActual() {
 
         rows += `<tr class="table-secondary section-${section.toLowerCase()}"><td colspan="4"><strong>${section.toUpperCase()}</strong></td></tr>`;
         
-        let sBudget = 0;
+        let sExpected = 0;
         let sActual = 0;
 
         sectionCategories.forEach(cat => {
-            const budget = budgetMap[cat] || 0;
+            const expected = expectedMap[cat] || 0;
             const actual = actualMap[cat] || 0;
-            sBudget += budget;
+            sExpected += expected;
             sActual += actual;
-            const variance = section === "Income" ? actual - budget : budget - actual;
+            const variance = section === "Income" ? actual - expected : expected - actual;
 
             rows += `
                 <tr>
                     <td>${cat}</td>
-                    <td>${formatCurrency(budget)}</td>
+                    <td>${formatCurrency(expected)}</td>
                     <td>${formatCurrency(actual)}</td>
                     <td class="${variance >= 0 ? "text-success" : "text-danger"}">
                         ${variance >= 0 ? "+" : ""}${formatCurrency(variance)}
@@ -582,14 +588,14 @@ function loadBudgetVsActual() {
                 </tr>`;
         });
 
-        sectionTotals[section].b = sBudget;
-        sectionTotals[section].a = sActual;
+        sectionTotals[section].expected = sExpected;
+        sectionTotals[section].actual = sActual;
 
-        const sVariance = section === "Income" ? sActual - sBudget : sBudget - sActual;
+        const sVariance = section === "Income" ? sActual - sExpected : sExpected - sActual;
         rows += `
             <tr class="section-total total-${section.toLowerCase()}">
                 <td><strong>TOTAL ${section.toUpperCase()}</strong></td>
-                <td><strong>${formatCurrency(sBudget)}</strong></td>
+                <td><strong>${formatCurrency(sExpected)}</strong></td>
                 <td><strong>${formatCurrency(sActual)}</strong></td>
                 <td class="${sVariance >= 0 ? "text-success" : "text-danger"}">
                     <strong>${sVariance >= 0 ? "+" : ""}${formatCurrency(sVariance)}</strong>
@@ -598,14 +604,14 @@ function loadBudgetVsActual() {
     });
 
     // Compute Net Grand Total (Net Surplus = Income - Outflows)
-    const netBudget = sectionTotals.Income.b - (sectionTotals.Expense.b + sectionTotals.Savings.b + sectionTotals.Debt.b + sectionTotals.Other.b);
-    const netActual = sectionTotals.Income.a - (sectionTotals.Expense.a + sectionTotals.Savings.a + sectionTotals.Debt.a + sectionTotals.Other.a);
-    const netVariance = netActual - netBudget;
+    const netExpected = sectionTotals.Income.expected - (sectionTotals.Expense.expected + sectionTotals.Savings.expected + sectionTotals.Debt.expected + sectionTotals.Other.expected);
+    const netActual = sectionTotals.Income.actual - (sectionTotals.Expense.actual + sectionTotals.Savings.actual + sectionTotals.Debt.actual + sectionTotals.Other.actual);
+    const netVariance = netActual - netExpected;
 
     rows += `
         <tr class="grand-total">
             <td><strong>NET SURPLUS / DEFICIT</strong></td>
-            <td><strong>${formatCurrency(netBudget)}</strong></td>
+            <td><strong>${formatCurrency(netExpected)}</strong></td>
             <td><strong>${formatCurrency(netActual)}</strong></td>
             <td class="${netVariance >= 0 ? "text-success" : "text-danger"}">
                 <strong>${netVariance >= 0 ? "+" : ""}${formatCurrency(netVariance)}</strong>
@@ -616,7 +622,12 @@ function loadBudgetVsActual() {
         <div class="table-responsive">
             <table class="table table-hover align-middle">
                 <thead>
-                    <tr><th>Category</th><th>Budget</th><th>Actual</th><th>Variance</th></tr>
+                    <tr>
+                        <th>Category</th>
+                        <th>Expected</th>
+                        <th>Actual</th>
+                        <th>Variance</th>
+                    </tr>
                 </thead>
                 <tbody>${rows || '<tr><td colspan="4" class="text-center text-muted">No data available for this period.</td></tr>'}</tbody>
             </table>
@@ -629,7 +640,7 @@ async function refreshFinancialViews() {
         loadFinancialHealth(),
         loadProjection(),
         loadFundingPlan(),
-        loadBudgetVsActual(),
+        loadExpectedVsActual(),
         loadBufferVsInvest(),
         loadFinancialHealthAdvisor(),       // DI-001
         loadFundingOptimizationAdvisor(),  // DI-002
@@ -667,7 +678,7 @@ async function changeViewPeriod() {
         loadFinancialHealth(),
         loadProjection(),
         loadFundingPlan(),
-        loadBudgetVsActual(),
+        loadExpectedVsActual(),
         loadFinancialHealthAdvisor(),       // DI-001
         loadFundingOptimizationAdvisor(),  // DI-002
         loadAssetAllocationAdvisor(),
@@ -705,7 +716,7 @@ async function refreshUI() {
     loadRecurringBillPositions();
 
     loadTransactions();
-    loadBudgetVsActual();
+    loadExpectedVsActual();
     loadScenarioCategories();
 
     await Promise.all([
