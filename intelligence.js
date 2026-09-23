@@ -61,36 +61,6 @@ function getWealthFlowSummary() {
     };
 }
 
-//Create Budget Summary Engine
-function getBudgetSummary(year = getViewYear(), month = getViewMonth()) {
-    const categoryTypes = {};
-    (appData.categories || []).forEach(cat => {
-        categoryTypes[cat.categoryName] = cat.budgetType;
-    });
-    let income = 0;
-    let expense = 0;
-    let savings = 0;
-    let debt = 0;
-    (appData.budget || []).forEach(item => {
-        if (Number(item.year) !== year) return;
-        if (item.month !== month) return;
-        const amount = Number(item.plannedAmount || 0);
-        const type = categoryTypes[item.category];
-        if (type === "Income") income += amount;
-        if (type === "Expense") expense += amount;
-        if (type === "Savings") savings += amount;
-        if (type === "Debt") debt += amount;
-    });
-    return {
-        income,
-        expense,
-        savings,
-        debt,
-        monthlyObligations: expense + debt,
-        monthlySurplus: income - expense - savings - debt
-    };
-}
-
 //Create Capital Position Engine
 function getCapitalPosition() {
     const commitments = getCommitmentSummary();
