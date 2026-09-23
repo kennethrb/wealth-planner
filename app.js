@@ -880,18 +880,11 @@ function loadCategoryDropdown() {
 }
 
 function getCashRequirementPlan() {
-    const accountMap = {};
-    (appData.accounts || []).forEach(account => {
-        accountMap[account.accountId] = account.accountName;
-    });
     const categoryFundingMap = {};
     (appData.categories || []).forEach(cat => {
         categoryFundingMap[cat.categoryName] = {
-            source:
-                accountMap[
-                    cat.preferredFundingSource
-                ] || ""
-,
+        source:
+        cat.preferredFundingSource || "",
             sourceId: cat.preferredFundingSourceId || ""
         };
     });
