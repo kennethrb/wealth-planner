@@ -716,6 +716,7 @@ async function refreshUI() {
 
     await Promise.all([
         loadNetWorth(),
+        loadCashRequirementPlan(),
         loadFinancialHealthAdvisor(),       // DI-001
         loadFundingOptimizationAdvisor(),  // DI-002
         loadAssetAllocationAdvisor(),
@@ -876,4 +877,50 @@ function loadCategoryDropdown() {
             `;
         }
     });
+}
+
+function getCashRequirementPlan() {
+    const categoryFundingMap = {};
+    (appData.categories || []).forEach(cat => {
+        categoryFundingMap[cat.categoryName] = {
+            source: cat.preferredFundingSource || "",
+            sourceId: cat.preferredFundingSourceId || ""
+        };
+    });
+    const fundingSources = {};
+    let cashRequirement = 0;
+    (appData.recurringBills || []).filter(bill => bill.active !== false).forEach(bill => {
+        const funding = categoryFundingMap[bill.budgetPosition];
+        if (!funding) return;
+        const source = funding.source;
+        const amount = Number(bill.defaultAmount || 0);
+        fundingSources[source] = (fundingSources[source] || 0) + amount;
+        if (source && source.toLowerCase().includes("cash")) {
+            cashRequirement += amount;
+        }
+    });
+    return {
+        cashRequirement,
+        fundingSources
+    };
+}
+
+function loadCashRequirementPlan() {
+    const plan = getCashRequirementPlan();
+    const cashContainer = document.getElementById("cashToWithdraw");
+    const fundingContainer = document.getElementById("fundingPlanList");
+    if (!cashContainer || !fundingContainer) return;
+    cashContainer.textContent = formatCurrency(plan.cashRequirement);
+    fundingContainer.innerHTML = Object.entries(plan.fundingSources).sort(
+        (a, b) => b[1] - a[1]).map(
+        ([source, amount]) => `
+            <div class="funding-row">
+                <span class="label">
+                    ${source}
+                </span>
+                <span class="amount">
+                    ${formatCurrency(amount)}
+                </span>
+            </div>
+        `).join("");
 }
