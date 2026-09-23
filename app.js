@@ -638,9 +638,6 @@ function loadExpectedVsActual() {
 async function refreshFinancialViews() {
     await Promise.all([
         loadUpcomingBills(),
-        loadFinancialHealth(),
-        loadProjection(),
-        loadFundingPlan(),
         loadExpectedVsActual(),
         loadBufferVsInvest(),
         loadFinancialHealthAdvisor(),       // DI-001
@@ -676,9 +673,6 @@ async function changeViewPeriod() {
         document.getElementById("viewMonth").value;
 
     await Promise.all([
-        loadFinancialHealth(),
-        loadProjection(),
-        loadFundingPlan(),
         loadExpectedVsActual(),
         loadFinancialHealthAdvisor(),       // DI-001
         loadFundingOptimizationAdvisor(),  // DI-002
@@ -722,8 +716,6 @@ async function refreshUI() {
 
     await Promise.all([
         loadNetWorth(),
-        loadProjection(),
-        loadFinancialHealth(),
         loadFinancialHealthAdvisor(),       // DI-001
         loadFundingOptimizationAdvisor(),  // DI-002
         loadAssetAllocationAdvisor(),
@@ -747,8 +739,7 @@ async function refreshUI() {
         loadUpcomingBills(),
         loadRecurringBills(),
         loadGoals(),
-        loadAccounts(),
-        loadFundingPlan()
+        loadAccounts()
     ]);
 }
 async function initializeApp() {
