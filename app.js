@@ -443,14 +443,13 @@ function runScenario() {
         debt = 0;
     const selectedYear = getViewYear();
     const selectedMonth = getViewMonth();
-    appData.recurringBills.filter(item => Number(item.year) === selectedYear && item.month === selectedMonth).forEach(item => {
-        const cat = appData.categories.find(c => c.categoryName === item.category);
-        if (!cat) return;
-        const amount = Number(item.plannedAmount);
-        if (cat.budgetType === "Income") income += amount;
-        if (cat.budgetType === "Expense") expense += amount;
-        if (cat.budgetType === "Savings") savings += amount;
-        if (cat.budgetType === "Debt") debt += amount;
+    appData.recurringBills.forEach(item => {
+        const amount = Number(item.defaultAmount || 0);
+        const type = item.budgetType || "";
+        if (type === "Income") income += amount;
+        if (type === "Expense") expense += amount;
+        if (type === "Savings") savings += amount;
+        if (type === "Debt") debt += amount;
     });
     const currentSurplus = income - expense - savings - debt;
     let scenarioSurplus = currentSurplus;
@@ -887,4 +886,3 @@ function loadCategoryDropdown() {
         }
     });
 }
-let hasUnsavedBudgetChanges = false;
