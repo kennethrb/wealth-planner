@@ -27,6 +27,15 @@
     --radius-md: 10px;
     --radius-sm: 6px;
     --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+   /* Color Governance */
+   
+   --wp-opportunity: #34d399;   /* Green */
+   --wp-info: #60a5fa;          /* Blue */
+   --wp-attention: #fbbf24;     /* Amber */
+   --wp-risk: #f87171;          /* Red */
+   --wp-secondary: #94a3b8;     /* Gray */
+   
 }
 
 * {
@@ -399,8 +408,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 .amount-savings {
-    color: #60a5fa;
-    font-weight: 700;
+    color: var(--wp-secondary);
+    font-weight:700;
 }
 
 .amount-debt {
@@ -1261,6 +1270,10 @@ tr.section-debt td:first-child {
     border-bottom: none;
 }
 
+.hero-value {
+    color: var(--wp-info);
+}
+
 .item-header,
 .goal-header {
     display: flex;
@@ -1285,10 +1298,12 @@ tr.section-debt td:first-child {
 }
 
 .progress-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #10b981, #34d399);
-    border-radius: 999px;
-    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    background:
+        linear-gradient(
+            90deg,
+            #3b82f6,
+            #60a5fa
+        );
 }
 
 .bill-overdue {
@@ -1302,8 +1317,7 @@ tr.section-debt td:first-child {
 }
 
 .bill-upcoming {
-    color: #34d399;
-    font-weight: 600;
+    color: var(--wp-info);
 }
 
 .margin-top {
