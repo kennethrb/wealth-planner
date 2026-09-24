@@ -1645,7 +1645,7 @@ function loadSafeToSpendCard() {
 
             <div class="metric-row">
                 <span>Safe-To-Spend</span>
-                <strong style="color:#10b981;">
+                <strong style="color:#60a5fa;">
                     ${formatCurrency(
                         result.safeToSpend
                     )}
@@ -2452,15 +2452,15 @@ async function loadWealthProjectionAccelerator() {
 
             <div class="metric-row">
                 <span>5-Year Projection</span>
-                <strong style="color: #10b981;">${formatCurrency(fv5)}</strong>
+                <strong style="color:#60a5fa;">${formatCurrency(fv5)}</strong>
             </div>
             <div class="metric-row">
                 <span>10-Year Projection</span>
-                <strong style="color: #10b981;">${formatCurrency(fv10)}</strong>
+                <strong style="color:#60a5fa;">${formatCurrency(fv10)}</strong>
             </div>
             <div class="metric-row">
                 <span>20-Year Projection</span>
-                <strong style="color: #10b981;">${formatCurrency(fv20)}</strong>
+                <strong style="color:#60a5fa;">${formatCurrency(fv20)}</strong>
             </div>
         </div>
     `;
@@ -2583,6 +2583,13 @@ async function loadPersonalInflation() {
     if (inflationRate > CONFIG.inflation.warning) status = "⚠️ Lifestyle Inflation";
     if (inflationRate > CONFIG.inflation.critical) status = "🚨 Expense Growth High";
 
+    const statusClass =
+        inflationRate > CONFIG.inflation.critical
+            ? "text-danger"
+            : inflationRate > CONFIG.inflation.warning
+                ? "text-warning"
+                : "text-info";
+
     container.innerHTML = `
         <div class="card">
             <h2>📊 Personal Inflation</h2>
@@ -2600,7 +2607,9 @@ async function loadPersonalInflation() {
             </div>
             <div class="metric-row">
                 <span>Status</span>
-                <strong>${status}</strong>
+                <strong class="${statusClass}">
+                    ${status}
+                </strong>
             </div>
         </div>
     `;
@@ -3255,7 +3264,7 @@ async function loadCashFlowCommandCenter() {
 
         </div>
 
-        <div class="advisor-status success">
+        <div class="advisor-status info">
             ${status}
         </div>
 
