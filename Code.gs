@@ -49,9 +49,9 @@ function getSpreadsheet(mode) {
 const SHEET_TRANSACTIONS = "Transactions";
 const SHEET_ACCOUNTS = "Accounts";
 const SHEET_CATEGORIES = "Categories";
-const SHEET_BUDGET = "BudgetPlan";
 const SHEET_GOALS = "Goals";
 const SHEET_RECURRING = "RecurringBills";
+const SHEET_ADVISOR_MEMORY = "AdvisorMemory";
 
 /* ===================================================
     2. WEB APP HANDLERS (ROUTERS)
@@ -86,27 +86,20 @@ function doGet(e) {
         return deleteAccount(params);
       case "getCategories":
         return createJsonResponse(getCategories(params.mode));
-      case "getBudgetPlan":
-        return createJsonResponse(getBudgetPlan(params.mode));
       case "getGoals":
         return createJsonResponse(getGoals(params.mode));
-      case "copyJanuaryToWholeYear":
-          return copyJanuaryToWholeYear({
-              mode: params.mode
-          });
-      case "copyCurrentYearToNextYear":
-          return copyCurrentYearToNextYear({
-              mode: params.mode,
-              year: params.year
-          });
-      case "saveBudget":
-          return saveBudget({
-              mode: params.mode,
-              year: params.year,
-              month: params.month,
-              category: params.category,
-              amount: params.amount
-          });
+      case "addGoal":
+          return addGoal(params);
+      case "updateGoal":
+          return updateGoal(params);
+      case "archiveGoal":
+          return archiveGoal(params);
+      case "deleteGoal":
+          return deleteGoal(params);
+      case "addAdvisorMemory":
+          return addAdvisorMemory(params);
+      case "updateAdvisorMemory":
+          return updateAdvisorMemory(params);
       case "addCategory":
       return addCategory({
           mode: params.mode,
@@ -119,20 +112,6 @@ function doGet(e) {
           return deleteCategory({
               mode: params.mode,
               categoryId: params.categoryId
-          });
-      case "addBudgetItem":
-          return addBudgetItem({
-              mode: params.mode,
-              year: params.year,
-              month: params.month,
-              category: params.category,
-              amount: params.amount
-          });
-      case "deleteBudgetItem":
-          return deleteBudgetItem({
-              mode: params.mode,
-              year: params.year,
-              category: params.category
           });
       case "addRecurringBill":
         return createJsonResponse(addRecurringBill(params));
@@ -168,13 +147,6 @@ function doPost(e) {
     const contents = JSON.parse(e.postData.contents);
     const action = contents.action;
 
-    if (action === "saveAllBudgets") {
-      return saveAllBudgets(
-          contents.budgetItems,
-          contents.mode
-      );
-    }
-
     if (action === "deleteCategory") {
       return deleteCategory({
           mode: contents.mode,
@@ -200,12 +172,12 @@ function doPost(e) {
 =================================================== */
 function getAllData(mode) {
   return createJsonResponse({
-  accounts: getAccounts(mode),
-  budget: getBudgetPlan(mode),
-  categories: getCategories(mode),
-  goals: getGoals(mode),
-  transactions: getTransactions(mode),
-  recurringBills: getRecurringBills(mode)
+    accounts: getAccounts(mode),
+    categories: getCategories(mode),
+    goals: getGoals(mode),
+    transactions: getTransactions(mode),
+    recurringBills: getRecurringBills(mode),
+    advisorMemory: getAdvisorMemory(mode)
   });
 }
 
@@ -254,12 +226,374 @@ function getCategories(mode) {
 }
 
 function getGoals(mode) {
-  return getSheetObjects(SHEET_GOALS,mode).map(row => ({
-    goal: row["Goal"] || "",
-    target: Number(row["Target"] || 0),
-    current: Number(row["Current"] || 0),
-    monthlyContribution: Number(row["Monthly Contribution"] || 0)
-  }));
+
+  return getSheetObjects(
+      SHEET_GOALS,
+      mode
+  ).map(row => {
+
+    const current =
+      Number(row["Current"] || 0);
+
+    const target =
+      Number(row["Target"] || 0);
+
+  return {
+      goalId:
+          row["Goal ID"] || "",
+
+      goal:
+          row["Goal"] || "",
+
+      target: target,
+
+      current: current,
+
+      monthlyContribution:
+        Number(
+          row["Monthly Contribution"] || 0
+        ),
+
+      status:
+        row["Status"] ||
+        (
+          current >= target
+            ? "GRADUATED"
+            : "ACTIVE"
+        ),
+
+      graduatedDate:
+        row["Graduated Date"] || "",
+
+      archivedDate:
+        row["Archived Date"] || ""
+    };
+  });
+
+}
+
+function addGoal(data) {
+
+  const sheet =
+      getModeSheet(
+          SHEET_GOALS,
+          data.mode
+      );
+
+  if (!sheet) {
+      return createJsonResponse({
+          success: false,
+          error: "Goals sheet not found"
+      });
+  }
+
+  const cols =
+      getColumnIndexMap(
+          SHEET_GOALS,
+          data.mode
+      );
+
+  const goalId =
+      "GOAL" + Date.now();
+
+  const row =
+      new Array(
+          sheet.getLastColumn()
+      ).fill("");
+
+  if (cols["Goal ID"])
+      row[cols["Goal ID"] - 1] =
+          goalId;
+
+  if (cols["Goal"])
+      row[cols["Goal"] - 1] =
+          data.goal || "";
+
+  if (cols["Target"])
+      row[cols["Target"] - 1] =
+          Number(data.target || 0);
+
+  if (cols["Current"])
+      row[cols["Current"] - 1] =
+          Number(data.current || 0);
+
+  if (cols["Monthly Contribution"])
+      row[
+          cols["Monthly Contribution"] - 1
+      ] =
+          Number(
+              data.monthlyContribution || 0
+          );
+
+  if (cols["Status"])
+      row[
+          cols["Status"] - 1
+      ] =
+          data.status || "ACTIVE";
+
+  sheet.appendRow(row);
+
+  return createJsonResponse({
+      success: true,
+      goalId: goalId
+  });
+}
+
+function updateGoal(data) {
+
+  const sheet =
+      getModeSheet(
+          SHEET_GOALS,
+          data.mode
+      );
+
+  if (!sheet) {
+      return createJsonResponse({
+          success: false,
+          error: "Goals sheet not found"
+      });
+  }
+
+  const goalId =
+      String(
+          data.goalId || ""
+      ).trim();
+
+  if (!goalId) {
+      return createJsonResponse({
+          success: false,
+          error: "Missing Goal ID"
+      });
+  }
+
+  const cols =
+      getColumnIndexMap(
+          SHEET_GOALS,
+          data.mode
+      );
+
+  const values =
+      sheet
+        .getDataRange()
+        .getValues();
+
+  const idCol =
+      cols["Goal ID"] - 1;
+
+  let rowIndex = -1;
+
+  for (
+      let i = 1;
+      i < values.length;
+      i++
+  ) {
+      if (
+          String(
+              values[i][idCol]
+          ).trim() === goalId
+      ) {
+          rowIndex = i + 1;
+          break;
+      }
+  }
+
+  if (rowIndex === -1) {
+      return createJsonResponse({
+          success: false,
+          error: "Goal not found"
+      });
+  }
+
+  if (cols["Goal"] && data.goal)
+      sheet.getRange(
+          rowIndex,
+          cols["Goal"]
+      ).setValue(data.goal);
+
+  if (cols["Target"])
+      sheet.getRange(
+          rowIndex,
+          cols["Target"]
+      ).setValue(
+          Number(data.target || 0)
+      );
+
+  if (cols["Current"])
+      sheet.getRange(
+          rowIndex,
+          cols["Current"]
+      ).setValue(
+          Number(data.current || 0)
+      );
+
+  if (
+      cols["Monthly Contribution"]
+  )
+      sheet.getRange(
+          rowIndex,
+          cols[
+            "Monthly Contribution"
+          ]
+      ).setValue(
+          Number(
+             data.monthlyContribution || 0
+          )
+      );
+
+  if (
+      cols["Status"] &&
+      data.status
+  )
+      sheet.getRange(
+          rowIndex,
+          cols["Status"]
+      ).setValue(
+          data.status
+      );
+
+  return createJsonResponse({
+      success: true
+  });
+}
+
+function archiveGoal(data) {
+
+  const sheet =
+      getModeSheet(
+          SHEET_GOALS,
+          data.mode
+      );
+
+  if (!sheet) {
+      return createJsonResponse({
+          success: false,
+          error: "Goals sheet not found"
+      });
+  }
+
+  const goalId =
+      String(
+          data.goalId || ""
+      ).trim();
+
+  const cols =
+      getColumnIndexMap(
+          SHEET_GOALS,
+          data.mode
+      );
+
+  const values =
+      sheet
+        .getDataRange()
+        .getValues();
+
+  const idCol =
+      cols["Goal ID"] - 1;
+
+  for (
+      let i = 1;
+      i < values.length;
+      i++
+  ) {
+
+      if (
+          String(
+              values[i][idCol]
+          ).trim() === goalId
+      ) {
+
+          if (cols["Status"]) {
+              sheet.getRange(
+                  i + 1,
+                  cols["Status"]
+              ).setValue(
+                  "ARCHIVED"
+              );
+          }
+
+          if (
+              cols["Archived Date"]
+          ) {
+              sheet.getRange(
+                  i + 1,
+                  cols["Archived Date"]
+              ).setValue(
+                  new Date()
+              );
+          }
+
+          return createJsonResponse({
+              success: true
+          });
+      }
+  }
+
+  return createJsonResponse({
+      success: false,
+      error: "Goal not found"
+  });
+}
+
+function deleteGoal(data) {
+
+  const sheet =
+      getModeSheet(
+          SHEET_GOALS,
+          data.mode
+      );
+
+  if (!sheet) {
+      return createJsonResponse({
+          success: false,
+          error: "Goals sheet not found"
+      });
+  }
+
+  const goalId =
+      String(
+          data.goalId || ""
+      ).trim();
+
+  const cols =
+      getColumnIndexMap(
+          SHEET_GOALS,
+          data.mode
+      );
+
+  const dataRange =
+      sheet
+        .getDataRange()
+        .getValues();
+
+  const idCol =
+      cols["Goal ID"] - 1;
+
+  for (
+      let i = 1;
+      i < dataRange.length;
+      i++
+  ) {
+
+      if (
+          String(
+              dataRange[i][idCol]
+          ).trim() === goalId
+      ) {
+
+          sheet.deleteRow(
+              i + 1
+          );
+
+          return createJsonResponse({
+              success: true
+          });
+      }
+  }
+
+  return createJsonResponse({
+      success: false,
+      error: "Goal not found"
+  });
 }
 
 /* ===================================================
@@ -290,6 +624,15 @@ function getAccounts(mode) {
         netWorthType: row["Net Worth Type"] || "Asset",
         lastReconciledDate: row["Last Reconciled Date"] || "",
         lastReconciledBalance: reconciledBalance,
+        protected:
+            String(
+                row["Protected"] || ""
+            ).toLowerCase() === "true",
+
+        minimumBalance:
+            Number(
+                row["Minimum Balance"] || 0
+            ),
         reconciled: false
       };
     })
@@ -324,6 +667,13 @@ function addAccount(data) {
   if (cols["Asset Class"]) row[cols["Asset Class"] - 1] = data.assetClass || "Cash";
   if (cols["Opening Balance"]) row[cols["Opening Balance"] - 1] = Number(data.currentBalance || data.openingBalance || 0);
   if (cols["Active"]) row[cols["Active"] - 1] = "Yes";
+  if (cols["Protected"])
+      row[cols["Protected"] - 1] =
+          String(data.protected) === "true";
+
+  if (cols["Minimum Balance"])
+      row[cols["Minimum Balance"] - 1] =
+          Number(data.minimumBalance || 0);
 
   sheet.appendRow(row);
   return createJsonResponse({ success: true, accountId: accountId });
@@ -364,6 +714,28 @@ function updateAccount(data) {
   if (cols["Net Worth Type"] && data.netWorthType) sheet.getRange(rowIndex, cols["Net Worth Type"]).setValue(data.netWorthType);
   if (cols["Type"] && data.type) sheet.getRange(rowIndex, cols["Type"]).setValue(data.type);
   if (cols["Asset Class"] && data.assetClass) sheet.getRange(rowIndex, cols["Asset Class"]).setValue(data.assetClass);
+  if (cols["Protected"])
+  {
+      sheet.getRange(
+          rowIndex,
+          cols["Protected"]
+      ).setValue(
+          String(data.protected) === "true"
+      );
+  }
+
+  if (cols["Minimum Balance"])
+  {
+      sheet.getRange(
+          rowIndex,
+          cols["Minimum Balance"]
+      ).setValue(
+          Number(
+              data.minimumBalance || 0
+          )
+      );
+  }
+
 
 
   return createJsonResponse({ success: true });
@@ -431,14 +803,7 @@ function archiveAccount(params) {
   return { success: false, message: "Account ID not found" };
 }
 
-function getBudgetPlan(mode) {
-  return getSheetObjects(SHEET_BUDGET,mode).map(row => ({
-    year: Number(row["Year"] || new Date().getFullYear()),
-    month: row["Month"] || "",
-    category: row["Category"] || "",
-    plannedAmount: Number(row["Planned Amount"] || 0)
-  }));
-}
+
 
 function getRecurringBills(mode) {
   return getSheetObjects(SHEET_RECURRING,mode).map(row => ({
@@ -453,6 +818,153 @@ function getRecurringBills(mode) {
     accountId: row["Account ID"] || "",
     active: row["Active"]
   }));
+}
+
+function getAdvisorMemory(mode) {
+
+    return getSheetObjects(
+        SHEET_ADVISOR_MEMORY,
+        mode
+    ).map(row => ({
+
+        recommendationId:
+            row["Recommendation ID"] || "",
+
+        createdDate:
+            row["Created Date"] || "",
+
+        recommendation:
+            row["Recommendation"] || "",
+
+        confidence:
+            Number(
+                row["Confidence"] || 0
+            ),
+
+        status:
+            row["Status"] || "PENDING",
+
+        outcome:
+            row["Outcome"] || ""
+
+    }));
+}
+
+function addAdvisorMemory(data) {
+
+    const sheet =
+        getModeSheet(
+            SHEET_ADVISOR_MEMORY,
+            data.mode
+        );
+
+    const cols =
+        getColumnIndexMap(
+            SHEET_ADVISOR_MEMORY,
+            data.mode
+        );
+
+    const row =
+        new Array(
+            sheet.getLastColumn()
+        ).fill("");
+
+    const id =
+        "ADV" + Date.now();
+
+    row[
+        cols["Recommendation ID"] - 1
+    ] = id;
+
+    row[
+        cols["Created Date"] - 1
+    ] = new Date();
+
+    row[
+        cols["Recommendation"] - 1
+    ] = data.recommendation;
+
+    row[
+        cols["Confidence"] - 1
+    ] = Number(
+        data.confidence || 0
+    );
+
+    row[
+        cols["Status"] - 1
+    ] = "PENDING";
+
+    row[
+        cols["Outcome"] - 1
+    ] = "";
+
+    sheet.appendRow(row);
+
+    return createJsonResponse({
+        success: true
+    });
+}
+
+function updateAdvisorMemory(data) {
+
+    const sheet =
+        getModeSheet(
+            SHEET_ADVISOR_MEMORY,
+            data.mode
+        );
+
+    const cols =
+        getColumnIndexMap(
+            SHEET_ADVISOR_MEMORY,
+            data.mode
+        );
+
+    const values =
+        sheet.getDataRange().getValues();
+
+    const idCol =
+        cols["Recommendation ID"] - 1;
+
+    for (let i = 1; i < values.length; i++) {
+
+        if (
+            String(values[i][idCol]).trim() ===
+            String(data.recommendationId).trim()
+        ) {
+
+            if (cols["Status"]) {
+
+                sheet.getRange(
+                    i + 1,
+                    cols["Status"]
+                ).setValue(
+                    data.status
+                );
+            }
+
+            if (
+                cols["Outcome"] &&
+                data.outcome
+            ) {
+
+                sheet.getRange(
+                    i + 1,
+                    cols["Outcome"]
+                ).setValue(
+                    data.outcome
+                );
+            }
+
+            return createJsonResponse({
+                success: true
+            });
+        }
+    }
+
+    return createJsonResponse({
+        success: false,
+        error: "Recommendation not found"
+    });
 }
 
 /* ===================================================
@@ -655,221 +1167,6 @@ function deleteTransaction(data) {
   return createJsonResponse({ success: false, error: "Transaction ID not found: " + searchId });
 }
 
-function copyJanuaryToWholeYear(request) {
-
-  const sheet =
-      getModeSheet(
-          SHEET_BUDGET,
-          request.mode
-      );
-
-  if (!sheet)
-      return createJsonResponse({ success: false });
-
-  const cols =
-      getColumnIndexMap(
-          SHEET_BUDGET,
-          request.mode
-      );
-
-  const data =
-      sheet.getDataRange().getValues();
-
-  const yearCol =
-      cols["Year"] - 1;
-
-  const monthCol =
-      cols["Month"] - 1;
-
-  const categoryCol =
-      cols["Category"] - 1;
-
-  const amountCol =
-      cols["Planned Amount"] - 1;
-
-  const months = [
-      "Jan","Feb","Mar","Apr",
-      "May","Jun","Jul","Aug",
-      "Sep","Oct","Nov","Dec"
-  ];
-
-  const newRows = [];
-
-  for (let i = 1; i < data.length; i++) {
-
-      const year = data[i][yearCol];
-      const month = data[i][monthCol];
-      const category = data[i][categoryCol];
-      const amount = data[i][amountCol];
-
-      if (month !== "Jan")
-          continue;
-
-      months.forEach(targetMonth => {
-
-          if (targetMonth === "Jan")
-              return;
-
-          const existingRow =
-              data.find(row =>
-                  row[yearCol] === year &&
-                  row[monthCol] === targetMonth &&
-                  row[categoryCol] === category
-              );
-
-          if (existingRow) {
-
-              existingRow[amountCol] = amount;
-
-          } else {
-
-              const row =
-                  new Array(sheet.getLastColumn())
-                      .fill("");
-
-              row[yearCol] = year;
-              row[monthCol] = targetMonth;
-              row[categoryCol] = category;
-              row[amountCol] = amount;
-
-              newRows.push(row);
-          }
-      });
-  }
-
-  if (newRows.length > 0) {
-
-      sheet.getRange(
-          sheet.getLastRow() + 1,
-          1,
-          newRows.length,
-          newRows[0].length
-      ).setValues(newRows);
-
-  }
-
-  sheet.getDataRange().setValues(data);
-
-  return createJsonResponse({
-      success: true
-  });
-}
-
-function copyCurrentYearToNextYear(request) {
-  const sheet =
-      getModeSheet(
-          SHEET_BUDGET,
-          request.mode
-      );
-  if (!sheet) return createJsonResponse({ success: false });
-
-  const cols =
-      getColumnIndexMap(
-          SHEET_BUDGET,
-          request.mode
-      );
-  const data = sheet.getDataRange().getValues();
-
-  const currentYear = Number(request.year);
-  const nextYear = currentYear + 1;
-
-  const yearCol = cols["Year"] - 1;
-  const monthCol = cols["Month"] - 1;
-  const categoryCol = cols["Category"] - 1;
-  const amountCol = cols["Planned Amount"] - 1;
-
-  const exists = data.some((row, i) => i > 0 && Number(row[yearCol]) === nextYear);
-  if (exists) {
-    return createJsonResponse({ success: false, message: `Year ${nextYear} already exists` });
-  }
-
-  const currentYearRows = data.filter((row, i) => i > 0 && Number(row[yearCol]) === currentYear);
-  const newRows = currentYearRows.map(row => {
-    const newRow = new Array(sheet.getLastColumn()).fill("");
-    newRow[yearCol] = nextYear;
-    newRow[monthCol] = row[monthCol];
-    newRow[categoryCol] = row[categoryCol];
-    newRow[amountCol] = row[amountCol];
-    return newRow;
-  });
-
-  if (newRows.length > 0) {
-    sheet.getRange(data.length + 1, 1, newRows.length, newRows[0].length).setValues(newRows);
-  }
-
-  return createJsonResponse({ success: true, nextYear: nextYear });
-}
-
-function saveAllBudgets(budgetItems,mode) {
-  const sheet =
-      getModeSheet(
-          SHEET_BUDGET,
-          mode
-      );
-  if (!sheet) return createJsonResponse({ success: false });
-
-  const cols =
-      getColumnIndexMap(
-          SHEET_BUDGET,
-          mode
-      );
-  const range = sheet.getDataRange();
-  const data = range.getValues();
-
-  const yearCol = cols["Year"] - 1;
-  const monthCol = cols["Month"] - 1;
-  const categoryCol = cols["Category"] - 1;
-  const amountCol = cols["Planned Amount"] - 1;
-
-  const updateMap = {};
-  budgetItems.forEach(item => {
-    const key = `${item.year}|${item.month}|${item.category}`;
-    updateMap[key] = Number(item.amount);
-  });
-
-  for (let i = 1; i < data.length; i++) {
-    const rowKey = `${data[i][yearCol]}|${data[i][monthCol]}|${data[i][categoryCol]}`;
-    if (updateMap[rowKey] !== undefined) {
-      data[i][amountCol] = updateMap[rowKey];
-    }
-  }
-
-  range.setValues(data);
-  return createJsonResponse({ success: true });
-}
-
-function saveBudget(request) {
-  const sheet =
-      getModeSheet(
-          SHEET_BUDGET,
-          request.mode
-      );
-  if (!sheet) return createJsonResponse({ success: false });
-
-  const cols =
-      getColumnIndexMap(
-          SHEET_BUDGET,
-          request.mode
-      );
-  const data = sheet.getDataRange().getValues();
-
-  const yearCol = cols["Year"] - 1;
-  const monthCol = cols["Month"] - 1;
-  const categoryCol = cols["Category"] - 1;
-
-  for (let i = 1; i < data.length; i++) {
-    if (
-      data[i][yearCol] == request.year &&
-      data[i][monthCol] == request.month &&
-      data[i][categoryCol] == request.category
-    ) {
-      sheet.getRange(i + 1, cols["Planned Amount"]).setValue(Number(request.amount));
-      return createJsonResponse({ success: true });
-    }
-  }
-
-  return createJsonResponse({ success: false, message: "Item not found" });
-}
 
 function addCategory(request) {
   const sheet =
@@ -920,7 +1217,7 @@ function deleteCategory(request) {
 
   let categoryName = "";
 
-  // 1. Find and remove category from Categories sheet, and capture categoryName for BudgetPlan cleanup
+  // Remove category from Categories sheet
   const categorySheet =
     getModeSheet(
         SHEET_CATEGORIES,
@@ -950,111 +1247,6 @@ function deleteCategory(request) {
       categorySheet.getRange(1, 1, updated.length, updated[0].length).setValues(updated);
     }
   }
-
-  // 2. Remove matching rows from BudgetPlan sheet using the retrieved categoryName
-  const budgetSheet =
-    getModeSheet(
-        SHEET_BUDGET,
-        request.mode
-    );
-  if (budgetSheet && categoryName) {
-    const cols =
-    getColumnIndexMap(
-        SHEET_BUDGET,
-        request.mode
-    );
-    const budgetData = budgetSheet.getDataRange().getValues();
-
-    if (budgetData.length > 1) {
-      const header = budgetData[0];
-      const categoryCol = cols["Category"] - 1;
-      const filtered = budgetData.slice(1).filter(row => row[categoryCol] !== categoryName);
-      const updated = [header, ...filtered];
-
-      budgetSheet.clearContents();
-      budgetSheet.getRange(1, 1, updated.length, updated[0].length).setValues(updated);
-    }
-  }
-
-  return createJsonResponse({ success: true });
-}
-
-function addBudgetItem(request) {
-  const sheet =
-      getModeSheet(
-          SHEET_BUDGET,
-          request.mode
-      );
-  if (!sheet) return createJsonResponse({ success: false, message: "Budget sheet not found" });
-
-  const cols =
-      getColumnIndexMap(
-          SHEET_BUDGET,
-          request.mode
-      );
-  const data = sheet.getDataRange().getValues();
-
-  const yearCol = cols["Year"] - 1;
-  const monthCol = cols["Month"] - 1;
-  const categoryCol = cols["Category"] - 1;
-  const amountCol = cols["Planned Amount"] - 1;
-
-  const exists = data.some((row, index) => {
-    if (index === 0) return false;
-    return Number(row[yearCol]) === Number(request.year) && row[categoryCol] === request.category;
-  });
-
-  if (exists) {
-    return createJsonResponse({
-      success: false,
-      message: `${request.category} already exists for ${request.year}`
-    });
-  }
-
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const newRows = months.map(month => {
-    const row = new Array(sheet.getLastColumn()).fill("");
-    row[yearCol] = Number(request.year);
-    row[monthCol] = month;
-    row[categoryCol] = request.category;
-    row[amountCol] = month === request.month ? Number(request.amount) : 0;
-    return row;
-  });
-
-  sheet.getRange(sheet.getLastRow() + 1, 1, newRows.length, newRows[0].length).setValues(newRows);
-
-  return createJsonResponse({ success: true, message: "Budget item added successfully" });
-}
-
-function deleteBudgetItem(request) {
-  const sheet =
-      getModeSheet(
-          SHEET_BUDGET,
-          request.mode
-      );
-  if (!sheet) return createJsonResponse({ success: false });
-
-  const cols =
-      getColumnIndexMap(
-          SHEET_BUDGET,
-          request.mode
-      );
-  const data = sheet.getDataRange().getValues();
-  if (data.length <= 1) return createJsonResponse({ success: true });
-
-  const yearCol = cols["Year"] - 1;
-  const categoryCol = cols["Category"] - 1;
-
-  const header = data[0];
-  const filtered = data.slice(1).filter(row => !(
-    Number(row[yearCol]) === Number(request.year) &&
-    row[categoryCol] === request.category
-  ));
-
-  const updated = [header, ...filtered];
-
-  sheet.clearContents();
-  sheet.getRange(1, 1, updated.length, updated[0].length).setValues(updated);
 
   return createJsonResponse({ success: true });
 }
@@ -1359,6 +1551,24 @@ function getModeSheet(
     ).getSheetByName(
         sheetName
     );
+}
+
+function getGoalStatus(goal) {
+
+  if (
+      goal.status === "ARCHIVED"
+  ) {
+      return "ARCHIVED";
+  }
+
+  if (
+      Number(goal.current) >=
+      Number(goal.target)
+  ) {
+      return "GRADUATED";
+  }
+
+  return "ACTIVE";
 }
 
 
