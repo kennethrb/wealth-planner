@@ -325,7 +325,7 @@ function getReleasedCapitalSummary() {
         totalReleasedCapital * 12;
     
     const tenYearImpact =
-        annualImpact * 10;
+        totalReleasedCapital * 12 * 10;
     
     const priority =
         getCapitalAllocationPriority();
@@ -388,7 +388,7 @@ function loadReleasedCapitalCard() {
     
         <div class="advisor-action">
             <div class="action-title">
-                WHY NOW
+                🎯 WHY NOW
             </div>
     
             <p>
@@ -399,19 +399,19 @@ function loadReleasedCapitalCard() {
     
         <div class="advisor-action success">
             <div class="action-title">
-                WEALTH IMPACT
+                💎 POTENTIAL WEALTH IMPACT
             </div>
-    
+        
             <p>
-                Potentially redirect
-                ${formatCurrency(data.tenYearImpact)}
-                over the next decade.
+                Keeping this capital deployed could redirect
+                <strong>${formatCurrency(data.tenYearImpact)}</strong>
+                toward future wealth goals over the next decade.
             </p>
         </div>
     
         <div class="advisor-action warning">
             <div class="action-title">
-                RISK
+                ⚠️ RISK
             </div>
     
             <p>
