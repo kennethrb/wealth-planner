@@ -1,5 +1,8 @@
 // ==================== FILE: accounts.js ====================
 
+// Tracks whether the form is in "Add" mode (null) or "Edit" mode (accountId)
+let editingAccountId = null;
+
 /**
  * Populate account type dropdown based on selected net worth type
  */
@@ -9,6 +12,7 @@ function loadAccountTypes() {
     if (!netWorthTypeSelect || !dropdown || typeof ACCOUNT_TYPES === "undefined") return;
 
     const netWorthType = netWorthTypeSelect.value;
+    const previousVal = dropdown.value;
     dropdown.innerHTML = "";
 
     Object.values(ACCOUNT_TYPES)
@@ -20,12 +24,14 @@ function loadAccountTypes() {
                 </option>
             `;
         });
+
+    if (previousVal) dropdown.value = previousVal;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("addAccountForm");
     if (form) {
-        form.addEventListener("submit", handleAddAccount);
+        form.addEventListener("submit", handleAccountFormSubmit);
     }
 
     const netWorthTypeSelect = document.getElementById("netWorthType");
@@ -36,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /**
- * READ: Renders accounts using the exact original DOM hierarchy & CSS classes
+ * READ: Renders active accounts list
  */
 function loadAccounts() {
     const container = document.getElementById("accounts");
@@ -65,7 +71,7 @@ function loadAccounts() {
                 const type = account.netWorthType || "Asset";
 
                 return `
-                    <div class="goal-item">
+                    <div class="goal-item" id="account-card-${id}">
                         <div class="item-header">
                             <span class="item-title">
                                 💳 ${escapeHtml(name)}
@@ -108,61 +114,7 @@ function loadAccounts() {
 }
 
 /**
- * CREATE: Handle form submission for adding an account
- */
-async function handleAddAccount(event) {
-    if (event) event.preventDefault();
-
-    const name = document.getElementById("accountName")?.value.trim() || "";
-    const netWorthType = document.getElementById("netWorthType")?.value || "Asset";
-    const assetClass = document.getElementById("accountType")?.value || "Cash";
-    const openingBalance = parseFloat(document.getElementById("openingBalance")?.value) || 0;
-    const isProtected = document.getElementById("accountProtected")?.checked || false;
-    const minimumBalance = parseFloat(document.getElementById("minimumBalance")?.value) || 0;
-
-    if (!name) {
-        showStatus("Please enter an account name", "warning");
-        return;
-    }
-
-    showStatus("Saving account to Google Sheets...", "info");
-
-    try {
-        const baseUrl = typeof GOOGLE_SCRIPT_URL !== "undefined" ? GOOGLE_SCRIPT_URL : (typeof BASE_URL !== "undefined" ? BASE_URL : "");
-        const mode = getCurrentMode();
-
-        const params = new URLSearchParams({
-            action: "addAccount",
-            mode: mode,
-            name: name,
-            netWorthType: netWorthType,
-            assetClass: assetClass,
-            openingBalance: openingBalance,
-            currentBalance: openingBalance,
-            protected: isProtected,
-            minimumBalance: minimumBalance
-        });
-
-        const response = await fetch(`${baseUrl}?${params.toString()}`);
-        const result = await response.json();
-
-        if (result.success) {
-            showStatus("Account added successfully", "success");
-            const form = document.getElementById("addAccountForm");
-            if (form) form.reset();
-            if (typeof loadData === "function") await loadData();
-            if (typeof refreshUI === "function") await refreshUI();
-        } else {
-            showStatus("Backend Error: " + (result.error || result.message), "error");
-        }
-    } catch (error) {
-        console.error("handleAddAccount error:", error);
-        showStatus("Failed to add account: " + error.message, "error");
-    }
-}
-
-/**
- * Opens the custom Edit Account modal and populates fields
+ * Switch form to EDIT state and populate fields
  */
 function editAccount(accountId) {
     const accounts = (typeof appData !== "undefined" && appData.accounts) ? appData.accounts : [];
@@ -172,82 +124,147 @@ function editAccount(accountId) {
         return;
     }
 
-    const currentName = account.accountName || account.name || "";
-    const currentBal = account.currentBalance !== undefined ? account.currentBalance : (account.openingBalance || account.balance || 0);
+    editingAccountId = accountId;
 
-    // Populate modal form fields
-    document.getElementById("editAccountId").value = accountId;
-    document.getElementById("editAccountName").value = currentName;
-    document.getElementById("editAccountBalance").value = currentBal;
-    document.getElementById("editNetWorthType").value = account.netWorthType || "Asset";
+    // 1. Populate Form Inputs
+    const elName = document.getElementById("accountName");
+    const elNetWorthType = document.getElementById("netWorthType");
+    const elAccountType = document.getElementById("accountType");
+    const elBalance = document.getElementById("openingBalance");
+    const elProtected = document.getElementById("accountProtected");
+    const elMinBalance = document.getElementById("minimumBalance");
 
-    // Show custom modal
-    const modal = document.getElementById("editAccountModal");
-    if (modal) {
-        modal.classList.remove("hidden");
+    if (elName) elName.value = account.accountName || account.name || "";
+    if (elNetWorthType) {
+        elNetWorthType.value = account.netWorthType || "Asset";
+        loadAccountTypes(); // Refresh types dropdown
+    }
+    if (elAccountType) elAccountType.value = account.assetClass || account.type || "Cash";
+    if (elBalance) elBalance.value = account.currentBalance !== undefined ? account.currentBalance : (account.openingBalance || 0);
+    if (elProtected) elProtected.checked = account.protected === true;
+    if (elMinBalance) elMinBalance.value = account.minimumBalance || 0;
+
+    // 2. Update Form Action Controls
+    const submitBtn = document.getElementById("accountFormSubmitBtn");
+    const cancelBtn = document.getElementById("accountFormCancelBtn");
+
+    if (submitBtn) submitBtn.textContent = "Save Changes";
+    if (cancelBtn) cancelBtn.classList.remove("hidden");
+
+    // 3. Scroll seamlessly to the form
+    const form = document.getElementById("addAccountForm");
+    if (form) {
+        form.scrollIntoView({ behavior: "smooth", block: "center" });
     }
 }
 
 /**
- * Closes the Edit Account modal
+ * Cancel Edit mode and restore ADD state
  */
-function closeEditAccountModal() {
-    const modal = document.getElementById("editAccountModal");
-    if (modal) {
-        modal.classList.add("hidden");
-    }
+function cancelAccountEdit() {
+    editingAccountId = null;
+
+    const form = document.getElementById("addAccountForm");
+    if (form) form.reset();
+
+    const submitBtn = document.getElementById("accountFormSubmitBtn");
+    const cancelBtn = document.getElementById("accountFormCancelBtn");
+
+    if (submitBtn) submitBtn.textContent = "Add Account";
+    if (cancelBtn) cancelBtn.classList.add("hidden");
+
+    loadAccountTypes();
 }
 
 /**
- * Handles submission of the custom Edit Account form
+ * Unified Form Handler (Dispatches to CREATE or UPDATE based on state)
  */
-async function handleUpdateAccountForm(event) {
+async function handleAccountFormSubmit(event) {
     if (event) event.preventDefault();
 
-    const accountId = document.getElementById("editAccountId").value;
-    const newName = document.getElementById("editAccountName").value.trim();
-    const newBalance = parseFloat(document.getElementById("editAccountBalance").value);
-    const netWorthType = document.getElementById("editNetWorthType").value;
+    const name = document.getElementById("accountName")?.value.trim() || "";
+    const netWorthType = document.getElementById("netWorthType")?.value || "Asset";
+    const assetClass = document.getElementById("accountType")?.value || "Cash";
+    const balance = parseFloat(document.getElementById("openingBalance")?.value) || 0;
+    const isProtected = document.getElementById("accountProtected")?.checked || false;
+    const minimumBalance = parseFloat(document.getElementById("minimumBalance")?.value) || 0;
 
-    if (!newName || isNaN(newBalance)) {
-        showStatus("Please enter valid account details", "warning");
+    if (!name) {
+        showStatus("Please enter an account name", "warning");
         return;
     }
 
-    closeEditAccountModal();
-    showStatus("Updating account in Google Sheets...", "info");
+    const baseUrl = typeof GOOGLE_SCRIPT_URL !== "undefined" ? GOOGLE_SCRIPT_URL : (typeof BASE_URL !== "undefined" ? BASE_URL : "");
+    const mode = getCurrentMode();
 
-    try {
-        const baseUrl = typeof GOOGLE_SCRIPT_URL !== "undefined" ? GOOGLE_SCRIPT_URL : (typeof BASE_URL !== "undefined" ? BASE_URL : "");
-        const mode = getCurrentMode();
+    if (editingAccountId) {
+        // --- UPDATE ROUTE ---
+        showStatus("Updating account...", "info");
+        try {
+            const params = new URLSearchParams({
+                action: "updateAccount",
+                mode: mode,
+                accountId: editingAccountId,
+                name: name,
+                netWorthType: netWorthType,
+                assetClass: assetClass,
+                type: assetClass,
+                currentBalance: balance,
+                openingBalance: balance
+            });
 
-        const params = new URLSearchParams({
-            action: "updateAccount",
-            mode: mode,
-            accountId: accountId,
-            name: newName,
-            currentBalance: newBalance,
-            netWorthType: netWorthType
-        });
+            const response = await fetch(`${baseUrl}?${params.toString()}`);
+            const result = await response.json();
 
-        const response = await fetch(`${baseUrl}?${params.toString()}`);
-        const result = await response.json();
-
-        if (result.success) {
-            showStatus("✅ Account updated successfully", "success");
-            if (typeof loadData === "function") await loadData();
-            if (typeof refreshUI === "function") await refreshUI();
-        } else {
-            showStatus("Update failed: " + (result.error || result.message), "error");
+            if (result.success) {
+                showStatus("✅ Account updated successfully", "success");
+                cancelAccountEdit(); // Reset form back to Add state
+                if (typeof loadData === "function") await loadData();
+                if (typeof refreshUI === "function") await refreshUI();
+            } else {
+                showStatus("Update failed: " + (result.error || result.message), "error");
+            }
+        } catch (error) {
+            console.error("updateAccount error:", error);
+            showStatus("Failed to update account", "error");
         }
-    } catch (error) {
-        console.error("handleUpdateAccountForm error:", error);
-        showStatus("Failed to update account", "error");
+    } else {
+        // --- CREATE ROUTE ---
+        showStatus("Saving new account...", "info");
+        try {
+            const params = new URLSearchParams({
+                action: "addAccount",
+                mode: mode,
+                name: name,
+                netWorthType: netWorthType,
+                assetClass: assetClass,
+                type: assetClass,
+                openingBalance: balance,
+                currentBalance: balance,
+                protected: isProtected,
+                minimumBalance: minimumBalance
+            });
+
+            const response = await fetch(`${baseUrl}?${params.toString()}`);
+            const result = await response.json();
+
+            if (result.success) {
+                showStatus("Account added successfully", "success");
+                cancelAccountEdit();
+                if (typeof loadData === "function") await loadData();
+                if (typeof refreshUI === "function") await refreshUI();
+            } else {
+                showStatus("Backend Error: " + (result.error || result.message), "error");
+            }
+        } catch (error) {
+            console.error("addAccount error:", error);
+            showStatus("Failed to add account: " + error.message, "error");
+        }
     }
 }
 
 /**
- * DELETE: Soft delete using custom showConfirmDialog
+ * DELETE: Soft delete with cascade safety check
  */
 async function deleteAccount(accountId, forceDelete = false) {
     if (!forceDelete) {
@@ -288,6 +305,7 @@ async function deleteAccount(accountId, forceDelete = false) {
 
         if (result.success) {
             showStatus("🗑 Account deleted successfully", "success");
+            if (editingAccountId === accountId) cancelAccountEdit(); // Reset if deleting active edit item
             if (typeof loadData === "function") await loadData();
             if (typeof refreshUI === "function") await refreshUI();
         } else {
