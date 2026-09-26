@@ -79,6 +79,15 @@ function getUnifiedProtectionStatus(
   
       availableCapital,
   
+      protectedObligations:
+          tier1.requiredAmount,
+  
+      protectedBuffer:
+          tier2.requiredAmount,
+  
+      strategicProtection:
+          tier3.requiredAmount,
+  
       tier1,
       tier2,
       tier3,
@@ -116,9 +125,10 @@ function getTier2Protection(commitments)
 function getTier3Protection(goals = []) {
 
     const emergencyGoals =
-        goals.filter(
-            goal =>
-                goal.type === "EMERGENCY_FUND"
+        goals.filter(goal =>
+            String(goal.goal || "")
+                .toLowerCase()
+                .includes("emergency")
         );
 
     const requiredAmount =
