@@ -137,17 +137,19 @@ function editAccount(accountId) {
     if (elName) elName.value = account.accountName || account.name || "";
     if (elNetWorthType) {
         elNetWorthType.value = account.netWorthType || "Asset";
-        loadAccountTypes(); // Refresh types dropdown
+        loadAccountTypes();
     }
     if (elAccountType) elAccountType.value = account.assetClass || account.type || "Cash";
     if (elBalance) elBalance.value = account.currentBalance !== undefined ? account.currentBalance : (account.openingBalance || 0);
-    if (elProtected) elProtected.checked = account.protected === true;
+    if (elProtected) elProtected.value = account.protected === true ? "true" : "false";
     if (elMinBalance) elMinBalance.value = account.minimumBalance || 0;
 
     // 2. Update Form Action Controls
+    const formTitle = document.getElementById("accountFormTitle");
     const submitBtn = document.getElementById("accountFormSubmitBtn");
     const cancelBtn = document.getElementById("accountFormCancelBtn");
 
+    if (formTitle) formTitle.textContent = "✏️ Edit Account";
     if (submitBtn) submitBtn.textContent = "Save Changes";
     if (cancelBtn) cancelBtn.classList.remove("hidden");
 
@@ -167,10 +169,12 @@ function cancelAccountEdit() {
     const form = document.getElementById("addAccountForm");
     if (form) form.reset();
 
+    const formTitle = document.getElementById("accountFormTitle");
     const submitBtn = document.getElementById("accountFormSubmitBtn");
     const cancelBtn = document.getElementById("accountFormCancelBtn");
 
-    if (submitBtn) submitBtn.textContent = "Add Account";
+    if (formTitle) formTitle.textContent = "➕ Add Account";
+    if (submitBtn) submitBtn.textContent = "➕ Add Account";
     if (cancelBtn) cancelBtn.classList.add("hidden");
 
     loadAccountTypes();
@@ -186,7 +190,8 @@ async function handleAccountFormSubmit(event) {
     const netWorthType = document.getElementById("netWorthType")?.value || "Asset";
     const assetClass = document.getElementById("accountType")?.value || "Cash";
     const balance = parseFloat(document.getElementById("openingBalance")?.value) || 0;
-    const isProtected = document.getElementById("accountProtected")?.checked || false;
+    const protectedSelect = document.getElementById("accountProtected");
+    const isProtected = protectedSelect ? protectedSelect.value === "true" : false;
     const minimumBalance = parseFloat(document.getElementById("minimumBalance")?.value) || 0;
 
     if (!name) {
@@ -210,7 +215,9 @@ async function handleAccountFormSubmit(event) {
                 assetClass: assetClass,
                 type: assetClass,
                 currentBalance: balance,
-                openingBalance: balance
+                openingBalance: balance,
+                protected: isProtected,
+                minimumBalance: minimumBalance
             });
 
             const response = await fetch(`${baseUrl}?${params.toString()}`);
@@ -218,7 +225,7 @@ async function handleAccountFormSubmit(event) {
 
             if (result.success) {
                 showStatus("✅ Account updated successfully", "success");
-                cancelAccountEdit(); // Reset form back to Add state
+                cancelAccountEdit();
                 if (typeof loadData === "function") await loadData();
                 if (typeof refreshUI === "function") await refreshUI();
             } else {
@@ -305,7 +312,7 @@ async function deleteAccount(accountId, forceDelete = false) {
 
         if (result.success) {
             showStatus("🗑 Account deleted successfully", "success");
-            if (editingAccountId === accountId) cancelAccountEdit(); // Reset if deleting active edit item
+            if (editingAccountId === accountId) cancelAccountEdit();
             if (typeof loadData === "function") await loadData();
             if (typeof refreshUI === "function") await refreshUI();
         } else {
