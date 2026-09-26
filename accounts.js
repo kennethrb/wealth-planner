@@ -1,357 +1,275 @@
 // ==================== FILE: accounts.js ====================
 
+/**
+ * Populate account type dropdown based on selected net worth type
+ */
 function loadAccountTypes() {
-
-    const netWorthType =
-        document.getElementById(
-            "netWorthType"
-        ).value;
-
-    const dropdown =
-        document.getElementById(
-            "accountType"
-        );
+    const netWorthType = document.getElementById("netWorthType")?.value;
+    const dropdown = document.getElementById("accountType");
+    if (!dropdown || typeof ACCOUNT_TYPES === "undefined") return;
 
     dropdown.innerHTML = "";
-
     Object.values(ACCOUNT_TYPES)
-        .filter(
-            type =>
-                type.netWorthType ===
-                netWorthType
-        )
+        .filter(type => type.netWorthType === netWorthType)
         .forEach(type => {
-
-            dropdown.innerHTML += `
-                <option value="${type.name}">
-                    ${type.name}
-                </option>
-            `;
-
+            dropdown.innerHTML += `<option value="${type.name}">${type.name}</option>`;
         });
 }
 
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
-
-        const form =
-            document.getElementById(
-                "addAccountForm"
-            );
-
-        if (!form) return;
-
-        form.addEventListener(
-            "submit",
-            handleAddAccount
-        );
-
-        document
-            .getElementById(
-                "netWorthType"
-            )
-            .addEventListener(
-                "change",
-                loadAccountTypes
-            );
-
-        loadAccountTypes();
-
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("addAccountForm");
+    if (form) {
+        form.addEventListener("submit", handleAddAccount);
     }
-);
 
+    const netWorthTypeSelect = document.getElementById("netWorthType");
+    if (netWorthTypeSelect) {
+        netWorthTypeSelect.addEventListener("change", loadAccountTypes);
+        loadAccountTypes();
+    }
+});
+
+/**
+ * CREATE: Handle form submission for adding an account
+ */
 async function handleAddAccount(event) {
+    if (event) event.preventDefault();
 
-    event.preventDefault();
+    const name = document.getElementById("accountName")?.value.trim() || "";
+    const netWorthType = document.getElementById("netWorthType")?.value || "Asset";
+    const assetClass = document.getElementById("accountType")?.value || "Cash";
+    const openingBalance = parseFloat(document.getElementById("openingBalance")?.value) || 0;
+    const isProtected = document.getElementById("accountProtected")?.checked || false;
+    const minimumBalance = parseFloat(document.getElementById("minimumBalance")?.value) || 0;
 
-    const name = document.getElementById("accountName").value.trim();
-    const netWorthType = document.getElementById("netWorthType").value;
-    const assetClass = document.getElementById("accountType").value;
-    const openingBalance =
-        document.getElementById("openingBalance").value;
-    
-    const currentBalance =
-        openingBalance;
-    
-    const protectedAccount =
-        document.getElementById(
-            "accountProtected"
-        ).value;
-    
-    const minimumBalance =
-        document.getElementById(
-            "minimumBalance"
-        ).value || 0;
+    if (!name) {
+        showStatus("Please enter an account name", "warning");
+        return;
+    }
+
+    showStatus("Saving account to Google Sheets...", "info");
 
     try {
+        const baseUrl = typeof GOOGLE_SCRIPT_URL !== "undefined" ? GOOGLE_SCRIPT_URL : (typeof BASE_URL !== "undefined" ? BASE_URL : "");
+        const mode = getCurrentMode();
 
-    const url =
-        `${BASE_URL}?action=addAccount`
-        + `&mode=${appMode}`
-        + `&name=${encodeURIComponent(name)}`
-        + `&netWorthType=${encodeURIComponent(netWorthType)}`
-        + `&assetClass=${encodeURIComponent(assetClass)}`
-        + `&openingBalance=${encodeURIComponent(openingBalance)}`
-        + `&currentBalance=${encodeURIComponent(currentBalance)}`
-        + `&protected=${encodeURIComponent(protectedAccount)}`
-        + `&minimumBalance=${encodeURIComponent(minimumBalance)}`;
+        const params = new URLSearchParams({
+            action: "addAccount",
+            mode: mode,
+            name: name,
+            netWorthType: netWorthType,
+            assetClass: assetClass,
+            openingBalance: openingBalance,
+            currentBalance: openingBalance,
+            protected: isProtected,
+            minimumBalance: minimumBalance
+        });
 
-        console.log("REQUEST:", url);
+        const response = await fetch(`${baseUrl}?${params.toString()}`);
+        const result = await response.json();
 
-        const response = await fetch(url);
-
-        const text = await response.text();
-
-        console.log("RAW RESPONSE:", text);
-
-        const result = JSON.parse(text);
-
-        console.log("RESULT:", result);
-
-        if (!result.success) {
-        showStatus(
-            "Backend Error",
-            "error"
-        );
-        
-        console.error(result);
-            return;
+        if (result.success) {
+            showStatus("Account added successfully", "success");
+            const form = document.getElementById("addAccountForm");
+            if (form) form.reset();
+            if (typeof loadData === "function") await loadData();
+            if (typeof refreshUI === "function") await refreshUI();
+        } else {
+            showStatus("Backend Error: " + (result.error || result.message), "error");
         }
-        await loadData();
-        await refreshUI();
-        
-        showStatus(
-            "Account added successfully",
-            "success"
-        );
-        
-
     } catch (error) {
-
-        console.error(error);
-
-        showStatus(
-            error.message,
-            "error"
-        );
-        
-        console.error(error);
+        console.error("handleAddAccount error:", error);
+        showStatus("Failed to add account: " + error.message, "error");
     }
 }
 
-
+/**
+ * READ: Render active accounts
+ */
 function loadAccounts() {
-
-    const container =
-        document.getElementById("accounts");
-
+    const container = document.getElementById("accounts");
     if (!container) return;
 
-    if (!appData.accounts || appData.accounts.length === 0) {
+    const accounts = (typeof appData !== "undefined" && appData.accounts) ? appData.accounts : [];
+    const activeAccounts = accounts.filter(acc => acc.active !== false);
 
+    if (activeAccounts.length === 0) {
         container.innerHTML = `
-            <div class="goal-item">
-                <span class="label">
-                    No accounts found
-                </span>
-            </div>
-        `;
-
+            <div class="account-card empty-state">
+                <span class="label">No active accounts found.</span>
+            </div>`;
         return;
     }
 
     container.innerHTML = `
-        <div class="goals-container">
-
-            ${appData.accounts.map(account => {
-
-                const name =
-                    account.name ||
-                    account.accountName ||
-                    "Unnamed Account";
-
-                const balance =
-                    Number(
-                        account.currentBalance ||
-                        account.balance ||
-                        0
-                    );
-
-                const type =
-                    account.netWorthType ||
-                    "Asset";
+        <div class="accounts-grid">
+            ${activeAccounts.map(account => {
+                const id = account.accountId || account.id;
+                const name = account.accountName || account.name || "Unnamed Account";
+                const balance = Number(account.currentBalance !== undefined ? account.currentBalance : (account.openingBalance || 0));
+                const netWorthType = account.netWorthType || "Asset";
+                const assetClass = account.assetClass || account.type || "Cash";
+                const isProtected = account.protected === true;
+                const minBalance = Number(account.minimumBalance || 0);
 
                 return `
-
-                    <div class="goal-item">
-
-                        <div class="item-header">
-
-                            <span class="item-title">
-                                💳 ${name}
-                            </span>
-
-                            <span class="item-value">
-                                ${formatCurrency(balance)}
-                            </span>
-
-                        </div>
-
-                        <div class="goal-details">
-
-                            <span>
-                                Type:
-                                <strong class="${
-                                    type === "Asset"
-                                        ? "text-success"
-                                        : "text-danger"
-                                }">
-                                    ${type}
-                                </strong>
-                            </span>
-
-                            <div
-                                style="
-                                    display:flex;
-                                    gap:8px;
-                                    align-items:center;
-                                "
-                            >
-
-                                <button
-                                    class="btn-secondary"
-                                    onclick="editAccount('${account.accountId}')"
-                                    title="Edit Account"
-                                >
-                                    ✏️
-                                </button>
-
-                                <button
-                                    class="btn-danger"
-                                    onclick="deleteAccount('${account.accountId}')"
-                                    title="Delete Account"
-                                >
-                                    🗑
-                                </button>
-
+                    <div class="account-card ${netWorthType.toLowerCase()}-card" data-account-id="${id}">
+                        <div class="account-card-header">
+                            <div class="account-title-group">
+                                <h4 class="account-name">💳 ${escapeHtml(name)}</h4>
+                                <span class="badge badge-${netWorthType.toLowerCase()}">${netWorthType}</span>${isProtected ? `<span class="badge badge-protected" title="Protected Account">🛡️ Protected</span>` : ""}
                             </div>
-
+                            <div class="account-actions">
+                                <button type="button" class="btn-icon btn-edit" onclick="editAccount('${id}')" title="Edit Account">✏️</button>
+                                <button type="button" class="btn-icon btn-delete" onclick="deleteAccount('${id}')" title="Delete Account">🗑️</button>
+                            </div>
                         </div>
 
+                        <div class="account-card-body">
+                            <div class="account-balance-display">
+                                <span class="balance-label">Current Balance</span>
+                                <span class="balance-value ${netWorthType === "Liability" ? "text-danger" : "text-success"}">
+                                    ${typeof formatCurrency === "function" ? formatCurrency(balance) : balance}
+                                </span>
+                            </div>
+                            <div class="account-meta-details">
+                                <span>Asset Class: <strong>${escapeHtml(assetClass)}</strong></span>${minBalance > 0 ? `<span>Min. Reserve: <strong>${typeof formatCurrency === "function" ? formatCurrency(minBalance) : minBalance}</strong></span>` : ""}
+                            </div>
+                        </div>
                     </div>
-
                 `;
-
             }).join("")}
-
         </div>
     `;
 }
 
-async function deleteAccount(accountId) {
-
-    const confirmed =
-        await showConfirmDialog(
-            "Delete Account",
-            "Are you sure you want to delete this account?"
-        );
-
-    if (!confirmed) return;
-
-    const response = await fetch(
-        `${BASE_URL}?action=deleteAccount`
-        + `&mode=${appMode}`
-        + `&accountId=${accountId}`
-    );
-
-    const text =
-        await response.text();
-    
-    console.log("DELETE RESPONSE:", text);
-    
-    const result =
-        JSON.parse(text);
-
-    if (!result.success) {
-
-        showStatus(
-            "Delete failed",
-            "error"
-        );
-
+/**
+ * UPDATE: Edit account details
+ */
+async function editAccount(accountId) {
+    const accounts = (typeof appData !== "undefined" && appData.accounts) ? appData.accounts : [];
+    const account = accounts.find(a => (a.accountId || a.id) === accountId);
+    if (!account) {
+        showStatus("Account not found", "error");
         return;
     }
 
-    await loadData();
-    console.log(
-        "ACCOUNTS AFTER DELETE:",
-        appData.accounts
-    );
-    await refreshUI();
+    const currentName = account.accountName || account.name || "";
+    const currentBal = account.currentBalance !== undefined ? account.currentBalance : (account.openingBalance || 0);
 
-    showStatus(
-        "🗑 Account deleted successfully",
-        "success"
-    );
+    const newName = prompt("Edit Account Name:", currentName);
+    if (newName === null) return;
 
+    const newBalanceStr = prompt("Edit Current Balance:", currentBal);
+    if (newBalanceStr === null) return;
+
+    const newBalance = parseFloat(newBalanceStr);
+    if (isNaN(newBalance)) {
+        showStatus("Invalid numerical balance entered", "warning");
+        return;
+    }
+
+    showStatus("Updating account...", "info");
+
+    try {
+        const baseUrl = typeof GOOGLE_SCRIPT_URL !== "undefined" ? GOOGLE_SCRIPT_URL : (typeof BASE_URL !== "undefined" ? BASE_URL : "");
+        const mode = getCurrentMode();
+
+        const params = new URLSearchParams({
+            action: "updateAccount",
+            mode: mode,
+            accountId: accountId,
+            name: newName.trim() || currentName,
+            currentBalance: newBalance,
+            netWorthType: account.netWorthType,
+            assetClass: account.assetClass
+        });
+
+        const response = await fetch(`${baseUrl}?${params.toString()}`);
+        const result = await response.json();
+
+        if (result.success) {
+            showStatus("✅ Account updated successfully", "success");
+            if (typeof loadData === "function") await loadData();
+            if (typeof refreshUI === "function") await refreshUI();
+        } else {
+            showStatus("Update failed: " + (result.error || result.message), "error");
+        }
+    } catch (error) {
+        console.error("editAccount error:", error);
+        showStatus("Failed to update account", "error");
+    }
 }
 
-async function editAccount(accountId) {
-
-        const account =
-            appData.accounts.find(
-                a => a.accountId === accountId
-            );
-    
-        if (!account) return;
-    
-        const minimumBalance =
-            prompt(
-                "Minimum Balance",
-                account.minimumBalance || 0
-            );
-    
-        if (minimumBalance === null)
-            return;
-    
-        const protectedAccount =
-            confirm(
-                `Protected Account?
-    
-    Current: ${account.protected ? "YES" : "NO"}
-    
-    OK = YES
-    Cancel = NO`
-            );
-    
-        const response =
-            await fetch(
-                `${BASE_URL}?action=updateAccount`
-                + `&mode=${appMode}`
-                + `&accountId=${accountId}`
-                + `&minimumBalance=${encodeURIComponent(minimumBalance)}`
-                + `&protected=${protectedAccount}`
-            );
-
-    const result =
-        await response.json();
-
-    if (!result.success) {
-
-        showStatus(
-            "Update failed",
-            "error"
-        );
-
-        return;
+/**
+ * DELETE: Soft delete with cascade dependency prompt
+ */
+async function deleteAccount(accountId, forceDelete = false) {
+    if (!forceDelete) {
+        const confirmed = typeof showConfirmDialog === "function" 
+            ? await showConfirmDialog("Delete Account", "Are you sure you want to delete this account?")
+            : confirm("Are you sure you want to delete this account?");
+        if (!confirmed) return;
     }
 
-    await loadData();
-    await refreshUI();
+    showStatus("Deleting account...", "info");
 
-    showStatus(
-        "✅ Account updated",
-        "success"
-    );
+    try {
+        const baseUrl = typeof GOOGLE_SCRIPT_URL !== "undefined" ? GOOGLE_SCRIPT_URL : (typeof BASE_URL !== "undefined" ? BASE_URL : "");
+        const mode = getCurrentMode();
+
+        const params = new URLSearchParams({
+            action: "deleteAccount",
+            mode: mode,
+            accountId: accountId,
+            forceDelete: forceDelete ? "true" : "false"
+        });
+
+        const response = await fetch(`${baseUrl}?${params.toString()}`);
+        const result = await response.json();
+
+        if (!result.success && result.requiresConfirmation) {
+            const proceed = confirm(`⚠️ CASCADE WARNING:\n\n${result.message}\n\nDo you still want to force delete this account?`);
+            if (proceed) {
+                await deleteAccount(accountId, true);
+            } else {
+                showStatus("Deletion canceled", "info");
+            }
+            return;
+        }
+
+        if (result.success) {
+            showStatus("🗑 Account deleted successfully", "success");
+            if (typeof loadData === "function") await loadData();
+            if (typeof refreshUI === "function") await refreshUI();
+        } else {
+            showStatus("Delete failed: " + (result.error || result.message), "error");
+        }
+    } catch (error) {
+        console.error("deleteAccount error:", error);
+        showStatus("Failed to delete account", "error");
+    }
+}
+
+/**
+ * Helper: Resolve current mode
+ */
+function getCurrentMode() {
+    if (typeof CURRENT_MODE !== "undefined") return CURRENT_MODE;
+    if (typeof appMode !== "undefined") return appMode;
+    if (typeof appData !== "undefined" && appData.mode) return appData.mode;
+    return "TEST";
+}
+
+/**
+ * Helper: HTML Sanitizer
+ */
+function escapeHtml(str) {
+    if (!str) return "";
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
