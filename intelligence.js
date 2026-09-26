@@ -1003,22 +1003,28 @@ function getSafeToSpend() {
 }
 
 function getProtectionStatus() {
-    const safe = getSafeToSpend();
-    const requiredProtection = safe.protectedBills + safe.protectedBuffer;
-    const protectionGap = Math.max(0, requiredProtection - safe.availableCash);
-    let protectionState = "ACTIVE";
-    if (protectionGap > 0) {
-        protectionState = "PROTECTION";
-    }
-    
+
+    const result =
+        getUnifiedProtectionStatus(
+            appData.accounts,
+            appData.recurringBills,
+            appData.goals,
+            []
+        );
+
     return {
-        availableCash: safe.availableCash,
-        protectedBills: safe.protectedBills,
-        protectedBuffer: safe.protectedBuffer,
-        requiredProtection,
-        protectionGap,
-        protectionState
-    }; 
+        availableCash:
+            result.totalCash,
+
+        requiredProtection:
+            result.requiredProtection,
+
+        protectionGap:
+            result.protectionGap,
+
+        protectionState:
+            result.state
+    };
 }
 
 /**
@@ -3388,7 +3394,13 @@ async function loadGoalFundingOptimizer() {
         if (opportunity <= 0) {
         
         
-            const protection = getProtectionStatus();
+            const protection =
+                getUnifiedProtectionStatus(
+                    appData.accounts,
+                    appData.recurringBills,
+                    appData.goals,
+                    []
+                );
             const requiredProtection = protection.requiredProtection;
             const protectionGap = protection.protectionGap;
         
