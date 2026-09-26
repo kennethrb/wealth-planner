@@ -64,6 +64,13 @@ function getUnifiedProtectionStatus(
       state = ProtectionState.OPTIMIZED;
   }
 
+  const recommendation =
+      getProtectionRecommendation(
+          state,
+          protectionGap,
+          availableCapital
+      );
+
   return {
       state,
       totalCash,
