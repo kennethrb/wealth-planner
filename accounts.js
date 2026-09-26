@@ -4,15 +4,21 @@
  * Populate account type dropdown based on selected net worth type
  */
 function loadAccountTypes() {
-    const netWorthType = document.getElementById("netWorthType")?.value;
+    const netWorthTypeSelect = document.getElementById("netWorthType");
     const dropdown = document.getElementById("accountType");
-    if (!dropdown || typeof ACCOUNT_TYPES === "undefined") return;
+    if (!netWorthTypeSelect || !dropdown || typeof ACCOUNT_TYPES === "undefined") return;
 
+    const netWorthType = netWorthTypeSelect.value;
     dropdown.innerHTML = "";
+
     Object.values(ACCOUNT_TYPES)
         .filter(type => type.netWorthType === netWorthType)
         .forEach(type => {
-            dropdown.innerHTML += `<option value="${type.name}">${type.name}</option>`;
+            dropdown.innerHTML += `
+                <option value="${type.name}">
+                    ${type.name}
+                </option>
+            `;
         });
 }
 
@@ -28,6 +34,78 @@ document.addEventListener("DOMContentLoaded", () => {
         loadAccountTypes();
     }
 });
+
+/**
+ * READ: Renders accounts using the exact original DOM hierarchy & CSS classes
+ */
+function loadAccounts() {
+    const container = document.getElementById("accounts");
+    if (!container) return;
+
+    const accounts = (typeof appData !== "undefined" && appData.accounts) ? appData.accounts : [];
+    const activeAccounts = accounts.filter(acc => acc.active !== false);
+
+    if (activeAccounts.length === 0) {
+        container.innerHTML = `
+            <div class="goal-item">
+                <span class="label">No accounts found</span>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="goals-container">
+            ${activeAccounts.map(account => {
+                const id = account.accountId || account.id;
+                const name = account.accountName || account.name || "Unnamed Account";
+                const balance = Number(
+                    account.currentBalance !== undefined ? account.currentBalance : (account.openingBalance || account.balance || 0)
+                );
+                const type = account.netWorthType || "Asset";
+
+                return `
+                    <div class="goal-item">
+                        <div class="item-header">
+                            <span class="item-title">
+                                💳 ${escapeHtml(name)}
+                            </span>
+                            <span class="item-value">
+                                ${typeof formatCurrency === "function" ? formatCurrency(balance) : balance}
+                            </span>
+                        </div>
+
+                        <div class="goal-details">
+                            <span>
+                                Type:
+                                <strong class="${type === "Asset" ? "text-success" : "text-danger"}">
+                                    ${type}
+                                </strong>
+                            </span>
+
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <button
+                                    class="btn-secondary"
+                                    onclick="editAccount('${id}')"
+                                    title="Edit Account"
+                                >
+                                    ✏️
+                                </button>
+                                <button
+                                    class="btn-danger"
+                                    onclick="deleteAccount('${id}')"
+                                    title="Delete Account"
+                                >
+                                    🗑
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join("")}
+        </div>
+    `;
+}
 
 /**
  * CREATE: Handle form submission for adding an account
@@ -84,67 +162,7 @@ async function handleAddAccount(event) {
 }
 
 /**
- * READ: Render active accounts
- */
-function loadAccounts() {
-    const container = document.getElementById("accounts");
-    if (!container) return;
-
-    const accounts = (typeof appData !== "undefined" && appData.accounts) ? appData.accounts : [];
-    const activeAccounts = accounts.filter(acc => acc.active !== false);
-
-    if (activeAccounts.length === 0) {
-        container.innerHTML = `
-            <div class="account-card empty-state">
-                <span class="label">No active accounts found.</span>
-            </div>`;
-        return;
-    }
-
-    container.innerHTML = `
-        <div class="accounts-grid">
-            ${activeAccounts.map(account => {
-                const id = account.accountId || account.id;
-                const name = account.accountName || account.name || "Unnamed Account";
-                const balance = Number(account.currentBalance !== undefined ? account.currentBalance : (account.openingBalance || 0));
-                const netWorthType = account.netWorthType || "Asset";
-                const assetClass = account.assetClass || account.type || "Cash";
-                const isProtected = account.protected === true;
-                const minBalance = Number(account.minimumBalance || 0);
-
-                return `
-                    <div class="account-card ${netWorthType.toLowerCase()}-card" data-account-id="${id}">
-                        <div class="account-card-header">
-                            <div class="account-title-group">
-                                <h4 class="account-name">💳 ${escapeHtml(name)}</h4>
-                                <span class="badge badge-${netWorthType.toLowerCase()}">${netWorthType}</span>${isProtected ? `<span class="badge badge-protected" title="Protected Account">🛡️ Protected</span>` : ""}
-                            </div>
-                            <div class="account-actions">
-                                <button type="button" class="btn-icon btn-edit" onclick="editAccount('${id}')" title="Edit Account">✏️</button>
-                                <button type="button" class="btn-icon btn-delete" onclick="deleteAccount('${id}')" title="Delete Account">🗑️</button>
-                            </div>
-                        </div>
-
-                        <div class="account-card-body">
-                            <div class="account-balance-display">
-                                <span class="balance-label">Current Balance</span>
-                                <span class="balance-value ${netWorthType === "Liability" ? "text-danger" : "text-success"}">
-                                    ${typeof formatCurrency === "function" ? formatCurrency(balance) : balance}
-                                </span>
-                            </div>
-                            <div class="account-meta-details">
-                                <span>Asset Class: <strong>${escapeHtml(assetClass)}</strong></span>${minBalance > 0 ? `<span>Min. Reserve: <strong>${typeof formatCurrency === "function" ? formatCurrency(minBalance) : minBalance}</strong></span>` : ""}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join("")}
-        </div>
-    `;
-}
-
-/**
- * UPDATE: Edit account details
+ * UPDATE: Prompt user for account updates
  */
 async function editAccount(accountId) {
     const accounts = (typeof appData !== "undefined" && appData.accounts) ? appData.accounts : [];
@@ -155,7 +173,7 @@ async function editAccount(accountId) {
     }
 
     const currentName = account.accountName || account.name || "";
-    const currentBal = account.currentBalance !== undefined ? account.currentBalance : (account.openingBalance || 0);
+    const currentBal = account.currentBalance !== undefined ? account.currentBalance : (account.openingBalance || account.balance || 0);
 
     const newName = prompt("Edit Account Name:", currentName);
     if (newName === null) return;
@@ -202,7 +220,7 @@ async function editAccount(accountId) {
 }
 
 /**
- * DELETE: Soft delete with cascade dependency prompt
+ * DELETE: Delete account with cascade safety check
  */
 async function deleteAccount(accountId, forceDelete = false) {
     if (!forceDelete) {
@@ -228,6 +246,7 @@ async function deleteAccount(accountId, forceDelete = false) {
         const response = await fetch(`${baseUrl}?${params.toString()}`);
         const result = await response.json();
 
+        // Check for dependency cascade warning from backend
         if (!result.success && result.requiresConfirmation) {
             const proceed = confirm(`⚠️ CASCADE WARNING:\n\n${result.message}\n\nDo you still want to force delete this account?`);
             if (proceed) {
