@@ -299,6 +299,123 @@ function getTopWealthAction() {
     return getCapitalAllocationPriority();
 }
 
+
+/**
+ * =========================================================
+ * DI-028 Released Capital Engine
+ * =========================================================
+ */
+function getReleasedGoalCapital() {
+    const graduation = getGraduatedGoals();
+    return {
+        sourceType: "GOAL",
+        totalReleasedCapital: graduation.releasedMonthlyContribution,
+        sources: graduation.goals.map(goal => ({
+            type: "GOAL",
+            name: goal.goal,
+            amount: Number(goal.monthlyContribution || 0)
+        }))
+    };
+
+function getReleasedCapitalSummary() {
+    const goalCapital = getReleasedGoalCapital();
+    const totalReleasedCapital = goalCapital.totalReleasedCapital;
+    const annualImpact =
+        totalReleasedCapital * 12;
+    
+    const tenYearImpact =
+        annualImpact * 10;
+    const priority =
+        getCapitalAllocationPriority();
+    
+    const recommendation =
+        priority.action;
+    const emergency = getEmergencyFundGap();
+    if (!emergency.fullyFunded) {
+        recommendation = "Strengthen Emergency Reserve";
+    }
+    return {
+        state:
+            totalReleasedCapital > 0
+                ? "ACTIVE"
+                : "NO_DATA",
+    
+        totalReleasedCapital,
+    
+        annualImpact,
+    
+        tenYearImpact,
+    
+        recommendation,
+    
+        sources:
+            goalCapital.sources
+    };
+}
+
+function loadReleasedCapitalCard() {
+    const data = getReleasedCapitalSummary();
+    const container = document.getElementById("releasedCapital");
+    if (!container) return;
+    if (data.state === "NO_DATA") {
+        container.innerHTML = "";
+        return;
+    }
+    container.innerHTML = `
+    <div class="card">
+    
+        <h2>♻ RELEASED CAPITAL</h2>
+    
+        <div class="advisor-action priority">
+            <div class="action-title">
+                RECOMMENDED ACTION
+            </div>
+    
+            <p>
+                Redirect
+                ${formatCurrency(data.totalReleasedCapital)}
+                per month to
+                ${data.recommendation}
+            </p>
+        </div>
+    
+        <div class="advisor-action">
+            <div class="action-title">
+                WHY NOW
+            </div>
+    
+            <p>
+                Completed goals have released
+                recurring contribution capacity.
+            </p>
+        </div>
+    
+        <div class="advisor-action success">
+            <div class="action-title">
+                WEALTH IMPACT
+            </div>
+    
+            <p>
+                Potentially redirect
+                ${formatCurrency(data.tenYearImpact)}
+                over the next decade.
+            </p>
+        </div>
+    
+        <div class="advisor-action warning">
+            <div class="action-title">
+                RISK
+            </div>
+    
+            <p>
+                Lifestyle inflation may consume released capital.
+            </p>
+        </div>
+    
+    </div>
+    `;
+}
+
 /*******************************************************
  * DI-015 Wealth Advisor
  *
@@ -524,6 +641,20 @@ function loadWealthOpportunityEngine() {
 function getWealthAdvisorActions() {
     const actions = [];
     const priorityAction = getCapitalAllocationPriority();
+
+    const released = getReleasedCapitalSummary();
+    if (released.state === "ACTIVE") {
+        actions.push({
+            priority: 3,
+            category: "Released Capital",
+            action: `Redirect ${formatCurrency(
+                    released.totalReleasedCapital
+                )}/month to ${
+                    released.recommendation
+                }`,
+            source: "DI-028"
+        });
+    }
     actions.push({
         priority: priorityAction.priority,
         category: priorityAction.category,
