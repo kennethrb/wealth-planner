@@ -975,25 +975,32 @@ function getOutstandingCycleBills() {
  * Safe spendable cash before next payday.
  */
 function getSafeToSpend() {
-    const availableCash = getTotalLiquidAssets(appData.accounts || []);
+
+    const protection =
+        getUnifiedProtectionStatus(
+            appData.accounts,
+            appData.recurringBills,
+            appData.goals,
+            []
+        );
+
+    const availableCash =
+        protection.totalCash;
+
     const protectedBills =
-        getOutstandingCycleBills()
-            .reduce(
-                (sum, bill) =>
-                    sum +
-                    Number(
-                        bill.defaultAmount || 0
-                    ),
-                0
-            );
-    const monthlyObligations =
-        getCommitmentSummary()
-            .totalCommitments;
-    
+        protection.protectedObligations;
+
     const protectedBuffer =
-        monthlyObligations *
-        CONFIG.payCycle.bufferReserveRatio;
-    const safeToSpend = Math.max(0, availableCash - protectedBills - protectedBuffer);
+        protection.protectedBuffer;
+
+    const safeToSpend =
+        Math.max(
+            0,
+            availableCash -
+            protectedBills -
+            protectedBuffer
+        );
+
     return {
         availableCash,
         protectedBills,
@@ -3223,7 +3230,7 @@ async function loadCashFlowCommandCenter() {
                 <span>Protected Buffer</span>
                 <strong>
                     ${formatCurrency(
-                        protection.protectedBuffer
+                        protection.tier2.requiredAmount
                     )}
                 </strong>
             </div>
