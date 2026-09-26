@@ -740,7 +740,8 @@ async function refreshUI() {
         loadUpcomingBills(),
         loadRecurringBills(),
         loadGoals(),
-        loadAccounts()
+        loadAccounts(),
+        loadReleasedCapitalCard()
     ]);
 }
 async function initializeApp() {
