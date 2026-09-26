@@ -322,81 +322,100 @@
           <div id="personalInflation"></div>
       </section>
 
-  <!-- 🎯 Wealth Goals -->
-      <div class="section-header">
-        <h2>🎯 Wealth Goals</h2>
-        <p>Track wealth-building progress and long-term objectives.</p>
-      </div>
-  
-      <!-- Accounts & Goals Grid -->
-      <section id="goals" class="grid-2">
-<div class="card">
+<!-- 🎯 Wealth Goals -->
+<div class="section-header">
+  <h2>🎯 Wealth Goals</h2>
+  <p>Track wealth-building progress and long-term objectives.</p>
+</div>
+
+<!-- Accounts & Goals Grid -->
+<section id="goals" class="grid-2">
+  <!-- 🏦 ACCOUNTS CARD -->
+  <div class="card">
     <div class="card-title">🏦 Accounts</div>
 
     <form id="addAccountForm">
-        <h2 id="accountFormTitle">➕ Add Account</h2>
+      <h2 id="accountFormTitle">➕ Add Account</h2>
 
-        <div class="form-row">
-            <input
-                type="text"
-                id="accountName"
-                placeholder="Account Name"
-                required>
+      <div class="form-row">
+        <input
+          type="text"
+          id="accountName"
+          placeholder="Account Name"
+          required />
 
-            <div class="form-group">
-                <label>Net Worth Type</label>
-                <select id="netWorthType">
-                    <option value="Asset">Asset</option>
-                    <option value="Liability">Liability</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Account Category</label>
-                <select id="accountType"></select>
-            </div>
-
-            <input
-                type="number"
-                id="openingBalance"
-                placeholder="Opening Balance"
-                step="0.01"
-                required>
-
-            <div class="form-group">
-                <label>Protected</label>
-                <select id="accountProtected">
-                    <option value="false">No</option>
-                    <option value="true">Yes</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Minimum Balance</label>
-                <input
-                    type="number"
-                    id="minimumBalance"
-                    value="0"
-                    step="0.01"
-                />
-            </div>
-
-            <div class="form-actions" style="display: flex; gap: 8px; width: 100%; margin-top: 10px;">
-                <button type="submit" id="accountFormSubmitBtn" class="btn-primary">
-                    ➕ Add Account
-                </button>
-                <button type="button" id="accountFormCancelBtn" class="btn-secondary hidden" onclick="cancelAccountEdit()">
-                    Cancel
-                </button>
-            </div>
+        <div class="form-group">
+          <label>Net Worth Type</label>
+          <select id="netWorthType">
+            <option value="Asset">Asset</option>
+            <option value="Liability">Liability</option>
+          </select>
         </div>
+
+        <div class="form-group">
+          <label>Account Category</label>
+          <select id="accountType"></select>
+        </div>
+
+        <input
+          type="number"
+          id="openingBalance"
+          placeholder="Opening Balance"
+          step="0.01"
+          required />
+
+        <div class="form-group">
+          <label>Protected</label>
+          <select id="accountProtected">
+            <option value="false">No</option>
+            <option value="true">Yes</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Minimum Balance</label>
+          <input
+            type="number"
+            id="minimumBalance"
+            value="0"
+            step="0.01" />
+        </div>
+
+        <div class="form-actions" style="display: flex; gap: 8px; width: 100%; margin-top: 10px;">
+          <button type="submit" id="accountFormSubmitBtn" class="btn-primary">
+            ➕ Add Account
+          </button>
+          <button type="button" id="accountFormCancelBtn" class="btn-secondary hidden" onclick="cancelAccountEdit()">
+            Cancel
+          </button>
+        </div>
+      </div>
     </form>
 
     <hr class="divider">
 
     <div id="accounts"></div>
-</div>
-      </section>
+  </div>
+
+  <!-- 🎯 GOALS CARD -->
+  <div class="card">
+    <div class="card-title">🎯 Goals</div>
+
+    <form id="addGoalForm">
+      <h2 id="goalFormTitle">➕ Add Goal</h2>
+      <div class="form-row">
+        <input type="text" id="goalName" placeholder="Goal Name" required>
+        <input type="number" id="goalTarget" placeholder="Target Amount" required>
+        <input type="number" id="goalContribution" placeholder="Monthly Contribution" required>
+        <button type="submit" id="goalFormSubmitBtn">➕ Add Goal</button>
+      </div>
+    </form>
+
+    <hr class="divider">
+
+    <div id="financialGoals"></div>
+  </div>
+</section>
 
       <footer class="app-footer">
       
