@@ -36,6 +36,21 @@ async function graduateGoal(goalId) {
     }
 }
 
+async function markGoalFunded(goalId) {
+    const params = new URLSearchParams({
+        action: "markGoalFunded",
+        mode: getCurrentMode(),
+        goalId
+    });
+    const response = await fetch(`${BASE_URL}?${params}`);
+    const result = await response.json();
+    if (result.success) {
+        await loadData();
+        await refreshUI();
+        showStatus("💰 Goal Funded", "success");
+    }
+}
+
 // Tracks whether the form is in "Add" mode (null) or "Edit" mode (goalId)
 let editingGoalId = null;
 
