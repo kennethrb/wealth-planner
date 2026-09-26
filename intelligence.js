@@ -3082,7 +3082,13 @@ async function loadCashFlowCommandCenter() {
     const opportunity =
         capital.opportunity;
 
-    const protection = getProtectionStatus();
+    const protection =
+        getUnifiedProtectionStatus(
+            appData.accounts,
+            appData.recurringBills,
+            appData.goals,
+            []
+        );
     const requiredProtection = protection.requiredProtection;
     const protectionGap = protection.protectionGap;
 
