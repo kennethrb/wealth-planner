@@ -324,25 +324,3 @@ async function deleteAccount(accountId, forceDelete = false) {
     }
 }
 
-/**
- * Helper: Resolve current mode
- */
-function getCurrentMode() {
-    if (typeof CURRENT_MODE !== "undefined") return CURRENT_MODE;
-    if (typeof appMode !== "undefined") return appMode;
-    if (typeof appData !== "undefined" && appData.mode) return appData.mode;
-    return "TEST";
-}
-
-/**
- * Helper: HTML Sanitizer
- */
-function escapeHtml(str) {
-    if (!str) return "";
-    return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
