@@ -371,7 +371,7 @@ function loadReleasedCapitalCard() {
     container.innerHTML = `
     <div class="card">
     
-        <h2>♻ RELEASED CAPITAL</h2>
+        <h2>♻️ Released Capital</h2>
     
         <div class="advisor-action priority">
             <div class="action-title">
