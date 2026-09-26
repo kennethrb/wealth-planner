@@ -1,5 +1,41 @@
 // ==================== FILE: goals.js ====================
 
+//Create a single source of truth lifecycle function.
+function getGoalLifecycleState(goal) {
+    const current = Number(goal.current || 0);
+    const target = Number(goal.target || 0);
+    const explicitStatus = String(goal.status || "").toUpperCase();
+    if (explicitStatus === "ARCHIVED") {
+        return "ARCHIVED";
+    }
+    if (explicitStatus === "GRADUATED") {
+        return "GRADUATED";
+    }
+    if (explicitStatus === "FUNDED") {
+        return "FUNDED";
+    }
+    if (target > 0 && current >= target) {
+        return "FUNDED";
+    }
+    return "ACTIVE";
+}
+async function graduateGoal(goalId) {
+    const confirmed = await showConfirmDialog("Graduate Goal", "Has this goal been completed?");
+    if (!confirmed) return;
+    const params = new URLSearchParams({
+        action: "graduateGoal",
+        mode: getCurrentMode(),
+        goalId
+    });
+    const response = await fetch(`${BASE_URL}?${params}`);
+    const result = await response.json();
+    if (result.success) {
+        await loadData();
+        await refreshUI();
+        showStatus("✅ Goal Graduated", "success");
+    }
+}
+
 // Tracks whether the form is in "Add" mode (null) or "Edit" mode (goalId)
 let editingGoalId = null;
 
@@ -48,10 +84,12 @@ function loadGoals() {
                 const progress = target > 0 ? ((current / target) * 100).toFixed(1) : 0;
                 const remainingAmount = Math.max(0, target - current);
 
-                const status = goal.status || (current >= target ? "GRADUATED" : "ACTIVE");
+                const status = getGoalLifecycleState(goal);
 
                 const statusBadge =
-                    status === "GRADUATED"
+                    status === "FUNDED"
+                        ? "💰 Funded"
+                        : status === "GRADUATED"
                         ? "✅ Graduated"
                         : status === "ARCHIVED"
                         ? "📦 Archived"
@@ -82,7 +120,16 @@ function loadGoals() {
                         </div>
 
                         <div class="progress-bar-bg" style="margin: 8px 0; background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; overflow: hidden;">
-                            <div class="progress-bar-fill" style="width: ${Math.min(progress, 100)}\%; background:${status === "GRADUATED" ? "#34d399" : "#60a5fa"}; height: 100%;"></div>
+                            <div class="progress-bar-fill" style="width: ${Math.min(progress, 100)}\%; 
+                            background:${
+                            (
+                                status === "FUNDED" ||
+                                status === "GRADUATED"
+                            )
+                            ? "#34d399"
+                            : "#60a5fa"
+                            }
+                            ; height: 100%;"></div>
                         </div>
 
                         <div class="goal-details">
@@ -107,14 +154,23 @@ function loadGoals() {
                                 <button
                                     class="btn-secondary"
                                     onclick="archiveGoal('${id}')"
-                                    title="Archive Goal"
                                 >
                                     📦
                                 </button>
+                                
+                                ${status === "FUNDED" ? `
+                                <button
+                                    class="btn-success"
+                                    onclick="graduateGoal('${id}')"
+                                    title="Graduate Goal"
+                                >
+                                    🎓
+                                </button>
+                                ` : ""}
+                                
                                 <button
                                     class="btn-danger"
                                     onclick="deleteGoal('${id}')"
-                                    title="Delete Goal"
                                 >
                                     🗑
                                 </button>
