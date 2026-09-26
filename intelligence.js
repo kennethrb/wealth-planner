@@ -316,6 +316,7 @@ function getReleasedGoalCapital() {
             amount: Number(goal.monthlyContribution || 0)
         }))
     };
+}
 
 function getReleasedCapitalSummary() {
     const goalCapital = getReleasedGoalCapital();
@@ -325,14 +326,20 @@ function getReleasedCapitalSummary() {
     
     const tenYearImpact =
         annualImpact * 10;
+    
     const priority =
         getCapitalAllocationPriority();
+
+    const emergency =
+        getEmergencyFundGap();
     
-    const recommendation =
+    let recommendation =
         priority.action;
-    const emergency = getEmergencyFundGap();
+
+    
     if (!emergency.fullyFunded) {
-        recommendation = "Strengthen Emergency Reserve";
+        recommendation =
+            "Strengthen Emergency Reserve";
     }
     return {
         state:
