@@ -399,22 +399,25 @@
 
   <!-- 🎯 GOALS CARD -->
   <div class="card">
-    <div class="card-title">🎯 Goals</div>
-
-    <form id="addGoalForm">
-      <h2 id="goalFormTitle">➕ Add Goal</h2>
-      <div class="form-row">
-        <input type="text" id="goalName" placeholder="Goal Name" required>
-        <input type="number" id="goalTarget" placeholder="Target Amount" required>
-        <input type="number" id="goalContribution" placeholder="Monthly Contribution" required>
-        <button type="submit" id="goalFormSubmitBtn">➕ Add Goal</button>
-      </div>
-    </form>
-
-    <hr class="divider">
-
-    <div id="financialGoals"></div>
-  </div>
+      <div class="card-title">🎯 Goals</div>
+  
+      <form id="addGoalForm">
+        <h2 id="goalFormTitle">➕ Add Goal</h2>
+        <div class="form-row">
+          <input type="text" id="goalName" placeholder="Goal Name" required>
+          <input type="number" id="goalTarget" placeholder="Target Amount" required>
+          <input type="number" id="goalContribution" placeholder="Monthly Contribution" required>
+          
+          <div class="form-actions" style="display: flex; gap: 8px; width: 100%; margin-top: 10px;">
+            <button type="submit" id="goalFormSubmitBtn" class="btn-primary">➕ Add Goal</button>
+            <button type="button" id="goalFormCancelBtn" class="btn-secondary hidden" onclick="cancelGoalEdit()">Cancel</button>
+          </div>
+        </div>
+      </form>
+  
+      <hr class="divider">
+      <div id="financialGoals"></div>
+    </div>
 </section>
 
       <footer class="app-footer">
