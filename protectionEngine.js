@@ -28,10 +28,7 @@ function getUnifiedProtectionStatus(
         getCommitmentSummary();
 
     const tier1 =
-        getTier1Protection(
-            recurringBills,
-            debts
-        );
+        getTier1Protection();
 
     const tier2 =
         getTier2Protection(
@@ -90,40 +87,19 @@ function getUnifiedProtectionStatus(
   };
 }
 
-function getTier1Protection(
-    recurringBills = [],
-    debts = []
-) {
+function getTier1Protection() {
 
-    const protectedBills =
-        recurringBills.filter(
-            bill => bill.isProtected === true
-        );
-
-    const billProtection =
-        protectedBills.reduce(
-            (sum, bill) =>
-                sum + Number(
-                    bill.defaultAmount ||
-                    bill.amount ||
-                    0
-                ),
-            0
-        );
-
-    const debtProtection =
-        debts.reduce(
-            (sum, debt) =>
-                sum + Number(debt.minimumPayment || 0),
-            0
-        );
+    const commitments =
+        getCommitmentSummary();
 
     return {
         tier: "TIER_1",
         name: "Protected Obligations",
         requiredAmount:
-            billProtection + debtProtection
+            commitments.protectedBills +
+            commitments.protectedDebt
     };
+
 }
 
 function getTier2Protection(commitments)
