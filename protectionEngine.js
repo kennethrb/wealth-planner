@@ -43,9 +43,6 @@ function getUnifiedProtectionStatus(
             goals
         );
 
-  const commitments =
-      getCommitmentSummary();
-
   const protectionRequirement =
       tier1.requiredAmount +
       tier2.requiredAmount +
