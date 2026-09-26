@@ -162,9 +162,9 @@ async function handleAddAccount(event) {
 }
 
 /**
- * UPDATE: Prompt user for account updates
+ * Opens the custom Edit Account modal and populates fields
  */
-async function editAccount(accountId) {
+function editAccount(accountId) {
     const accounts = (typeof appData !== "undefined" && appData.accounts) ? appData.accounts : [];
     const account = accounts.find(a => (a.accountId || a.id) === accountId);
     if (!account) {
@@ -175,19 +175,47 @@ async function editAccount(accountId) {
     const currentName = account.accountName || account.name || "";
     const currentBal = account.currentBalance !== undefined ? account.currentBalance : (account.openingBalance || account.balance || 0);
 
-    const newName = prompt("Edit Account Name:", currentName);
-    if (newName === null) return;
+    // Populate modal form fields
+    document.getElementById("editAccountId").value = accountId;
+    document.getElementById("editAccountName").value = currentName;
+    document.getElementById("editAccountBalance").value = currentBal;
+    document.getElementById("editNetWorthType").value = account.netWorthType || "Asset";
 
-    const newBalanceStr = prompt("Edit Current Balance:", currentBal);
-    if (newBalanceStr === null) return;
+    // Show custom modal
+    const modal = document.getElementById("editAccountModal");
+    if (modal) {
+        modal.classList.remove("hidden");
+    }
+}
 
-    const newBalance = parseFloat(newBalanceStr);
-    if (isNaN(newBalance)) {
-        showStatus("Invalid numerical balance entered", "warning");
+/**
+ * Closes the Edit Account modal
+ */
+function closeEditAccountModal() {
+    const modal = document.getElementById("editAccountModal");
+    if (modal) {
+        modal.classList.add("hidden");
+    }
+}
+
+/**
+ * Handles submission of the custom Edit Account form
+ */
+async function handleUpdateAccountForm(event) {
+    if (event) event.preventDefault();
+
+    const accountId = document.getElementById("editAccountId").value;
+    const newName = document.getElementById("editAccountName").value.trim();
+    const newBalance = parseFloat(document.getElementById("editAccountBalance").value);
+    const netWorthType = document.getElementById("editNetWorthType").value;
+
+    if (!newName || isNaN(newBalance)) {
+        showStatus("Please enter valid account details", "warning");
         return;
     }
 
-    showStatus("Updating account...", "info");
+    closeEditAccountModal();
+    showStatus("Updating account in Google Sheets...", "info");
 
     try {
         const baseUrl = typeof GOOGLE_SCRIPT_URL !== "undefined" ? GOOGLE_SCRIPT_URL : (typeof BASE_URL !== "undefined" ? BASE_URL : "");
@@ -197,10 +225,9 @@ async function editAccount(accountId) {
             action: "updateAccount",
             mode: mode,
             accountId: accountId,
-            name: newName.trim() || currentName,
+            name: newName,
             currentBalance: newBalance,
-            netWorthType: account.netWorthType,
-            assetClass: account.assetClass
+            netWorthType: netWorthType
         });
 
         const response = await fetch(`${baseUrl}?${params.toString()}`);
@@ -214,13 +241,13 @@ async function editAccount(accountId) {
             showStatus("Update failed: " + (result.error || result.message), "error");
         }
     } catch (error) {
-        console.error("editAccount error:", error);
+        console.error("handleUpdateAccountForm error:", error);
         showStatus("Failed to update account", "error");
     }
 }
 
 /**
- * DELETE: Delete account with cascade safety check
+ * DELETE: Soft delete using custom showConfirmDialog
  */
 async function deleteAccount(accountId, forceDelete = false) {
     if (!forceDelete) {
@@ -246,9 +273,11 @@ async function deleteAccount(accountId, forceDelete = false) {
         const response = await fetch(`${baseUrl}?${params.toString()}`);
         const result = await response.json();
 
-        // Check for dependency cascade warning from backend
         if (!result.success && result.requiresConfirmation) {
-            const proceed = confirm(`⚠️ CASCADE WARNING:\n\n${result.message}\n\nDo you still want to force delete this account?`);
+            const proceed = typeof showConfirmDialog === "function"
+                ? await showConfirmDialog("Cascade Dependency Warning", `${result.message}\n\nDo you still want to force delete this account?`)
+                : confirm(`⚠️ CASCADE WARNING:\n\n${result.message}\n\nDo you still want to force delete this account?`);
+            
             if (proceed) {
                 await deleteAccount(accountId, true);
             } else {
