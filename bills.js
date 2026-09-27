@@ -1,5 +1,9 @@
 async function addRecurringBill() {
     const billNameInput = document.getElementById("billName");
+    const commitmentType =
+        document.getElementById(
+            "billCommitmentType"
+        )?.value || "BILL";
     const budgetTypeInput = document.getElementById("billBudgetType");
     const budgetPositionInput = document.getElementById("billBudgetPosition");
     const amountTypeInput = document.getElementById("billAmountType");
@@ -23,6 +27,7 @@ async function addRecurringBill() {
     await fetch(`${BASE_URL}?action=addRecurringBill` + 
         `&mode=${appMode}` +
         `&billName=${encodeURIComponent(billName)}` + 
+        `&commitmentType=${encodeURIComponent(commitmentType)}` +
         `&budgetType=${encodeURIComponent(budgetType)}` + 
         `&budgetPosition=${encodeURIComponent(budgetPosition)}` + 
         `&amountType=${encodeURIComponent(amountType)}` + 
@@ -276,7 +281,7 @@ function loadUpcomingBills() {
             status = `🟡 Due in ${daysRemaining} day(s)`;
             statusClass = "bill-due-soon";
         } else {
-            status = `🟢 Due in ${daysRemaining} day(s)`;
+            status = `🔵 Due in ${daysRemaining} day(s)`;
             statusClass = "bill-upcoming";
         }
 
@@ -308,8 +313,15 @@ function loadRecurringBills() {
   container.innerHTML = bills.map(bill => `
     <div class="funding-row">
       <div>
-        <strong>${bill.billName}</strong><br>
-        <small>${bill.budgetType} • Due Day ${bill.dueDay}</small>
+        <strong>${bill.billName}</strong>
+        
+        <small>
+        ${bill.commitmentType}
+        •
+        ${bill.budgetType}
+        •
+        Due Day ${bill.dueDay}
+        </small>
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
         <span>${formatCurrency(bill.defaultAmount)}</span>
