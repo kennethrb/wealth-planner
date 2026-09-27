@@ -87,6 +87,26 @@ async function deleteRecurringBill(billId) {
 
 let editingBillId = null;
 function editRecurringBill(billId) {
+    const formTitle =
+        document.getElementById(
+            "billFormTitle"
+        );
+    const form =
+        document.getElementById(
+            "billName"
+        );
+    
+    if (form) {
+        form.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+    }
+    
+    if (formTitle) {
+        formTitle.textContent =
+            "✏️ Edit Recurring Bill";
+    }
     const bill =
         appData.recurringBills.find(
             b => b.billId === billId
@@ -124,7 +144,8 @@ function editRecurringBill(billId) {
 
     document.getElementById(
         "billFormSubmitBtn"
-    ).textContent = "💾 Update Bill";
+    ).textContent =
+        "Save Changes";
 
     document.getElementById(
         "billFormCancelBtn"
@@ -132,6 +153,15 @@ function editRecurringBill(billId) {
 }
 
 function cancelRecurringBillEdit() {
+    const formTitle =
+        document.getElementById(
+            "billFormTitle"
+        );
+    
+    if (formTitle) {
+        formTitle.textContent =
+            "➕ Add Recurring Bill";
+    }
 
     editingBillId = null;
 
