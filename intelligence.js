@@ -4,21 +4,28 @@
 
 function getCommitmentSummary() {
     const activeBills = (appData.recurringBills || []).filter(bill => bill.active !== false);
-    const protectedDebt = activeBills.filter(bill => String(bill.budgetType || "").toLowerCase() === "debt").reduce(
+    const protectedBills = activeBills.filter(bill => bill.commitmentType === "BILL").reduce(
         (sum, bill) => sum + Number(bill.defaultAmount || 0), 0);
-    const protectedBills = activeBills.filter(bill => String(bill.budgetType || "").toLowerCase() !== "debt").reduce(
+    const protectedDebt = activeBills.filter(bill => bill.commitmentType === "DEBT").reduce(
+        (sum, bill) => sum + Number(bill.defaultAmount || 0), 0);
+    const cashRequirements = activeBills.filter(bill => bill.commitmentType === "CASH_REQUIREMENT").reduce(
+        (sum, bill) => sum + Number(bill.defaultAmount || 0), 0);
+    const lifestyleCommitments = activeBills.filter(bill => bill.commitmentType === "LIFESTYLE").reduce(
         (sum, bill) => sum + Number(bill.defaultAmount || 0), 0);
     const goalFunding = (appData.goals || []).filter(goal => {
         const current = Number(goal.current || 0);
         const target = Number(goal.target || 0);
         return current < target;
-    }).reduce((sum, goal) => sum + Number(goal.monthlyContribution || 0), 0);
-    const totalCommitments = protectedBills + protectedDebt + goalFunding;
+    }).reduce(
+        (sum, goal) => sum + Number(goal.monthlyContribution || 0), 0);
+    const totalCommitments = protectedBills + protectedDebt + cashRequirements + lifestyleCommitments + goalFunding;
     const availableCash = getTotalLiquidAssets(appData.accounts || []);
-    const availableCapital = Math.max(0, availableCash - totalCommitments);
+    const availableCapital = Math.max(0, availableCash - protectedBills - protectedDebt - goalFunding);
     return {
         protectedBills,
         protectedDebt,
+        cashRequirements,
+        lifestyleCommitments,
         goalFunding,
         totalCommitments,
         availableCash,
