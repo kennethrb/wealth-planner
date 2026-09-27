@@ -431,6 +431,16 @@
           <input type="text" id="goalName" placeholder="Goal Name" required>
           <input type="number" id="goalTarget" placeholder="Target Amount" required>
           <input type="number" id="goalContribution" placeholder="Monthly Contribution" required>
+
+          <select id="goalMode">
+              <option value="VIRTUAL">
+                  Virtual Goal
+              </option>
+          
+              <option value="PROTECTED">
+                  Protected Goal
+              </option>
+          </select>
           
           <div class="form-actions" style="display: flex; gap: 8px; width: 100%; margin-top: 10px;">
             <button type="submit" id="goalFormSubmitBtn" class="btn-primary">➕ Add Goal</button>
