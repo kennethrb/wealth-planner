@@ -113,13 +113,17 @@ function getTier1Protection() {
 
 function getTier2Protection(commitments)
 {
-    return {
-        tier: "TIER_2",
-        name: "Operating Buffer",
-        requiredAmount:
-            commitments.totalCommitments *
-            CONFIG.payCycle.bufferReserveRatio
-    };
+  const protectedCommitments =
+      commitments.protectedBills +
+      commitments.protectedDebt;
+  
+  return {
+      tier: "TIER_2",
+      name: "Operating Buffer",
+      requiredAmount:
+          protectedCommitments *
+          CONFIG.payCycle.bufferReserveRatio
+  };
 }
 
 function getTier3Protection(goals = []) {
