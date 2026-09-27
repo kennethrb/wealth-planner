@@ -84,16 +84,27 @@ function getCapitalPosition() {
 
 function getOpportunityCapital() {
     const availableCash = getTotalLiquidAssets(appData.accounts || []);
-    const totalRecurringBills = getTotalRecurringBills();
+    const commitments =
+        getCommitmentSummary();
+    
+    const protectedRecurringBills =
+        commitments.protectedBills +
+        commitments.protectedDebt;
     const remainingBills = getOutstandingCycleBills().reduce(
         (sum, bill) => sum + Number(bill.defaultAmount || 0), 0);
-    const coverage = totalRecurringBills === 0 ? CONFIG.cashFlow.unlimitedCoverage : availableCash / totalRecurringBills;
+    const coverage = protectedRecurringBills === 0 ? CONFIG.cashFlow.unlimitedCoverage : availableCash / protectedRecurringBills;
     const surplus = availableCash - remainingBills;
     const opportunity = surplus > 0 ? surplus * CONFIG.opportunityAllocation.reserveRatio : 0;
     return {
         availableCash,
         remainingBills,
-        totalRecurringBills,
+    
+        protectedRecurringBills,
+    
+        // backwards compatibility
+        totalRecurringBills:
+            protectedRecurringBills,
+    
         coverage,
         surplus,
         opportunity
@@ -1097,11 +1108,32 @@ function getCurrentPayCycle() {
  * in Phase 2.
  */
 function getCycleBills() {
-    const cycle = getCurrentPayCycle();
-    return (appData.recurringBills || []).filter(bill => bill.active !== false).filter(bill => {
-        const dueDate = getNextDueDate(Number(bill.dueDay));
-        return (dueDate <= cycle.nextPayday);
-    });
+
+    const cycle =
+        getCurrentPayCycle();
+
+    return (appData.recurringBills || [])
+        .filter(
+            bill =>
+                bill.active !== false
+        )
+        .filter(
+            bill =>
+                bill.commitmentType === "BILL" ||
+                bill.commitmentType === "DEBT"
+        )
+        .filter(bill => {
+
+            const dueDate =
+                getNextDueDate(
+                    Number(bill.dueDay)
+                );
+
+            return (
+                dueDate <=
+                cycle.nextPayday
+            );
+        });
 }
 
 function getOutstandingCycleBills() {
@@ -3233,8 +3265,8 @@ async function loadCashFlowCommandCenter() {
     const coverage =
         capital.coverage;
 
-    const totalRecurringBills =
-        capital.totalRecurringBills;
+    const protectedRecurringBills =
+        capital.protectedRecurringBills;
 
     const surplus =
         capital.surplus;
@@ -3508,10 +3540,10 @@ async function loadCashFlowCommandCenter() {
         </div>
         
         <div class="metric-row">
-            <span>Monthly Bill Load</span>
+            <span>Protected Obligations</span>
             <strong>
                 ${formatCurrency(
-                    totalRecurringBills
+                    protectedRecurringBills
                 )}
             </strong>
         </div>
