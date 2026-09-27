@@ -13,9 +13,22 @@ function getCommitmentSummary() {
     const lifestyleCommitments = activeBills.filter(bill => bill.commitmentType === "LIFESTYLE").reduce(
         (sum, bill) => sum + Number(bill.defaultAmount || 0), 0);
     const goalFunding = (appData.goals || []).filter(goal => {
-        const current = Number(goal.current || 0);
-        const target = Number(goal.target || 0);
-        return current < target;
+    
+        const current =
+            Number(goal.current || 0);
+    
+        const target =
+            Number(goal.target || 0);
+    
+        const goalMode =
+            String(
+                goal.goalMode || "VIRTUAL"
+            ).toUpperCase();
+    
+        return (
+            current < target &&
+            goalMode === "PROTECTED"
+        );
     }).reduce(
         (sum, goal) => sum + Number(goal.monthlyContribution || 0), 0);
     const totalCommitments = protectedBills + protectedDebt + cashRequirements + lifestyleCommitments + goalFunding;
@@ -54,9 +67,22 @@ function getWealthFlowSummary() {
         if (type === "Debt") debt += amount;
     });
         const goalFunding = (appData.goals || []).filter(goal => {
-            const current = Number(goal.current || 0);
-            const target = Number(goal.target || 0);
-            return current < target;
+        
+            const current =
+                Number(goal.current || 0);
+        
+            const target =
+                Number(goal.target || 0);
+        
+            const goalMode =
+                String(
+                    goal.goalMode || "VIRTUAL"
+                ).toUpperCase();
+        
+            return (
+                current < target &&
+                goalMode === "PROTECTED"
+            );
         }).reduce((sum, goal) => sum + Number(goal.monthlyContribution || 0), 0);
     const monthlySurplus = income - expense - debt - goalFunding;
     return {
