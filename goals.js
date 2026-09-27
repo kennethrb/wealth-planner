@@ -215,10 +215,15 @@ function editGoal(goalId) {
     const elName = document.getElementById("goalName");
     const elTarget = document.getElementById("goalTarget");
     const elContribution = document.getElementById("goalContribution");
+    const elGoalMode = document.getElementById("goalMode");
 
     if (elName) elName.value = goal.goal || goal.goalName || "";
     if (elTarget) elTarget.value = goal.target || 0;
     if (elContribution) elContribution.value = goal.monthlyContribution || 0;
+    if (elGoalMode) {
+        elGoalMode.value =
+            goal.goalMode || "VIRTUAL";
+    }
 
     // 2. Update Form Action Controls
     const formTitle = document.getElementById("goalFormTitle");
@@ -267,6 +272,10 @@ function cancelGoalEdit() {
  */
 async function handleGoalFormSubmit(event) {
     if (event) event.preventDefault();
+    const goalMode =
+        document.getElementById(
+            "goalMode"
+        )?.value || "VIRTUAL";
 
     const goalName = document.getElementById("goalName")?.value.trim() || "";
     const target = parseFloat(document.getElementById("goalTarget")?.value) || 0;
@@ -295,7 +304,8 @@ async function handleGoalFormSubmit(event) {
                 goal: goalName,
                 target: target,
                 current: currentAmount,
-                monthlyContribution: monthlyContribution
+                monthlyContribution: monthlyContribution,
+                goalMode: goalMode
             });
 
             const response = await fetch(`${baseUrl}?${params.toString()}`);
@@ -323,7 +333,8 @@ async function handleGoalFormSubmit(event) {
                 goal: goalName,
                 target: target,
                 current: 0,
-                monthlyContribution: monthlyContribution
+                monthlyContribution: monthlyContribution,
+                goalMode: goalMode
             });
 
             const response = await fetch(`${baseUrl}?${params.toString()}`);
