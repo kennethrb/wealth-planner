@@ -2,21 +2,29 @@
 
 //Create a single source of truth lifecycle function.
 function getGoalLifecycleState(goal) {
-    const current = Number(goal.current || 0);
-    const target = Number(goal.target || 0);
-    const explicitStatus = String(goal.status || "").toUpperCase();
+
+    const current =
+        Number(goal.current || 0);
+
+    const target =
+        Number(goal.target || 0);
+
+    const explicitStatus =
+        String(goal.status || "")
+        .toUpperCase();
+
     if (explicitStatus === "ARCHIVED") {
         return "ARCHIVED";
     }
+
     if (explicitStatus === "GRADUATED") {
         return "GRADUATED";
     }
-    if (explicitStatus === "FUNDED") {
-        return "FUNDED";
-    }
+
     if (target > 0 && current >= target) {
         return "FUNDED";
     }
+
     return "ACTIVE";
 }
 async function graduateGoal(goalId) {
