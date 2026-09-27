@@ -24,17 +24,23 @@ async function addRecurringBill() {
         return;
     }
 
-    if (editingBillId) {
-    
-        await fetch(
-            `${BASE_URL}?action=updateRecurringBill`
-            + `&mode=${appMode}`
-            + `&billId=${editingBillId}`
-            + `&amount=${amount}`
-            + `&commitmentType=${encodeURIComponent(commitmentType)}`
-        );
-    
-    } else {
+        if (editingBillId) {
+        
+            await fetch(
+                `${BASE_URL}?action=updateRecurringBill`
+                + `&mode=${appMode}`
+                + `&billId=${editingBillId}`
+                + `&billName=${encodeURIComponent(billName)}`
+                + `&commitmentType=${encodeURIComponent(commitmentType)}`
+                + `&budgetType=${encodeURIComponent(budgetType)}`
+                + `&budgetPosition=${encodeURIComponent(budgetPosition)}`
+                + `&amountType=${encodeURIComponent(amountType)}`
+                + `&amount=${amount}`
+                + `&dueDay=${dueDay}`
+                + `&account=${encodeURIComponent(account)}`
+            );
+        
+        } else {
     
         await fetch(
             `${BASE_URL}?action=addRecurringBill`
