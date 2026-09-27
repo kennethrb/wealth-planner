@@ -1268,11 +1268,19 @@ function getPaydayPlan() {
 function getGraduatedGoals() {
     const goals = appData.goals || [];
     const graduated = goals.filter(goal => {
-        const current = Number(goal.current || 0);
-        const target = Number(goal.target || 0);
+    
+        const goalMode =
+            String(
+                goal.goalMode || "VIRTUAL"
+            ).toUpperCase();
+    
         return (
-            String(goal.status).toUpperCase() === "GRADUATED"
+            String(goal.status)
+                .toUpperCase() === "GRADUATED"
+            &&
+            goalMode === "PROTECTED"
         );
+    
     });
     const releasedMonthlyContribution = graduated.reduce(
         (sum, goal) => sum + Number(goal.monthlyContribution || 0), 0);
