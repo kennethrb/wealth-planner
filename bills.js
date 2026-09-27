@@ -24,28 +24,49 @@ async function addRecurringBill() {
         return;
     }
 
-    await fetch(`${BASE_URL}?action=addRecurringBill` + 
-        `&mode=${appMode}` +
-        `&billName=${encodeURIComponent(billName)}` + 
-        `&commitmentType=${encodeURIComponent(commitmentType)}` +
-        `&budgetType=${encodeURIComponent(budgetType)}` + 
-        `&budgetPosition=${encodeURIComponent(budgetPosition)}` + 
-        `&amountType=${encodeURIComponent(amountType)}` + 
-        `&amount=${amount}` + 
-        `&dueDay=${dueDay}` + 
-        `&account=${encodeURIComponent(account)}`
-    );
+    if (editingBillId) {
+    
+        await fetch(
+            `${BASE_URL}?action=updateRecurringBill`
+            + `&mode=${appMode}`
+            + `&billId=${editingBillId}`
+            + `&amount=${amount}`
+            + `&commitmentType=${encodeURIComponent(commitmentType)}`
+        );
+    
+    } else {
+    
+        await fetch(
+            `${BASE_URL}?action=addRecurringBill`
+            + `&mode=${appMode}`
+            + `&billName=${encodeURIComponent(billName)}`
+            + `&commitmentType=${encodeURIComponent(commitmentType)}`
+            + `&budgetType=${encodeURIComponent(budgetType)}`
+            + `&budgetPosition=${encodeURIComponent(budgetPosition)}`
+            + `&amountType=${encodeURIComponent(amountType)}`
+            + `&amount=${amount}`
+            + `&dueDay=${dueDay}`
+            + `&account=${encodeURIComponent(account)}`
+        );
+    
+    }
 
     await loadData();
     loadRecurringBills();
     await refreshFinancialViews();
+    cancelRecurringBillEdit();
 
     // Reset Form Input Fields
     if (billNameInput) billNameInput.value = "";
     if (amountInput) amountInput.value = "";
     if (dueDayInput) dueDayInput.value = "";
 
-    showStatus("✅ Recurring bill created", "success");
+    showStatus(
+        editingBillId
+            ? "✅ Recurring bill updated"
+            : "✅ Recurring bill created",
+        "success"
+    );
 }
 
 async function deleteRecurringBill(billId) {
@@ -63,36 +84,73 @@ async function deleteRecurringBill(billId) {
 }
 
 // Edit recurring bill amount
-async function editRecurringBill(billId) {
-    const bill = appData.recurringBills.find(b => b.billId === billId);
+
+let editingBillId = null;
+function editRecurringBill(billId) {
+    const bill =
+        appData.recurringBills.find(
+            b => b.billId === billId
+        );
+
     if (!bill) return;
-  
-    const newAmount = await showInputDialog(
-      "Edit Recurring Bill",
-      bill.billName,
-      bill.defaultAmount
-    );
-  
-    if (newAmount === null) return;
-    if (isNaN(newAmount) || Number(newAmount) < 0) {
-      showStatus("⚠ Invalid amount","warning");
-      return;
-    }
-  
-    await fetch(
-        `${BASE_URL}?action=updateRecurringBill`
-        + `&mode=${appMode}`
-        + `&billId=${billId}`
-        + `&amount=${newAmount}`
-    );
-  
-    await loadData();
-  
-    loadRecurringBills();
-    await refreshFinancialViews();
-  
-    showStatus("✅ Recurring Bill Updated","success");
-  }
+
+    editingBillId = billId;
+
+    document.getElementById("billName").value =
+        bill.billName;
+
+    document.getElementById("billCommitmentType").value =
+        bill.commitmentType || "BILL";
+
+    document.getElementById("billBudgetType").value =
+        bill.budgetType;
+
+    loadRecurringBillPositions();
+
+    document.getElementById("billBudgetPosition").value =
+        bill.budgetPosition;
+
+    document.getElementById("billAmountType").value =
+        bill.amountType;
+
+    document.getElementById("billAmount").value =
+        bill.defaultAmount;
+
+    document.getElementById("billDueDay").value =
+        bill.dueDay;
+
+    document.getElementById("billAccount").value =
+        bill.accountId;
+
+    document.getElementById(
+        "billFormSubmitBtn"
+    ).textContent = "💾 Update Bill";
+
+    document.getElementById(
+        "billFormCancelBtn"
+    ).classList.remove("hidden");
+}
+
+function cancelRecurringBillEdit() {
+
+    editingBillId = null;
+
+    document.getElementById("billName").value = "";
+    document.getElementById("billAmount").value = "";
+    document.getElementById("billDueDay").value = "";
+
+    document.getElementById(
+        "billCommitmentType"
+    ).value = "BILL";
+
+    document.getElementById(
+        "billFormSubmitBtn"
+    ).textContent = "➕ Add Bill";
+
+    document.getElementById(
+        "billFormCancelBtn"
+    ).classList.add("hidden");
+}
 
 // Generate transactions from recurring bills
 async function generateBills() {
