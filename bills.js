@@ -212,7 +212,15 @@ function loadUpcomingBills() {
   const container = document.getElementById("upcomingBills");
   if (!container) return;
 
-  const activeBills = (appData.recurringBills || []).filter(bill => bill.active);
+const activeBills =
+    (appData.recurringBills || [])
+        .filter(bill =>
+            bill.active &&
+            (
+                bill.commitmentType === "BILL" ||
+                bill.commitmentType === "DEBT"
+            )
+        );
 
   if (!activeBills.length) {
     container.innerHTML = `
