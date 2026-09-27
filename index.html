@@ -164,6 +164,16 @@
           <h2>➕ Add Recurring Bill</h2>
           <div class="form-row">
               <input type="text" id="billName" placeholder="Bill Name">
+              <select id="billCommitmentType">
+                  <option value="BILL">Bill</option>
+                  <option value="DEBT">Debt</option>
+                  <option value="CASH_REQUIREMENT">
+                      Cash Requirement
+                  </option>
+                  <option value="LIFESTYLE">
+                      Lifestyle
+                  </option>
+              </select>
               <select
                 id="billBudgetType"
                 onchange="loadRecurringBillPositions()">
