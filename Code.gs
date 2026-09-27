@@ -65,7 +65,7 @@ function doGet(e) {
       case "getAllData":
         return getAllData(params.mode);
       case "getTransactions":
-        return createJsonResponse(getTransactions());
+        return createJsonResponse(getTransactions(params.mode));
       case "addTransaction":
         return addTransaction(params);
       case "updateTransaction":
@@ -92,6 +92,10 @@ function doGet(e) {
           return addGoal(params);
       case "updateGoal":
           return updateGoal(params);
+      case "markGoalFunded":
+          return markGoalFunded(params);
+      case "graduateGoal":
+          return graduateGoal(params);
       case "archiveGoal":
           return archiveGoal(params);
       case "deleteGoal":
@@ -255,12 +259,7 @@ function getGoals(mode) {
         ),
 
       status:
-        row["Status"] ||
-        (
-          current >= target
-            ? "GRADUATED"
-            : "ACTIVE"
-        ),
+          row["Status"] || "ACTIVE",
 
       graduatedDate:
         row["Graduated Date"] || "",
@@ -440,20 +439,120 @@ function updateGoal(data) {
           )
       );
 
-  if (
-      cols["Status"] &&
-      data.status
-  )
+  const calculatedStatus =
+      getGoalStatus({
+          current: data.current || 0,
+          target: data.target || 0,
+          status: data.status || "ACTIVE"
+      });
+
+  if (cols["Status"]) {
       sheet.getRange(
           rowIndex,
           cols["Status"]
       ).setValue(
-          data.status
+          calculatedStatus
       );
+  }
 
   return createJsonResponse({
       success: true
   });
+}
+
+function markGoalFunded(data) {
+
+    const sheet =
+        getModeSheet(
+            SHEET_GOALS,
+            data.mode
+        );
+
+    const cols =
+        getColumnIndexMap(
+            SHEET_GOALS,
+            data.mode
+        );
+
+    const values =
+        sheet.getDataRange().getValues();
+
+    const idCol =
+        cols["Goal ID"] - 1;
+
+    for (let i = 1; i < values.length; i++) {
+
+        if (
+            String(values[i][idCol]).trim() ===
+            String(data.goalId).trim()
+        ) {
+
+            sheet.getRange(
+                i + 1,
+                cols["Status"]
+            ).setValue("FUNDED");
+
+            return createJsonResponse({
+                success: true
+            });
+        }
+    }
+
+    return createJsonResponse({
+        success: false,
+        error: "Goal not found"
+    });
+}
+
+function graduateGoal(data) {
+
+    const sheet =
+        getModeSheet(
+            SHEET_GOALS,
+            data.mode
+        );
+
+    const cols =
+        getColumnIndexMap(
+            SHEET_GOALS,
+            data.mode
+        );
+
+    const values =
+        sheet.getDataRange().getValues();
+
+    const idCol =
+        cols["Goal ID"] - 1;
+
+    for (let i = 1; i < values.length; i++) {
+
+        if (
+            String(values[i][idCol]).trim() ===
+            String(data.goalId).trim()
+        ) {
+
+            sheet.getRange(
+                i + 1,
+                cols["Status"]
+            ).setValue("GRADUATED");
+
+            if (cols["Graduated Date"]) {
+                sheet.getRange(
+                    i + 1,
+                    cols["Graduated Date"]
+                ).setValue(new Date());
+            }
+
+            return createJsonResponse({
+                success: true
+            });
+        }
+    }
+
+    return createJsonResponse({
+        success: false,
+        error: "Goal not found"
+    });
 }
 
 function archiveGoal(data) {
@@ -679,24 +778,18 @@ function addAccount(data) {
   return createJsonResponse({ success: true, accountId: accountId });
 }
 
-/** UPDATE: Edit account details or balance */
+/**
+ * UPDATE: Edits account details or balance with environment mode support
+ */
 function updateAccount(data) {
-  const sheet =
-      getModeSheet(
-          SHEET_ACCOUNTS,
-          data.mode
-      );
+  const mode = data.mode;
+  const sheet = getModeSheet(SHEET_ACCOUNTS, mode);
   if (!sheet) return createJsonResponse({ success: false, error: "Accounts sheet not found" });
 
-  const accountId = String(data.accountId || data.id).trim();
+  const accountId = String(data.accountId || data.id || "").trim();
   if (!accountId) return createJsonResponse({ success: false, error: "Missing Account ID" });
 
-  const cols =
-      getColumnIndexMap(
-          SHEET_ACCOUNTS,
-          data.mode
-      );
-
+  const cols = getColumnIndexMap(SHEET_ACCOUNTS, mode);
   const idColIndex = cols["Account ID"] - 1;
   const values = sheet.getDataRange().getValues();
 
@@ -710,54 +803,71 @@ function updateAccount(data) {
 
   if (rowIndex === -1) return createJsonResponse({ success: false, error: "Account not found" });
 
-  if (cols["Account Name"] && data.name) sheet.getRange(rowIndex, cols["Account Name"]).setValue(data.name);
-  if (cols["Net Worth Type"] && data.netWorthType) sheet.getRange(rowIndex, cols["Net Worth Type"]).setValue(data.netWorthType);
-  if (cols["Type"] && data.type) sheet.getRange(rowIndex, cols["Type"]).setValue(data.type);
-  if (cols["Asset Class"] && data.assetClass) sheet.getRange(rowIndex, cols["Asset Class"]).setValue(data.assetClass);
-  if (cols["Protected"])
-  {
-      sheet.getRange(
-          rowIndex,
-          cols["Protected"]
-      ).setValue(
-          String(data.protected) === "true"
-      );
+  const accountName = data.name !== undefined ? data.name : data.accountName;
+  if (cols["Account Name"] && accountName !== undefined) {
+    sheet.getRange(rowIndex, cols["Account Name"]).setValue(accountName);
+  }
+  if (cols["Net Worth Type"] && data.netWorthType !== undefined) {
+    sheet.getRange(rowIndex, cols["Net Worth Type"]).setValue(data.netWorthType);
+  }
+  if (cols["Type"] && data.type !== undefined) {
+    sheet.getRange(rowIndex, cols["Type"]).setValue(data.type);
+  }
+  if (cols["Asset Class"] && data.assetClass !== undefined) {
+    sheet.getRange(rowIndex, cols["Asset Class"]).setValue(data.assetClass);
+  }
+  if (cols["Opening Balance"] && data.openingBalance !== undefined) {
+    sheet.getRange(rowIndex, cols["Opening Balance"]).setValue(Number(data.openingBalance));
+  }
+  if (cols["Current Balance"] && data.currentBalance !== undefined) {
+    sheet.getRange(rowIndex, cols["Current Balance"]).setValue(Number(data.currentBalance));
+  }
+  if (cols["Protected"] && data.protected !== undefined) {
+    sheet.getRange(
+      rowIndex,
+      cols["Protected"]
+    ).setValue(
+      String(data.protected) === "true" ||
+      data.protected === true
+    );
   }
 
-  if (cols["Minimum Balance"])
-  {
-      sheet.getRange(
-          rowIndex,
-          cols["Minimum Balance"]
-      ).setValue(
-          Number(
-              data.minimumBalance || 0
-          )
-      );
+  if (cols["Minimum Balance"] && data.minimumBalance !== undefined) {
+    sheet.getRange(
+      rowIndex,
+      cols["Minimum Balance"]
+    ).setValue(
+      Number(data.minimumBalance)
+    );
   }
 
-
-
-  return createJsonResponse({ success: true });
+  return createJsonResponse({ success: true, accountId: accountId });
 }
 
-/** DELETE: Soft delete (set Active = No) or delete row */
+/**
+ * DELETE: Soft delete with cascade safety check for linked Goals & Recurring Bills
+ */
 function deleteAccount(data) {
-  const sheet =
-      getModeSheet(
-          SHEET_ACCOUNTS,
-          data.mode
-      );
+  const mode = data.mode;
+  const sheet = getModeSheet(SHEET_ACCOUNTS, mode);
   if (!sheet) return createJsonResponse({ success: false, error: "Accounts sheet not found" });
 
-  const accountId = String(data.accountId || data.id).trim();
+  const accountId = String(data.accountId || data.id || "").trim();
   if (!accountId) return createJsonResponse({ success: false, error: "Missing Account ID" });
-  const cols =
-      getColumnIndexMap(
-          SHEET_ACCOUNTS,
-          data.mode
-      );
 
+  // 1. Dependency / Cascade Check (Recurring Bills & Goals)
+  const linkedDependencies = checkAccountDependencies(accountId, mode);
+  if (linkedDependencies.hasDependencies && !data.forceDelete) {
+    return createJsonResponse({
+      success: false,
+      requiresConfirmation: true,
+      message: `Account is linked to ${linkedDependencies.summary}. Please confirm deletion or reassign.`,
+      dependencies: linkedDependencies
+    });
+  }
+
+  // 2. Locate and Soft Delete Account
+  const cols = getColumnIndexMap(SHEET_ACCOUNTS, mode);
   const idColIndex = cols["Account ID"] - 1;
   const values = sheet.getDataRange().getValues();
 
@@ -768,11 +878,59 @@ function deleteAccount(data) {
       } else {
         sheet.deleteRow(i + 1); // Hard delete fallback
       }
-      return createJsonResponse({ success: true });
+      return createJsonResponse({ success: true, deletedAccountId: accountId });
     }
   }
 
   return createJsonResponse({ success: false, error: "Account ID not found" });
+}
+
+/**
+ * HELPER: Checks for active dependencies before deletion
+ */
+function checkAccountDependencies(accountId, mode) {
+  let linkedBillsCount = 0;
+  let linkedGoalsCount = 0;
+
+  // Check Recurring Bills using SHEET_RECURRING constant
+  const billsSheet = getModeSheet(SHEET_RECURRING, mode);
+  if (billsSheet) {
+    const cols = getColumnIndexMap(SHEET_RECURRING, mode);
+    if (cols["Account ID"]) {
+      const values = billsSheet.getDataRange().getValues();
+      for (let i = 1; i < values.length; i++) {
+        if (String(values[i][cols["Account ID"] - 1]).trim() === String(accountId).trim()) {
+          linkedBillsCount++;
+        }
+      }
+    }
+  }
+
+  // Check Goals
+  const goalsSheet = getModeSheet(SHEET_GOALS, mode);
+  if (goalsSheet) {
+    const cols = getColumnIndexMap(SHEET_GOALS, mode);
+    const idCol = cols["Linked Account ID"] || cols["Account ID"] || cols["Preferred Funding Source ID"];
+    if (idCol) {
+      const values = goalsSheet.getDataRange().getValues();
+      for (let i = 1; i < values.length; i++) {
+        if (String(values[i][idCol - 1]).trim() === String(accountId).trim()) {
+          linkedGoalsCount++;
+        }
+      }
+    }
+  }
+
+  const parts = [];
+  if (linkedBillsCount > 0) parts.push(`${linkedBillsCount} recurring bill(s)`);
+  if (linkedGoalsCount > 0) parts.push(`${linkedGoalsCount} goal(s)`);
+
+  return {
+    hasDependencies: parts.length > 0,
+    linkedBillsCount,
+    linkedGoalsCount,
+    summary: parts.join(" and ")
+  };
 }
 
 function archiveAccount(params) {
@@ -1555,17 +1713,16 @@ function getModeSheet(
 
 function getGoalStatus(goal) {
 
-  if (
-      goal.status === "ARCHIVED"
-  ) {
+  if (goal.status === "ARCHIVED") {
       return "ARCHIVED";
   }
 
-  if (
-      Number(goal.current) >=
-      Number(goal.target)
-  ) {
+  if (goal.status === "GRADUATED") {
       return "GRADUATED";
+  }
+
+  if (goal.status === "FUNDED") {
+      return "FUNDED";
   }
 
   return "ACTIVE";
