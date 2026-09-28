@@ -268,32 +268,28 @@ const activeBills =
   let totalBillsAmount = 0;
   let paidAmount = 0;
 
-  activeBills.forEach(bill => {
-    const isPaid = checkIsPaid(bill);
-    const amount = Number(bill.defaultAmount || 0);
-
-    totalBillsAmount += amount;
-
-    if (isPaid) {
-        paidCount++;
-        paidAmount += amount;
-    } else {
-        dueCount++;
-    }
-  });
+    activeBills.forEach(bill => {
+        const isPaid = checkIsPaid(bill);
+        const amount = Number(bill.defaultAmount || 0);
+        totalBillsAmount += amount;
+        if (isPaid) {
+            paidCount++;
+            paidAmount += amount;
+        } else {
+            const dueDate = getNextDueDate(Number(bill.dueDay));
+            const daysRemaining = Math.ceil(
+                (dueDate - today) / (1000 * 60 * 60 * 24));
+            dueCount++;
+            if (daysRemaining <= 0) {
+                overdueCount++;
+            }
+        }
+    });
 
   const remainingAmount = totalBillsAmount - paidAmount;
   // Find next unpaid bill due
   const nextBill = activeBills
-    .filter(bill => !(appData.transactions || []).some(tx => {
-      const txDate = new Date(tx.Date || tx.date);
-      const details = tx.Details || tx.details || "";
-        return (
-            tx.budgetPosition === bill.budgetPosition &&
-            txDate.getMonth() === currentMonth &&
-            txDate.getFullYear() === currentYear
-        );
-    }))
+    .filter(bill => !checkIsPaid(bill))
     .sort((a,b) => a.dueDay - b.dueDay)[0];
   // Calculate bill completion percentage
   const totalBills = activeBills.length;
@@ -503,6 +499,7 @@ function isBillPaidThisCycle(bill) {
     const currentYear = today.getFullYear();
     return (appData.transactions || []).some(tx => {
         const txDate = new Date(tx.Date || tx.date);
-        return (tx.budgetPosition === bill.budgetPosition && txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear);
+        const txRecurringBillId = tx.recurringBillId || tx["Recurring Bill ID"] || "";
+        return (String(txRecurringBillId).trim() === String(bill.billId).trim() && txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear);
     });
 }
