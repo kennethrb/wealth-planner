@@ -139,6 +139,10 @@ async function addTransaction() {
     
     // Reset state
     editingTransactionId = null;
+    const cancelButton = document.getElementById("cancelTransactionEditBtn");
+    if (cancelButton) {
+        cancelButton.style.display = "none";
+    }
     document.getElementById("txDate").value = "";
     document.getElementById("txAmount").value = "";
     document.getElementById("txDetails").value = "";
@@ -297,6 +301,35 @@ function loadTransactions() {
 // Replace editTransaction in script.js
 let editingTransactionId = null;
 
+function cancelTransactionEdit() {
+    editingTransactionId = null;
+    document.getElementById("txDate").value = "";
+    document.getElementById("txAmount").value = "";
+    document.getElementById("txDetails").value = "";
+    if (document.getElementById("txBudgetType")) {
+        document.getElementById("txBudgetType").selectedIndex = 0;
+    }
+    if (document.getElementById("txBudgetPosition")) {
+        document.getElementById("txBudgetPosition").selectedIndex = 0;
+    }
+    if (document.getElementById("txAccount")) {
+        document.getElementById("txAccount").selectedIndex = 0;
+    }
+    if (document.getElementById("txToAccount")) {
+        document.getElementById("txToAccount").selectedIndex = 0;
+    }
+    toggleTransactionFields();
+    const saveButton = document.querySelector('button[onclick="addTransaction()"]');
+    if (saveButton) {
+        saveButton.innerHTML = "➕ Add Transaction";
+    }
+    const cancelButton = document.getElementById("cancelTransactionEditBtn");
+    if (cancelButton) {
+        cancelButton.style.display = "none";
+    }
+    showStatus("Edit cancelled", "info");
+}
+
 function editTransaction(transactionId) {
     const tx = appData.transactions.find(t => (t.transactionId || t['Transaction ID']) === transactionId);
     if (!tx) return;
@@ -349,6 +382,16 @@ function editTransaction(transactionId) {
     const button = document.querySelector('button[onclick="addTransaction()"]');
     if (button) {
         button.innerHTML = "💾 Save Changes";
+    }
+    
+    const cancelButton =
+        document.getElementById(
+            "cancelTransactionEditBtn"
+        );
+    
+    if (cancelButton) {
+        cancelButton.style.display =
+            "inline-flex";
     }
 }
 
