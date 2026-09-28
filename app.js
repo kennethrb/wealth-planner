@@ -908,15 +908,12 @@ function getCashRequirementPlan() {
 }
 
 function loadCashRequirementPlan() {
+    const commitments = getCommitmentSummary();
+    const cashRequirement = commitments.cashRequirements || 0;
     const fundingSources = {};
-    let cashRequirement = 0;
     (appData.recurringBills || []).filter(bill => bill.active !== false).forEach(bill => {
-        const source = bill.account || "";
-        const amount = Number(bill.defaultAmount || 0);
-        fundingSources[source] = (fundingSources[source] || 0) + amount;
-        if (source === "Cash Wallet") {
-            cashRequirement += amount;
-        }
+        const account = bill.account || "Unknown";
+        fundingSources[account] = (fundingSources[account] || 0) + Number(bill.defaultAmount || 0);
     });
     const cashContainer = document.getElementById("cashToWithdraw");
     const fundingContainer = document.getElementById("fundingPlanList");
