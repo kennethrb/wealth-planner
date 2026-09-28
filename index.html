@@ -288,10 +288,23 @@
     
       <div class="form-group">
         <label>&nbsp;</label>
-        <button
-          onclick="addTransaction()">
-          ➕ Add Transaction
-        </button>
+        <div class="transaction-actions">
+        
+            <button onclick="addTransaction()">
+                ➕ Add Transaction
+            </button>
+        
+            <button
+                id="cancelTransactionEditBtn"
+                onclick="cancelTransactionEdit()"
+                style="display:none;"
+                class="btn-secondary">
+        
+                ❌ Cancel
+        
+            </button>
+        
+        </div>
       </div>
     
     </div>
