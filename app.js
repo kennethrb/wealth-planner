@@ -907,7 +907,7 @@ function getCashRequirementPlan() {
     };
 }
 
-function getCashRequirementPlan() {
+function loadCashRequirementPlan() {
     const fundingSources = {};
     let cashRequirement = 0;
     (appData.recurringBills || []).filter(bill => bill.active !== false).forEach(bill => {
@@ -918,8 +918,22 @@ function getCashRequirementPlan() {
             cashRequirement += amount;
         }
     });
-    return {
-        cashRequirement,
-        fundingSources
-    };
+    const cashContainer = document.getElementById("cashToWithdraw");
+    const fundingContainer = document.getElementById("fundingPlanList");
+    if (!cashContainer || !fundingContainer) {
+        return;
+    }
+    cashContainer.textContent = formatCurrency(cashRequirement);
+    fundingContainer.innerHTML = Object.entries(fundingSources).sort(
+        (a, b) => b[1] - a[1]).map(
+        ([source, amount]) => `
+                <div class="funding-row">
+                    <span class="label">
+                        ${source}
+                    </span>
+                    <span class="amount">
+                        ${formatCurrency(amount)}
+                    </span>
+                </div>
+            `).join("");
 }
