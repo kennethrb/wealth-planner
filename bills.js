@@ -499,3 +499,11 @@ function isBillPaidThisCycle(bill) {
         return (String(txRecurringBillId).trim() === String(bill.billId).trim() && txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear);
     });
 }
+
+function loadCashRequirementPlanner() {
+    const commitment = getCommitmentSummary();
+    const amount = commitment.cashRequirements || 0;
+    const el = document.getElementById("cashToWithdraw");
+    if (!el) return;
+    el.textContent = formatCurrency(amount);
+}
