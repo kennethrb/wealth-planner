@@ -138,7 +138,7 @@ function getTier3Protection(goals = []) {
     const requiredAmount =
         emergencyGoals.reduce(
             (sum, goal) =>
-                sum + Number(goal.targetAmount || 0),
+                sum + Number(goal.target || 0),
             0
         );
 
