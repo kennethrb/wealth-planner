@@ -907,30 +907,19 @@ function getCashRequirementPlan() {
     };
 }
 
-function loadCashRequirementPlan() {
-    const commitments = getCommitmentSummary();
-    const cashRequirement = commitments.cashRequirements || 0;
+function getCashRequirementPlan() {
     const fundingSources = {};
+    let cashRequirement = 0;
     (appData.recurringBills || []).filter(bill => bill.active !== false).forEach(bill => {
-        const account = bill.account || "Unknown";
-        fundingSources[account] = (fundingSources[account] || 0) + Number(bill.defaultAmount || 0);
+        const source = bill.account || "";
+        const amount = Number(bill.defaultAmount || 0);
+        fundingSources[source] = (fundingSources[source] || 0) + amount;
+        if (source === "Cash Wallet") {
+            cashRequirement += amount;
+        }
     });
-    const cashContainer = document.getElementById("cashToWithdraw");
-    const fundingContainer = document.getElementById("fundingPlanList");
-    if (!cashContainer || !fundingContainer) {
-        return;
-    }
-    cashContainer.textContent = formatCurrency(cashRequirement);
-    fundingContainer.innerHTML = Object.entries(fundingSources).sort(
-        (a, b) => b[1] - a[1]).map(
-        ([source, amount]) => `
-                <div class="funding-row">
-                    <span class="label">
-                        ${source}
-                    </span>
-                    <span class="amount">
-                        ${formatCurrency(amount)}
-                    </span>
-                </div>
-            `).join("");
+    return {
+        cashRequirement,
+        fundingSources
+    };
 }
