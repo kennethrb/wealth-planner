@@ -414,11 +414,7 @@ function loadRecurringBills() {
         <strong>${bill.billName}</strong>
         
         <small>
-        ${bill.commitmentType}
-        •
-        ${bill.budgetType}
-        •
-        Due Day ${bill.dueDay}
+        📅 Due Day ${bill.dueDay}
         </small>
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
