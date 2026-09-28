@@ -3709,6 +3709,13 @@ async function loadGoalFundingOptimizer() {
 
         const rankedGoals =
             goals
+        
+                .filter(goal =>
+                    String(
+                        goal.goalMode || "VIRTUAL"
+                    ).toUpperCase() === "PROTECTED"
+                )
+        
                 .map(goal => {
 
                     const current =
@@ -3777,11 +3784,30 @@ async function loadGoalFundingOptimizer() {
             rankedGoals[0];
 
         if (!bestGoal) {
-
-        container.style.display = "none";
-        container.innerHTML = "";
-        return;
-
+        
+            container.innerHTML = `
+                <div class="card">
+        
+                    <h2>🎯 Goal Funding Optimizer</h2>
+        
+                    <div class="advisor-action">
+        
+                        <div class="action-title">
+                            No Protected Goals
+                        </div>
+        
+                        <p>
+                            Create a Protected Goal to
+                            participate in capital allocation
+                            recommendations.
+                        </p>
+        
+                    </div>
+        
+                </div>
+            `;
+        
+            return;
         }
 
         container.style.display = "";
