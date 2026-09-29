@@ -44,17 +44,18 @@ async function runIntelligenceQA() {
             const affordableAmt = excess > 0 ? Math.floor(excess * 0.5) : 0;
             await loadPurchaseEvaluator(affordableAmt);
             assertMetric(
-                "Evaluator (Affordable)", 
-                window.qaPurchase.recommendation === "✅ Affordable" ? 1 : 0, 
+                "Evaluator (Affordable)",
+                window.qaPurchase.recommendation === "✅ Within Safe-To-Spend" ? 1 : 0,
                 1
             );
+
 
             // 2. Impacts Buffer (Dips into emergency buffer)
             const impactAmt = excess > 0 ? excess + Math.floor(target * 0.5) : Math.floor(totalCash * 0.5);
             await loadPurchaseEvaluator(impactAmt);
             assertMetric(
-                "Evaluator (Impacts Buffer)", 
-                window.qaPurchase.recommendation === "⚠️ Impacts Emergency Buffer" ? 1 : 0, 
+                "Evaluator (Impacts Buffer)",
+                window.qaPurchase.recommendation === "⚠️ Exceeds Safe-To-Spend" ? 1 : 0,
                 1
             );
 
@@ -78,7 +79,11 @@ async function runIntelligenceQA() {
         assertMetric("Wealth Sweep (Emergency)", window.qaSweep.emergencySweep, expectedEmergencySweep);
         assertMetric("Wealth Sweep (Investment)", window.qaSweep.investmentSweep, expectedInvestmentSweep);
         // Assert DI-008 Metrics
-        assertMetric("Action Plan Triggered", window.qaActionPlan.totalActions >= 0 ? 1 : 0, 1);
+        assertMetric(
+            "Action Plan Priority",
+            !!window.qaActionPlan.topPriority ? 1 : 0,
+            1
+        );
 
         // ---
         
