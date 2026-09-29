@@ -2749,11 +2749,15 @@ async function loadPersonalInflation() {
     }
 
     // intelligence.js -> loadPersonalInflation()
-    const rawInflationRate = previousExpense > 0 
-        ? ((currentExpense - previousExpense) / previousExpense) * 100 
-        : 0;
+    const rawInflationRate =
+        previousExpense > 0
+            ? ((currentExpense - previousExpense) / previousExpense) * 100
+            : null;
     
-    const inflationRate = Number(rawInflationRate.toFixed(2));
+    const inflationRate =
+        rawInflationRate === null
+            ? null
+            : Number(rawInflationRate.toFixed(2));
     
     // Expose QA Metrics for qa.js
     window.qaInflation = {
@@ -2763,8 +2767,10 @@ async function loadPersonalInflation() {
         currentExpense,
         previousExpense,
         inflationRate,
-        sourceUsed
+        sourceUsed,
+        hasHistoricalData: previousExpense > 0
     };
+
 
     logQATrace(
     "DI-005",
