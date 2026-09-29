@@ -119,8 +119,17 @@ function getOpportunityCapital() {
     const remainingBills = getOutstandingCycleBills().reduce(
         (sum, bill) => sum + Number(bill.defaultAmount || 0), 0);
     const coverage = protectedRecurringBills === 0 ? CONFIG.cashFlow.unlimitedCoverage : availableCash / protectedRecurringBills;
-    const surplus = availableCash - remainingBills;
-    const opportunity = surplus > 0 ? surplus * CONFIG.opportunityAllocation.reserveRatio : 0;
+    const capitalPosition =
+        getCapitalPosition();
+    
+    const surplus =
+        capitalPosition.excessCash;
+    
+    const opportunity =
+        surplus > 0
+            ? surplus *
+              CONFIG.opportunityAllocation.reserveRatio
+            : 0;
     return {
         availableCash,
         remainingBills,
