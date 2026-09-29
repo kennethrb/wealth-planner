@@ -144,7 +144,6 @@ function showInputDialog(title, message, value = "") {
 
 
 function parseTransactionDate(rawDate) {
-
     const date = new Date(rawDate);
 
     if (isNaN(date.getTime())) {
@@ -152,9 +151,9 @@ function parseTransactionDate(rawDate) {
     }
 
     return {
-        year: date.getFullYear(),
-        monthIndex: date.getMonth(),
-        day: date.getDate()
+        year: date.getUTCFullYear(),
+        monthIndex: date.getUTCMonth(),
+        day: date.getUTCDate()
     };
 }
 
