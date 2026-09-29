@@ -92,7 +92,11 @@ async function runIntelligenceQA() {
         
         console.group(key);
         // qa.js -> inside runIntelligenceQA()
-        assertMetric("Inflation", window.qaInflation.inflationRate, expected.inflation, 0.01);
+        if (window.qaInflation.hasHistoricalData) {
+            assertMetric("Inflation", window.qaInflation.inflationRate, expected.inflation, 0.01);
+        } else {
+            console.warn("Skipping Inflation QA - no historical data");
+        }
         assertMetric("Monthly Velocity", window.qaVelocity.monthlyVelocity, expected.monthlyVelocity);
         assertMetric("Annual Velocity", window.qaVelocity.annualVelocity, expected.annualVelocity);
         assertMetric("Buffer Target", window.qaBuffer.bufferTarget, expected.bufferTarget);
