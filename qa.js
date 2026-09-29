@@ -223,6 +223,13 @@ function validateDateLineage() {
     assertMetric("Boundary Year", boundary.year, 2025);
     assertMetric("Boundary Month", boundary.monthIndex, 1);
     assertMetric("Boundary Day", boundary.day, 1);
+
+    console.table({
+    input: testDate,
+    parsedYear: parsed.year,
+    parsedMonth: parsed.monthIndex,
+    parsedDay: parsed.day
+});
 }
 
 function validatePurchaseEvaluatorNullHandling() {
