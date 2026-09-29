@@ -29,6 +29,7 @@ async function runIntelligenceQA() {
         await loadWealthSweep();
         await loadFinancialHealthAdvisor();
         await loadWealthProjectionAccelerator();
+        await loadWealthAdvisor();
         // Add inside runIntelligenceQA() loop in qa.js:
         await loadMonthlyWealthActionPlan();
 
@@ -83,6 +84,23 @@ async function runIntelligenceQA() {
             "Action Plan Priority",
             !!window.qaActionPlan.topPriority ? 1 : 0,
             1
+        );
+        assertMetric(
+            "Advisor Has Actions",
+            window.qaWealthAdvisor.actions.length > 0 ? 1 : 0,
+            1
+        );
+        
+        assertMetric(
+            "Advisor Top Action Exists",
+            !!window.qaWealthAdvisor.topAction ? 1 : 0,
+            1
+        );
+
+        assertMetric(
+            "Advisor Action Alignment",
+            window.qaActionPlan.totalActions > 0 ? 1 : 0,
+            window.qaWealthAdvisor.topAction ? 1 : 0
         );
 
         // ---
