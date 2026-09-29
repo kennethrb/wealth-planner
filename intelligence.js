@@ -3181,6 +3181,20 @@ async function loadMonthlyWealthActionPlan() {
         });
     
     }
+        const emergencyGap =
+            getEmergencyFundGap();
+        
+        if (!emergencyGap.fullyFunded) {
+        
+            actions.push({
+                priority: 1,
+                badge: "🛡️ Emergency Fund",
+                title: "Increase Emergency Fund Reserves",
+                detail: `Current gap: ${formatCurrency(emergencyGap.gap)}`,
+                impact: "Improves financial resilience and protection"
+            });
+        
+        }
 
     // Sort actions by priority
     actions.sort((a, b) => a.priority - b.priority);
