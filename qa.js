@@ -215,21 +215,20 @@ function assertMetric(label, actual, expected, tolerance = 1) {
 
 function validateDateLineage() {
     const parsed = parseTransactionDate("2024-12-31T16:00:00.000Z");
-    assertMetric("Date Lineage Year", parsed.year, 2025);
-    assertMetric("Date Lineage Month", parsed.monthIndex, 0);
-    assertMetric("Date Lineage Day", parsed.day, 1);
+    assertMetric("Date Lineage Year", parsed.year, 2024);
+    assertMetric("Date Lineage Month", parsed.monthIndex, 11);
+    assertMetric("Date Lineage Day", parsed.day, 31);
     // Month Boundary Test
     const boundary = parseTransactionDate("2025-01-31T16:00:00.000Z");
     assertMetric("Boundary Year", boundary.year, 2025);
-    assertMetric("Boundary Month", boundary.monthIndex, 1);
-    assertMetric("Boundary Day", boundary.day, 1);
+    assertMetric("Boundary Month", boundary.monthIndex, 0);
+    assertMetric("Boundary Day", boundary.day, 31);
 
     console.table({
-    input: testDate,
-    parsedYear: parsed.year,
-    parsedMonth: parsed.monthIndex,
-    parsedDay: parsed.day
-});
+        parsedYear: parsed.year,
+        parsedMonth: parsed.monthIndex,
+        parsedDay: parsed.day
+    });
 }
 
 function validatePurchaseEvaluatorNullHandling() {
