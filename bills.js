@@ -490,12 +490,65 @@ function getNextDueDate(dueDay) {
 }
 
 function isBillPaidThisCycle(bill) {
+
     const today = new Date();
     const currentMonth = today.getMonth();
     const currentYear = today.getFullYear();
+
     return (appData.transactions || []).some(tx => {
+
         const txDate = new Date(tx.Date || tx.date);
-        const txRecurringBillId = tx.recurringBillId || tx["Recurring Bill ID"] || "";
-        return (String(txRecurringBillId).trim() === String(bill.billId).trim() && txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear);
+
+        if (
+            txDate.getMonth() !== currentMonth ||
+            txDate.getFullYear() !== currentYear
+        ) {
+            return false;
+        }
+
+        // Tier 1: Direct link
+        const txBillId =
+            tx.recurringBillId ||
+            tx["Recurring Bill ID"] ||
+            "";
+
+        if (
+            String(txBillId).trim() ===
+            String(bill.billId).trim()
+        ) {
+            return true;
+        }
+
+        // Tier 2: Manual transaction matching
+
+        const txDetails =
+            String(
+                tx.Details ||
+                tx.details ||
+                ""
+            )
+            .trim()
+            .toLowerCase();
+
+        const billName =
+            String(
+                bill.billName || ""
+            )
+            .trim()
+            .toLowerCase();
+
+        const sameName =
+            txDetails === billName;
+
+        const sameAmount =
+            Math.abs(
+                Number(tx.Amount || tx.amount || 0) -
+                Number(bill.defaultAmount || 0)
+            ) < 1;
+
+        return (
+            sameName &&
+            sameAmount
+        );
     });
 }
