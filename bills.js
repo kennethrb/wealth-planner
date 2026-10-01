@@ -491,64 +491,49 @@ function getNextDueDate(dueDay) {
 
 function isBillPaidThisCycle(bill) {
 
-    const today = new Date();
-    const currentMonth = today.getMonth();
-    const currentYear = today.getFullYear();
+    const cycle = getCurrentPayCycle();
 
-    return (appData.transactions || []).some(tx => {
+    return (appData.transactions || [])
+        .some(tx => {
 
-        const txDate = new Date(tx.Date || tx.date);
+            const txDate =
+                new Date(tx.Date || tx.date);
 
-        if (
-            txDate.getMonth() !== currentMonth ||
-            txDate.getFullYear() !== currentYear
-        ) {
-            return false;
-        }
+            if (
+                txDate < cycle.cycleStart ||
+                txDate > cycle.cycleEnd
+            ) {
+                return false;
+            }
 
-        // Tier 1: Direct link
-        const txBillId =
-            tx.recurringBillId ||
-            tx["Recurring Bill ID"] ||
-            "";
+            const recurringMatch =
+                String(
+                    tx.recurringBillId ||
+                    tx["Recurring Bill ID"] ||
+                    ""
+                ).trim() ===
+                String(bill.billId).trim();
 
-        if (
-            String(txBillId).trim() ===
-            String(bill.billId).trim()
-        ) {
-            return true;
-        }
+            if (recurringMatch) {
+                return true;
+            }
 
-        // Tier 2: Manual transaction matching
+            const details =
+                String(
+                    tx.Details ||
+                    tx.details ||
+                    ""
+                )
+                .trim()
+                .toLowerCase();
 
-        const txDetails =
-            String(
-                tx.Details ||
-                tx.details ||
-                ""
-            )
-            .trim()
-            .toLowerCase();
-
-        const billName =
-            String(
-                bill.billName || ""
-            )
-            .trim()
-            .toLowerCase();
-
-        const sameName =
-            txDetails === billName;
-
-        const sameAmount =
-            Math.abs(
-                Number(tx.Amount || tx.amount || 0) -
-                Number(bill.defaultAmount || 0)
-            ) < 1;
-
-        return (
-            sameName &&
-            sameAmount
-        );
-    });
+            return (
+                details ===
+                String(
+                    bill.billName
+                )
+                .trim()
+                .toLowerCase()
+            );
+        });
 }
