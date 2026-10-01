@@ -99,7 +99,7 @@ function getSelectedYear() {
 }
 
 function getSelectedMonth() {
-    return document.getElementById("actualMonth")?.value || "Jan";
+    return getViewMonth();
 }
 
 async function addCategory() {
