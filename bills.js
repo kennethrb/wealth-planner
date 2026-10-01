@@ -537,3 +537,92 @@ function isBillPaidThisCycle(bill) {
             );
         });
 }
+
+function loadBillExecutionQueue() {
+
+    const container =
+        document.getElementById(
+            "billExecutionQueue"
+        );
+
+    if (!container) return;
+
+    const unpaidBills =
+        getOutstandingCycleBills();
+
+    container.innerHTML = `
+        <div class="card">
+
+            <h3>
+                📋 Bills Due This Cycle
+            </h3>
+
+            ${unpaidBills.map(bill => `
+                <label
+                    class="funding-row">
+
+                    <input
+                        type="checkbox"
+                        class="bill-selector"
+                        value="${bill.billId}">
+
+                    <span>
+                        ${bill.billName}
+                    </span>
+
+                    <strong>
+                        ${formatCurrency(
+                            bill.defaultAmount
+                        )}
+                    </strong>
+
+                </label>
+            `).join("")}
+
+            <button
+                onclick="
+                    generateSelectedBills()
+                ">
+                ✅ Generate Selected
+            </button>
+
+        </div>
+    `;
+}
+
+async function generateSelectedBills() {
+
+    const selectedIds =
+        [...document.querySelectorAll(
+            ".bill-selector:checked"
+        )]
+        .map(el => el.value);
+
+    if (!selectedIds.length) {
+
+        showStatus(
+            "Select at least one bill.",
+            "warning"
+        );
+
+        return;
+    }
+
+    for (const billId of selectedIds) {
+
+        await fetch(
+            `${BASE_URL}?action=generateSingleBill`
+            + `&billId=${billId}`
+            + `&mode=${appMode}`
+        );
+
+    }
+
+    await loadData();
+    await refreshFinancialViews();
+
+    showStatus(
+        "✅ Bills Generated",
+        "success"
+    );
+}
