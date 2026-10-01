@@ -657,7 +657,8 @@ async function refreshFinancialViews() {
         loadPayCycleCard(),
         loadSafeToSpendCard(),
         loadPaydayPlan(),
-        loadScenarioWorkbench()
+        loadScenarioWorkbench(),
+        loadBillExecutionQueue()
         
     ]);
 }
@@ -741,7 +742,8 @@ async function refreshUI() {
         loadRecurringBills(),
         loadGoals(),
         loadAccounts(),
-        loadReleasedCapitalCard()
+        loadReleasedCapitalCard(),
+        loadBillExecutionQueue()
     ]);
 }
 async function initializeApp() {
