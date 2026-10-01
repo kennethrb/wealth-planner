@@ -583,7 +583,7 @@ function loadBillExecutionQueue() {
                 onclick="
                     generateSelectedBills()
                 ">
-                ✅ Generate Selected
+                💸 Record Payment
             </button>
 
         </div>
@@ -619,14 +619,10 @@ async function generateSelectedBills() {
     }
 
     await loadData();
-
-    loadTransactions();
-
-    await refreshFinancialViews();
+    await refreshUI();
 
     showStatus(
         "✅ Bills Generated",
         "success"
     );
-
 }
