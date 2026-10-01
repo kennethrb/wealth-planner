@@ -1159,16 +1159,39 @@ function getCycleBills() {
         )
         .filter(bill => {
 
-            const dueDate =
-                getNextDueDate(
-                    Number(bill.dueDay)
+            const dueDay =
+                Number(bill.dueDay);
+
+            let dueDate;
+
+            if (
+                dueDay >=
+                cycle.cycleStart.getDate()
+            ) {
+
+                dueDate = new Date(
+                    cycle.cycleStart.getFullYear(),
+                    cycle.cycleStart.getMonth(),
+                    dueDay
                 );
 
+            } else {
+
+                dueDate = new Date(
+                    cycle.cycleEnd.getFullYear(),
+                    cycle.cycleEnd.getMonth(),
+                    dueDay
+                );
+
+            }
+
             return (
-                dueDate <=
-                cycle.nextPayday
+                dueDate >= cycle.cycleStart &&
+                dueDate <= cycle.cycleEnd
             );
+
         });
+
 }
 
 function getOutstandingCycleBills() {
