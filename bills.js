@@ -619,10 +619,14 @@ async function generateSelectedBills() {
     }
 
     await loadData();
+
+    loadTransactions();
+
     await refreshFinancialViews();
 
     showStatus(
         "✅ Bills Generated",
         "success"
     );
+
 }
