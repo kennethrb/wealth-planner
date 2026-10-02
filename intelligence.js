@@ -1228,12 +1228,16 @@ function getSafeToSpend() {
     const protectedBuffer =
         protection.protectedBuffer;
 
+    const strategicProtection =
+        protection.tier3.requiredAmount;
+    
     const safeToSpend =
         Math.max(
             0,
             availableCash -
             protectedBills -
-            protectedBuffer
+            protectedBuffer -
+            strategicProtection
         );
 
     return {
