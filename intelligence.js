@@ -96,15 +96,31 @@ function getWealthFlowSummary() {
 
 //Create Capital Position Engine
 function getCapitalPosition() {
-    const commitments = getCommitmentSummary();
-    const bufferTarget = commitments.totalCommitments * CONFIG.buffer.months;
-    const excessCash = Math.max(0, commitments.availableCash - bufferTarget);
+
+    const protection =
+        getUnifiedProtectionStatus(
+            appData.accounts,
+            appData.recurringBills,
+            appData.goals,
+            []
+        );
+
     return {
-        availableCash: commitments.availableCash,
-        monthlyObligations: commitments.totalCommitments,
-        bufferTarget,
-        excessCash,
-        commitmentDriven: true
+
+        availableCash:
+            protection.totalCash,
+
+        monthlyObligations:
+            protection.requiredProtection,
+
+        bufferTarget:
+            protection.requiredProtection,
+
+        excessCash:
+            protection.availableCapital,
+
+        commitmentDriven: false,
+        protectionDriven: true
     };
 }
 
