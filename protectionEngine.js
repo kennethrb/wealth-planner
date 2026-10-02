@@ -128,12 +128,17 @@ function getTier2Protection(commitments)
 
 function getTier3Protection(goals = []) {
 
-    const emergencyGoals =
-        goals.filter(goal =>
-            String(goal.goal || "")
-                .toLowerCase()
-                .includes("emergency")
-        );
+  const protectedGoals =
+      goals.filter(goal =>
+          [
+              "EMERGENCY",
+              "SAFETY",
+              "COMMITTED",
+              "GROWTH"
+          ].includes(
+              goal.protectionRole
+          )
+      );
 
     const requiredAmount =
         emergencyGoals.reduce(
