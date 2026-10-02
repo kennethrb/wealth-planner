@@ -126,7 +126,7 @@ function getTier2Protection(commitments)
   
   return {
       tier: "TIER_2",
-      name: "Operating Buffer",
+      name: "Liquidity Protection",
       requiredAmount:
           protectedCommitments *
           CONFIG.payCycle.bufferReserveRatio
