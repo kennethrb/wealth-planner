@@ -128,20 +128,20 @@ function getTier2Protection(commitments)
 
 function getTier3Protection(goals = []) {
 
-  const protectedGoals =
-      goals.filter(goal =>
-          [
-              "EMERGENCY",
-              "SAFETY",
-              "COMMITTED",
-              "GROWTH"
-          ].includes(
-              goal.protectionRole
-          )
-      );
+    const protectedGoals =
+        goals.filter(goal =>
+            [
+                "EMERGENCY",
+                "SAFETY",
+                "COMMITTED",
+                "GROWTH"
+            ].includes(
+                goal.protectionRole
+            )
+        );
 
     const requiredAmount =
-        emergencyGoals.reduce(
+        protectedGoals.reduce(
             (sum, goal) =>
                 sum + Number(goal.target || 0),
             0
