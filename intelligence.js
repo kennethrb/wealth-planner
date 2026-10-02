@@ -847,6 +847,9 @@ function getAdvisorConfidence(action) {
     if (opportunity.opportunity > 100000) score += 10;
     else if (opportunity.opportunity > 50000) score += 5;
     if (action?.category === "Emergency Fund") score += 10;
+    if (action.category === "Released Capital") {
+        score += 20;
+    }
     score = Math.max(0, Math.min(score, 100));
     return {
         score,
