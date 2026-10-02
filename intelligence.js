@@ -401,12 +401,23 @@ function getReleasedCapitalSummary() {
 
     const emergency =
         getEmergencyFundGap();
+
+    const allocation =
+        getCapitalAllocationPlan();
+
+    
+    let destination =
+        priority.category;
     
     let recommendation =
-        priority.action;
+        `Redirect released capital to ${destination}`;
 
     
     if (!emergency.fullyFunded) {
+    
+        destination =
+            "Emergency Fund";
+    
         recommendation =
             "Strengthen Emergency Reserve";
     }
@@ -423,6 +434,8 @@ function getReleasedCapitalSummary() {
         tenYearImpact,
     
         recommendation,
+        destination,
+        allocation,
     
         sources:
             goalCapital.sources
@@ -448,10 +461,32 @@ function loadReleasedCapitalCard() {
             </div>
     
             <p>
-                Redirect
+                Deploy
                 ${formatCurrency(data.totalReleasedCapital)}
-                per month to
-                ${data.recommendation}
+                per month toward
+                ${data.destination}
+            </p>
+        </div>
+
+        <div class="metric-row">
+            <span>
+                Destination
+            </span>
+        
+            <strong>
+                ${data.destination}
+            </strong>
+        </div>
+
+        <div class="advisor-action success">
+            <div class="action-title">
+                CAPITAL DEPLOYMENT
+            </div>
+        
+            <p>
+                Auto-allocation engine recommends
+                redirecting released capital toward
+                ${data.destination}.
             </p>
         </div>
     
@@ -721,13 +756,14 @@ function getWealthAdvisorActions() {
     const released = getReleasedCapitalSummary();
     if (released.state === "ACTIVE") {
         actions.push({
-            priority: 3,
+            priority: 1,
             category: "Released Capital",
-            action: `Redirect ${formatCurrency(
-                    released.totalReleasedCapital
-                )}/month to ${
-                    released.recommendation
-                }`,
+            action:
+            `Redirect ${formatCurrency(
+                released.totalReleasedCapital
+            )}/month toward ${
+                released.destination
+            }`,
             source: "DI-028"
         });
     }
@@ -3147,6 +3183,33 @@ async function loadMonthlyWealthActionPlan() {
     await loadGoalFundingOptimizer();
 
     const actions = [];
+
+    const released =
+        getReleasedCapitalSummary();
+    
+    if (
+        released.state === "ACTIVE"
+    ) {
+    
+        actions.push({
+            priority: 2,
+            badge: "♻️ Released Capital",
+    
+            title:
+                `Redirect ${formatCurrency(
+                    released.totalReleasedCapital
+                )}/month`,
+    
+            detail:
+                `Allocate toward ${released.destination}`,
+    
+            impact:
+                `${formatCurrency(
+                    released.tenYearImpact
+                )} potential wealth impact`
+        });
+    
+    }
 
     // 1. High Priority: Funding Deficits
     if (window.qaFundingAdvisor?.deficitCount > 0){
