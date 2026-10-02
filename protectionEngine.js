@@ -98,17 +98,24 @@ function getUnifiedProtectionStatus(
 
 function getTier1Protection() {
 
-    const commitments =
-        getCommitmentSummary();
+    const outstandingBills =
+        getOutstandingCycleBills();
+
+    const requiredAmount =
+        outstandingBills.reduce(
+            (sum, bill) =>
+                sum +
+                Number(
+                    bill.defaultAmount || 0
+                ),
+            0
+        );
 
     return {
         tier: "TIER_1",
-        name: "Protected Obligations",
-        requiredAmount:
-            commitments.protectedBills +
-            commitments.protectedDebt
+        name: "Outstanding Obligations",
+        requiredAmount
     };
-
 }
 
 function getTier2Protection(commitments)
