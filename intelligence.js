@@ -754,6 +754,22 @@ function getWealthAdvisorActions() {
     const priorityAction = getCapitalAllocationPriority();
 
     const released = getReleasedCapitalSummary();
+
+    const suppressEmergencyRecommendation =
+        released.state === "ACTIVE" &&
+        released.destination === "Emergency Fund";
+    if (
+        !suppressEmergencyRecommendation
+    ) {
+    
+        actions.push({
+            priority: priorityAction.priority,
+            category: priorityAction.category,
+            action: priorityAction.action,
+            source: "DI-011"
+        });
+    
+    }
     if (released.state === "ACTIVE") {
         actions.push({
             priority: 1,
@@ -767,12 +783,7 @@ function getWealthAdvisorActions() {
             source: "DI-028"
         });
     }
-    actions.push({
-        priority: priorityAction.priority,
-        category: priorityAction.category,
-        action: priorityAction.action,
-        source: "DI-011"
-    });
+
     if (window.qaGoalFundingOptimizer && priorityAction.category !== "Goal Completion") {
         actions.push({
             priority: 2,
@@ -904,6 +915,18 @@ function getAdvisorState() {
             state: "ACCELERATION MODE",
             objective: "Complete Important Goals"
         };
+    }
+
+    const emergency =
+        getEmergencyFundGap();
+    
+    if (!emergency.fullyFunded) {
+    
+        return {
+            state: "PROTECTION MODE",
+            objective: "Strengthen Emergency Fund"
+        };
+    
     }
     return {
         state: "OPTIMIZATION MODE",
