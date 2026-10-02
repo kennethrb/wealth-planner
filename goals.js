@@ -157,6 +157,14 @@ function loadGoals() {
 
                         <div class="goal-details">
                             <span>${statusBadge}</span>
+                            <div style="
+                                display:flex;
+                                gap:8px;
+                                flex-wrap:wrap;
+                            ">
+                                <span>🎯 ${goal.goalMode || "VIRTUAL"}</span>
+                                <span>🛡 ${goal.protectionRole || "OPTIONAL"}</span>
+                            </div>
 
                             <span>
                                 Target: ${typeof formatCurrency === "function" ? formatCurrency(target) : target} (${progress}%)
@@ -216,6 +224,16 @@ function editGoal(goalId) {
         showStatus("Goal not found", "error");
         return;
     }
+    const elProtectionRole =
+        document.getElementById(
+            "goalProtectionRole"
+        );
+    
+    if (elProtectionRole) {
+        elProtectionRole.value =
+            goal.protectionRole ||
+            "OPTIONAL";
+    }
 
     editingGoalId = goalId;
 
@@ -265,6 +283,14 @@ function cancelGoalEdit() {
     const formTitle = document.getElementById("goalFormTitle");
     const submitBtn = document.getElementById("goalFormSubmitBtn");
     const cancelBtn = document.getElementById("goalFormCancelBtn");
+    const role =
+        document.getElementById(
+            "goalProtectionRole"
+        );
+    
+    if (role) {
+        role.value = "OPTIONAL";
+    }
 
     if (formTitle) formTitle.textContent = "➕ Add Goal";
     if (submitBtn) submitBtn.textContent = "➕ Add Goal";
@@ -288,6 +314,11 @@ async function handleGoalFormSubmit(event) {
     const goalName = document.getElementById("goalName")?.value.trim() || "";
     const target = parseFloat(document.getElementById("goalTarget")?.value) || 0;
     const monthlyContribution = parseFloat(document.getElementById("goalContribution")?.value) || 0;
+
+    const goalProtectionRole =
+        document.getElementById(
+            "goalProtectionRole"
+        )?.value || "OPTIONAL";
 
     if (!goalName) {
         showStatus("Please enter a goal name", "warning");
@@ -313,7 +344,8 @@ async function handleGoalFormSubmit(event) {
                 target: target,
                 current: currentAmount,
                 monthlyContribution: monthlyContribution,
-                goalMode: goalMode
+                goalMode: goalMode,
+                protectionRole: goalProtectionRole
             });
 
             const response = await fetch(`${baseUrl}?${params.toString()}`);
@@ -342,7 +374,8 @@ async function handleGoalFormSubmit(event) {
                 target: target,
                 current: 0,
                 monthlyContribution: monthlyContribution,
-                goalMode: goalMode
+                goalMode: goalMode,
+                protectionRole: goalProtectionRole
             });
 
             const response = await fetch(`${baseUrl}?${params.toString()}`);
