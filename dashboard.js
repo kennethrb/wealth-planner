@@ -28,8 +28,23 @@ function getAssetAllocation() {
 }
 
 function loadAssetAllocationAdvisor() {
-    const recommendation = getAssetAllocationRecommendation();
-    document.getElementById("assetAllocationAdvisor").innerHTML = `
+
+    const container =
+        document.getElementById(
+            "assetAllocationAdvisor"
+        );
+
+    if (!container) {
+        console.warn(
+            "assetAllocationAdvisor container missing"
+        );
+        return;
+    }
+
+    const recommendation =
+        getAssetAllocationRecommendation();
+
+    container.innerHTML = `
         <div class="card">
             <h2>🎯 Asset Allocation Advisor</h2>
 
