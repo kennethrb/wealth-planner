@@ -134,7 +134,7 @@ function getOpportunityCapital() {
         commitments.protectedDebt;
     const remainingBills = getOutstandingCycleBills().reduce(
         (sum, bill) => sum + Number(bill.defaultAmount || 0), 0);
-    const coverage = protectedRecurringBills === 0 ? CONFIG.cashFlow.unlimitedCoverage : availableCash / protectedRecurringBills;
+    const coverage = protectedRecurringBills === 0 ? CONFIG.cashFlowDomain.cashFlow.unlimitedCoverage : availableCash / protectedRecurringBills;
     const capitalPosition =
         getCapitalPosition();
     
@@ -275,7 +275,7 @@ function getRecommendationScores() {
     if (
         goal &&
         goal.completable &&
-        cashFlow.coverage >= CONFIG.cashFlow.healthyCoverage
+        cashFlow.coverage >= CONFIG.cashFlowDomain.cashFlow.healthyCoverage
     ) {
     
         goalScore += 100;
@@ -316,7 +316,7 @@ function getRecommendationScores() {
     });
 
     let cashFlowScore = 0;
-    if (cashFlow.coverage < CONFIG.cashFlow.minimumCoverage) {
+    if (cashFlow.coverage < CONFIG.cashFlowDomain.cashFlow.minimumCoverage) {
         cashFlowScore = 999;
     }
     scores.push({
@@ -565,7 +565,7 @@ function getWealthAdvisorSummary() {
      * Detect insufficient coverage
      * for upcoming obligations.
      */
-    if (window.qaCashFlow && window.qaCashFlow.coverage < CONFIG.cashFlow.minimumCoverage) {
+    if (window.qaCashFlow && window.qaCashFlow.coverage < CONFIG.cashFlowDomain.cashFlow.minimumCoverage) {
         warnings.push({
             category: "Cash Flow",
             message: "Available cash is insufficient for upcoming obligations"
@@ -832,7 +832,7 @@ function getAdvisorConfidence(action) {
     const opportunity = getOpportunityCapital();
     const emergencyGap = getEmergencyFundGap();
     const liquidity = opportunity.coverage || 0;
-    if (liquidity < CONFIG.cashFlow.minimumCoverage) {
+    if (liquidity < CONFIG.cashFlowDomain.cashFlow.minimumCoverage) {
         return {
             score: 90,
             level: "LIQUIDITY PROTECTION"
@@ -865,9 +865,9 @@ function getAdvisorConfidenceBreakdown(action) {
     // Liquidity
     factors.push({
         category: "Liquidity",
-        score: opportunity.coverage >= CONFIG.cashFlow.healthyCoverage ? 100 : opportunity.coverage >= CONFIG.cashFlow.minimumCoverage ? 70 : 30,
-        status: opportunity.coverage >= CONFIG.cashFlow.healthyCoverage ? "GOOD" : opportunity.coverage >= CONFIG.cashFlow.minimumCoverage ? "FAIR" : "WEAK",
-        message: opportunity.coverage >= CONFIG.cashFlow.healthyCoverage ? "Liquidity protected" : opportunity.coverage >= CONFIG.cashFlow.minimumCoverage ? "Liquidity acceptable" : "Liquidity risk detected"
+        score: opportunity.coverage >= CONFIG.cashFlowDomain.cashFlow.healthyCoverage ? 100 : opportunity.coverage >= CONFIG.cashFlowDomain.cashFlow.minimumCoverage ? 70 : 30,
+        status: opportunity.coverage >= CONFIG.cashFlowDomain.cashFlow.healthyCoverage ? "GOOD" : opportunity.coverage >= CONFIG.cashFlowDomain.cashFlow.minimumCoverage ? "FAIR" : "WEAK",
+        message: opportunity.coverage >= CONFIG.cashFlowDomain.cashFlow.healthyCoverage ? "Liquidity protected" : opportunity.coverage >= CONFIG.cashFlowDomain.cashFlow.minimumCoverage ? "Liquidity acceptable" : "Liquidity risk detected"
     });
     // Emergency Fund
     factors.push({
@@ -907,7 +907,7 @@ function getConfidenceReason(score) {
 function getAdvisorState() {
     const goal = window.qaGoalFundingOptimizer;
     const cashFlow = window.qaCashFlow;
-    if (cashFlow && cashFlow.coverage < CONFIG.cashFlow.minimumCoverage) {
+    if (cashFlow && cashFlow.coverage < CONFIG.cashFlowDomain.cashFlow.minimumCoverage) {
         return {
             state: "PROTECTION MODE",
             objective: "Protect Liquidity"
@@ -2078,11 +2078,11 @@ async function loadBufferVsInvest() {
     } else {
         const investAmount =
             excessCash *
-            CONFIG.bufferVsInvest.invest;
+            CONFIG.cashFlowDomain.bufferVsInvest.invest;
         
         const debtAmount =
             excessCash *
-            CONFIG.bufferVsInvest.debt;
+            CONFIG.cashFlowDomain.bufferVsInvest.debt;
 
 
         recommendationHtml = `
@@ -2295,15 +2295,15 @@ async function loadFinancialHealthAdvisor() {
             title: "Deploy Monthly Surplus",
         invest:
             monthlySurplus *
-            CONFIG.surplusDeployment.invest,
+            CONFIG.cashFlowDomain.surplusDeployment.invest,
         
         debt:
             monthlySurplus *
-            CONFIG.surplusDeployment.debt,
+            CONFIG.cashFlowDomain.surplusDeployment.debt,
         
         emergency:
             monthlySurplus *
-            CONFIG.surplusDeployment.emergency
+            CONFIG.cashFlowDomain.surplusDeployment.emergency
         });
     
     }
@@ -3281,7 +3281,7 @@ async function loadMonthlyWealthActionPlan() {
 
     if (
         window.qaCashFlow?.coverage <
-        CONFIG.cashFlow.minimumCoverage
+        CONFIG.cashFlowDomain.cashFlow.minimumCoverage
     ) {
     
         actions.unshift({
@@ -3487,7 +3487,7 @@ async function loadCashFlowCommandCenter() {
 
     if (
         coverage <
-        CONFIG.cashFlow.minimumCoverage
+        CONFIG.cashFlowDomain.cashFlow.minimumCoverage
     ) {
 
         status =
@@ -3498,7 +3498,7 @@ async function loadCashFlowCommandCenter() {
 
     } else if (
         coverage <
-        CONFIG.cashFlow.healthyCoverage
+        CONFIG.cashFlowDomain.cashFlow.healthyCoverage
     ) {
 
         status =
@@ -3703,7 +3703,7 @@ async function loadCashFlowCommandCenter() {
             <strong>
                 ${formatCurrency(
                     opportunity *
-                    CONFIG.cashFlowDeployment.goals
+                    CONFIG.cashFlowDomain.cashFlowDeployment.goals
                 )}
             </strong>
         </div>
@@ -3713,7 +3713,7 @@ async function loadCashFlowCommandCenter() {
             <strong>
                 ${formatCurrency(
                     opportunity *
-                    CONFIG.cashFlowDeployment.investments
+                    CONFIG.cashFlowDomain.cashFlowDeployment.investments
                 )}
             </strong>
         </div>
@@ -3723,7 +3723,7 @@ async function loadCashFlowCommandCenter() {
             <strong>
                 ${formatCurrency(
                     opportunity *
-                    CONFIG.cashFlowDeployment.debtReduction
+                    CONFIG.cashFlowDomain.cashFlowDeployment.debtReduction
                 )}
             </strong>
         </div>
