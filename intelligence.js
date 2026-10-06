@@ -1109,7 +1109,9 @@ function getAdvisorExplanation() {
 function getEmergencyFundGap() {
     const commitments = getCommitmentSummary();
     const monthlyObligations = commitments.totalCommitments;
-    const targetEmergencyFund = monthlyObligations * CONFIG.emergencyFundMonths;
+    const targetEmergencyFund =
+        monthlyObligations *
+        CONFIG.protection.emergencyFundMonths;
     const emergencyGoals = (appData.goals || []).filter(goal => String(goal.goal || "").toLowerCase().includes("emergency"));
     const currentEmergencyFund = emergencyGoals.reduce(
         (sum, goal) => sum + Number(goal.current || 0), 0);
@@ -1187,7 +1189,8 @@ function getTotalLiquidAssets(accounts = []) {
  * Calculate current pay cycle boundaries.
  */
 function getCurrentPayCycle() {
-    const paydayDay = CONFIG.payCycle.paydayDay;
+    const paydayDay =
+        CONFIG.protection.payCycle.paydayDay;
     const today = new Date();
     const currentDay = today.getDate();
     let cycleStart;
@@ -2113,7 +2116,7 @@ async function loadBufferVsInvest() {
                 <strong>${formatCurrency(monthlyObligations)}</strong>
             </div>
             <div class="metric-row">
-                <span>Buffer Target (${CONFIG.buffer.months}x)</span>
+                <span>Buffer Target (${CONFIG.protection.buffer.months}x)</span>
                 <strong>${formatCurrency(bufferTarget)}</strong>
             </div>
             <div class="metric-row">
