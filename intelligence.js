@@ -962,6 +962,9 @@ function getMonthlyWealthBrief() {
     const narrative =
         getAdvisorNarrative();
 
+    const protectionRequired =
+    advisorState.state === "PROTECTION MODE";
+
     
     return {
     
@@ -993,7 +996,7 @@ function getMonthlyWealthBrief() {
         advisorReason,
     
         summary:
-        safeSpend.safeToSpend <= 0
+        protectionRequired
             ? `Liquidity protection is currently required.
                Available cash should remain reserved
                for obligations and protection targets.`
