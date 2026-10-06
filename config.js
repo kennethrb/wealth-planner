@@ -9,15 +9,6 @@
  * ============================================================
  */
 const CONFIG = {
-    // Backward Compatibility
-    ...ProtectionConfig,
-    ...CashflowConfig,
-    ...AdvisorConfig,
-    ...CapitalAllocationConfig,
-    ...WindfallConfig,
-    ...InvestmentConfig,
-
-    // New Domain Structure
     protection: ProtectionConfig,
     cashFlowDomain: CashflowConfig,
     advisor: AdvisorConfig,
