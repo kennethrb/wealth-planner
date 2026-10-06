@@ -2673,12 +2673,12 @@ function getAssetAllocationRecommendation() {
     const cashPercent = allocation.Cash?.percent || 0;
     const totalAssets = Object.values(allocation).reduce(
         (sum, item) => sum + item.amount, 0);
-    const targetCashPercent = CONFIG.assetAllocation.targetCashPercent;
+    const targetCashPercent = CONFIG.investmentsDomain.assetAllocation.targetCashPercent;
     const targetCashAmount = totalAssets * (targetCashPercent / 100);
     const excessCash = Math.max(0, cashAmount - targetCashAmount);
     return {
-        status: cashPercent > CONFIG.assetAllocation.warningCashPercent ? "warning" : "good",
-        title: cashPercent > CONFIG.assetAllocation.warningCashPercent ? "High Cash Allocation" : "Asset Allocation Healthy",
+        status: cashPercent > CONFIG.investmentsDomain.assetAllocation.warningCashPercent ? "warning" : "good",
+        title: cashPercent > CONFIG.investmentsDomain.assetAllocation.warningCashPercent ? "High Cash Allocation" : "Asset Allocation Healthy",
         currentPercent: cashPercent,
         targetPercent: targetCashPercent,
         cashAmount,
@@ -2743,9 +2743,9 @@ async function loadWealthProjectionAccelerator() {
         if (!container) return;
         const flow = getWealthFlowSummary();
         const monthlySurplus = flow.monthlySurplus;
-        const investableAmount = Math.max(0, monthlySurplus * CONFIG.projection.investableRatio); // Assume 70% sweep into investments
+        const investableAmount = Math.max(0, monthlySurplus * CONFIG.investmentsDomain.wealthProjection.investableRatio); // Assume 70% sweep into investments
         const annualReturnRate =
-            CONFIG.wealthProjection.annualReturn; // Assumed 7% conservative annual return
+            CONFIG.investmentsDomain.wealthProjection.annualReturn; // Assumed 7% conservative annual return
 
     // Future Value Formula: FV = P * (((1 + r/n)^(n*t) - 1) / (r/n))
     const calculateFV = (years) => {
@@ -2791,7 +2791,7 @@ async function loadWealthProjectionAccelerator() {
             </div>
             <div class="metric-row">
                 <span>Assumed Return (CAGR)</span>
-                <strong>${(CONFIG.wealthProjection.annualReturn * 100).toFixed(1)}%</strong>
+                <strong>${(CONFIG.investmentsDomain.wealthProjection.annualReturn * 100).toFixed(1)}%</strong>
             </div>
 
             <hr>
@@ -3107,12 +3107,12 @@ async function loadWealthSweep() {
     const excessCash = capital.excessCash;
 
     // Default Allocation Ratios: 20% Debt Payoff, 10% Emergency Top-up, 70% Investment
-    const debtSweep = roundMoney(excessCash * CONFIG.wealthSweep.debt);
-    const emergencySweep = roundMoney(excessCash * CONFIG.wealthSweep.emergency);
-    const investmentSweep = roundMoney(excessCash * CONFIG.wealthSweep.investment);
+    const debtSweep = roundMoney(excessCash * CONFIG.investmentsDomain.wealthSweep.debt);
+    const emergencySweep = roundMoney(excessCash * CONFIG.investmentsDomain.wealthSweep.emergency);
+    const investmentSweep = roundMoney(excessCash * CONFIG.investmentsDomain.wealthSweep.investment);
 
     // Projected 3-Year Investment Return @ 8% CAGR
-    const estimated3YrReturn = investmentSweep * (Math.pow(1 + CONFIG.wealthSweep.projectedReturn, 3) - 1);
+    const estimated3YrReturn = investmentSweep * (Math.pow(1 + CONFIG.investmentsDomain.wealthSweep.projectedReturn, 3) - 1);
     const total3YrBenefit = debtSweep + investmentSweep + estimated3YrReturn;
 
     // Expose QA Metrics for qa.js
@@ -3169,21 +3169,21 @@ async function loadWealthSweep() {
                 <div class="metric-row">
                 <span>
                     💳 Debt Payoff Allocation
-                    (${CONFIG.wealthSweep.debt * 100}%)
+                    (${CONFIG.investmentsDomain.wealthSweep.debt * 100}%)
                 </span>
                     <strong>${formatCurrency(debtSweep)}</strong>
                 </div>
                 <div class="metric-row">
                 <span>
                     🛡️ Emergency Buffer Cushion
-                    (${CONFIG.wealthSweep.emergency * 100}%)
+                    (${CONFIG.investmentsDomain.wealthSweep.emergency * 100}%)
                 </span>
                     <strong>${formatCurrency(emergencySweep)}</strong>
                 </div>
                 <div class="metric-row">
                 <span>
                     📈 Wealth Investment Sweep
-                    (${CONFIG.wealthSweep.investment * 100}%)
+                    (${CONFIG.investmentsDomain.wealthSweep.investment * 100}%)
                 </span>
                     <strong>${formatCurrency(investmentSweep)}</strong>
                 </div>
