@@ -129,7 +129,7 @@ function getTier2Protection(commitments)
       name: "Liquidity Protection",
       requiredAmount:
           protectedCommitments *
-          CONFIG.payCycle.bufferReserveRatio
+          CONFIG.protection.payCycle.bufferReserveRatio
   };
 }
 
