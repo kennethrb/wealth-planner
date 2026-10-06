@@ -2247,8 +2247,8 @@ async function loadFinancialHealthAdvisor() {
     let status = "Healthy";
     
     if (
-        savingsRate < CONFIG.financialHealth.savingsTargetRate ||
-        debtRate > CONFIG.financialHealth.maxDebtRate
+        savingsRate < CONFIG.advisor.financialHealth.savingsTargetRate ||
+        debtRate > CONFIG.advisor.financialHealth.maxDebtRate
     ) {
         status = "Needs Improvement";
     }
@@ -2256,13 +2256,13 @@ async function loadFinancialHealthAdvisor() {
     const problems = [];
     const actions = [];
 
-    if (savingsRate < CONFIG.financialHealth.savingsTargetRate) {
+    if (savingsRate < CONFIG.advisor.financialHealth.savingsTargetRate) {
 
     problems.push(
-        `Savings rate is below recommended ${CONFIG.financialHealth.savingsTargetRate}%`
+        `Savings rate is below recommended ${CONFIG.advisor.financialHealth.savingsTargetRate}%`
     );
 
-    const targetSavingsRate = CONFIG.financialHealth.savingsTargetRate;
+    const targetSavingsRate = CONFIG.advisor.financialHealth.savingsTargetRate;
     
     const savingsGap =
         income * (targetSavingsRate / 100) - savings;
@@ -2276,7 +2276,7 @@ async function loadFinancialHealthAdvisor() {
 
     if (
         debtRate >
-        CONFIG.financialHealth.maxDebtRate
+        CONFIG.advisor.financialHealth.maxDebtRate
     ) {
 
         problems.push(
@@ -2314,9 +2314,9 @@ async function loadFinancialHealthAdvisor() {
 
     const isHealthy =
         savingsRate >=
-            CONFIG.financialHealth.savingsTargetRate &&
+            CONFIG.advisor.financialHealth.savingsTargetRate &&
         debtRate <=
-            CONFIG.financialHealth.maxDebtRate;
+            CONFIG.advisor.financialHealth.maxDebtRate;
     
     if (isHealthy) {
     
@@ -2929,13 +2929,13 @@ async function loadPersonalInflation() {
     }
 
     let status = "✅ Spending Stable";
-    if (inflationRate > CONFIG.inflation.warning) status = "⚠️ Lifestyle Inflation";
-    if (inflationRate > CONFIG.inflation.critical) status = "🚨 Expense Growth High";
+    if (inflationRate > CONFIG.advisor.inflation.warning) status = "⚠️ Lifestyle Inflation";
+    if (inflationRate > CONFIG.advisor.inflation.critical) status = "🚨 Expense Growth High";
 
     const statusClass =
-        inflationRate > CONFIG.inflation.critical
+        inflationRate > CONFIG.advisor.inflation.critical
             ? "text-danger"
-            : inflationRate > CONFIG.inflation.warning
+            : inflationRate > CONFIG.advisor.inflation.warning
                 ? "text-warning"
                 : "text-info";
 
@@ -3252,13 +3252,13 @@ async function loadMonthlyWealthActionPlan() {
     }
 
     // 2. High Priority: Savings Gap
-    if (window.qaFinancialHealthAdvisor?.savingsRate < CONFIG.financialHealth.savingsTargetRate) {
+    if (window.qaFinancialHealthAdvisor?.savingsRate < CONFIG.advisor.financialHealth.savingsTargetRate) {
         const gap = window.qaFinancialHealthAdvisor.wealthImpact;
         actions.push({
             priority: 3,
             badge: "🎯 Savings Gap",
             title: "Increase Monthly Savings Rate",
-            detail: `Current savings rate is under ${CONFIG.financialHealth.savingsTargetRate}%.`,
+            detail: `Current savings rate is under ${CONFIG.advisor.financialHealth.savingsTargetRate}%.`,
             impact: `10-Year Net Worth Impact: +${formatCurrency(gap)}`
         });
     }
