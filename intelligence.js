@@ -144,7 +144,7 @@ function getOpportunityCapital() {
     const opportunity =
         surplus > 0
             ? surplus *
-              CONFIG.opportunityAllocation.reserveRatio
+              CONFIG.capitalAllocationDomain.opportunityAllocation.reserveRatio
             : 0;
     return {
         availableCash,
@@ -170,19 +170,19 @@ function getCapitalAllocationPlan() {
         opportunity: allocationBase,
         emergencyAllocation:
             allocationBase *
-            CONFIG.capitalAllocation.emergencyFund,
+            CONFIG.capitalAllocationDomain.capitalAllocation.emergencyFund,
         
         debtAllocation:
             allocationBase *
-            CONFIG.capitalAllocation.debtReduction,
+            CONFIG.capitalAllocationDomain.capitalAllocation.debtReduction,
         
         goalAllocation:
             allocationBase *
-            CONFIG.capitalAllocation.goals,
+            CONFIG.capitalAllocationDomain.capitalAllocation.goals,
         
         investmentAllocation:
             allocationBase *
-            CONFIG.capitalAllocation.investments
+            CONFIG.capitalAllocationDomain.capitalAllocation.investments
     };
 }
 
@@ -2530,11 +2530,11 @@ async function loadFundingOptimizationAdvisor() {
             excessAmount: excessCash,
             goalAllocation:
                 excessCash *
-                CONFIG.idleCashAllocation.goals,
+                CONFIG.capitalAllocationDomain.idleCashAllocation.goals,
             
             investAllocation:
                 excessCash *
-                CONFIG.idleCashAllocation.investments
+                CONFIG.capitalAllocationDomain.idleCashAllocation.investments
         });
     }
 
@@ -2647,11 +2647,11 @@ async function loadFundingOptimizationAdvisor() {
                                 <strong>${formatCurrency(item.excessAmount)}</strong>
                             </div>
                             <div class="allocation-row">
-                                <span>🎯 Goal Reserve (${CONFIG.idleCashAllocation.goals * 100}%)</span>
+                                <span>🎯 Goal Reserve (${CONFIG.capitalAllocationDomain.idleCashAllocation.goals * 100}%)</span>
                                 <strong>${formatCurrency(item.goalAllocation)}</strong>
                             </div>
                             <div class="allocation-row">
-                                <span>📈 Investment Sweep (${CONFIG.idleCashAllocation.investments * 100}%)</span>
+                                <span>📈 Investment Sweep (${CONFIG.capitalAllocationDomain.idleCashAllocation.investments * 100}%)</span>
                                 <strong>${formatCurrency(item.investAllocation)}</strong>
                             </div>
                         </div>
