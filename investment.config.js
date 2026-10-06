@@ -1,15 +1,13 @@
 const InvestmentConfig = {
+
     wealthProjection: {
-        annualReturn: 0.07
+        annualReturn: 0.07,
+        investableRatio: 0.70
     },
 
     assetAllocation: {
         targetCashPercent: 20,
         warningCashPercent: 40
-    },
-
-    projection: {
-        investableRatio: 0.70
     },
 
     wealthSweep: {
@@ -18,4 +16,5 @@ const InvestmentConfig = {
         investment: 0.70,
         projectedReturn: 0.08
     }
+
 };
