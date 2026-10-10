@@ -573,9 +573,6 @@ function getWealthAdvisorSummary() {
     
     const recommendations =
         getRankedRecommendations();
-    
-    const topRecommendation =
-        recommendations[0];
 
     console.log(
         "Advisor Context",
@@ -594,6 +591,9 @@ function getWealthAdvisorSummary() {
 
     const actions =
         getWealthAdvisorActions();
+
+    const topAction =
+        actions[0] || null;
 
     const topRecommendation =
         getPrimaryRecommendation();
