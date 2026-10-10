@@ -550,9 +550,15 @@ function getWealthAdvisorSummary() {
 
     const context =
         getAdvisorContext();
-
+    
     const wealthState =
         getWealthState();
+    
+    const recommendations =
+        getRankedRecommendations();
+    
+    const topRecommendation =
+        recommendations[0];
 
     console.log(
         "Advisor Context",
@@ -562,6 +568,11 @@ function getWealthAdvisorSummary() {
     console.log(
         "Wealth State",
         wealthState
+    );
+
+    console.log(
+        "Ranked Recommendations",
+        recommendations
     );
 
     const actions =
