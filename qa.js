@@ -92,15 +92,15 @@ async function runIntelligenceQA() {
         );
         
         assertMetric(
-            "Advisor Top Action Exists",
-            !!window.qaWealthAdvisor.topAction ? 1 : 0,
+            "Advisor Recommendation Exists",
+            !!window.qaWealthAdvisor.topRecommendation ? 1 : 0,
             1
         );
 
         assertMetric(
             "Advisor Action Alignment",
             window.qaActionPlan.totalActions > 0 ? 1 : 0,
-            window.qaWealthAdvisor.topAction ? 1 : 0
+            window.qaWealthAdvisor.topRecommendation ? 1 : 0
         );
 
         // ---
