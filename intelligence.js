@@ -547,9 +547,29 @@ function loadReleasedCapitalCard() {
  * Opportunities
  *******************************************************/
 function getWealthAdvisorSummary() {
-    // Advisor recommendation queue
-    const actions = getWealthAdvisorActions();
-    const topAction = actions[0] || null;
+
+    const context =
+        getAdvisorContext();
+
+    const wealthState =
+        getWealthState();
+
+    console.log(
+        "Advisor Context",
+        context
+    );
+
+    console.log(
+        "Wealth State",
+        wealthState
+    );
+
+    const actions =
+        getWealthAdvisorActions();
+
+    const topAction =
+        actions[0] || null;
+
     // Advisor warnings
     const warnings = [];
     // DI-012 Wealth Opportunity Engine
