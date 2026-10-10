@@ -1059,34 +1059,6 @@ function loadWealthAdvisor() {
     return advisor;
 }
 
-function getAdvisorConfidence(action) {
-    const opportunity = getOpportunityCapital();
-    const emergencyGap = getEmergencyFundGap();
-    const liquidity = opportunity.coverage || 0;
-    if (liquidity < CONFIG.cashFlowDomain.cashFlow.minimumCoverage) {
-        return {
-            score: 90,
-            level: "LIQUIDITY PROTECTION"
-        };
-    }
-    let score = 50;
-    if (liquidity >= 12) score += 20;
-    else if (liquidity >= 6) score += 10;
-    else score -= 10;
-    if (emergencyGap.gap <= 0) score += 15;
-    else if (emergencyGap.gap <= 50000) score += 5;
-    if (opportunity.opportunity > 100000) score += 10;
-    else if (opportunity.opportunity > 50000) score += 5;
-    if (action?.category === "Emergency Fund") score += 10;
-    if (action.category === "Released Capital") {
-        score += 15;
-    }
-    score = Math.max(0, Math.min(score, 100));
-    return {
-        score,
-        level: score >= 90 ? "HIGH" : score >= 70 ? "MEDIUM" : "LOW"
-    };
-}
 
 function getRecommendationConfidenceBreakdown(
     recommendation
@@ -1161,47 +1133,6 @@ function getRecommendationConfidenceBreakdown(
         factors
     };
 }
-
-function getAdvisorConfidenceBreakdown(action) {
-    const opportunity = getOpportunityCapital();
-    const emergency = getEmergencyFundGap();
-    const goal = window.qaGoalFundingOptimizer;
-    const factors = [];
-    // Liquidity
-    factors.push({
-        category: "Liquidity",
-        score: opportunity.coverage >= CONFIG.cashFlowDomain.cashFlow.healthyCoverage ? 100 : opportunity.coverage >= CONFIG.cashFlowDomain.cashFlow.minimumCoverage ? 70 : 30,
-        status: opportunity.coverage >= CONFIG.cashFlowDomain.cashFlow.healthyCoverage ? "GOOD" : opportunity.coverage >= CONFIG.cashFlowDomain.cashFlow.minimumCoverage ? "FAIR" : "WEAK",
-        message: opportunity.coverage >= CONFIG.cashFlowDomain.cashFlow.healthyCoverage ? "Liquidity protected" : opportunity.coverage >= CONFIG.cashFlowDomain.cashFlow.minimumCoverage ? "Liquidity acceptable" : "Liquidity risk detected"
-    });
-    // Emergency Fund
-    factors.push({
-        category: "Emergency Fund",
-        score: emergency.fullyFunded ? 100 : emergency.gap <= 50000 ? 70 : 40,
-        status: emergency.fullyFunded ? "GOOD" : emergency.gap <= 50000 ? "FAIR" : "WEAK",
-        message: emergency.fullyFunded ? "Emergency reserve funded" : "Emergency reserve below target"
-    });
-    // Goal Readiness
-    factors.push({
-        category: "Goal Readiness",
-        score: goal?.completable ? 100 : 60,
-        status: goal?.completable ? "GOOD" : "FAIR",
-        message: goal?.completable ? "Goal can be completed" : "Goal still requires funding"
-    });
-    // Data Quality
-    factors.push({
-        category: "Data Quality",
-        score: 100,
-        status: "GOOD",
-        message: "Required advisor data available"
-    });
-    return {
-        score: getAdvisorConfidence(action).score,
-        factors
-    };
-}
-
-
 
 function getConfidenceReason(score) {
     if (score >= 90) return "Strong financial data supports this recommendation.";
