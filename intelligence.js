@@ -663,54 +663,107 @@ function getWealthAdvisorSummary() {
 
 function getAdvisorNarrative() {
     const advisor = getWealthAdvisorSummary();
-    const topAction = advisor.topAction;
+
+    const recommendation =
+        advisor.topRecommendation;
+
     let narrative = {
-        recommendation: topAction?.action || "",
-        reason: "",
+        recommendation:
+            recommendation?.title || "",
+        reason:
+            recommendation?.reason || "",
         urgency: "MEDIUM",
         wealthImpact: "",
         riskIfIgnored: "",
         alternativeActions: [],
         confidenceFactors: []
     };
-    if (!topAction) {
-        narrative.reason = "No actionable opportunity detected.";
-        narrative.wealthImpact = "Current position appears optimized.";
-        narrative.riskIfIgnored = "No immediate risk detected.";
+
+    if (!recommendation) {
+        narrative.reason =
+            "No actionable opportunity detected.";
+
+        narrative.wealthImpact =
+            "Current position appears optimized.";
+
+        narrative.riskIfIgnored =
+            "No immediate risk detected.";
+
         return narrative;
     }
-    switch (topAction.category) {
-        case "Cash Flow Protection":
-            narrative.reason = "Available cash is insufficient to safely cover upcoming obligations.";
+
+    switch (recommendation.state) {
+
+        case AdvisorStates.PROTECTION_GAP:
+
             narrative.urgency = "HIGH";
-            narrative.wealthImpact = "Prevents overdrafts, missed payments, and liquidity stress.";
-            narrative.riskIfIgnored = "Increased risk of cash shortfall before next payday.";
+
+            narrative.wealthImpact =
+                "Protects liquidity and prevents future cash flow stress.";
+
+            narrative.riskIfIgnored =
+                "Protection requirements may remain underfunded.";
+
             break;
-        case "Emergency Fund":
-            narrative.reason = "Emergency reserves remain below target levels.";
+
+        case AdvisorStates.CASH_CONSTRAINED:
+
             narrative.urgency = "HIGH";
-            narrative.wealthImpact = "Improves resilience and protects long-term wealth.";
-            narrative.riskIfIgnored = "Unexpected expenses may require debt or asset liquidation.";
+
+            narrative.wealthImpact =
+                "Improves cash buffer resilience.";
+
+            narrative.riskIfIgnored =
+                "Risk of short-term liquidity pressure.";
+
             break;
-        case "Goal Completion":
-            narrative.reason = window.qaGoalFundingOptimizer?.reason || "Goal can be accelerated immediately.";
-            narrative.urgency = "MEDIUM";
-            narrative.wealthImpact = "Improves goal completion velocity.";
-            narrative.riskIfIgnored = "Goal completion will take longer.";
+
+        case AdvisorStates.GOAL_ACCELERATION:
+
+            narrative.wealthImpact =
+                "Accelerates goal completion and releases future capital.";
+
+            narrative.riskIfIgnored =
+                "Goal completion may be delayed.";
+
             break;
-        case "Investments":
-            narrative.reason = "Protection requirements have been satisfied.";
-            narrative.urgency = "MEDIUM";
-            narrative.wealthImpact = "Potential long-term net worth growth.";
-            narrative.riskIfIgnored = "Idle cash may remain unproductive.";
+
+        case AdvisorStates.CAPITAL_DEPLOYMENT:
+
+            narrative.wealthImpact =
+                "Deploys idle capital toward growth objectives.";
+
+            narrative.riskIfIgnored =
+                "Cash remains underutilized.";
+
             break;
-        case "Debt Reduction":
-            narrative.reason = "Debt reduction improves future cash flow flexibility.";
-            narrative.wealthImpact = "Reduces future financial drag.";
-            narrative.riskIfIgnored = "Additional interest will continue accumulating.";
+
+        case AdvisorStates.OPPORTUNITY_RICH:
+
+            narrative.wealthImpact =
+                "Captures high-value wealth opportunities.";
+
+            narrative.riskIfIgnored =
+                "Potential growth opportunities may be missed.";
+
+            break;
+
+        default:
+
+            narrative.wealthImpact =
+                "Supports long-term wealth optimization.";
+
+            narrative.riskIfIgnored =
+                "Opportunity cost from inaction.";
+
             break;
     }
-    narrative.alternativeActions = advisor.actions.slice(1).map(action => action.action);
+
+    narrative.alternativeActions =
+        advisor.actions
+            .slice(1)
+            .map(action => action.action);
+
     return narrative;
 }
 
@@ -824,51 +877,164 @@ function loadWealthOpportunityEngine() {
 }
 
 function getWealthAdvisorActions() {
-    const actions = [];
-    const priorityAction = getCapitalAllocationPriority();
 
-    const released = getReleasedCapitalSummary();
+    const actions = [];
+
+    const recommendation =
+        getPrimaryRecommendation();
+
+    const released =
+        getReleasedCapitalSummary();
 
     const suppressEmergencyRecommendation =
         released.state === "ACTIVE" &&
         released.destination === "Emergency Fund";
+
     if (
+        recommendation &&
         !suppressEmergencyRecommendation
     ) {
-    
         actions.push({
-            priority: priorityAction.priority,
-            category: priorityAction.category,
-            action: priorityAction.action,
-            source: "DI-011"
+            priority:
+                recommendation.priority || 1,
+
+            category:
+                recommendation.state || "ADVISOR",
+
+            action:
+                recommendation.title ||
+                recommendation.reason,
+
+            source: "AB-006"
         });
-    
     }
+
     if (released.state === "ACTIVE") {
+
         actions.push({
             priority: 1,
+
             category: "Released Capital",
+
             action:
-            `Redirect ${formatCurrency(
-                released.totalReleasedCapital
-            )}/month toward ${
-                released.destination
-            }`,
+                `Redirect ${formatCurrency(
+                    released.totalReleasedCapital
+                )}/month toward ${released.destination}`,
+
             source: "DI-028"
         });
     }
 
-    if (window.qaGoalFundingOptimizer && priorityAction.category !== "Goal Completion") {
+    if (
+        window.qaGoalFundingOptimizer &&
+        recommendation?.state !==
+            AdvisorStates.GOAL_ACCELERATION
+    ) {
+
         actions.push({
             priority: 2,
+
             category: "Goal Funding",
-            action: window.qaGoalFundingOptimizer.priorityAction,
+
+            action:
+                window.qaGoalFundingOptimizer.priorityAction,
+
             source: "DI-010"
         });
     }
+
     actions.sort(
-        (a, b) => a.priority - b.priority);
+        (a, b) => a.priority - b.priority
+    );
+
     return actions;
+}
+
+function getRecommendationConfidence(recommendation) {
+
+    const opportunity =
+        getOpportunityCapital();
+
+    const emergencyGap =
+        getEmergencyFundGap();
+
+    const liquidity =
+        opportunity.coverage || 0;
+
+    if (
+        liquidity <
+        CONFIG.cashFlowDomain.cashFlow.minimumCoverage
+    ) {
+        return {
+            score: 90,
+            level: "LIQUIDITY PROTECTION"
+        };
+    }
+
+    let score = 50;
+
+    if (liquidity >= 12) {
+        score += 20;
+    }
+    else if (liquidity >= 6) {
+        score += 10;
+    }
+    else {
+        score -= 10;
+    }
+
+    if (emergencyGap.gap <= 0) {
+        score += 15;
+    }
+    else if (emergencyGap.gap <= 50000) {
+        score += 5;
+    }
+
+    if (opportunity.opportunity > 100000) {
+        score += 10;
+    }
+    else if (opportunity.opportunity > 50000) {
+        score += 5;
+    }
+
+    switch (recommendation?.state) {
+
+        case AdvisorStates.PROTECTION_GAP:
+            score += 10;
+            break;
+
+        case AdvisorStates.CASH_CONSTRAINED:
+            score += 10;
+            break;
+
+        case AdvisorStates.GOAL_ACCELERATION:
+            score += 5;
+            break;
+
+        case AdvisorStates.CAPITAL_DEPLOYMENT:
+            score += 5;
+            break;
+
+        case AdvisorStates.OPPORTUNITY_RICH:
+            score += 5;
+            break;
+    }
+
+    score =
+        Math.max(
+            0,
+            Math.min(score, 100)
+        );
+
+    return {
+        score,
+        level:
+            score >= 90
+                ? "HIGH"
+                : score >= 70
+                ? "MEDIUM"
+                : "LOW"
+    };
 }
 
 function loadWealthAdvisor() {
@@ -1054,8 +1220,8 @@ function getMonthlyWealthBrief() {
             advisorState.objective,
     
         headline:
-            advisor.topRecommendation?.title ||
-            advisor.topAction?.action,
+            advisor.topRecommendation?.title
+            || "Maintain Stability",
         
         confidenceLevel:
             confidence.level,
@@ -1143,31 +1309,39 @@ function loadMonthlyWealthBrief() {
 
 function getAdvisorExplanation() {
 
-    const priority =
-        getCapitalAllocationPriority();
+    const advisor =
+        getWealthAdvisorSummary();
 
-    switch (priority.category) {
+    const recommendation =
+        advisor.topRecommendation;
 
-        case "Cash Flow Protection":
-            return "Available cash is insufficient to safely cover upcoming obligations. Capital preservation is currently the highest priority.";
+    if (!recommendation) {
+        return "No recommendation available.";
+    }
 
-        case "Emergency Fund":
-            return "Emergency reserves remain below target levels. Strengthening liquidity improves resilience before deploying capital into growth opportunities.";
+    switch (recommendation.state) {
 
-        case "Goal Completion":
-            return window.qaGoalFundingOptimizer?.reason ||
-                "This goal offers the fastest path to measurable progress.";
+        case AdvisorStates.PROTECTION_GAP:
+            return "Liquidity protection is currently the highest priority because available reserves are below protection requirements.";
 
-        case "Investments":
-            return "Core protections are satisfied. Available capital can now be directed toward long-term wealth growth.";
+        case AdvisorStates.CASH_CONSTRAINED:
+            return "Cash coverage remains below target levels and additional liquidity should be accumulated before capital deployment.";
 
-        case "Debt Reduction":
-            return "Reducing debt improves financial flexibility and lowers future cash obligations.";
+        case AdvisorStates.GOAL_ACCELERATION:
+            return "Available capital can immediately accelerate goal completion and improve wealth velocity.";
+
+        case AdvisorStates.CAPITAL_DEPLOYMENT:
+            return "Protection requirements have been satisfied and available capital can be deployed toward higher-value opportunities.";
+
+        case AdvisorStates.OPPORTUNITY_RICH:
+            return "Multiple high-impact opportunities are available and capital deployment is likely to improve long-term wealth outcomes.";
 
         default:
-            return "No explanation available.";
+            return recommendation.reason ||
+                "Continue executing your current wealth strategy.";
     }
 }
+
 
 
 
@@ -1440,20 +1614,40 @@ function getProtectionStatus() {
  * for the current pay cycle.
  */
 function getPaydayPlan() {
-    const cycle = getCurrentPayCycle();
-    const safeSpend = getSafeToSpend();
-    const allocation = getCapitalAllocationPlan();
-    const topAction = getCapitalAllocationPriority();
+
+    const cycle =
+        getCurrentPayCycle();
+
+    const safeSpend =
+        getSafeToSpend();
+
+    const allocation =
+        getCapitalAllocationPlan();
+
+    const topRecommendation =
+        getPrimaryRecommendation();
+
     return {
         nextPayday: cycle.nextPayday,
         daysRemaining: cycle.daysRemaining,
         safeToSpend: safeSpend.safeToSpend,
-        emergencyFund: allocation.emergencyAllocation,
-        debtReduction: allocation.debtAllocation,
-        goals: allocation.goalAllocation,
-        investments: allocation.investmentAllocation,
-        opportunityCapital: allocation.opportunity,
-        topAction
+
+        emergencyFund:
+            allocation.emergencyAllocation,
+
+        debtReduction:
+            allocation.debtAllocation,
+
+        goals:
+            allocation.goalAllocation,
+
+        investments:
+            allocation.investmentAllocation,
+
+        opportunityCapital:
+            allocation.opportunity,
+
+        topRecommendation
     };
 }
 
@@ -1648,7 +1842,7 @@ function loadPaydayPlan() {
                 <div class="metric-row">
                     <span>Highest Priority</span>
                     <strong>
-                        ${plan.topAction.action}
+                        ${plan.topRecommendation?.title}
                     </strong>
                 </div>
 
@@ -1813,7 +2007,7 @@ function loadPaydayPlan() {
                 </div>
 
                 <p>
-                    ${plan.topAction.action}
+                    ${plan.topRecommendation?.title}
                 </p>
 
             </div>
@@ -4312,12 +4506,24 @@ function buildGoalResponse() {
 }
 
 function buildInvestmentResponse() {
-    const priority = getCapitalAllocationPriority();
+
+    const advisor =
+        getWealthAdvisorSummary();
+
+    const recommendation =
+        advisor.topRecommendation;
+
     return {
-        answer: priority.action,
+        answer:
+            recommendation?.title ||
+            "No investment recommendation available",
+
         confidence: 85,
-        source: "DI-011",
-        generatedAt: new Date().toISOString()
+
+        source: "AB-006",
+
+        generatedAt:
+            new Date().toISOString()
     };
 }
 
@@ -4360,7 +4566,10 @@ function buildExplanationResponse() {
     const explanation = getAdvisorExplanation();
     return {
         answer: explanation,
-        confidence: getAdvisorConfidence(advisor.topAction).score,
+        confidence:
+            getAdvisorConfidence(
+                advisor.topRecommendation
+            ).score,
         source: "DI-015",
         generatedAt: new Date().toISOString()
     };
