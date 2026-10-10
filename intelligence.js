@@ -2954,58 +2954,6 @@ function getAssetAllocationRecommendation() {
     };
 }
 
-async function loadAssetAllocationAdvisor() {
-    const container = document.getElementById("assetAllocationAdvisor");
-    if (!container) return;
-    const rec = getAssetAllocationRecommendation();
-    const DEMO_MODE = true;
-    
-    if (DEMO_MODE) {
-        container.style.display = "none";
-        return;
-    }
-    
-    container.style.display = "";
-    container.innerHTML = `
-        <div class="card">
-            <h2>🎯 Asset Allocation Advisor</h2>
-
-            <div class="metric-row">
-                <span>Status</span>
-                <strong>${rec.title}</strong>
-            </div>
-
-            <div class="metric-row">
-                <span>Current Cash</span>
-                <strong>${rec.currentPercent}%</strong>
-            </div>
-
-            <div class="metric-row">
-                <span>Target Cash</span>
-                <strong>${rec.targetPercent}%</strong>
-            </div>
-
-            <div class="metric-row">
-                <span>Excess Cash</span>
-                <strong>${formatCurrency(rec.excessCash)}</strong>
-            </div>
-
-            <hr>
-
-            <div class="advisor-action priority">
-                <div class="action-title">
-                    🚀 Recommended Action
-                </div>
-
-                <div class="allocation-row">
-                    <span>Deploy Into Growth Assets</span>
-                    <strong>${formatCurrency(rec.excessCash)}</strong>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
 async function loadWealthProjectionAccelerator() {
         const container = document.getElementById("wealthProjectionAccelerator");
         if (!container) return;
