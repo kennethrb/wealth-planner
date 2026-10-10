@@ -544,6 +544,35 @@ function getPrimaryRecommendation() {
     return recommendations[0];
 }
 
+function getUnifiedAdvisorOutput() {
+
+    const context =
+        getAdvisorContext();
+
+    const wealthState =
+        getWealthState();
+
+    const recommendation =
+        getPrimaryRecommendation();
+
+    const opportunities =
+        getWealthOpportunities();
+
+    return {
+
+        context,
+
+        wealthState,
+
+        recommendation,
+
+        opportunities,
+
+        generatedAt:
+            new Date().toISOString()
+    };
+}
+
 /*******************************************************
  * DI-015 Wealth Advisor
  *
@@ -565,14 +594,11 @@ function getPrimaryRecommendation() {
  *******************************************************/
 function getWealthAdvisorSummary() {
 
-    const context =
-        getAdvisorContext();
+    const advisorOutput =
+        getUnifiedAdvisorOutput();
     
-    const wealthState =
-        getWealthState();
-    
-    const recommendations =
-        getRankedRecommendations();
+    const topRecommendation =
+        advisorOutput.recommendation;
 
     console.log(
         "Advisor Context",
@@ -595,8 +621,7 @@ function getWealthAdvisorSummary() {
     const topAction =
         actions[0] || null;
 
-    const topRecommendation =
-        getPrimaryRecommendation();
+
 
     // Advisor warnings
     const warnings = [];
@@ -997,7 +1022,9 @@ function getMonthlyWealthBrief() {
     
     const projectedBenefit =
         window.qaSweep?.total3YrBenefit || 0;
-    const advisorReason = getAdvisorExplanation();
+    const advisorReason =
+        advisor.topRecommendation?.reason ||
+        getAdvisorExplanation();
     const confidence =
         getAdvisorConfidence(
             advisor.topAction
@@ -1027,6 +1054,7 @@ function getMonthlyWealthBrief() {
             advisorState.objective,
     
         headline:
+            advisor.topRecommendation?.title ||
             advisor.topAction?.action,
         
         confidenceLevel:
