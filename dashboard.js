@@ -35,9 +35,6 @@ function loadAssetAllocationAdvisor() {
         );
 
     if (!container) {
-        console.warn(
-            "assetAllocationAdvisor container missing"
-        );
         return;
     }
 
@@ -46,18 +43,43 @@ function loadAssetAllocationAdvisor() {
 
     container.innerHTML = `
         <div class="card">
+
             <h2>🎯 Asset Allocation Advisor</h2>
 
             <div class="metric-row">
-                <strong>${recommendation.title}</strong>
+                <span>Status</span>
+                <strong>
+                    ${recommendation.title}
+                </strong>
             </div>
 
-            <p>
-                ${recommendation.message}
-            </p>
+            <div class="metric-row">
+                <span>Current Cash</span>
+                <strong>
+                    ${recommendation.currentPercent}%
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>Target Cash</span>
+                <strong>
+                    ${recommendation.targetPercent}%
+                </strong>
+            </div>
+
+            <div class="metric-row">
+                <span>Excess Cash</span>
+                <strong>
+                    ${formatCurrency(
+                        recommendation.excessCash
+                    )}
+                </strong>
+            </div>
+
         </div>
     `;
 }
+
 
 
 
