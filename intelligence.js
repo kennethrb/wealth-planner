@@ -527,6 +527,23 @@ function loadReleasedCapitalCard() {
     `;
 }
 
+function getPrimaryRecommendation() {
+
+    const recommendations =
+        getRankedRecommendations();
+
+    if (!recommendations.length) {
+        return {
+            id: "NO_ACTION",
+            priority: 0,
+            title: "Maintain stability",
+            reason: "No critical action detected."
+        };
+    }
+
+    return recommendations[0];
+}
+
 /*******************************************************
  * DI-015 Wealth Advisor
  *
@@ -578,8 +595,8 @@ function getWealthAdvisorSummary() {
     const actions =
         getWealthAdvisorActions();
 
-    const topAction =
-        actions[0] || null;
+    const topRecommendation =
+        getPrimaryRecommendation();
 
     // Advisor warnings
     const warnings = [];
@@ -605,6 +622,7 @@ function getWealthAdvisorSummary() {
     return {
         generatedAt: new Date().toISOString(),
         status: "ACTIVE",
+        topRecommendation,
         // Highest-priority recommendation
         topAction,
         // Full advisor queue
