@@ -1097,6 +1097,163 @@ function getAdvisorConfidence(action) {
     };
 }
 
+function getRecommendationConfidence(recommendation) {
+
+    const opportunity =
+        getOpportunityCapital();
+
+    const emergencyGap =
+        getEmergencyFundGap();
+
+    const liquidity =
+        opportunity.coverage || 0;
+
+    if (
+        liquidity <
+        CONFIG.cashFlowDomain.cashFlow.minimumCoverage
+    ) {
+        return {
+            score: 90,
+            level: "LIQUIDITY PROTECTION"
+        };
+    }
+
+    let score = 50;
+
+    if (liquidity >= 12) {
+        score += 20;
+    } else if (liquidity >= 6) {
+        score += 10;
+    } else {
+        score -= 10;
+    }
+
+    if (emergencyGap.gap <= 0) {
+        score += 15;
+    } else if (emergencyGap.gap <= 50000) {
+        score += 5;
+    }
+
+    if (opportunity.opportunity > 100000) {
+        score += 10;
+    } else if (opportunity.opportunity > 50000) {
+        score += 5;
+    }
+
+    switch (recommendation?.state) {
+
+        case AdvisorStates.PROTECTION_GAP:
+            score += 10;
+            break;
+
+        case AdvisorStates.CASH_CONSTRAINED:
+            score += 10;
+            break;
+
+        case AdvisorStates.GOAL_ACCELERATION:
+            score += 5;
+            break;
+
+        case AdvisorStates.CAPITAL_DEPLOYMENT:
+            score += 5;
+            break;
+
+        case AdvisorStates.OPPORTUNITY_RICH:
+            score += 5;
+            break;
+    }
+
+    score =
+        Math.max(
+            0,
+            Math.min(score, 100)
+        );
+
+    return {
+        score,
+        level:
+            score >= 90
+                ? "HIGH"
+                : score >= 70
+                ? "MEDIUM"
+                : "LOW"
+    };
+}
+
+function getRecommendationConfidenceBreakdown(
+    recommendation
+) {
+
+    const opportunity =
+        getOpportunityCapital();
+
+    const emergency =
+        getEmergencyFundGap();
+
+    const goal =
+        window.qaGoalFundingOptimizer;
+
+    const factors = [];
+
+    factors.push({
+        category: "Liquidity",
+        score:
+            opportunity.coverage >=
+            CONFIG.cashFlowDomain.cashFlow.healthyCoverage
+                ? 100
+                : opportunity.coverage >=
+                  CONFIG.cashFlowDomain.cashFlow.minimumCoverage
+                ? 70
+                : 30,
+        message:
+            opportunity.coverage >=
+            CONFIG.cashFlowDomain.cashFlow.healthyCoverage
+                ? "Liquidity protected"
+                : "Liquidity risk detected"
+    });
+
+    factors.push({
+        category: "Emergency Fund",
+        score:
+            emergency.fullyFunded
+                ? 100
+                : 40,
+        message:
+            emergency.fullyFunded
+                ? "Emergency reserve funded"
+                : "Emergency reserve below target"
+    });
+
+    factors.push({
+        category: "Goal Readiness",
+        score:
+            goal?.completable
+                ? 100
+                : 60,
+        message:
+            goal?.completable
+                ? "Goal can be completed"
+                : "Goal still requires funding"
+    });
+
+    factors.push({
+        category: "Advisor State",
+        score:
+            recommendation?.priority || 0,
+        message:
+            recommendation?.title ||
+            "No recommendation"
+    });
+
+    return {
+        score:
+            getRecommendationConfidence(
+                recommendation
+            ).score,
+        factors
+    };
+}
+
 function getAdvisorConfidenceBreakdown(action) {
     const opportunity = getOpportunityCapital();
     const emergency = getEmergencyFundGap();
@@ -1192,12 +1349,13 @@ function getMonthlyWealthBrief() {
         advisor.topRecommendation?.reason ||
         getAdvisorExplanation();
     const confidence =
-        getAdvisorConfidence(
-            advisor.topAction
+        getRecommendationConfidence(
+            advisor.topRecommendation
         );
+    
     const confidenceBreakdown =
-        getAdvisorConfidenceBreakdown(
-            advisor.topAction
+        getRecommendationConfidenceBreakdown(
+            advisor.topRecommendation
         );
     const opportunityEngine =
         getWealthOpportunities();
