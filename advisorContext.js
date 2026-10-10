@@ -42,6 +42,50 @@ function getAdvisorContext() {
                 );
 
             return remaining <= cashFlow.opportunity;
-        }
-                           }
+        });
 
+    return {
+
+        generatedAt:
+            new Date().toISOString(),
+
+        liquidity: {
+            availableCash: protection.totalCash,
+            coverage: cashFlow.coverage,
+            safeToSpend: getSafeToSpend().safeToSpend
+        },
+
+        obligations: {
+            protectedBills: protection.protectedObligations,
+            requiredProtection: protection.requiredProtection,
+            protectionGap: protection.protectionGap
+        },
+
+        goals: {
+            activeCount: activeGoals.length,
+            completableCount: completableGoals.length,
+            completableGoals:
+                completableGoals.map(g => g.goal)
+        },
+
+        cashFlow: {
+            opportunityCapital: cashFlow.opportunity,
+            surplus: cashFlow.surplus
+        },
+
+        advisorMemory: {
+            totalRecommendations:
+                advisorMemory.length,
+
+            completed:
+                advisorMemory.filter(
+                    m => m.status === "COMPLETED"
+                ).length,
+
+            ignored:
+                advisorMemory.filter(
+                    m => m.status === "IGNORED"
+                ).length
+        }
+    };
+}
