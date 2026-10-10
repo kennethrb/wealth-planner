@@ -575,11 +575,11 @@ function getWealthAdvisorSummary() {
         recommendations
     );
 
-    const recommendations =
-        getRankedRecommendations();
-    
-    const topRecommendation =
-        recommendations[0] || null;
+    const actions =
+        getWealthAdvisorActions();
+
+    const topAction =
+        actions[0] || null;
 
     // Advisor warnings
     const warnings = [];
@@ -616,23 +616,6 @@ function getWealthAdvisorSummary() {
         // DI-012 opportunities
         opportunities: opportunityEngine.opportunities
     };
-}
-
-function getPrimaryRecommendation() {
-
-    const recommendations =
-        getRankedRecommendations();
-
-    if (!recommendations.length) {
-
-        return {
-            title: "Maintain stability",
-            priority: 0,
-            reason: "No high-priority action detected."
-        };
-    }
-
-    return recommendations[0];
 }
 
 function getAdvisorNarrative() {
