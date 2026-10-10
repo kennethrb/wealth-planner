@@ -601,18 +601,18 @@ function getWealthAdvisorSummary() {
         advisorOutput.recommendation;
 
     console.log(
-        "Advisor Context",
-        context
+        "Advisor Output",
+        advisorOutput
     );
-
+    
+    console.log(
+        "Recommendation",
+        advisorOutput.recommendation
+    );
+    
     console.log(
         "Wealth State",
-        wealthState
-    );
-
-    console.log(
-        "Ranked Recommendations",
-        recommendations
+        advisorOutput.wealthState
     );
 
     const actions =
