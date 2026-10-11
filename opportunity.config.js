@@ -20,6 +20,18 @@ const OpportunityConfig = {
 
         minimumOpportunityImpact: 1000
 
+    },
+    
+    priorityMap: {
+    
+        CRITICAL: 100,
+    
+        HIGH: 75,
+    
+        MEDIUM: 50,
+    
+        LOW: 25
+    
     }
 
 };
