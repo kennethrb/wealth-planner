@@ -786,63 +786,9 @@ function getAdvisorNarrative() {
  *
  */
 function getWealthOpportunities() {
+
     const opportunities =
         getRankedOpportunities();
-    const cashFlow = getOpportunityCapital();
-    const goalPlan = window.qaGoalFundingOptimizer;
-    const sweep = window.qaSweep;
-    /**
-     * Idle Cash Opportunity
-     *
-     * Detect deployable cash that is
-     * currently generating no return.
-     */
-    if (cashFlow.opportunity > 50000) {
-        opportunities.push({
-            category: "Idle Cash",
-            priority: "HIGH",
-            action: `Deploy ₱${cashFlow.opportunity.toLocaleString()} of idle cash`,
-            impact: cashFlow.opportunity
-        });
-    }
-    /**
-     * Goal Completion Opportunity
-     *
-     * Detect goals that can be
-     * completed immediately.
-     */
-    if (goalPlan && goalPlan.completable) {
-        opportunities.push({
-            category: "Goal Completion",
-            priority: "HIGH",
-            action: goalPlan.priorityAction,
-            impact: goalPlan.suggestedFunding
-        });
-    }
-    /**
-     * Investment Growth Opportunity
-     */
-    if (sweep && sweep.investmentSweep > 0) {
-        opportunities.push({
-            category: "Investment Growth",
-            priority: "MEDIUM",
-            action: `Invest ₱${sweep.investmentSweep.toLocaleString()}`,
-            impact: sweep.total3YrBenefit
-        });
-    }
-    /**
-     * Debt Optimization Opportunity
-     */
-    if (sweep && sweep.debtSweep > 0) {
-        opportunities.push({
-            category: "Debt Optimization",
-            priority: "MEDIUM",
-            action: `Apply ₱${sweep.debtSweep.toLocaleString()} toward debt reduction`,
-            impact: sweep.debtSweep
-        });
-    }
-    opportunities.sort(
-        (a, b) => b.impact - a.impact);
 
     return {
 
@@ -850,15 +796,22 @@ function getWealthOpportunities() {
             opportunities.length,
 
         estimatedImpact:
+
             opportunities.reduce(
+
                 (sum, item) =>
-                    sum + Number(item.wealthImpact || 0),
+
+                    sum +
+                    Number(item.wealthImpact || 0),
+
                 0
+
             ),
 
         opportunities
 
     };
+
 }
 
 
