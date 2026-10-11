@@ -68,6 +68,16 @@ function detectCapitalReleaseOpportunities() {
 
     const opportunities = [];
 
+    const wealthState =
+        getWealthState();
+
+    if (
+        wealthState ===
+        AdvisorStates.PROTECTION_GAP
+    ) {
+        return opportunities;
+    }
+
     const released =
         getReleasedCapitalSummary();
 
