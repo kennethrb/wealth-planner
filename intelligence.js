@@ -786,7 +786,8 @@ function getAdvisorNarrative() {
  *
  */
 function getWealthOpportunities() {
-    const opportunities = [];
+    const opportunities =
+        getRankedOpportunities();
     const cashFlow = getOpportunityCapital();
     const goalPlan = window.qaGoalFundingOptimizer;
     const sweep = window.qaSweep;
@@ -842,11 +843,21 @@ function getWealthOpportunities() {
     }
     opportunities.sort(
         (a, b) => b.impact - a.impact);
+
     return {
-        count: opportunities.length,
-        estimatedImpact: opportunities.reduce(
-            (sum, item) => sum + item.impact, 0),
+
+        count:
+            opportunities.length,
+
+        estimatedImpact:
+            opportunities.reduce(
+                (sum, item) =>
+                    sum + Number(item.wealthImpact || 0),
+                0
+            ),
+
         opportunities
+
     };
 }
 
