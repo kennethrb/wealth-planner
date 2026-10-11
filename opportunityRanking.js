@@ -97,3 +97,32 @@ function getRankedOpportunities() {
         );
 
 }
+
+function debugOpportunityScoring() {
+
+    const opportunities =
+        getDetectedOpportunities();
+
+    return opportunities.map(item => ({
+
+        title:
+            item.title,
+
+        type:
+            item.type,
+
+        priority:
+            item.priority,
+
+        confidence:
+            item.confidence,
+
+        wealthImpact:
+            item.wealthImpact,
+
+        score:
+            getOpportunityScore(item)
+
+    }));
+
+}
