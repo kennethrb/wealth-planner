@@ -150,7 +150,7 @@ function getTier3Protection(goals = []) {
     const requiredAmount =
         protectedGoals.reduce(
             (sum, goal) =>
-                sum + Number(goal.target || 0),
+                sum + Number(goal.current || 0),
             0
         );
 
