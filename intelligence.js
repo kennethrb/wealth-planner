@@ -396,9 +396,6 @@ function getReleasedCapitalSummary() {
     const tenYearImpact =
         totalReleasedCapital * 12 * 10;
     
-    const recommendationEngine =
-        getPrimaryRecommendation();
-    
     const emergency =
         getEmergencyFundGap();
     
@@ -406,11 +403,10 @@ function getReleasedCapitalSummary() {
         getCapitalAllocationPlan();
     
     let destination =
-        recommendationEngine?.title ||
         "Wealth Priority";
     
     let recommendation =
-        `Redirect released capital to ${destination}`;
+        "Redirect released capital to highest priority wealth objective";
 
     
     if (!emergency.fullyFunded) {
