@@ -146,11 +146,12 @@ function getOpportunityCapital() {
         getCommitmentSummary();
     
     const protectedRecurringBills =
-        commitments.protectedBills +
-        commitments.protectedDebt;
+        commitments.totalCommitments;
     const remainingBills = getOutstandingCycleBills().reduce(
         (sum, bill) => sum + Number(bill.defaultAmount || 0), 0);
-    const coverage = protectedRecurringBills === 0 ? CONFIG.cashFlowDomain.cashFlow.unlimitedCoverage : availableCash / protectedRecurringBills;
+    const coverage =
+        availableCash /
+        protectedRecurringBills;
     const capitalPosition =
         getCapitalPosition();
     
