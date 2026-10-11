@@ -14,5 +14,6 @@ const CONFIG = {
     advisor: AdvisorConfig,
     capitalAllocationDomain: CapitalAllocationConfig,
     windfall: WindfallConfig,
-    investmentsDomain: InvestmentConfig
+    investmentsDomain: InvestmentConfig,
+    opportunity: OpportunityConfig
 };
