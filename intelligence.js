@@ -105,23 +105,39 @@ function getCapitalPosition() {
             []
         );
 
+    const commitments =
+        getCommitmentSummary();
+
+    const monthlyObligations =
+        commitments.totalCommitments;
+
+    const bufferTarget =
+        monthlyObligations *
+        CONFIG.protection.emergencyFundMonths;
+
+    const excessCash =
+        Math.max(
+            0,
+            protection.totalCash - bufferTarget
+        );
+
     return {
 
         availableCash:
             protection.totalCash,
 
-        monthlyObligations:
-            protection.requiredProtection,
+        monthlyObligations,
 
-        bufferTarget:
-            protection.requiredProtection,
+        bufferTarget,
 
-        excessCash:
-            protection.availableCapital,
+        excessCash,
 
-        commitmentDriven: false,
-        protectionDriven: true
+        commitmentDriven: true,
+
+        protectionDriven: false
+
     };
+
 }
 
 function getOpportunityCapital() {
