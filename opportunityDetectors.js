@@ -1,14 +1,21 @@
 // ==================== FILE: opportunityDetectors.js ====================
+
 function detectGoalCompletionOpportunities() {
 
-    const opportunityCapital =
-        getOpportunityCapital().opportunity;
+    const opportunities = [];
 
-    return (appData.goals || [])
+    const opportunityCapital =
+        Number(
+            getOpportunityCapital().opportunity || 0
+        );
+
+    (appData.goals || [])
+
         .filter(goal =>
             getGoalLifecycleState(goal) === "ACTIVE"
         )
-        .map(goal => {
+
+        .forEach(goal => {
 
             const remaining =
                 Math.max(
@@ -18,35 +25,149 @@ function detectGoalCompletionOpportunities() {
                 );
 
             if (
-                remaining <= 0 ||
-                remaining > opportunityCapital
+                remaining > 0 &&
+                remaining <= opportunityCapital
             ) {
-                return null;
+
+                opportunities.push(
+
+                    createOpportunity({
+
+                        type:
+                            OpportunityType.GOAL_COMPLETION,
+
+                        title:
+                            `Complete ${goal.goal}`,
+
+                        description:
+                            "Goal can be completed immediately.",
+
+                        wealthImpact:
+                            remaining,
+
+                        priority:
+                            OpportunityPriority.HIGH,
+
+                        confidence:
+                            90,
+
+                        action:
+                            `Fund ${goal.goal} with ${formatCurrency(remaining)}`
+
+                    })
+                );
             }
 
-            return createOpportunity({
+        });
+
+    return opportunities;
+}
+
+
+function detectCapitalReleaseOpportunities() {
+
+    const opportunities = [];
+
+    const released =
+        getReleasedCapitalSummary();
+
+    if (
+        released &&
+        released.totalReleasedCapital > 0
+    ) {
+
+        opportunities.push(
+
+            createOpportunity({
+
                 type:
-                    OpportunityType.GOAL_COMPLETION,
+                    OpportunityType.CAPITAL_RELEASE,
 
                 title:
-                    `Complete ${goal.goal}`,
+                    "Deploy Released Capital",
 
                 description:
-                    "Goal can be completed immediately.",
+                    "Graduated goals released recurring capital.",
 
                 wealthImpact:
-                    remaining,
+                    Number(
+                        released.tenYearImpact || 0
+                    ),
 
                 priority:
                     OpportunityPriority.HIGH,
 
                 confidence:
-                    90,
+                    95,
 
                 action:
-                    `Fund ${goal.goal} with ${formatCurrency(remaining)}`
-            });
+                    released.recommendation
 
-        })
-        .filter(Boolean);
+            })
+        );
+
+    }
+
+    return opportunities;
+}
+
+
+function detectIdleCashOpportunities() {
+
+    const opportunities = [];
+
+    const capital =
+        getOpportunityCapital();
+
+    if (
+        Number(capital.opportunity || 0) > 50000
+    ) {
+
+        opportunities.push(
+
+            createOpportunity({
+
+                type:
+                    OpportunityType.IDLE_CASH,
+
+                title:
+                    "Deploy Idle Capital",
+
+                description:
+                    "Available capital exceeds protection requirements.",
+
+                wealthImpact:
+                    Number(capital.opportunity || 0),
+
+                priority:
+                    OpportunityPriority.MEDIUM,
+
+                confidence:
+                    85,
+
+                action:
+                    `Deploy ${formatCurrency(capital.opportunity)}`
+
+            })
+
+        );
+
+    }
+
+    return opportunities;
+}
+
+
+function getDetectedOpportunities() {
+
+    return [
+
+        ...detectGoalCompletionOpportunities(),
+
+        ...detectCapitalReleaseOpportunities(),
+
+        ...detectIdleCashOpportunities()
+
+    ];
+
 }
