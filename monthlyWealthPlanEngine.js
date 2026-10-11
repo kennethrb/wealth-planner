@@ -1,8 +1,5 @@
 // ==================== FILE: monthlyWealthPlanEngine.js ====================
 
-  
-// ==================== FILE: monthlyWealthPlanEngine.js ====================
-
 const MonthlyPlanStatus = {
     DRAFT: "DRAFT",
     ACTIVE: "ACTIVE",
@@ -36,32 +33,12 @@ function getMonthlyWealthPlan() {
 
     const executionSteps = [];
 
-    switch (advisor?.wealthState) {
-
-        case "PROTECTION_GAP":
-
-            executionSteps.push(
-                {
-                    id: "STEP001",
-                    completed: false,
-                    label:
-                        "Preserve available cash reserves"
-                },
-                {
-                    id: "STEP002",
-                    completed: false,
-                    label:
-                        "Avoid discretionary spending"
-                },
-                {
-                    id: "STEP003",
-                    completed: false,
-                    label:
-                        "Increase liquidity coverage"
-                }
-            );
-
-            break;
+    console.log(
+        "PLAN STATE",
+        advisor?.wealthState
+    );
+  
+    switch (recommendation?.id) {
 
         case "ALLOCATION_READY":
 
@@ -82,6 +59,31 @@ function getMonthlyWealthPlan() {
 
             break;
 
+          case "PROTECT_LIQUIDITY":
+          
+              executionSteps.push(
+                  {
+                      id: "STEP001",
+                      completed: false,
+                      label:
+                          "Preserve available cash reserves"
+                  },
+                  {
+                      id: "STEP002",
+                      completed: false,
+                      label:
+                          "Avoid discretionary spending"
+                  },
+                  {
+                      id: "STEP003",
+                      completed: false,
+                      label:
+                          "Increase liquidity coverage"
+                  }
+              );
+          
+              break;
+
         default:
 
             executionSteps.push(
@@ -94,21 +96,26 @@ function getMonthlyWealthPlan() {
             );
     }
 
-    let wealthImpactNarrative =
-        "Improves long-term wealth position";
+    let wealthImpactNarrative = "";
 
     if (advisor?.wealthState === "PROTECTION_GAP") {
-
+    
         wealthImpactNarrative =
-            "Protects capital from future cash shortfalls";
-
-    } else if (topOpportunity) {
-
-        wealthImpactNarrative =
-            topOpportunity.description ||
-            "Accelerates wealth growth";
-
+            "Prevents future cash shortfalls and protects upcoming obligations.";
+    
     }
+    else if (advisor?.wealthState === "GOAL_ACCELERATION") {
+    
+        wealthImpactNarrative =
+            "Accelerates goal completion and releases future capital.";
+    
+    }
+    else {
+    
+        wealthImpactNarrative =
+            "Improves long-term wealth growth.";
+    }
+
 
     return {
 
@@ -240,6 +247,18 @@ function loadMonthlyWealthPlanCard() {
                 ${plan.advisorReason}
             </p>
 
+        </div>
+
+        <div class="advisor-action warning">
+        
+            <div class="action-title">
+                URGENCY
+            </div>
+        
+            <p>
+                Immediate Action Required
+            </p>
+        
         </div>
 
         <div class="advisor-action success">
