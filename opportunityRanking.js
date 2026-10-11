@@ -2,18 +2,19 @@
 
 function getRankedOpportunities() {
 
-    return getDetectedOpportunities()
+    const opportunities =
+        getDetectedOpportunities();
 
-        .sort(
+    return opportunities.sort((a, b) => {
 
-            (a, b) =>
+        const scoreA =
+            Number(a.wealthImpact || 0);
 
-                Number(b.wealthImpact || 0)
+        const scoreB =
+            Number(b.wealthImpact || 0);
 
-                -
+        return scoreB - scoreA;
 
-                Number(a.wealthImpact || 0)
-
-        );
+    });
 
 }
