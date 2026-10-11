@@ -32,11 +32,6 @@ function getMonthlyWealthPlan() {
         getAdvisorNarrative();
 
     const executionSteps = [];
-
-    console.log(
-        "PLAN STATE",
-        advisor?.wealthState
-    );
   
     switch (recommendation?.id) {
 
@@ -96,24 +91,24 @@ function getMonthlyWealthPlan() {
             );
     }
 
-    let wealthImpactNarrative = "";
-
-    if (advisor?.wealthState === "PROTECTION_GAP") {
+    let wealthImpactNarrative =
+        "Improves long-term wealth growth.";
     
-        wealthImpactNarrative =
-            "Prevents future cash shortfalls and protects upcoming obligations.";
+    switch (recommendation?.id) {
     
-    }
-    else if (advisor?.wealthState === "GOAL_ACCELERATION") {
+        case "PROTECT_LIQUIDITY":
     
-        wealthImpactNarrative =
-            "Accelerates goal completion and releases future capital.";
+            wealthImpactNarrative =
+                "Prevents future cash shortfalls and protects upcoming obligations.";
     
-    }
-    else {
+            break;
     
-        wealthImpactNarrative =
-            "Improves long-term wealth growth.";
+        case "FUND_GOAL":
+    
+            wealthImpactNarrative =
+                "Accelerates goal completion and releases future capital.";
+    
+            break;
     }
 
 
