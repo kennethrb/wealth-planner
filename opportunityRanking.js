@@ -1,29 +1,77 @@
 // ==================== FILE: opportunityRanking.js ====================
 
-function getOpportunityScore(opportunity) {
+function getOpportunityScore(
+    opportunity
+) {
 
-    const impact =
-        Number(opportunity.wealthImpact || 0);
+    const context =
+        getAdvisorContext();
 
-    const confidence =
-        Number(opportunity.confidence || 0);
+    const weights =
+        CONFIG.opportunity.scoring;
 
     const priorityMap = {
+
         CRITICAL: 100,
+
         HIGH: 75,
+
         MEDIUM: 50,
+
         LOW: 25
+
     };
+
+    const impact =
+        Number(
+            opportunity.wealthImpact || 0
+        );
+
+    const confidence =
+        Number(
+            opportunity.confidence || 0
+        );
 
     const priority =
         priorityMap[
             opportunity.priority
         ] || 0;
 
+    let protectionAlignment = 100;
+
+    if (
+        context.liquidity.coverage <
+        CONFIG.cashFlowDomain.cashFlow.minimumCoverage
+    ) {
+        protectionAlignment = 0;
+    }
+
+    let goalAcceleration = 0;
+
+    if (
+        opportunity.type ===
+        OpportunityType.GOAL_COMPLETION
+    ) {
+        goalAcceleration = 100;
+    }
+
     return (
-        impact * 0.60 +
-        confidence * 0.20 +
-        priority * 0.20
+
+        impact *
+        weights.wealthImpact +
+
+        confidence *
+        weights.confidence +
+
+        priority *
+        weights.priority +
+
+        protectionAlignment *
+        weights.protectionAlignment +
+
+        goalAcceleration *
+        weights.goalAcceleration
+
     );
 
 }
@@ -33,9 +81,14 @@ function getRankedOpportunities() {
     return getDetectedOpportunities()
 
         .map(item => ({
+        
             ...item,
+        
             score:
-                getOpportunityScore(item)
+                Number(
+                    getOpportunityScore(item)
+                ).toFixed(2)
+        
         }))
 
         .sort(
