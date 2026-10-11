@@ -157,55 +157,6 @@ function detectIdleCashOpportunities() {
     return opportunities;
 }
 
-function detectWindfallOpportunities() {
-
-    const opportunities = [];
-
-    const released =
-        getReleasedCapitalSummary();
-
-    if (
-        released &&
-        released.totalReleasedCapital > 0
-    ) {
-
-        opportunities.push(
-
-            createOpportunity({
-
-                type:
-                    OpportunityType.WINDFALL,
-
-                title:
-                    "Released Capital Available",
-
-                description:
-                    "Completed goals have created reusable capital.",
-
-                wealthImpact:
-                    Number(
-                        released.tenYearImpact || 0
-                    ),
-
-                priority:
-                    OpportunityPriority.HIGH,
-
-                confidence:
-                    95,
-
-                action:
-                    released.recommendation
-
-            })
-
-        );
-
-    }
-
-    return opportunities;
-
-}
-
 
 function getDetectedOpportunities() {
 
@@ -215,9 +166,7 @@ function getDetectedOpportunities() {
 
         ...detectCapitalReleaseOpportunities(),
 
-        ...detectIdleCashOpportunities(),
-
-        ...detectWindfallOpportunities()
+        ...detectIdleCashOpportunities()
 
     ];
 
