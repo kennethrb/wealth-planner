@@ -1,72 +1,166 @@
 // ==================== FILE: monthlyWealthPlanEngine.js ====================
 
   
-    const MonthlyPlanStatus = {
-        DRAFT: "DRAFT",
-        ACTIVE: "ACTIVE",
-        COMPLETED: "COMPLETED",
-        ABANDONED: "ABANDONED"
-    };
+// ==================== FILE: monthlyWealthPlanEngine.js ====================
+
+const MonthlyPlanStatus = {
+    DRAFT: "DRAFT",
+    ACTIVE: "ACTIVE",
+    COMPLETED: "COMPLETED",
+    ABANDONED: "ABANDONED"
+};
 
 function getMonthlyWealthPlan() {
 
-    const advisor = getWealthAdvisorSummary();
-    const opportunities = getWealthOpportunities();
+    const advisor =
+        getWealthAdvisorSummary();
 
-    const primaryRecommendation =
-        advisor.topRecommendation;
+    const recommendation =
+        advisor?.recommendation ||
+        advisor?.topRecommendation ||
+        {};
+
+    const opportunityEngine =
+        getWealthOpportunities();
 
     const topOpportunity =
-        opportunities.opportunities?.[0];
+        opportunityEngine?.opportunities?.[0];
 
     const confidence =
         getRecommendationConfidence(
-            primaryRecommendation
+            recommendation
         );
-
 
     const narrative =
         getAdvisorNarrative();
 
+    const executionSteps = [];
+
+    switch (advisor?.wealthState) {
+
+        case "PROTECTION_GAP":
+
+            executionSteps.push(
+                {
+                    id: "STEP001",
+                    completed: false,
+                    label:
+                        "Preserve available cash reserves"
+                },
+                {
+                    id: "STEP002",
+                    completed: false,
+                    label:
+                        "Avoid discretionary spending"
+                },
+                {
+                    id: "STEP003",
+                    completed: false,
+                    label:
+                        "Increase liquidity coverage"
+                }
+            );
+
+            break;
+
+        case "ALLOCATION_READY":
+
+            executionSteps.push(
+                {
+                    id: "STEP001",
+                    completed: false,
+                    label:
+                        "Allocate deployable capital"
+                },
+                {
+                    id: "STEP002",
+                    completed: false,
+                    label:
+                        "Prioritize highest ROI goal"
+                }
+            );
+
+            break;
+
+        default:
+
+            executionSteps.push(
+                {
+                    id: "STEP001",
+                    completed: false,
+                    label:
+                        "Maintain current wealth strategy"
+                }
+            );
+    }
+
+    let wealthImpactNarrative =
+        "Improves long-term wealth position";
+
+    if (advisor?.wealthState === "PROTECTION_GAP") {
+
+        wealthImpactNarrative =
+            "Protects capital from future cash shortfalls";
+
+    } else if (topOpportunity) {
+
+        wealthImpactNarrative =
+            topOpportunity.description ||
+            "Accelerates wealth growth";
+
+    }
+
     return {
-    
-        planId: `PLAN_${Date.now()}`,
-    
+
+        planId:
+            `PLAN_${Date.now()}`,
+
         createdDate:
             new Date().toISOString(),
-    
+
         financialMonth:
             getViewMonth(),
-    
+
         financialYear:
             getViewYear(),
-    
+
         primaryAction:
-            primaryRecommendation?.title ||
+            recommendation?.title ||
             "Maintain Stability",
-    
+
         secondaryAction:
-            topOpportunity?.action || "",
-    
+            topOpportunity?.action ||
+            "No secondary action recommended",
+
+        advisorReason:
+            recommendation?.reason ||
+            "",
+
         wealthImpact:
             Number(
                 topOpportunity?.wealthImpact || 0
             ),
-    
-        advisorReason:
-            primaryRecommendation?.reason || "",
-    
+
+        wealthImpactNarrative,
+
         confidence:
-            confidence.score,
-    
+            confidence?.score || 0,
+
         risk:
-            narrative?.riskIfIgnored || "",
-    
+            narrative?.riskIfIgnored ||
+            "Protection requirements may remain underfunded.",
+
         alternatives:
-            narrative?.alternativeActions || [],
-    
-        executionSteps: [],
-    
+            narrative?.alternativeActions ||
+            [],
+
+        executionSteps,
+
+        completedSteps: 0,
+
+        totalSteps:
+            executionSteps.length,
+
         status:
             MonthlyPlanStatus.ACTIVE
     };
@@ -85,30 +179,55 @@ function loadMonthlyWealthPlanCard() {
     if (!container) return;
 
     container.innerHTML = `
+
     <div class="card">
 
-        <h2>📋 MONTHLY WEALTH PLAN</h2>
+        <h2>
+            📋 MONTHLY WEALTH PLAN
+        </h2>
 
         <div class="advisor-action priority">
 
             <div class="action-title">
-                PRIMARY ACTION
+                THIS MONTH'S PRIORITY
             </div>
 
-            <p>
+            <p class="big-decision">
                 ${plan.primaryAction}
             </p>
 
         </div>
 
+        <div class="metric-row">
+
+            <span>Plan Status</span>
+
+            <strong style="color:#34d399">
+                ${plan.status}
+            </strong>
+
+        </div>
+
+        <div class="metric-row">
+
+            <span>Confidence</span>
+
+            <strong>
+                ${plan.confidence}%
+            </strong>
+
+        </div>
+
         <div class="advisor-action">
+
             <div class="action-title">
                 SECONDARY ACTION
             </div>
-        
+
             <p>
                 ${plan.secondaryAction}
             </p>
+
         </div>
 
         <div class="advisor-action">
@@ -130,53 +249,75 @@ function loadMonthlyWealthPlanCard() {
             </div>
 
             <p>
-                ${formatCurrency(
-                    plan.wealthImpact
-                )}
+                ${plan.wealthImpactNarrative}
             </p>
 
         </div>
 
         <div class="advisor-action warning">
-        
+
             <div class="action-title">
                 RISK
             </div>
-        
+
             <p>
                 ${plan.risk}
             </p>
-        
+
         </div>
 
         <div class="advisor-action">
-        
+
+            <div class="action-title">
+                EXECUTION PLAN
+            </div>
+
+            ${plan.executionSteps
+                .map(step => `
+                    <div style="
+                        padding:8px 0;
+                        border-bottom:
+                        1px solid rgba(255,255,255,.08);
+                    ">
+                        ☐ ${step.label}
+                    </div>
+                `)
+                .join("")}
+
+        </div>
+
+        <div class="advisor-action">
+
             <div class="action-title">
                 ALTERNATIVES
             </div>
-        
+
             ${
-                plan.alternatives?.length
+                plan.alternatives.length
                 ? plan.alternatives
-                    .map(item => `
-                        <p>${item}</p>
-                    `)
+                    .map(
+                        alt => `<p>• ${alt}</p>`
+                    )
                     .join("")
                 : "<p>No alternatives available</p>"
             }
-        
+
         </div>
 
         <div class="metric-row">
 
-            <span>Confidence</span>
+            <span>Progress</span>
 
             <strong>
-                ${plan.confidence}%
+                ${plan.completedSteps}
+                /
+                ${plan.totalSteps}
+                Complete
             </strong>
 
         </div>
 
     </div>
+
     `;
 }
