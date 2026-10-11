@@ -12,6 +12,11 @@ const OpportunityCatalog = {
         type: OpportunityType.IDLE_CASH
     },
 
+    WINDFALL: {
+        type:
+            OpportunityType.WINDFALL
+    },
+
     PROTECTION_GAP: {
         type: OpportunityType.PROTECTION_GAP
     },
