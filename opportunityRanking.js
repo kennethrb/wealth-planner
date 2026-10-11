@@ -21,7 +21,7 @@ function getOpportunityScore(
         );
 
     const priority =
-        priorityMap[
+        CONFIG.opportunity.priorityMap[
             opportunity.priority
         ] || 0;
 
