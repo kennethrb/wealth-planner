@@ -732,6 +732,7 @@ async function refreshUI() {
         loadAdvisorDashboard(),
         loadWealthOpportunityEngine(), // DI-012
         loadMonthlyWealthActionPlan(),     // DI-008
+        loadMonthlyWealthPlanCard(),
         loadPayCycleCard(),
         loadSafeToSpendCard(),
         loadPaydayPlan(),
