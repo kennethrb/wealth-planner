@@ -1,13 +1,19 @@
+// ==================== FILE: opportunityRanking.js ====================
+
 function getRankedOpportunities() {
 
-    const opportunities =
-        getDetectedOpportunities();
+    return getDetectedOpportunities()
 
-    return opportunities
         .sort(
+
             (a, b) =>
-                b.wealthImpact -
-                a.wealthImpact
+
+                Number(b.wealthImpact || 0)
+
+                -
+
+                Number(a.wealthImpact || 0)
+
         );
 
 }
