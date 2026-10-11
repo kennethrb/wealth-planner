@@ -140,10 +140,10 @@ function getTier3Protection(goals = []) {
             [
                 "EMERGENCY",
                 "SAFETY",
-                "COMMITTED",
-                "GROWTH"
+                "COMMITTED"
             ].includes(
-                goal.protectionRole
+                String(goal.protectionRole || "")
+                    .toUpperCase()
             )
         );
 
@@ -157,8 +157,11 @@ function getTier3Protection(goals = []) {
     return {
         tier: "TIER_3",
         name: "Strategic Protection",
-        requiredAmount
+        requiredAmount,
+        protectedGoalCount:
+            protectedGoals.length
     };
+
 }
 
 function getProtectionRecommendation(
