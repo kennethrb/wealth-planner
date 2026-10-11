@@ -171,3 +171,28 @@ function getDetectedOpportunities() {
     ];
 
 }
+
+function debugOpportunityEngine() {
+
+    console.group(
+        "Opportunity Engine"
+    );
+
+    console.log(
+        "Capital",
+        getOpportunityCapital()
+    );
+
+    console.log(
+        "Detected",
+        getDetectedOpportunities()
+    );
+
+    console.log(
+        "Ranked",
+        getRankedOpportunities()
+    );
+
+    console.groupEnd();
+
+}
