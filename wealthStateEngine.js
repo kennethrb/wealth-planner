@@ -5,7 +5,10 @@ function getWealthState() {
     const context =
         getAdvisorContext();
 
-    if (context.obligations.protectionGap > 0) {
+    if (
+        context.liquidity.coverage <
+        CONFIG.cashFlowDomain.cashFlow.minimumCoverage
+    ) {
         return AdvisorStates.PROTECTION_GAP;
     }
 
