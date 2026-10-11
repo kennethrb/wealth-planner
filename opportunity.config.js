@@ -1,3 +1,5 @@
+// ==================== FILE: opportunity.config.js ====================
+
 const OpportunityConfig = {
 
     scoring: {
@@ -11,6 +13,12 @@ const OpportunityConfig = {
         protectionAlignment: 0.20,
 
         goalAcceleration: 0.15
+
+    },
+
+    thresholds: {
+
+        minimumOpportunityImpact: 1000
 
     }
 
