@@ -47,6 +47,41 @@ function getRankedRecommendations() {
         });
     }
 
+    const opportunities =
+        getRankedOpportunities();
+    
+    if (
+        recommendations.length === 0 &&
+        opportunities.length > 0
+    ) {
+    
+        const topOpportunity =
+            opportunities[0];
+    
+        recommendations.push({
+    
+            id:
+                "TOP_OPPORTUNITY",
+    
+            priority:
+                50,
+    
+            title:
+                topOpportunity.title,
+    
+            reason:
+                topOpportunity.description,
+    
+            state:
+                AdvisorStates.OPPORTUNITY_RICH
+    
+        });
+    
+    }
+    
     return recommendations
-        .sort((a, b) => b.priority - a.priority);
+        .sort(
+            (a, b) =>
+                b.priority - a.priority
+        );
 }
