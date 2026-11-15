@@ -82,7 +82,6 @@ function detectCapitalReleaseOpportunities() {
     ) {
 
         opportunities.push(
-
             createOpportunity({
 
                 type:
@@ -103,14 +102,12 @@ function detectCapitalReleaseOpportunities() {
                     OpportunityPriority.HIGH,
 
                 confidence:
-                    95,
+                    CONFIG.opportunity.confidence.capitalRelease,
 
                 action:
                     released.recommendation
-
             })
         );
-
     }
 
     return opportunities;
@@ -125,11 +122,11 @@ function detectIdleCashOpportunities() {
         getOpportunityCapital();
 
     if (
-        Number(capital.opportunity || 0) > 50000
+        Number(capital.opportunity || 0) >
+        CONFIG.opportunity.thresholds.idleCashThreshold
     ) {
 
         opportunities.push(
-
             createOpportunity({
 
                 type:
@@ -142,21 +139,20 @@ function detectIdleCashOpportunities() {
                     "Available capital exceeds protection requirements.",
 
                 wealthImpact:
-                    Number(capital.opportunity || 0),
+                    Number(
+                        capital.opportunity || 0
+                    ),
 
                 priority:
                     OpportunityPriority.MEDIUM,
 
                 confidence:
-                    85,
+                    CONFIG.opportunity.confidence.idleCash,
 
                 action:
                     `Deploy ${formatCurrency(capital.opportunity)}`
-
             })
-
         );
-
     }
 
     return opportunities;
