@@ -1347,8 +1347,12 @@ function getEmergencyFundGap() {
         monthlyObligations *
         CONFIG.protection.emergencyFundMonths;
     const emergencyGoals = (appData.goals || []).filter(goal => String(goal.goal || "").toLowerCase().includes("emergency"));
-    const currentEmergencyFund = emergencyGoals.reduce(
-        (sum, goal) => sum + Number(goal.current || 0), 0);
+    const currentEmergencyFund =
+    emergencyGoals.reduce(
+        (sum, goal) =>
+            sum + getGoalCurrent(goal),
+        0
+    );
     const gap = Math.max(0, targetEmergencyFund - currentEmergencyFund);
     return {
         targetEmergencyFund,
@@ -4085,7 +4089,7 @@ async function loadGoalFundingOptimizer() {
                 .map(goal => {
 
                     const current =
-                        Number(goal.current || 0);
+                        getGoalCurrent(goal);
 
                     const target =
                         Number(goal.target || 0);
