@@ -220,6 +220,15 @@ function loadGoals() {
 function editGoal(goalId) {
     const goals = (typeof appData !== "undefined" && appData.goals) ? appData.goals : [];
     const goal = goals.find(g => (g.goalId || g.id) === goalId);
+    const elGoalAccount =
+        document.getElementById(
+            "goalAccountId"
+        );
+    
+    if (elGoalAccount) {
+        elGoalAccount.value =
+            goal.goalAccountId || "";
+    }
     if (!goal) {
         showStatus("Goal not found", "error");
         return;
@@ -306,6 +315,10 @@ function cancelGoalEdit() {
  */
 async function handleGoalFormSubmit(event) {
     if (event) event.preventDefault();
+    const goalAccountId =
+        document.getElementById(
+            "goalAccountId"
+        )?.value || "";
     const goalMode =
         document.getElementById(
             "goalMode"
@@ -345,7 +358,8 @@ async function handleGoalFormSubmit(event) {
                 current: currentAmount,
                 monthlyContribution: monthlyContribution,
                 goalMode: goalMode,
-                protectionRole: goalProtectionRole
+                protectionRole: goalProtectionRole,
+                goalAccountId: goalAccountId
             });
 
             const response = await fetch(`${baseUrl}?${params.toString()}`);
@@ -375,7 +389,8 @@ async function handleGoalFormSubmit(event) {
                 current: 0,
                 monthlyContribution: monthlyContribution,
                 goalMode: goalMode,
-                protectionRole: goalProtectionRole
+                protectionRole: goalProtectionRole,
+                goalAccountId: goalAccountId
             });
 
             const response = await fetch(`${baseUrl}?${params.toString()}`);
@@ -472,4 +487,27 @@ async function deleteGoal(goalId) {
         console.error("deleteGoal error:", error);
         showStatus("Failed to delete goal", "error");
     }
+}
+
+function populateGoalAccounts() {
+
+    const select =
+        document.getElementById(
+            "goalAccountId"
+        );
+
+    if (!select) return;
+
+    select.innerHTML =
+        '<option value="">No Linked Account</option>';
+
+    (appData.accounts || []).forEach(account => {
+
+        select.innerHTML += `
+            <option value="${account.accountId}">
+                ${account.accountName}
+            </option>
+        `;
+    });
+
 }
