@@ -19,7 +19,7 @@ function detectGoalCompletionOpportunities() {
                 Math.max(
                     0,
                     Number(goal.target || 0)
-                    - Number(goal.current || 0)
+                    - getGoalCurrent(goal)
                 );
 
             if (
