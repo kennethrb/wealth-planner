@@ -288,9 +288,38 @@ const activeBills =
 
   const remainingAmount = totalBillsAmount - paidAmount;
   // Find next unpaid bill due
-  const nextBill = activeBills
-    .filter(bill => !checkIsPaid(bill))
-    .sort((a,b) => a.dueDay - b.dueDay)[0];
+    const nextBill = activeBills
+        .filter(bill => !checkIsPaid(bill))
+        .sort((a, b) => {
+    
+            const nextA =
+                getNextDueDate(
+                    Number(a.dueDay)
+                );
+    
+            const nextB =
+                getNextDueDate(
+                    Number(b.dueDay)
+                );
+    
+            return nextA - nextB;
+    
+        })[0];
+
+    const nextBillDueDate =
+        nextBill
+            ? getNextDueDate(
+                Number(nextBill.dueDay)
+              )
+            : null;
+    
+    const nextBillDays =
+        nextBillDueDate
+            ? Math.ceil(
+                (nextBillDueDate - today) /
+                (1000 * 60 * 60 * 24)
+              )
+            : null;
   // Calculate bill completion percentage
   const totalBills = activeBills.length;
   const completionPercent = totalBills > 0 ? Math.round((paidCount / totalBills) * 100) : 0;
@@ -341,7 +370,9 @@ const activeBills =
       <div class="funding-row">
         <div>
           <div>${nextBill.billName}</div>
-          <small>Due Day ${nextBill.dueDay}</small>
+            <small>
+            Due in ${nextBillDays} day(s)
+            </small>
         </div>
         <span>${formatCurrency(nextBill.defaultAmount)}</span>
       </div>
