@@ -703,6 +703,7 @@ async function refreshUI() {
     loadCategoryDropdown();
 
     loadFundingSources();
+    populateGoalAccounts();
 
     loadTransferAccounts();
     loadTransactionAccounts();
