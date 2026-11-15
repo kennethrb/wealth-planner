@@ -10,11 +10,9 @@ function detectGoalCompletionOpportunities() {
         );
 
     (appData.goals || [])
-
         .filter(goal =>
             getGoalLifecycleState(goal) === "ACTIVE"
         )
-
         .forEach(goal => {
 
             const remaining =
@@ -30,7 +28,6 @@ function detectGoalCompletionOpportunities() {
             ) {
 
                 opportunities.push(
-
                     createOpportunity({
 
                         type:
@@ -49,15 +46,13 @@ function detectGoalCompletionOpportunities() {
                             OpportunityPriority.HIGH,
 
                         confidence:
-                            90,
+                            CONFIG.opportunity.confidence.goalCompletion,
 
                         action:
                             `Fund ${goal.goal} with ${formatCurrency(remaining)}`
-
                     })
                 );
             }
-
         });
 
     return opportunities;
