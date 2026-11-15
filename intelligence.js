@@ -959,10 +959,16 @@ function getRecommendationConfidence(recommendation) {
         score += 5;
     }
 
-    if (opportunity.opportunity > 100000) {
+    if (
+        opportunity.opportunity >
+        CONFIG.opportunity.thresholds.opportunityRichThreshold
+    ) {
         score += 10;
     }
-    else if (opportunity.opportunity > 50000) {
+    else if (
+        opportunity.opportunity >
+        CONFIG.opportunity.thresholds.idleCashThreshold
+    ) {
         score += 5;
     }
 
