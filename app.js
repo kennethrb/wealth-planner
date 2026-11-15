@@ -911,8 +911,39 @@ function getCashRequirementPlan() {
 }
 
 function loadCashRequirementPlan() {
-    const commitments = getCommitmentSummary();
-    const cashRequirement = commitments.cashRequirements || 0;
+    const cashRequirement =
+        (appData.recurringBills || [])
+            .filter(bill => bill.active !== false)
+            .filter(bill => {
+    
+                const account =
+                    (appData.accounts || [])
+                        .find(a =>
+                            a.accountId === bill.accountId
+                        );
+    
+                if (!account) {
+                    return false;
+                }
+    
+                const assetClass =
+                    String(
+                        account.assetClass ||
+                        account.type ||
+                        ""
+                    ).toUpperCase();
+    
+                return assetClass === "CASH";
+    
+            })
+            .reduce(
+                (sum, bill) =>
+                    sum +
+                    Number(
+                        bill.defaultAmount || 0
+                    ),
+                0
+            );
     const fundingSources = {};
     (appData.recurringBills || []).filter(bill => bill.active !== false).forEach(bill => {
         const account = bill.account || "Unknown";
