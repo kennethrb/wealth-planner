@@ -4,7 +4,7 @@
 function getGoalLifecycleState(goal) {
 
     const current =
-        Number(goal.current || 0);
+        getGoalCurrent(goal);
 
     const target =
         Number(goal.target || 0);
@@ -100,7 +100,7 @@ function loadGoals() {
             ${displayGoals.map(goal => {
                 const id = goal.goalId || goal.id;
                 const name = goal.goal || goal.goalName || "Unnamed Goal";
-                const current = Number(goal.current || 0);
+                const current = getGoalCurrent(goal);
                 const target = Number(goal.target || 1);
                 const monthlyContribution = Number(goal.monthlyContribution || 0);
 
@@ -510,4 +510,34 @@ function populateGoalAccounts() {
         `;
     });
 
+}
+
+function getGoalCurrent(goal) {
+
+    const mode =
+        String(
+            goal.goalMode || "VIRTUAL"
+        ).toUpperCase();
+
+    if (
+        mode === "PROTECTED" &&
+        goal.goalAccountId
+    ) {
+
+        const account =
+            (appData.accounts || [])
+                .find(
+                    a =>
+                    a.accountId ===
+                    goal.goalAccountId
+                );
+
+        if (account) {
+            return Number(
+                account.currentBalance || 0
+            );
+        }
+    }
+
+    return Number(goal.current || 0);
 }
