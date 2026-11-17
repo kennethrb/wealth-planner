@@ -222,90 +222,20 @@
     
     </div>
 
+
+  
     <!-- Monthly Transaction Section -->
     <section id="execution" class="card">
-    <h2>💳 Transaction Tracker</h2>
-    
-      <div class="form-row">
-
-      <div class="form-group">
-        <label>Date</label>
-        <input
-          type="date"
-          id="txDate">
+      <div class="card-header">
+          <h2>💳 Transaction Tracker</h2>
+      
+          <button
+              id="openTransactionModal"
+              class="btn-primary">
+              ➕ Record Activity
+          </button>
       </div>
     
-      <div class="form-group">
-        <label>Amount</label>
-        <input
-          type="number"
-          id="txAmount"
-          placeholder="0.00">
-      </div>
-    
-      <div class="form-group">
-        <label>Details</label>
-        <input
-          type="text"
-          id="txDetails"
-          placeholder="Transaction details">
-      </div>
-    
-      <div class="form-group">
-        <label>Account</label>
-        <select id="txAccount">
-        </select>
-      </div>
-    
-      <div class="form-group">
-        <label>Budget Type</label>
-        <select id="txBudgetType"
-                onchange="toggleTransactionFields()">
-          <option value="Income">Income</option>
-          <option value="Expense">Expense</option>
-          <option value="Savings">Savings</option>
-          <option value="Debt">Debt</option>
-          <option value="Transfer">Transfer</option>
-        </select>
-      </div>
-    
-      <div class="form-group">
-        <label>Budget Position</label>
-        <select
-            id="txBudgetPosition"
-            onchange="syncSavingsDestination()">
-        </select>
-      </div>
-      <div class="form-group"
-           id="txTransferContainer"
-           style="display:none;">
-        <label>Transfer To</label>
-        <select id="txToAccount">
-        </select>
-      </div>
-    
-      <div class="form-group">
-        <label>&nbsp;</label>
-        <div class="transaction-actions">
-        
-            <button onclick="addTransaction()">
-                ➕ Add Transaction
-            </button>
-        
-            <button
-                id="cancelTransactionEditBtn"
-                onclick="cancelTransactionEdit()"
-                style="display:none;"
-                class="btn-secondary">
-        
-                ❌ Cancel
-        
-            </button>
-        
-        </div>
-      </div>
-    
-    </div>
     
       <div
         id="transactionsList"
@@ -472,6 +402,80 @@
 
   </main>
 
+  <div id="transactionModal" class="modal-overlay">
+  
+    <div class="modal-card">
+  
+      <div class="modal-header">
+        <h2>➕ Record Activity</h2>
+  
+        <button
+          class="modal-close"
+          onclick="closeTransactionModal()">
+          ✕
+        </button>
+      </div>
+  
+      <div class="form-row">
+  
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="txDate">
+        </div>
+  
+        <div class="form-group">
+          <label>Amount</label>
+          <input type="number"
+                 id="txAmount">
+        </div>
+  
+        <div class="form-group">
+          <label>Details</label>
+          <input type="text"
+                 id="txDetails">
+        </div>
+  
+        <div class="form-group">
+          <label>Account</label>
+          <select id="txAccount"></select>
+        </div>
+  
+        <div class="form-group">
+          <label>Budget Type</label>
+          <select id="txBudgetType"
+                  onchange="toggleTransactionFields()">
+            <option value="Income">Income</option>
+            <option value="Expense">Expense</option>
+            <option value="Savings">Savings</option>
+            <option value="Debt">Debt</option>
+            <option value="Transfer">Transfer</option>
+          </select>
+        </div>
+  
+        <div class="form-group">
+          <label>Budget Position</label>
+          <select id="txBudgetPosition"></select>
+        </div>
+  
+        <div class="form-group"
+             id="txTransferContainer"
+             style="display:none;">
+  
+          <label>Transfer To</label>
+  
+          <select id="txToAccount"></select>
+        </div>
+  
+        <button onclick="addTransaction()">
+          Save Activity
+        </button>
+  
+      </div>
+  
+    </div>
+  
+  </div>
+  
   <!-- Confirmation Modal -->
   <div id="confirmModal" class="confirm-modal">
       <div class="confirm-card">
