@@ -602,7 +602,7 @@ function loadTransactions() {
 // Replace editTransaction in script.js
 let editingTransactionId = null;
 
-function cancelTransactionEdit() {
+function resetTransactionForm() {
     editingTransactionId = null;
     document.getElementById("txDate").value = "";
     document.getElementById("txAmount").value = "";
@@ -749,4 +749,5 @@ function closeTransactionModal() {
     document
         .getElementById("transactionModal")
         .classList.remove("show");
+    resetTransactionForm()
 }
