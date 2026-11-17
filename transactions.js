@@ -156,6 +156,7 @@ async function addTransaction() {
     
     await refreshUI();
     showStatus("✅ Transaction recorded", "success");
+    closeTransactionModal();
 }
 
 function syncSavingsDestination()
@@ -434,4 +435,16 @@ function loadTransferAccounts() {
             </option>
         `;
     });
+}
+
+function openTransactionModal() {
+    document
+        .getElementById("transactionModal")
+        .classList.add("show");
+}
+
+function closeTransactionModal() {
+    document
+        .getElementById("transactionModal")
+        .classList.remove("show");
 }
