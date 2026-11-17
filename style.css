@@ -2008,6 +2008,12 @@ tr.section-debt td:first-child {
     font-size: 18px;
 }
 
+.commitment-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .bill-menu {
     margin-top: 12px;
     display: flex;
