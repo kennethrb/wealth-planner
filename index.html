@@ -151,62 +151,28 @@
     </div>
     
     <section class="card">
-        <h2>🔁 Recurring Bills</h2>
+    
+        <div class="card-header">
+    
+            <h2>🔁 Recurring Bills</h2>
+    
+            <button
+                id="openBillModal"
+                class="btn-primary">
+    
+                ➕ Add Bill
+    
+            </button>
+    
+        </div>
+    
+        <hr class="divider">
+    
         <div id="recurringBillsList"></div>
+    
         <div id="billExecutionQueue"></div>
+    
     </section>
-
-    <div style="display:none;">
-    <section class="card">
-          <h2 id="billFormTitle">
-              ➕ Add Recurring Bill
-          </h2>
-          <div class="form-row">
-              <input type="text" id="billName" placeholder="Bill Name">
-              <select id="billCommitmentType">
-                  <option value="BILL">Bill</option>
-                  <option value="DEBT">Debt</option>
-                  <option value="CASH_REQUIREMENT">
-                      Cash Requirement
-                  </option>
-                  <option value="LIFESTYLE">
-                      Lifestyle
-                  </option>
-              </select>
-              <select
-                id="billBudgetType"
-                onchange="loadRecurringBillPositions()">
-              
-                <option value="Expense">Expense</option>
-                <option value="Savings">Savings</option>
-                <option value="Debt">Debt</option>
-              
-              </select>
-              <select id="billBudgetPosition">
-              </select>
-              <select id="billAmountType">
-                  <option value="Fixed">Fixed</option>
-                  <option value="Variable">Variable</option>
-              </select>
-              <input type="number" id="billAmount" placeholder="Amount">
-              <input type="number" id="billDueDay" min="1" max="31" placeholder="Due Day">
-              <select id="billAccount">
-              </select>
-                <button
-                    id="billFormSubmitBtn"
-                    onclick="addRecurringBill()">
-                    ➕ Add Bill
-                </button>
-                
-                <button
-                    id="billFormCancelBtn"
-                    class="btn-secondary hidden"
-                    onclick="cancelRecurringBillEdit()">
-                    Cancel
-                </button>
-          </div>
-      </section>
-      </div>
 
     <!-- 💳 Transactions -->
     <div class="section-header">
@@ -442,6 +408,85 @@
 
     </div>
 
+</div>
+
+<div id="billModal" class="modal-overlay">
+    <div class="modal-card">
+
+        <div class="modal-header">
+            <h2 id="billFormTitle">
+                ➕ Add Recurring Bill
+            </h2>
+
+            <button
+                class="modal-close"
+                onclick="closeBillModal()">
+                ✕
+            </button>
+        </div>
+
+        <div class="form-row">
+
+            <input
+                type="text"
+                id="billName"
+                placeholder="Bill Name">
+
+            <select id="billCommitmentType">
+                <option value="BILL">Bill</option>
+                <option value="DEBT">Debt</option>
+                <option value="CASH_REQUIREMENT">Cash Requirement</option>
+                <option value="LIFESTYLE">Lifestyle</option>
+            </select>
+
+            <select
+                id="billBudgetType"
+                onchange="loadRecurringBillPositions()">
+                <option value="Expense">Expense</option>
+                <option value="Savings">Savings</option>
+                <option value="Debt">Debt</option>
+            </select>
+
+            <select id="billBudgetPosition"></select>
+
+            <select id="billAmountType">
+                <option value="Fixed">Fixed</option>
+                <option value="Variable">Variable</option>
+            </select>
+
+            <input
+                type="number"
+                id="billAmount"
+                placeholder="Amount">
+
+            <input
+                type="number"
+                id="billDueDay"
+                min="1"
+                max="31"
+                placeholder="Due Day">
+
+            <select id="billAccount"></select>
+
+            <div class="form-actions">
+                <button
+                    id="billFormSubmitBtn"
+                    onclick="addRecurringBill()">
+                    ➕ Add Bill
+                </button>
+
+                <button
+                    type="button"
+                    id="billFormCancelBtn"
+                    class="btn-secondary hidden"
+                    onclick="cancelRecurringBillEdit()">
+                    Cancel
+                </button>
+            </div>
+
+        </div>
+
+    </div>
 </div>
 
   
