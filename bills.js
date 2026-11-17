@@ -128,6 +128,19 @@ async function deleteRecurringBill(billId) {
 
 let editingBillId = null;
 function editRecurringBill(billId) {
+
+    console.log(
+        "Editing Bill ID:",
+        billId
+    );
+
+    console.table(
+        appData.recurringBills.map(b => ({
+            id: b.billId,
+            name: b.billName
+        }))
+    );
+
     const formTitle =
         document.getElementById(
             "billFormTitle"
