@@ -11,9 +11,25 @@ function openAccountModal() {
 }
 
 function closeAccountModal() {
+    editingAccountId = null;
+
+    const form = document.getElementById("addAccountForm");
+    if (form) form.reset();
+
+    const formTitle = document.getElementById("accountFormTitle");
+    const submitBtn = document.getElementById("accountFormSubmitBtn");
+
+    if (formTitle) formTitle.textContent = "➕ Add Account";
+    if (submitBtn) submitBtn.textContent = "➕ Add Account";
+
+    loadAccountTypes();
     document
         .getElementById("accountModal")
         ?.classList.remove("show");
+}
+
+function cancelAccountEdit() {
+    closeAccountModal();
 }
 
 
@@ -161,35 +177,13 @@ function editAccount(accountId) {
     // 2. Update Form Action Controls
     const formTitle = document.getElementById("accountFormTitle");
     const submitBtn = document.getElementById("accountFormSubmitBtn");
-    const cancelBtn = document.getElementById("accountFormCancelBtn");
 
     if (formTitle) formTitle.textContent = "✏️ Edit Account";
     if (submitBtn) submitBtn.textContent = "Save Changes";
-    if (cancelBtn) cancelBtn.classList.remove("hidden");
 
     openAccountModal();
 }
 
-/**
- * Cancel Edit mode and restore ADD state
- */
-function cancelAccountEdit() {
-    editingAccountId = null;
-
-    const form = document.getElementById("addAccountForm");
-    if (form) form.reset();
-
-    const formTitle = document.getElementById("accountFormTitle");
-    const submitBtn = document.getElementById("accountFormSubmitBtn");
-    const cancelBtn = document.getElementById("accountFormCancelBtn");
-
-    if (formTitle) formTitle.textContent = "➕ Add Account";
-    if (submitBtn) submitBtn.textContent = "➕ Add Account";
-    if (cancelBtn) cancelBtn.classList.add("hidden");
-
-    loadAccountTypes();
-    closeAccountModal();
-}
 
 /**
  * Unified Form Handler (Dispatches to CREATE or UPDATE based on state)
