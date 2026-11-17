@@ -288,13 +288,17 @@ function renderTransactionCards(recent) {
             </div>
         
             <div class="commitment-due">
-        
+            
                 ${account}
-                •
+            
+            </div>
+            
+            <div class="transaction-date">
+            
                 ${formatTransactionDate(
                     tx.Date || tx.date
                 )}
-        
+            
             </div>
         
             <div
