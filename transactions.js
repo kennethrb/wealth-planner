@@ -140,10 +140,6 @@ async function addTransaction() {
     
     // Reset state
     editingTransactionId = null;
-    const cancelButton = document.getElementById("cancelTransactionEditBtn");
-    if (cancelButton) {
-        cancelButton.style.display = "none";
-    }
     document.getElementById("txDate").value = "";
     document.getElementById("txAmount").value = "";
     document.getElementById("txDetails").value = "";
@@ -625,11 +621,7 @@ function resetTransactionForm() {
         saveButton.innerHTML =
             "➕ Record Activity";
     }
-    const cancelButton = document.getElementById("cancelTransactionEditBtn");
-    if (cancelButton) {
-        cancelButton.style.display = "none";
-    }
-    showStatus("Edit cancelled", "info");
+
 }
 
 function editTransaction(transactionId) {
@@ -686,15 +678,6 @@ function editTransaction(transactionId) {
         button.innerHTML = "💾 Save Changes";
     }
     
-    const cancelButton =
-        document.getElementById(
-            "cancelTransactionEditBtn"
-        );
-    
-    if (cancelButton) {
-        cancelButton.style.display =
-            "inline-flex";
-    }
     openTransactionModal();
 }
 
