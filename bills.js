@@ -473,10 +473,10 @@ function loadRecurringBills() {
         appData.recurringBills || [];
     
     const bills =
-        allBills.slice(
-            0,
-            billDisplayCount
-        );
+    allBills.slice(
+        0,
+        billDisplayCount
+    );
 
     if (!bills.length) {
 
@@ -490,7 +490,7 @@ function loadRecurringBills() {
     }
 
     const totalCommitments =
-        bills.reduce(
+        allBills.reduce(
             (sum, bill) =>
                 sum +
                 Number(
@@ -633,6 +633,30 @@ function loadRecurringBills() {
             }).join("")}
 
         </div>
+
+        ${allBills.length > billDisplayCount
+            ? `
+                <div
+                    style="
+                        text-align:center;
+                        margin-top:16px;
+                    ">
+        
+                    <button
+                        class="btn-secondary"
+                        onclick="showMoreBills()">
+        
+                    Show More (
+                        ${allBills.length - billDisplayCount}
+                        remaining
+                    )
+        
+                    </button>
+        
+                </div>
+            `
+            : ""
+        }
 
     `;
 }
