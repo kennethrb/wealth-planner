@@ -1,3 +1,5 @@
+let billDisplayCount = 5;
+
 function openBillModal() {
 
     if (!editingBillId) {
@@ -467,8 +469,14 @@ function loadRecurringBills() {
 
     if (!container) return;
 
-    const bills =
+    const allBills =
         appData.recurringBills || [];
+    
+    const bills =
+        allBills.slice(
+            0,
+            billDisplayCount
+        );
 
     if (!bills.length) {
 
@@ -549,20 +557,32 @@ function loadRecurringBills() {
                     <div
                         class="commitment-card">
 
-                        <div
-                            class="
-                                commitment-badge
-                                ${badgeClass}
-                            ">
-
-                            ${bill.commitmentType
-                                .replaceAll(
-                                    "_",
-                                    " "
-                                )}
-
+                        <div class="commitment-top-row">
+                        
+                            <div
+                                class="
+                                    commitment-badge
+                                    ${badgeClass}
+                                ">
+                        
+                                ${bill.commitmentType
+                                    .replaceAll(
+                                        "_",
+                                        " "
+                                    )}
+                        
+                            </div>
+                        
+                            <button
+                                class="commitment-menu-btn"
+                                onclick="toggleBillMenu('${bill.billId}')">
+                        
+                                ⋮
+                        
+                            </button>
+                        
                         </div>
-
+                        
                         <div class="commitment-main-row">
                         
                             <div class="commitment-name">
@@ -582,14 +602,6 @@ function loadRecurringBills() {
                             <div class="commitment-due">
                                 Due Day ${bill.dueDay}
                             </div>
-                        
-                            <button
-                                class="commitment-menu-btn"
-                                onclick="toggleBillMenu('${bill.billId}')">
-                        
-                                ⋮
-                        
-                            </button>
                         
                         </div>
                         
@@ -647,6 +659,14 @@ function toggleBillMenu(billId) {
                 );
             }
         });
+}
+
+function showMoreBills() {
+
+    billDisplayCount += 5;
+
+    loadRecurringBills();
+
 }
 
 function loadRecurringBillAccounts() {
