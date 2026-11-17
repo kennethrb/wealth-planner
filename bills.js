@@ -94,16 +94,17 @@ async function addRecurringBill() {
 
     await loadData();
     loadRecurringBills();
+    
+    const wasEditing = !!editingBillId;
+    
+    await loadData();
+    loadRecurringBills();
     await refreshFinancialViews();
+    
     cancelRecurringBillEdit();
-
-    // Reset Form Input Fields
-    if (billNameInput) billNameInput.value = "";
-    if (amountInput) amountInput.value = "";
-    if (dueDayInput) dueDayInput.value = "";
-
+    
     showStatus(
-        editingBillId
+        wasEditing
             ? "✅ Recurring bill updated"
             : "✅ Recurring bill created",
         "success"
@@ -129,33 +130,10 @@ async function deleteRecurringBill(billId) {
 let editingBillId = null;
 function editRecurringBill(billId) {
 
-    console.log(
-        "Editing Bill ID:",
-        billId
-    );
-
-    console.table(
-        appData.recurringBills.map(b => ({
-            id: b.billId,
-            name: b.billName
-        }))
-    );
-
     const formTitle =
         document.getElementById(
             "billFormTitle"
         );
-    const form =
-        document.getElementById(
-            "billName"
-        );
-    
-    if (form) {
-        form.scrollIntoView({
-            behavior: "smooth",
-            block: "center"
-        });
-    }
     
     if (formTitle) {
         formTitle.textContent =
