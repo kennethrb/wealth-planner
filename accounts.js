@@ -3,6 +3,20 @@
 // Tracks whether the form is in "Add" mode (null) or "Edit" mode (accountId)
 let editingAccountId = null;
 
+
+function openAccountModal() {
+    document
+        .getElementById("accountModal")
+        ?.classList.add("show");
+}
+
+function closeAccountModal() {
+    document
+        .getElementById("accountModal")
+        ?.classList.remove("show");
+}
+
+
 /**
  * Populate account type dropdown based on selected net worth type
  */
@@ -153,11 +167,7 @@ function editAccount(accountId) {
     if (submitBtn) submitBtn.textContent = "Save Changes";
     if (cancelBtn) cancelBtn.classList.remove("hidden");
 
-    // 3. Scroll seamlessly to the form
-    const form = document.getElementById("addAccountForm");
-    if (form) {
-        form.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
+    openAccountModal();
 }
 
 /**
@@ -178,6 +188,7 @@ function cancelAccountEdit() {
     if (cancelBtn) cancelBtn.classList.add("hidden");
 
     loadAccountTypes();
+    closeAccountModal();
 }
 
 /**
@@ -226,6 +237,7 @@ async function handleAccountFormSubmit(event) {
             if (result.success) {
                 showStatus("✅ Account updated successfully", "success");
                 cancelAccountEdit();
+                closeAccountModal();
                 if (typeof loadData === "function") await loadData();
                 if (typeof refreshUI === "function") await refreshUI();
             } else {
@@ -258,6 +270,7 @@ async function handleAccountFormSubmit(event) {
             if (result.success) {
                 showStatus("Account added successfully", "success");
                 cancelAccountEdit();
+                closeAccountModal();
                 if (typeof loadData === "function") await loadData();
                 if (typeof refreshUI === "function") await refreshUI();
             } else {
