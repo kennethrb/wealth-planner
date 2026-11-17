@@ -628,12 +628,25 @@ async function initializeApp() {
 
     viewState.month =
     monthNames[new Date().getMonth()];
-    document.getElementById("viewMonth").value =
-    viewState.month;
-
-    viewState.year = new Date().getFullYear();
-    document.getElementById("viewYear").value = 
-    viewState.year;
+    
+    const viewMonthEl =
+    document.getElementById("viewMonth");
+    
+    if (viewMonthEl) {
+        viewMonthEl.value =
+        viewState.month;
+    }
+    
+    viewState.year =
+    new Date().getFullYear();
+    
+    const viewYearEl =
+    document.getElementById("viewYear");
+    
+    if (viewYearEl) {
+        viewYearEl.value =
+        viewState.year;
+    }
     
     await refreshUI();
     showIntelTab('advisor');
