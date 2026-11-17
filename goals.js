@@ -41,10 +41,51 @@ function openGoalModal() {
 
 function closeGoalModal() {
 
+    editingGoalId = null;
+
+    const form =
+        document.getElementById(
+            "addGoalForm"
+        );
+
+    if (form) form.reset();
+
+    const role =
+        document.getElementById(
+            "goalProtectionRole"
+        );
+
+    if (role) {
+        role.value = "OPTIONAL";
+    }
+
+    const title =
+        document.getElementById(
+            "goalFormTitle"
+        );
+
+    const submitBtn =
+        document.getElementById(
+            "goalFormSubmitBtn"
+        );
+
+    if (title) {
+        title.textContent =
+            "➕ Add Goal";
+    }
+
+    if (submitBtn) {
+        submitBtn.textContent =
+            "➕ Add Goal";
+    }
+
     document
         .getElementById("goalModal")
         ?.classList.remove("show");
+}
 
+function cancelGoalEdit() {
+    closeGoalModal();
 }
 
 //Create a single source of truth lifecycle function.
@@ -113,12 +154,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("addGoalForm");
     if (form) {
         form.addEventListener("submit", handleGoalFormSubmit);
-    }
-
-    // Optional: If you add a cancel button to your goal form markup
-    const cancelBtn = document.getElementById("goalFormCancelBtn");
-    if (cancelBtn) {
-        cancelBtn.addEventListener("click", cancelGoalEdit);
     }
 });
 
@@ -474,49 +509,16 @@ function editGoal(goalId) {
     // 2. Update Form Action Controls
     const formTitle = document.getElementById("goalFormTitle");
     const submitBtn = document.getElementById("goalFormSubmitBtn");
-    const cancelBtn = document.getElementById("goalFormCancelBtn");
 
     if (formTitle) formTitle.textContent = "✏️ Edit Goal";
     if (submitBtn) submitBtn.textContent = "Save Changes";
 
-    // Show the cancel button
-    if (cancelBtn) {
-        cancelBtn.classList.remove("hidden");
-    }
+
 
     openGoalModal();
 }
 
-/**
- * Cancel Edit mode and restore ADD state for goals
- */
-function cancelGoalEdit() {
-    editingGoalId = null;
 
-    const form = document.getElementById("addGoalForm");
-    if (form) form.reset();
-
-    const formTitle = document.getElementById("goalFormTitle");
-    const submitBtn = document.getElementById("goalFormSubmitBtn");
-    const cancelBtn = document.getElementById("goalFormCancelBtn");
-    const role =
-        document.getElementById(
-            "goalProtectionRole"
-        );
-    
-    if (role) {
-        role.value = "OPTIONAL";
-    }
-
-    if (formTitle) formTitle.textContent = "➕ Add Goal";
-    if (submitBtn) submitBtn.textContent = "➕ Add Goal";
-    
-    // Hide cancel button if it uses the hidden class pattern
-    if (cancelBtn) {
-        cancelBtn.classList.add("hidden");
-    }
-    closeGoalModal();
-}
 
 /**
  * Unified Form Handler (Dispatches to CREATE or UPDATE based on state)
