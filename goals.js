@@ -289,11 +289,7 @@ function editGoal(goalId) {
         cancelBtn.classList.remove("hidden");
     }
 
-    // 3. Scroll smoothly to the form
-    const form = document.getElementById("addGoalForm");
-    if (form) {
-        form.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
+    openGoalModal();
 }
 
 /**
@@ -324,6 +320,7 @@ function cancelGoalEdit() {
     if (cancelBtn) {
         cancelBtn.classList.add("hidden");
     }
+    closeGoalModal();
 }
 
 /**
@@ -384,6 +381,7 @@ async function handleGoalFormSubmit(event) {
             if (result.success) {
                 showStatus("✅ Goal updated successfully", "success");
                 cancelGoalEdit();
+                handleGoalFormSubmit()
                 if (typeof loadData === "function") await loadData();
                 if (typeof refreshUI === "function") await refreshUI();
             } else {
@@ -415,6 +413,7 @@ async function handleGoalFormSubmit(event) {
             if (result.success) {
                 showStatus("✅ Goal added successfully", "success");
                 cancelGoalEdit();
+                handleGoalFormSubmit()
                 if (typeof loadData === "function") await loadData();
                 if (typeof refreshUI === "function") await refreshUI();
             } else {
