@@ -523,8 +523,8 @@ function loadRecurringBills() {
             <div
                 class="commitment-meta">
 
-                ${bills.length}
-                Active Commitments
+            ${allBills.length}
+            Active Commitments
 
             </div>
 
@@ -635,28 +635,33 @@ function loadRecurringBills() {
         </div>
 
         ${allBills.length > billDisplayCount
-            ? `
-                <div
-                    style="
-                        text-align:center;
-                        margin-top:16px;
-                    ">
+        ? `
+        <div class="show-more-container">
         
-                    <button
-                        class="btn-secondary"
-                        onclick="showMoreBills()">
+            <div class="show-more-label">
         
-                    Show More (
-                        ${allBills.length - billDisplayCount}
-                        remaining
-                    )
+                Showing
+                ${Math.min(
+                    billDisplayCount,
+                    allBills.length
+                )}
+                of
+                ${allBills.length}
+                commitments
         
-                    </button>
+            </div>
         
-                </div>
-            `
-            : ""
-        }
+            <button
+                class="btn-secondary"
+                onclick="showMoreBills()">
+        
+                View More Commitments
+        
+            </button>
+        
+        </div>
+        `
+        : ""}
 
     `;
 }
