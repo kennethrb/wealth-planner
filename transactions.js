@@ -189,19 +189,105 @@ function syncSavingsDestination()
     }
 }
 
-function loadTransactions() {
+function renderTransactionCards(recent) {
 
-    const container =
-        document.getElementById(
-            "transactionsList"
-        );
+    return recent.map(tx => {
 
-    if (!container) return;
+        const budgetType =
+            tx["Budget Type"] ||
+            tx.budgetType ||
+            "";
 
-    const recent =
-        [...appData.transactions]
-            .reverse()
-            .slice(0, 20);
+        const account =
+            tx.Account ||
+            tx.account ||
+            "";
+
+        const details =
+            tx.Details ||
+            tx.details ||
+            "Transaction";
+
+        const amount =
+            tx.Amount ||
+            tx.amount ||
+            0;
+
+        const transactionId =
+            tx.transactionId ||
+            tx["Transaction ID"];
+
+        const amountDisplay =
+            budgetType === "Income"
+                ? `+${formatCurrency(amount)}`
+            : budgetType === "Transfer"
+                ? `${formatCurrency(amount)}`
+            : `-${formatCurrency(amount)}`;
+
+        let badgeClass =
+            "activity-info";
+
+        if (budgetType === "Income") {
+            badgeClass = "activity-income";
+        }
+        else if (budgetType === "Expense") {
+            badgeClass = "activity-expense";
+        }
+        else if (budgetType === "Savings") {
+            badgeClass = "activity-savings";
+        }
+        else if (budgetType === "Debt") {
+            badgeClass = "activity-debt";
+        }
+
+        return `
+            <div class="transaction-mobile-card">
+
+                <div class="activity-type ${badgeClass}">
+                    ${budgetType.toUpperCase()}
+                </div>
+
+                <div class="activity-title">
+                    ${details}
+                </div>
+
+                <div class="activity-meta">
+                    ${account}
+                </div>
+
+                <div class="activity-date">
+                    ${formatTransactionDate(
+                        tx.Date || tx.date
+                    )}
+                </div>
+
+                <div class="activity-amount">
+                    ${amountDisplay}
+                </div>
+
+                <div class="activity-actions">
+
+                    <button
+                        class="btn-delete-row"
+                        onclick="editTransaction('${transactionId}')">
+                        ✏️
+                    </button>
+
+                    <button
+                        class="btn-delete-row"
+                        onclick="deleteTransactionRecord('${transactionId}')">
+                        🗑️
+                    </button>
+
+                </div>
+
+            </div>
+        `;
+
+    }).join("");
+}
+
+function renderTransactionTable(container, recent) {
 
     container.innerHTML = `
     <div class="table-responsive">
@@ -293,6 +379,37 @@ function loadTransactions() {
       </table>
     </div>
   `;
+}
+
+function loadTransactions() {
+
+    const container =
+        document.getElementById(
+            "transactionsList"
+        );
+
+    if (!container) return;
+
+    const recent =
+        [...appData.transactions]
+        .reverse()
+        .slice(0, 20);
+
+    if (window.innerWidth <= 768) {
+
+        container.innerHTML =
+            renderTransactionCards(
+                recent
+            );
+
+    } else {
+
+    renderTransactionTable(
+        container,
+        recent
+    );
+
+    }
 }
 
 // Fix potential date timezone offsets when editing transactions
