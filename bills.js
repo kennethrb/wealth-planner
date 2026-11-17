@@ -563,58 +563,56 @@ function loadRecurringBills() {
 
                         </div>
 
-                        <div
-                            class="commitment-name">
-
-                            ${bill.billName}
-
+                        <div class="commitment-main-row">
+                        
+                            <div class="commitment-name">
+                                ${bill.billName}
+                            </div>
+                        
+                            <div class="commitment-amount">
+                                ${formatCurrency(
+                                    bill.defaultAmount
+                                )}
+                            </div>
+                        
                         </div>
-
-                        <div
-                            class="commitment-due">
-
-                            Due Day
-                            ${bill.dueDay}
-
-                        </div>
-
-                        <div
-                            class="commitment-amount">
-
-                            ${formatCurrency(
-                                bill.defaultAmount
-                            )}
-
-                        </div>
-
-                        <div
-                            class="
-                                commitment-actions
-                            ">
-
+                        
+                        <div class="commitment-footer-row">
+                        
+                            <div class="commitment-due">
+                                Due Day ${bill.dueDay}
+                            </div>
+                        
                             <button
-                                class="btn-delete-row"
-                                onclick="
-                                    editRecurringBill(
-                                        '${bill.billId}'
-                                    )">
-
-                                ✏️
-
+                                class="commitment-menu-btn"
+                                onclick="toggleBillMenu('${bill.billId}')">
+                        
+                                ⋮
+                        
                             </button>
-
-                            <button
-                                class="btn-delete-row"
-                                onclick="
-                                    deleteRecurringBill(
-                                        '${bill.billId}'
-                                    )">
-
-                                🗑
-
-                            </button>
-
+                        
                         </div>
+                        
+                        <div
+                            id="bill-menu-${bill.billId}"
+                            class="bill-menu hidden">
+                        
+                            <button
+                                onclick="editRecurringBill('${bill.billId}')">
+                        
+                                ✏️ Edit Bill
+                        
+                            </button>
+                        
+                            <button
+                                onclick="deleteRecurringBill('${bill.billId}')">
+                        
+                                🗑 Delete Bill
+                        
+                            </button>
+                        
+                        </div>
+
 
                     </div>
 
@@ -625,6 +623,30 @@ function loadRecurringBills() {
         </div>
 
     `;
+}
+
+function toggleBillMenu(billId) {
+
+    document
+        .querySelectorAll(".bill-menu")
+        .forEach(menu => {
+
+            if (
+                menu.id ===
+                `bill-menu-${billId}`
+            ) {
+
+                menu.classList.toggle(
+                    "hidden"
+                );
+
+            } else {
+
+                menu.classList.add(
+                    "hidden"
+                );
+            }
+        });
 }
 
 function loadRecurringBillAccounts() {
