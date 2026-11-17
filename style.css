@@ -1629,6 +1629,56 @@ tr.section-debt td:first-child {
     display: flex !important;
 }
 
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,.75);
+    backdrop-filter: blur(8px);
+    z-index: 100000;
+}
+
+.modal-overlay.show {
+    display: flex;
+}
+
+.modal-card {
+    width: 95%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+
+    background: var(--surface);
+
+    border-radius: 16px;
+
+    border: 1px solid var(--border);
+
+    padding: 24px;
+}
+
+.modal-header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    margin-bottom:20px;
+}
+
+.modal-close {
+    background:none;
+    border:none;
+
+    color:white;
+
+    font-size:20px;
+
+    cursor:pointer;
+}
+
+
 .confirm-card {
     width: 90%;
     max-width: 420px;
