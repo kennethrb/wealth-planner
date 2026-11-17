@@ -367,64 +367,97 @@
       </div>
   
   </div>
+
+  <div id="goalModal" class="modal-overlay">
+
+    <div class="modal-card">
+
+        <div class="modal-header">
+
+            <h2 id="goalFormTitle">
+                🎯 Create Goal
+            </h2>
+
+            <button
+                class="modal-close"
+                onclick="closeGoalModal()">
+
+                ✕
+
+            </button>
+
+        </div>
+
+
+        <form id="addGoalForm">
+          <h2 id="goalFormTitle">➕ Add Goal</h2>
+          <div class="form-row">
+            <input type="text" id="goalName" placeholder="Goal Name" required>
+            <input type="number" id="goalTarget" placeholder="Target Amount" required>
+            <input type="number" id="goalContribution" placeholder="Monthly Contribution" required>
+  
+            <select id="goalMode">
+                <option value="VIRTUAL">
+                    Virtual Goal
+                </option>
+            
+                <option value="PROTECTED">
+                    Protected Goal
+                </option>
+            </select>
+  
+            <select id="goalProtectionRole">
+                <option value="OPTIONAL">
+                    Optional
+                </option>
+            
+                <option value="EMERGENCY">
+                    Emergency Reserve
+                </option>
+            
+                <option value="SAFETY">
+                    Safety Reserve
+                </option>
+            
+                <option value="COMMITTED">
+                    Committed Goal
+                </option>
+            
+                <option value="GROWTH">
+                    Growth Capital
+                </option>
+            </select>
+  
+            <select id="goalAccountId">
+                <option value="">
+                    No Linked Account
+                </option>
+            </select>
+            
+            <div class="form-actions" style="display: flex; gap: 8px; width: 100%; margin-top: 10px;">
+              <button type="submit" id="goalFormSubmitBtn" class="btn-primary">➕ Add Goal</button>
+              <button type="button" id="goalFormCancelBtn" class="btn-secondary hidden" onclick="cancelGoalEdit()">Cancel</button>
+            </div>
+          </div>
+        </form>
+
+    </div>
+
+</div>
+
+  
   
   
   <!-- 🎯 GOALS CARD -->
   <div class="card">
-      <div class="card-title">🎯 Goals</div>
-  
-      <form id="addGoalForm">
-        <h2 id="goalFormTitle">➕ Add Goal</h2>
-        <div class="form-row">
-          <input type="text" id="goalName" placeholder="Goal Name" required>
-          <input type="number" id="goalTarget" placeholder="Target Amount" required>
-          <input type="number" id="goalContribution" placeholder="Monthly Contribution" required>
-
-          <select id="goalMode">
-              <option value="VIRTUAL">
-                  Virtual Goal
-              </option>
-          
-              <option value="PROTECTED">
-                  Protected Goal
-              </option>
-          </select>
-
-          <select id="goalProtectionRole">
-              <option value="OPTIONAL">
-                  Optional
-              </option>
-          
-              <option value="EMERGENCY">
-                  Emergency Reserve
-              </option>
-          
-              <option value="SAFETY">
-                  Safety Reserve
-              </option>
-          
-              <option value="COMMITTED">
-                  Committed Goal
-              </option>
-          
-              <option value="GROWTH">
-                  Growth Capital
-              </option>
-          </select>
-
-          <select id="goalAccountId">
-              <option value="">
-                  No Linked Account
-              </option>
-          </select>
-          
-          <div class="form-actions" style="display: flex; gap: 8px; width: 100%; margin-top: 10px;">
-            <button type="submit" id="goalFormSubmitBtn" class="btn-primary">➕ Add Goal</button>
-            <button type="button" id="goalFormCancelBtn" class="btn-secondary hidden" onclick="cancelGoalEdit()">Cancel</button>
-          </div>
-        </div>
-      </form>
-  
+    <div class="card-header">
+        <h2>🎯 Goals</h2>
+        <button
+            id="openGoalModal"
+            class="btn-primary">
+            🎯 Create Goal
+        </button>
+    </div>
       <hr class="divider">
       <div id="financialGoals"></div>
     </div>
