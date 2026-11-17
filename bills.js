@@ -26,13 +26,42 @@ function openBillModal() {
 }
 
 function closeBillModal() {
+    const formTitle =
+        document.getElementById(
+            "billFormTitle"
+        );
+    
+    if (formTitle) {
+        formTitle.textContent =
+            "➕ Add Recurring Bill";
+    }
+
+    editingBillId = null;
+
+    document.getElementById("billName").value = "";
+    document.getElementById("billAmount").value = "";
+    document.getElementById("billDueDay").value = "";
+
+    document.getElementById(
+        "billCommitmentType"
+    ).value = "BILL";
+
+    document.getElementById(
+        "billFormSubmitBtn"
+    ).textContent = "➕ Add Bill";
 
     const modal =
-        document.getElementById("billModal");
-
+        document.getElementById(
+            "billModal"
+        );
+    
     if (modal) {
         modal.classList.remove("show");
     }
+}
+
+function cancelRecurringBillEdit() {
+    closeBillModal();
 }
 
 async function addRecurringBill() {
@@ -183,42 +212,8 @@ function editRecurringBill(billId) {
     ).textContent =
         "Save Changes";
 
-    document.getElementById(
-        "billFormCancelBtn"
-    ).classList.remove("hidden");
 }
 
-function cancelRecurringBillEdit() {
-    const formTitle =
-        document.getElementById(
-            "billFormTitle"
-        );
-    
-    if (formTitle) {
-        formTitle.textContent =
-            "➕ Add Recurring Bill";
-    }
-
-    editingBillId = null;
-
-    document.getElementById("billName").value = "";
-    document.getElementById("billAmount").value = "";
-    document.getElementById("billDueDay").value = "";
-
-    document.getElementById(
-        "billCommitmentType"
-    ).value = "BILL";
-
-    document.getElementById(
-        "billFormSubmitBtn"
-    ).textContent = "➕ Add Bill";
-
-    document.getElementById(
-        "billFormCancelBtn"
-    ).classList.add("hidden");
-    closeBillModal();
-
-}
 
 // Generate transactions from recurring bills
 async function generateBills() {
