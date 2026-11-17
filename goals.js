@@ -381,7 +381,6 @@ async function handleGoalFormSubmit(event) {
             if (result.success) {
                 showStatus("✅ Goal updated successfully", "success");
                 cancelGoalEdit();
-                handleGoalFormSubmit()
                 if (typeof loadData === "function") await loadData();
                 if (typeof refreshUI === "function") await refreshUI();
             } else {
@@ -413,7 +412,6 @@ async function handleGoalFormSubmit(event) {
             if (result.success) {
                 showStatus("✅ Goal added successfully", "success");
                 cancelGoalEdit();
-                handleGoalFormSubmit()
                 if (typeof loadData === "function") await loadData();
                 if (typeof refreshUI === "function") await refreshUI();
             } else {
