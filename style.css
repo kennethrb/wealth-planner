@@ -2010,8 +2010,22 @@ tr.section-debt td:first-child {
 
 .commitment-top-row {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+}
+
+.commitment-menu-btn {
+    margin-left: auto;
+}
+
+.show-more-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.show-more-label {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-bottom: 10px;
 }
 
 .bill-menu {
