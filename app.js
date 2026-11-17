@@ -625,6 +625,13 @@ async function initializeApp() {
      "May","Jun","Jul","Aug",
      "Sep","Oct","Nov","Dec"
     ];
+    
+    document
+    .getElementById("openTransactionModal")
+    ?.addEventListener(
+        "click",
+        openTransactionModal
+    );
 
     viewState.month =
     monthNames[new Date().getMonth()];
