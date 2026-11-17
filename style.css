@@ -1901,6 +1901,16 @@ tr.section-debt td:first-child {
     gap: 12px;
 }
 
+.activity-grid .commitment-card {
+    padding: 18px;
+}
+
+.transaction-date {
+    color: var(--text-muted);
+    font-size: 12px;
+    margin-top: 4px;
+}
+
 .commitment-summary {
     text-align: center;
     margin-bottom: 20px;
