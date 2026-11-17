@@ -578,6 +578,7 @@ async function refreshUI() {
     loadRecurringBillPositions();
 
     loadTransactions();
+    registerTransactionFilters();
     loadScenarioCategories();
 
     await Promise.all([
