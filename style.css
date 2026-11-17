@@ -1842,6 +1842,60 @@ tr.section-debt td:first-child {
     color: #94a3b8;
 }
 
+.activity-toolbar {
+    margin-bottom: 12px;
+}
+
+.activity-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.activity-chip {
+    background: rgba(255,255,255,.04);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 13px;
+}
+
+.activity-chip.active {
+    background: rgba(16,185,129,.15);
+    color: #34d399;
+    border-color: rgba(
+        16,185,129,.25
+    );
+}
+
+.activity-subline {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.activity-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+}
+
+.activity-amount {
+    margin: 0;
+}
+
+.activity-chip {
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+.activity-chip:hover {
+    border-color: rgba(16,185,129,.25);
+}
+
 @keyframes slideIn {
     from {
         opacity: 0;
