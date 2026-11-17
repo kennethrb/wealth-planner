@@ -1,3 +1,38 @@
+function openBillModal() {
+
+    if (!editingBillId) {
+
+        document.getElementById(
+            "billFormTitle"
+        ).textContent =
+            "➕ Add Recurring Bill";
+
+        document.getElementById(
+            "billFormSubmitBtn"
+        ).textContent =
+            "➕ Add Bill";
+    }
+
+    const modal =
+        document.getElementById(
+            "billModal"
+        );
+
+    if (modal) {
+        modal.classList.add("show");
+    }
+}
+
+function closeBillModal() {
+
+    const modal =
+        document.getElementById("billModal");
+
+    if (modal) {
+        modal.classList.remove("show");
+    }
+}
+
 async function addRecurringBill() {
     const billNameInput = document.getElementById("billName");
     const commitmentType =
@@ -121,6 +156,8 @@ function editRecurringBill(billId) {
     if (!bill) return;
 
     editingBillId = billId;
+    
+    openBillModal();
 
     document.getElementById("billName").value =
         bill.billName;
@@ -186,6 +223,8 @@ function cancelRecurringBillEdit() {
     document.getElementById(
         "billFormCancelBtn"
     ).classList.add("hidden");
+    closeBillModal();
+
 }
 
 // Generate transactions from recurring bills
