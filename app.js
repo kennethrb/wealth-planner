@@ -640,6 +640,13 @@ async function initializeApp() {
         openAccountModal
     );
 
+    document
+    .getElementById("openGoalModal")
+    ?.addEventListener(
+        "click",
+        openGoalModal
+    );
+
     viewState.month =
     monthNames[new Date().getMonth()];
     
