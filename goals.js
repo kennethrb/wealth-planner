@@ -9,18 +9,26 @@ function showMoreGoals() {
 
 function toggleGoalMenu(goalId) {
 
+    const targetMenu =
+        document.getElementById(
+            `goal-menu-${goalId}`
+        );
+
+    if (!targetMenu) return;
+
     document
-        .querySelectorAll("[id^='goal-menu-']")
+        .querySelectorAll(".goal-menu")
         .forEach(menu => {
 
-            if (menu.id === `goal-menu-${goalId}`) {
-                menu.classList.toggle("hidden");
-            } else {
+            if (menu !== targetMenu) {
                 menu.classList.add("hidden");
             }
 
         });
 
+    targetMenu.classList.toggle(
+        "hidden"
+    );
 }
 
 function openGoalModal() {
@@ -338,62 +346,31 @@ function loadGoals() {
                         </div>
 
                         <div
-                            id="
-                                goal-menu-${goalId}
-                            "
-                            class="
-                                bill-menu
-                                hidden
-                            "
+                            id="goal-menu-${goalId}"
+                            class="goal-menu bill-menu hidden"
                         >
-
-                            <button
-                                onclick="
-                                    editGoal(
-                                        '${goalId}'
-                                    )
-                                "
-                            >
+                        
+                            <button onclick="editGoal('${goalId}')">
                                 ✏️ Edit Goal
                             </button>
-
-                            <button
-                                onclick="
-                                    archiveGoal(
-                                        '${goalId}'
-                                    )
-                                "
-                            >
+                        
+                            <button onclick="archiveGoal('${goalId}')">
                                 📦 Archive Goal
                             </button>
-
-                            ${
-                                status ===
-                                "FUNDED"
+                        
+                            ${status === "FUNDED"
                                 ? `
-                                <button
-                                    onclick="
-                                        graduateGoal(
-                                            '${goalId}'
-                                        )
-                                    "
-                                >
+                                <button onclick="graduateGoal('${goalId}')">
                                     🎓 Graduate Goal
                                 </button>
                                 `
                                 : ""
                             }
-
-                            <button
-                                onclick="
-                                    deleteGoal(
-                                        '${goalId}'
-                                    )
-                                "
-                            >
+                        
+                            <button onclick="deleteGoal('${goalId}')">
                                 🗑 Delete Goal
                             </button>
-
+                        
                         </div>
 
                     </div>
