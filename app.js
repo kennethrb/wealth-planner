@@ -647,6 +647,13 @@ async function initializeApp() {
         openGoalModal
     );
 
+    document
+    .getElementById("openBillModal")
+    ?.addEventListener(
+        "click",
+        openBillModal
+    );
+
     viewState.month =
     monthNames[new Date().getMonth()];
     
