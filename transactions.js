@@ -1,3 +1,4 @@
+let transactionDisplayCount = 5;
 let transactionSearchTerm = "";
 let transactionFilter = "ALL";
 
@@ -406,7 +407,7 @@ function setTransactionFilter(event, type){
     event.target.classList.add(
         "active"
     );
-
+    transactionDisplayCount = 5;
     loadTransactions();
 }
 
@@ -424,9 +425,17 @@ function registerTransactionFilters() {
         transactionSearchTerm =
             e.target.value
                 .toLowerCase();
-
+        transactionDisplayCount = 5;
         loadTransactions();
     };
+}
+
+function showMoreTransactions() {
+
+    transactionDisplayCount += 5;
+
+    loadTransactions();
+
 }
 
 function loadTransactions() {
@@ -476,13 +485,40 @@ function loadTransactions() {
     }
 
     if (window.innerWidth <= 768) {
-
+    
+        const visible =
+            recent.slice(
+                0,
+                transactionDisplayCount
+            );
+    
         container.innerHTML =
             renderTransactionCards(
-                recent
+                visible
             );
-
-    } else {
+    
+        if (
+            transactionDisplayCount <
+            recent.length
+        ) {
+    
+            container.innerHTML += `
+                <div class="show-more-container">
+    
+                    <button
+                        class="btn-secondary"
+                        onclick="showMoreTransactions()">
+    
+                        Show More
+    
+                    </button>
+    
+                </div>
+            `;
+        }
+    
+    }
+    else {
 
         renderTransactionTable(
             container,
