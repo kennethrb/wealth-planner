@@ -115,9 +115,6 @@ async function addTransaction() {
         return;
     }
     
-    const confirmed = await showConfirmDialog("Save Transaction", "Do you want to save this transaction?");
-    if (!confirmed) return;
-    
     const action = editingTransactionId ? "updateTransaction" : "addTransaction";
     
     let url = `${BASE_URL}?action=${action}`
