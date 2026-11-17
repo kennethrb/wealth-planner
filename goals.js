@@ -1,5 +1,21 @@
 // ==================== FILE: goals.js ====================
 
+function openGoalModal() {
+
+    document
+        .getElementById("goalModal")
+        ?.classList.add("show");
+
+}
+
+function closeGoalModal() {
+
+    document
+        .getElementById("goalModal")
+        ?.classList.remove("show");
+
+}
+
 //Create a single source of truth lifecycle function.
 function getGoalLifecycleState(goal) {
 
