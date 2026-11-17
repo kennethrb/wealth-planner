@@ -246,50 +246,85 @@ function renderTransactionCards(recent) {
         }
 
         return `
-        <div class="transaction-mobile-card">
         
-            <div class="activity-type ${badgeClass}">
-                ${budgetType.toUpperCase()}
+        <div class="commitment-card">
+        
+            <div class="commitment-top-row">
+        
+                <div
+                    class="activity-type ${badgeClass}">
+        
+                    ${budgetType.toUpperCase()}
+        
+                </div>
+        
+                <button
+                    class="commitment-menu-btn"
+                    onclick="
+                        toggleTransactionMenu(
+                            '${transactionId}'
+                        )">
+        
+                    ⋮
+        
+                </button>
+        
             </div>
         
-            <div class="activity-title">
-                ${details}
-            </div>
+            <div class="commitment-main-row">
         
-            <div class="activity-subline">
-                <span>${account}</span>
-                <span>${
-                    formatTransactionDate(
-                        tx.Date || tx.date
-                    )
-                }</span>
-            </div>
+                <div class="commitment-name">
         
-            <div class="activity-footer">
+                    ${details}
         
-                <div class="activity-amount">
+                </div>
+        
+                <div class="commitment-amount">
+        
                     ${amountDisplay}
-                </div>
-        
-                <div class="activity-actions">
-        
-                    <button
-                        class="btn-delete-row"
-                        onclick="editTransaction('${transactionId}')">
-                        ✏️
-                    </button>
-        
-                    <button
-                        class="btn-delete-row"
-                        onclick="deleteTransactionRecord('${transactionId}')">
-                        🗑️
-                    </button>
         
                 </div>
+        
+            </div>
+        
+            <div class="commitment-due">
+        
+                ${account}
+                •
+                ${formatTransactionDate(
+                    tx.Date || tx.date
+                )}
+        
+            </div>
+        
+            <div
+                id="tx-menu-${transactionId}"
+                class="bill-menu hidden">
+        
+                <button
+                    onclick="
+                        editTransaction(
+                            '${transactionId}'
+                        )">
+        
+                    ✏️ Edit Activity
+        
+                </button>
+        
+                <button
+                    onclick="
+                        deleteTransactionRecord(
+                            '${transactionId}'
+                        )">
+        
+                    🗑 Delete Activity
+        
+                </button>
         
             </div>
         
         </div>
+        
         `;
 
     }).join("");
@@ -436,6 +471,35 @@ function showMoreTransactions() {
 
     loadTransactions();
 
+}
+
+function toggleTransactionMenu(
+    transactionId
+) {
+
+    document
+        .querySelectorAll(
+            "[id^='tx-menu-']"
+        )
+        .forEach(menu => {
+
+            if (
+                menu.id ===
+                `tx-menu-${transactionId}`
+            ) {
+
+                menu.classList.toggle(
+                    "hidden"
+                );
+
+            } else {
+
+                menu.classList.add(
+                    "hidden"
+                );
+            }
+
+        });
 }
 
 function loadTransactions() {
