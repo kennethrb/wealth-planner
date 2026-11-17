@@ -633,6 +633,13 @@ async function initializeApp() {
         openTransactionModal
     );
 
+    document
+    .getElementById("openAccountModal")
+    ?.addEventListener(
+        "click",
+        openAccountModal
+    );
+
     viewState.month =
     monthNames[new Date().getMonth()];
     
