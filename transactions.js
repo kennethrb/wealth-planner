@@ -556,10 +556,13 @@ function loadTransactions() {
                 transactionDisplayCount
             );
     
-        container.innerHTML =
-            renderTransactionCards(
-                visible
-            );
+        container.innerHTML = `
+            <div class="activity-grid">
+                ${renderTransactionCards(
+                    visible
+                )}
+            </div>
+        `;
     
         if (
             transactionDisplayCount <
