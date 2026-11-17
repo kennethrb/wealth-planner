@@ -1,5 +1,28 @@
 // ==================== FILE: goals.js ====================
 
+let goalDisplayCount = 5;
+
+function showMoreGoals() {
+    goalDisplayCount += 5;
+    loadGoals();
+}
+
+function toggleGoalMenu(goalId) {
+
+    document
+        .querySelectorAll("[id^='goal-menu-']")
+        .forEach(menu => {
+
+            if (menu.id === `goal-menu-${goalId}`) {
+                menu.classList.toggle("hidden");
+            } else {
+                menu.classList.add("hidden");
+            }
+
+        });
+
+}
+
 function openGoalModal() {
 
     document
@@ -95,138 +118,333 @@ document.addEventListener("DOMContentLoaded", () => {
  * READ: Renders active and graduated goals using the original card design
  */
 function loadGoals() {
-    const container = document.getElementById("financialGoals");
+
+    const container =
+        document.getElementById(
+            "financialGoals"
+        );
+
     if (!container) return;
 
-    const goals = (typeof appData !== "undefined" && appData.goals) ? appData.goals : [];
-    // Display Active & Graduated goals (Filter out archived ones from main list)
-    const displayGoals = goals.filter(g => g.status !== "ARCHIVED");
+    const allGoals =
+        (appData.goals || [])
+        .filter(
+            g =>
+                getGoalLifecycleState(g)
+                !== "ARCHIVED"
+        );
 
-    if (displayGoals.length === 0) {
+    if (!allGoals.length) {
+
         container.innerHTML = `
-            <div class="goal-item">
-                <span class="label">No active goals found</span>
-            </div>
+            <p>
+                No active goals found.
+            </p>
         `;
+
         return;
     }
 
+    const visibleGoals =
+        allGoals.slice(
+            0,
+            goalDisplayCount
+        );
+
+    const totalRemaining =
+        allGoals.reduce(
+            (sum, goal) => {
+
+                const current =
+                    getGoalCurrent(goal);
+
+                const target =
+                    Number(
+                        goal.target || 0
+                    );
+
+                return (
+                    sum +
+                    Math.max(
+                        0,
+                        target - current
+                    )
+                );
+
+            },
+            0
+        );
+
     container.innerHTML = `
-        <div class="goals-container">
-            ${displayGoals.map(goal => {
-                const id = goal.goalId || goal.id;
-                const name = goal.goal || goal.goalName || "Unnamed Goal";
-                const current = getGoalCurrent(goal);
-                const target = Number(goal.target || 1);
-                const monthlyContribution = Number(goal.monthlyContribution || 0);
 
-                const progress = target > 0 ? ((current / target) * 100).toFixed(1) : 0;
-                const remainingAmount = Math.max(0, target - current);
+        <div class="commitment-summary">
 
-                const status = getGoalLifecycleState(goal);
+            <div class="commitment-label">
+                GOAL PORTFOLIO
+            </div>
 
-                const statusBadge =
+            <div class="commitment-total">
+                ${formatCurrency(totalRemaining)}
+            </div>
+
+            <div class="commitment-meta">
+                ${allGoals.length}
+                Active Goals
+            </div>
+
+        </div>
+
+        <div class="commitment-grid">
+
+            ${visibleGoals.map(goal => {
+
+                const goalId =
+                    goal.goalId ||
+                    goal.id;
+
+                const name =
+                    goal.goal ||
+                    "Goal";
+
+                const current =
+                    getGoalCurrent(goal);
+
+                const target =
+                    Number(
+                        goal.target || 0
+                    );
+
+                const remaining =
+                    Math.max(
+                        0,
+                        target - current
+                    );
+
+                const progress =
+                    target > 0
+                    ? Math.round(
+                        (current / target) *
+                        100
+                    )
+                    : 0;
+
+                const status =
+                    getGoalLifecycleState(
+                        goal
+                    );
+
+                let forecast =
+                    "";
+
+                if (
                     status === "FUNDED"
-                        ? "💰 Funded"
-                        : status === "GRADUATED"
-                        ? "✅ Graduated"
-                        : status === "ARCHIVED"
-                        ? "📦 Archived"
-                        : "🎯 Active";
+                ) {
 
-                let forecast = "N/A";
-                let monthsRemaining = "N/A";
+                    forecast =
+                        "100% Complete";
 
-                if (monthlyContribution > 0 && remainingAmount > 0) {
-                    monthsRemaining = Math.ceil(remainingAmount / monthlyContribution);
-                    const completionDate = new Date();
-                    completionDate.setMonth(completionDate.getMonth() + monthsRemaining);
+                }
+                else if (
+                    status ===
+                    "GRADUATED"
+                ) {
 
-                    forecast = completionDate.toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "short"
-                    });
-                } else if (remainingAmount === 0) {
-                    forecast = "Achieved";
-                    monthsRemaining = 0;
+                    forecast =
+                        "Completed";
+
+                }
+                else {
+
+                    forecast =
+                        `${progress}% Complete`;
+
+                }
+
+                let subtitle =
+                    "";
+
+                if (
+                    status ===
+                    "FUNDED"
+                ) {
+
+                    subtitle =
+                        "Protected";
+
+                }
+                else {
+
+                    subtitle =
+                        `${formatCurrency(
+                            remaining
+                        )} Remaining`;
+
                 }
 
                 return `
-                    <div class="goal-item" id="goal-card-${id}">
-                        <div class="item-header">
-                            <span class="item-title">🎯 ${escapeHtml(name)}</span>
-                            <span class="item-value">${typeof formatCurrency === "function" ? formatCurrency(current) : current}</span>
+
+                    <div class="commitment-card">
+
+                        <div class="commitment-top-row">
+
+                            <div
+                                class="
+                                    commitment-badge
+                                    commitment-bill
+                                "
+                            >
+                                GOAL
+                            </div>
+
+                            <button
+                                class="
+                                    commitment-menu-btn
+                                "
+                                onclick="
+                                    toggleGoalMenu(
+                                        '${goalId}'
+                                    )
+                                "
+                            >
+                                ⋮
+                            </button>
+
                         </div>
 
-                        <div class="progress-bar-bg" style="margin: 8px 0; background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; overflow: hidden;">
-                            <div class="progress-bar-fill" style="width: ${Math.min(progress, 100)}\%; 
-                            background:${
-                            (
-                                status === "FUNDED" ||
-                                status === "GRADUATED"
-                            )
-                            ? "#34d399"
-                            : "#60a5fa"
+                        <div
+                            class="
+                                commitment-name
+                            "
+                        >
+                            ${escapeHtml(
+                                name
+                            )}
+                        </div>
+
+                        <div
+                            class="
+                                commitment-amount
+                            "
+                        >
+                            ${subtitle}
+                        </div>
+
+                        <div
+                            class="
+                                commitment-due
+                            "
+                        >
+                            ${forecast}
+                        </div>
+
+                        <div
+                            id="
+                                goal-menu-${goalId}
+                            "
+                            class="
+                                bill-menu
+                                hidden
+                            "
+                        >
+
+                            <button
+                                onclick="
+                                    editGoal(
+                                        '${goalId}'
+                                    )
+                                "
+                            >
+                                ✏️ Edit Goal
+                            </button>
+
+                            <button
+                                onclick="
+                                    archiveGoal(
+                                        '${goalId}'
+                                    )
+                                "
+                            >
+                                📦 Archive Goal
+                            </button>
+
+                            ${
+                                status ===
+                                "FUNDED"
+                                ? `
+                                <button
+                                    onclick="
+                                        graduateGoal(
+                                            '${goalId}'
+                                        )
+                                    "
+                                >
+                                    🎓 Graduate Goal
+                                </button>
+                                `
+                                : ""
                             }
-                            ; height: 100%;"></div>
+
+                            <button
+                                onclick="
+                                    deleteGoal(
+                                        '${goalId}'
+                                    )
+                                "
+                            >
+                                🗑 Delete Goal
+                            </button>
+
                         </div>
 
-                        <div class="goal-details">
-                            <span>${statusBadge}</span>
-                            <div style="
-                                display:flex;
-                                gap:8px;
-                                flex-wrap:wrap;
-                            ">
-                                <span>🎯 ${goal.goalMode || "VIRTUAL"}</span>
-                                <span>🛡 ${goal.protectionRole || "OPTIONAL"}</span>
-                            </div>
-
-                            <span>
-                                Target: ${typeof formatCurrency === "function" ? formatCurrency(target) : target} (${progress}%)
-                            </span>
-
-                            <span>
-                                Est: <strong>${forecast}</strong>${typeof monthsRemaining === "number" ? `(${monthsRemaining} mos)` : ""}
-                            </span>
-
-                            <div style="display:flex; gap:8px; align-items:center; margin-top:8px;">
-                                <button
-                                    class="btn-secondary"
-                                    onclick="editGoal('${id}')"
-                                    title="Edit Goal"
-                                >
-                                    ✏️
-                                </button>
-                                <button
-                                    class="btn-secondary"
-                                    onclick="archiveGoal('${id}')"
-                                >
-                                    📦
-                                </button>
-                                
-                                ${status === "FUNDED" ? `
-                                <button
-                                    class="btn-success"
-                                    onclick="graduateGoal('${id}')"
-                                    title="Graduate Goal"
-                                >
-                                    🎓
-                                </button>
-                                ` : ""}
-                                
-                                <button
-                                    class="btn-danger"
-                                    onclick="deleteGoal('${id}')"
-                                >
-                                    🗑
-                                </button>
-                            </div>
-                        </div>
                     </div>
+
                 `;
+
             }).join("")}
+
         </div>
+
+        ${
+            allGoals.length >
+            goalDisplayCount
+                ? `
+                <div
+                    class="
+                        show-more-container
+                    "
+                >
+
+                    <div
+                        class="
+                            show-more-label
+                        "
+                    >
+                        Showing
+                        ${Math.min(
+                            goalDisplayCount,
+                            allGoals.length
+                        )}
+                        of
+                        ${allGoals.length}
+                        goals
+                    </div>
+
+                    <button
+                        class="
+                            btn-secondary
+                        "
+                        onclick="
+                            showMoreGoals()
+                        "
+                    >
+                        View More Goals
+                    </button>
+
+                </div>
+                `
+                : ""
+        }
+
     `;
 }
 
