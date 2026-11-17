@@ -459,32 +459,172 @@ const activeBills =
 }
 
 function loadRecurringBills() {
-  const container = document.getElementById("recurringBillsList");
-  if (!container) return;
 
-  const bills = appData.recurringBills || [];
+    const container =
+        document.getElementById(
+            "recurringBillsList"
+        );
 
-  if (!bills.length) {
-    container.innerHTML = "<p>No recurring bills found.</p>";
-    return;
-  }
+    if (!container) return;
 
-  container.innerHTML = bills.map(bill => `
-    <div class="funding-row">
-      <div>
-        <strong>${bill.billName}</strong>
-        
-        <small>
-        📅 Due Day ${bill.dueDay}
-        </small>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <span>${formatCurrency(bill.defaultAmount)}</span>
-        <button class="btn-delete-row" onclick="editRecurringBill('${bill.billId}')">✏️</button>
-        <button class="btn-delete-row" onclick="deleteRecurringBill('${bill.billId}')">🗑</button>
-      </div>
-    </div>
-  `).join("");
+    const bills =
+        appData.recurringBills || [];
+
+    if (!bills.length) {
+
+        container.innerHTML = `
+            <p>
+                No recurring commitments found.
+            </p>
+        `;
+
+        return;
+    }
+
+    const totalCommitments =
+        bills.reduce(
+            (sum, bill) =>
+                sum +
+                Number(
+                    bill.defaultAmount || 0
+                ),
+            0
+        );
+
+    container.innerHTML = `
+
+        <div
+            class="commitment-summary">
+
+            <div
+                class="commitment-label">
+
+                MONTHLY COMMITMENTS
+
+            </div>
+
+            <div
+                class="commitment-total">
+
+                ${formatCurrency(
+                    totalCommitments
+                )}
+
+            </div>
+
+            <div
+                class="commitment-meta">
+
+                ${bills.length}
+                Active Commitments
+
+            </div>
+
+        </div>
+
+        <div class="commitment-grid">
+
+            ${bills.map(bill => {
+
+                const badgeClass =
+                    (
+                        bill.commitmentType
+                        === "DEBT"
+                    )
+                    ? "commitment-debt"
+                    : (
+                        bill.commitmentType
+                        === "CASH_REQUIREMENT"
+                    )
+                    ? "commitment-cash"
+                    : (
+                        bill.commitmentType
+                        === "LIFESTYLE"
+                    )
+                    ? "commitment-lifestyle"
+                    : "commitment-bill";
+
+                return `
+
+                    <div
+                        class="commitment-card">
+
+                        <div
+                            class="
+                                commitment-badge
+                                ${badgeClass}
+                            ">
+
+                            ${bill.commitmentType
+                                .replaceAll(
+                                    "_",
+                                    " "
+                                )}
+
+                        </div>
+
+                        <div
+                            class="commitment-name">
+
+                            ${bill.billName}
+
+                        </div>
+
+                        <div
+                            class="commitment-due">
+
+                            Due Day
+                            ${bill.dueDay}
+
+                        </div>
+
+                        <div
+                            class="commitment-amount">
+
+                            ${formatCurrency(
+                                bill.defaultAmount
+                            )}
+
+                        </div>
+
+                        <div
+                            class="
+                                commitment-actions
+                            ">
+
+                            <button
+                                class="btn-delete-row"
+                                onclick="
+                                    editRecurringBill(
+                                        '${bill.billId}'
+                                    )">
+
+                                ✏️
+
+                            </button>
+
+                            <button
+                                class="btn-delete-row"
+                                onclick="
+                                    deleteRecurringBill(
+                                        '${bill.billId}'
+                                    )">
+
+                                🗑
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }).join("")}
+
+        </div>
+
+    `;
 }
 
 function loadRecurringBillAccounts() {
