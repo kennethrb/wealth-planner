@@ -245,54 +245,50 @@ function renderTransactionCards(recent) {
         }
 
         return `
-            <div class="transaction-mobile-card">
-
-                <div class="activity-type ${badgeClass}">
-                    ${budgetType.toUpperCase()}
+        <div class="transaction-mobile-card">
+        
+            <div class="activity-type ${badgeClass}">
+                ${budgetType.toUpperCase()}
+            </div>
+        
+            <div class="activity-title">
+                ${details}
+            </div>
+        
+            <div class="activity-subline">
+                <span>${account}</span>
+                <span>${
+                    formatTransactionDate(
+                        tx.Date || tx.date
+                    )
+                }</span>
+            </div>
+        
+            <div class="activity-footer">
+        
+                <div class="activity-amount">
+                    ${amountDisplay}
                 </div>
-
-                <div class="activity-title">
-                    ${details}
-                </div>
-
-                <div class="activity-subline">
-                
-                    <span>
-                        ${account}
-                    </span>
-                
-                    <span>
-                        ${formatTransactionDate(
-                            tx.Date || tx.date
-                        )}
-                    </span>
-                
-                </div>
-                
-                <div class="activity-footer">
-                
-                    <div class="activity-amount">
-                        ${amountDisplay}
-                    </div>
-                
-                    <div class="activity-actions">
-
-
+        
+                <div class="activity-actions">
+        
                     <button
                         class="btn-delete-row"
                         onclick="editTransaction('${transactionId}')">
                         ✏️
                     </button>
-
+        
                     <button
                         class="btn-delete-row"
                         onclick="deleteTransactionRecord('${transactionId}')">
                         🗑️
                     </button>
-
+        
                 </div>
-
+        
             </div>
+        
+        </div>
         `;
 
     }).join("");
@@ -439,12 +435,14 @@ function loadTransactions() {
         document.getElementById(
             "transactionsList"
         );
+    const MAX_ACTIVITY_CARDS = 20;
 
     if (!container) return;
 
     let recent =
         [...appData.transactions]
-        .reverse();
+        .reverse()
+        .slice(0, MAX_ACTIVITY_CARDS);
 
     if (transactionFilter !== "ALL") {
 
