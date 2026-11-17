@@ -1896,6 +1896,11 @@ tr.section-debt td:first-child {
     border-color: rgba(16,185,129,.25);
 }
 
+.activity-grid {
+    display: grid;
+    gap: 12px;
+}
+
 .commitment-summary {
     text-align: center;
     margin-bottom: 20px;
