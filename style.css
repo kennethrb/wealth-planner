@@ -1984,6 +1984,42 @@ tr.section-debt td:first-child {
     color: #94a3b8;
 }
 
+.commitment-main-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.commitment-footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.commitment-menu-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 0;
+    width: auto;
+    min-width: auto;
+    box-shadow: none;
+    font-size: 18px;
+}
+
+.bill-menu {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+
 @keyframes slideIn {
     from {
         opacity: 0;
