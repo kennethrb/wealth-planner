@@ -205,10 +205,52 @@
       </div>
     
     
+      <div class="activity-toolbar">
+      
+          <input
+              type="text"
+              id="transactionSearch"
+              placeholder="Search activity...">
+      
+      </div>
+      
+      <div class="activity-filters">
+      
+          <button class="activity-chip active"
+              onclick="setTransactionFilter(event,'ALL')">
+              All
+          </button>
+      
+          <button class="activity-chip"
+              onclick="setTransactionFilter(event,'Income')">
+              Income
+          </button>
+      
+          <button class="activity-chip"
+              onclick="setTransactionFilter(event,'Expense')">
+              Expense
+          </button>
+      
+          <button class="activity-chip"
+              onclick="setTransactionFilter(event,'Savings')">
+              Savings
+          </button>
+      
+          <button class="activity-chip"
+              onclick="setTransactionFilter(event,'Debt')">
+              Debt
+          </button>
+      
+          <button class="activity-chip"
+              onclick="setTransactionFilter(event,'Transfer')">
+              Transfer
+          </button>
+      
+      </div>
+      
       <div
-        id="transactionsList"
-        class="margin-top">
-    
+          id="transactionsList"
+          class="margin-top">
       </div>
     
     </section>
