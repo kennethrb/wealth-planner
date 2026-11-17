@@ -27,7 +27,6 @@
   <div class="nav-links">
     <a href="#dashboardWorkspace" class="nav-item active"><span class="icon">🏦</span><span>Overview</span></a>
     <a href="#intelligence" class="nav-item"><span class="icon">🧠</span><span>Intelligence</span></a>
-    <a href="#planning" class="nav-item"><span class="icon">🗂</span><span>Planning</span></a>
     <a href="#execution" class="nav-item"><span class="icon">💳</span><span>Transactions</span></a>
     <a href="#goals" class="nav-item"><span class="icon">🎯</span><span>Goals</span></a>
   </div>
@@ -108,18 +107,17 @@
       </div>
     </div>
 
+
+  <div style="display:none;">
     <!-- 🗂 PLANNING -->
     <div class="section-header">
-    
       <h2>
         🗂 Planning
       </h2>
-    
       <p>
         Define categories and allocate
         your money intentionally.
       </p>
-    
     </div>
 
     <!-- Category Management -->
@@ -130,31 +128,27 @@
             type="text"
             id="categoryName"
             placeholder="Category Name">
-        
         <select id="budgetType">
             <option>Income</option>
             <option>Expense</option>
             <option>Savings</option>
             <option>Debt</option>
         </select>
-        
         <input
             type="text"
             id="categoryGroup"
             placeholder="Group">
-        
         <select id="preferredFundingSource">
         </select>
         <button onclick="addCategory()">➕ Add Category</button>
       </div>
-
       <hr class="divider">
-
       <div class="form-row">
         <select id="deleteCategorySelect"></select>
         <button class="btn-danger" onclick="deleteCategory()">🗑 Delete Category</button>
       </div>
     </section>
+    </div>
     
     <section class="card">
         <h2>🔁 Recurring Bills</h2>
