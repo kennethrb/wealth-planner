@@ -1,3 +1,6 @@
+let transactionSearchTerm = "";
+let transactionFilter = "ALL";
+
 function loadTransactionAccounts() {
     const dropdown = document.getElementById("txAccount");
     if (!dropdown) return;
@@ -201,7 +204,8 @@ function renderTransactionCards(recent) {
         const account =
             tx.Account ||
             tx.account ||
-            "";
+            tx["Account Name"] ||
+            "Account";
 
         const details =
             tx.Details ||
@@ -251,21 +255,28 @@ function renderTransactionCards(recent) {
                     ${details}
                 </div>
 
-                <div class="activity-meta">
-                    ${account}
+                <div class="activity-subline">
+                
+                    <span>
+                        ${account}
+                    </span>
+                
+                    <span>
+                        ${formatTransactionDate(
+                            tx.Date || tx.date
+                        )}
+                    </span>
+                
                 </div>
+                
+                <div class="activity-footer">
+                
+                    <div class="activity-amount">
+                        ${amountDisplay}
+                    </div>
+                
+                    <div class="activity-actions">
 
-                <div class="activity-date">
-                    ${formatTransactionDate(
-                        tx.Date || tx.date
-                    )}
-                </div>
-
-                <div class="activity-amount">
-                    ${amountDisplay}
-                </div>
-
-                <div class="activity-actions">
 
                     <button
                         class="btn-delete-row"
@@ -310,7 +321,8 @@ function renderTransactionTable(container, recent) {
             const account =
                 tx.Account ||
                 tx.account ||
-                "";
+                tx["Account Name"] ||
+                "Account";
         
             const transferTo =
                 tx["Transfer To Account"] ||
@@ -381,6 +393,46 @@ function renderTransactionTable(container, recent) {
   `;
 }
 
+function setTransactionFilter(event, type){
+
+    transactionFilter = type;
+
+    document
+        .querySelectorAll(
+            ".activity-chip"
+        )
+        .forEach(chip =>
+            chip.classList.remove(
+                "active"
+            )
+        );
+
+    event.target.classList.add(
+        "active"
+    );
+
+    loadTransactions();
+}
+
+function registerTransactionFilters() {
+
+    const search =
+        document.getElementById(
+            "transactionSearch"
+        );
+
+    if (!search) return;
+
+    search.oninput = (e) => {
+
+        transactionSearchTerm =
+            e.target.value
+                .toLowerCase();
+
+        loadTransactions();
+    };
+}
+
 function loadTransactions() {
 
     const container =
@@ -390,10 +442,40 @@ function loadTransactions() {
 
     if (!container) return;
 
-    const recent =
+    let recent =
         [...appData.transactions]
-        .reverse()
-        .slice(0, 20);
+        .reverse();
+
+    if (transactionFilter !== "ALL") {
+
+        recent =
+            recent.filter(tx =>
+                (
+                    tx["Budget Type"]
+                    || tx.budgetType
+                ) === transactionFilter
+            );
+    }
+
+    if (transactionSearchTerm) {
+
+        recent =
+            recent.filter(tx => {
+
+                const searchText =
+                `
+                ${tx.Details || tx.details || ""}
+                ${tx.Account || tx.account || ""}
+                ${tx["Budget Type"] || tx.budgetType || ""}
+                `
+                .toLowerCase();
+
+                return searchText.includes(
+                    transactionSearchTerm
+                );
+
+            });
+    }
 
     if (window.innerWidth <= 768) {
 
@@ -404,11 +486,10 @@ function loadTransactions() {
 
     } else {
 
-    renderTransactionTable(
-        container,
-        recent
-    );
-
+        renderTransactionTable(
+            container,
+            recent
+        );
     }
 }
 
