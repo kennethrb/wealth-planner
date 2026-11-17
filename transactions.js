@@ -146,7 +146,7 @@ async function addTransaction() {
     
     const button = document.querySelector('button[onclick="addTransaction()"]');
     if (button) {
-        button.innerHTML = "➕ Add Transaction";
+        button.innerHTML = "➕ Record Activity";
     }
     
     await loadData();
@@ -319,7 +319,8 @@ function cancelTransactionEdit() {
     toggleTransactionFields();
     const saveButton = document.querySelector('button[onclick="addTransaction()"]');
     if (saveButton) {
-        saveButton.innerHTML = "➕ Add Transaction";
+        saveButton.innerHTML =
+            "➕ Record Activity";
     }
     const cancelButton = document.getElementById("cancelTransactionEditBtn");
     if (cancelButton) {
@@ -391,6 +392,7 @@ function editTransaction(transactionId) {
         cancelButton.style.display =
             "inline-flex";
     }
+    openTransactionModal();
 }
 
 async function deleteTransactionRecord(transactionId) {
