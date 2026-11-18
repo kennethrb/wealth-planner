@@ -72,6 +72,23 @@ function toggleTransactionFields() {
         }
 
         loadTransactionPositions();
+        
+        setTimeout(() => {
+        
+            const category =
+                document.getElementById(
+                    "txBudgetPosition"
+                );
+        
+            if (
+                category &&
+                category.options.length > 0 &&
+                !category.value
+            ) {
+                category.selectedIndex = 0;
+            }
+        
+        }, 0);
 
     } else {
 
@@ -86,6 +103,23 @@ function toggleTransactionFields() {
         }
 
         loadTransactionPositions();
+        
+        setTimeout(() => {
+        
+            const category =
+                document.getElementById(
+                    "txBudgetPosition"
+                );
+        
+            if (
+                category &&
+                category.options.length > 0 &&
+                !category.value
+            ) {
+                category.selectedIndex = 0;
+            }
+        
+        }, 0);
     }
 }
 
@@ -733,4 +767,120 @@ function closeTransactionModal() {
         .getElementById("transactionModal")
         .classList.remove("show");
     resetTransactionForm()
+}
+
+function openCategoryModal() {
+
+    const budgetType =
+        document.getElementById(
+            "txBudgetType"
+        )?.value || "Expense";
+
+    document.getElementById(
+        "modalBudgetType"
+    ).value = budgetType;
+
+    const funding =
+        document.getElementById(
+            "modalFundingSource"
+        );
+
+    if (funding) {
+        funding.innerHTML = "";
+
+        appData.accounts.forEach(account => {
+            funding.innerHTML += `
+                <option value="${account.accountId}">
+                    ${account.accountName}
+                </option>
+            `;
+        });
+    }
+
+    document
+        .getElementById("categoryModal")
+        .classList.add("show");
+}
+
+function closeCategoryModal() {
+
+    document
+        .getElementById("categoryModal")
+        .classList.remove("show");
+
+    document.getElementById(
+        "modalCategoryName"
+    ).value = "";
+    
+    document.getElementById(
+        "modalCategoryGroup"
+    ).value = "Other";
+}
+
+async function saveCategoryFromModal() {
+
+    const categoryName =
+        document.getElementById(
+            "modalCategoryName"
+        )?.value
+        ?.trim();
+
+    const budgetType =
+        document.getElementById(
+            "modalBudgetType"
+        )?.value;
+
+    const group =
+        document.getElementById(
+            "modalCategoryGroup"
+        )?.value || "Other";
+
+    const fundingSource =
+        document.getElementById(
+            "modalFundingSource"
+        )?.value;
+
+    if (!categoryName) {
+
+        showStatus(
+            "⚠ Category name required",
+            "warning"
+        );
+
+        return;
+    }
+
+    await fetch(
+        `${BASE_URL}?action=addCategory`
+        + `&mode=${appMode}`
+        + `&categoryName=${encodeURIComponent(categoryName)}`
+        + `&budgetType=${encodeURIComponent(budgetType)}`
+        + `&group=${encodeURIComponent(group)}`
+        + `&preferredFundingSource=${encodeURIComponent(fundingSource)}`
+    );
+
+    await loadData();
+
+    const previousType = budgetType;
+    
+    document.getElementById(
+        "txBudgetType"
+    ).value = previousType;
+    
+    loadTransactionPositions();
+    
+    setTimeout(() => {
+    
+        document.getElementById(
+            "txBudgetPosition"
+        ).value = categoryName;
+    
+    }, 10);
+
+    showStatus(
+        "✅ Category created",
+        "success"
+    );
+
+    closeCategoryModal();
 }
