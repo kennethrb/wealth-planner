@@ -713,6 +713,10 @@ function showMoreBills() {
 function collapseBills() {
     billDisplayCount = 5;
     loadRecurringBills();
+
+    requestAnimationFrame(() => {
+        scrollToCardStart("recurringBillsList");
+    });
 }
 
 function loadRecurringBillAccounts() {
