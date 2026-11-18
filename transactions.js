@@ -1013,3 +1013,113 @@ function editCategory(categoryId) {
         .getElementById("categoryModal")
         .classList.add("show");
 }
+
+function openCategoryManagerModal()
+{
+    renderCategoryManager();
+
+    document
+        .getElementById(
+            "categoryManagerModal"
+        )
+        .classList.add("show");
+}
+
+function closeCategoryManagerModal()
+{
+    document
+        .getElementById(
+            "categoryManagerModal"
+        )
+        .classList.remove("show");
+}
+
+function renderCategoryManager()
+{
+    const container =
+        document.getElementById(
+            "categoryManagerList"
+        );
+
+    if (!container)
+        return;
+
+    const grouped = {};
+
+    appData.categories.forEach(category =>
+    {
+        const type =
+            category.budgetType ||
+            "Other";
+
+        if (!grouped[type])
+        {
+            grouped[type] = [];
+        }
+
+        grouped[type].push(category);
+    });
+
+    let html = "";
+
+    Object.keys(grouped)
+        .sort()
+        .forEach(type =>
+    {
+        html += `
+            <div class="category-group">
+                <div class="category-group-title">
+                    ${type.toUpperCase()}
+                </div>
+        `;
+
+        grouped[type]
+            .sort((a,b)=>
+                a.categoryName.localeCompare(
+                    b.categoryName
+                )
+            )
+            .forEach(category =>
+        {
+            html += `
+                <div class="category-manager-row">
+
+                    <div class="category-name">
+                        ${category.categoryName}
+                    </div>
+
+                    <button
+                        class="btn-secondary"
+                        onclick="
+                            closeCategoryManagerModal();
+                            editCategory(
+                                '${category.categoryId}'
+                            );
+                        ">
+                        ✏️
+                    </button>
+
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+    });
+
+    html += `
+        <div class="category-manager-footer">
+
+            <button
+                onclick="
+                    closeCategoryManagerModal();
+                    openCategoryModal();
+                ">
+                ➕ New Category
+            </button>
+
+        </div>
+    `;
+
+    container.innerHTML =
+        html;
+}
