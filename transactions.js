@@ -909,18 +909,31 @@ async function saveCategoryFromModal() {
 
     await loadData();
 
-    const previousType = budgetType;
-
-    document.getElementById(
-        "txBudgetType"
-    ).value = previousType;
-
+    // Refresh BOTH consumers
     loadTransactionPositions();
+    loadRecurringBillPositions();
 
+    // Reselect newly-created category
     setTimeout(() => {
-        document.getElementById(
-            "txBudgetPosition"
-        ).value = categoryName;
+
+        const txCategory =
+            document.getElementById(
+                "txBudgetPosition"
+            );
+
+        if (txCategory) {
+            txCategory.value = categoryName;
+        }
+
+        const billCategory =
+            document.getElementById(
+                "billBudgetPosition"
+            );
+
+        if (billCategory) {
+            billCategory.value = categoryName;
+        }
+
     }, 10);
 
     showStatus(
@@ -932,18 +945,9 @@ async function saveCategoryFromModal() {
 
     editingCategoryId = null;
 
-    const title =
-        document.querySelector(
-            "#categoryModal h2"
-        );
-
-    if (title) {
-        title.textContent =
-            "🏷 Create Category";
-    }
-
     closeCategoryModal();
 }
+
 
 function editCategory(categoryId) {
 
