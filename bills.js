@@ -817,25 +817,109 @@ function loadBillExecutionQueue() {
     const unpaidBills =
         getOutstandingCycleBills();
 
-    container.innerHTML = `
-        <div class="card">
+    if (!unpaidBills.length) {
 
-            <h3>
-                📋 Bills Due This Cycle
-            </h3>
+        container.innerHTML = `
+            <div class="card payment-action-card">
+
+                <div class="payment-action-label">
+                    ✅ PAYMENT ACTIONS
+                </div>
+
+                <div class="payment-action-total">
+                    All Clear
+                </div>
+
+                <div class="payment-action-subtitle">
+                    No commitments require funding
+                </div>
+
+                <div class="advisor-action">
+                    All recurring commitments have been
+                    handled for the current cycle.
+                </div>
+
+            </div>
+        `;
+
+        return;
+    }
+
+    const totalRequired =
+        unpaidBills.reduce(
+            (sum, bill) =>
+                sum +
+                Number(
+                    bill.defaultAmount || 0
+                ),
+            0
+        );
+
+    const count =
+        unpaidBills.length;
+
+    container.innerHTML = `
+
+        <div class="card payment-action-card">
+
+            <div class="payment-action-label">
+                ⚠ PAYMENT ACTIONS
+            </div>
+
+            <div class="payment-action-total">
+                ${formatCurrency(totalRequired)}
+            </div>
+
+            <div class="payment-action-subtitle">
+                Required This Cycle
+            </div>
+
+            <div class="advisor-action">
+
+                <strong>
+                    Recommended Action
+                </strong>
+
+                Record payments for
+                ${count}
+                outstanding commitment${count > 1 ? "s" : ""}.
+
+            </div>
+
+            <div class="advisor-action">
+
+                <strong>
+                    Wealth Impact
+                </strong>
+
+                Maintaining commitments protects
+                cash flow stability and prevents
+                avoidable financial friction.
+
+            </div>
+
+            <hr>
 
             ${unpaidBills.map(bill => `
-                <label
-                    class="funding-row">
+
+                <label class="funding-row">
 
                     <input
                         type="checkbox"
                         class="bill-selector"
                         value="${bill.billId}">
 
-                    <span>
-                        ${bill.billName}
-                    </span>
+                    <div>
+
+                        <div>
+                            ${bill.billName}
+                        </div>
+
+                        <small class="text-muted">
+                            Due Day ${bill.dueDay}
+                        </small>
+
+                    </div>
 
                     <strong>
                         ${formatCurrency(
@@ -844,16 +928,18 @@ function loadBillExecutionQueue() {
                     </strong>
 
                 </label>
+
             `).join("")}
 
             <button
                 onclick="
                     generateSelectedBills()
                 ">
-                💸 Record Payment
+                💸 Record Selected Payments
             </button>
 
         </div>
+
     `;
 }
 
