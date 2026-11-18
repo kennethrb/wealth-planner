@@ -1062,9 +1062,6 @@ function injectCategoryDeleteButton(
     deleteButton.className =
         "btn-danger";
 
-    deleteButton.style.marginTop =
-        "12px";
-
     deleteButton.textContent =
         "🗑 Delete Category";
 
@@ -1085,14 +1082,8 @@ function injectCategoryDeleteButton(
             "div"
         );
     
-    actionBar.style.display =
-        "flex";
-    
-    actionBar.style.gap =
-        "8px";
-    
-    actionBar.style.marginTop =
-        "12px";
+    actionBar.className =
+        "category-modal-actions";
     
     saveButton.parentNode.insertBefore(
         actionBar,
