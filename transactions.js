@@ -1080,7 +1080,30 @@ function injectCategoryDeleteButton(
         closeCategoryManagerModal();
     };
 
-    saveButton.parentNode.appendChild(
+    const actionBar =
+        document.createElement(
+            "div"
+        );
+    
+    actionBar.style.display =
+        "flex";
+    
+    actionBar.style.gap =
+        "8px";
+    
+    actionBar.style.marginTop =
+        "12px";
+    
+    saveButton.parentNode.insertBefore(
+        actionBar,
+        saveButton
+    );
+    
+    actionBar.appendChild(
+        saveButton
+    );
+    
+    actionBar.appendChild(
         deleteButton
     );
 }
