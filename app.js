@@ -873,3 +873,23 @@ function loadCashRequirementPlan() {
                 </div>
             `).join("");
 }
+
+// ====================
+// Shared UI Helpers
+// ====================
+
+function scrollToCardStart(elementId, offset = 80) {
+    const el = document.getElementById(elementId);
+
+    if (!el) return;
+
+    const top =
+        el.getBoundingClientRect().top +
+        window.pageYOffset -
+        offset;
+
+    window.scrollTo({
+        top,
+        behavior: "smooth"
+    });
+}
