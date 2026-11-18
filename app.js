@@ -189,6 +189,48 @@ async function deleteCategory() {
     showStatus(`🗑 Category deleted`, "success");
 }
 
+async function deleteCategoryById(
+    categoryId
+) {
+
+    const confirmed =
+        await showConfirmDialog(
+            "Delete Category",
+            "Delete this category?"
+        );
+
+    if (!confirmed) return;
+
+    const response =
+        await fetch(
+            `${BASE_URL}?action=deleteCategory`
+            + `&mode=${appMode}`
+            + `&categoryId=${encodeURIComponent(categoryId)}`
+        );
+
+    const result =
+        await response.json();
+
+    if (!result.success) {
+
+        showStatus(
+            result.message,
+            "warning"
+        );
+
+        return;
+    }
+
+    await loadData();
+
+    await refreshUI();
+
+    showStatus(
+        "🗑 Category deleted",
+        "success"
+    );
+}
+
 function recalculateAccountBalances() {
 
     const balances = {};
@@ -566,6 +608,7 @@ async function refreshUI() {
     loadViewYearDropdown();
     
     loadCategoryDropdown();
+    loadCategoryManager();
 
     loadFundingSources();
     populateGoalAccounts();
@@ -786,6 +829,105 @@ function loadCategoryDropdown() {
             `;
         }
     });
+}
+
+function loadCategoryManager() {
+
+    const container =
+        document.getElementById(
+            "categoryManagerList"
+        );
+
+    if (!container) return;
+
+    container.innerHTML =
+        appData.categories
+            .sort((a, b) =>
+                a.categoryName.localeCompare(
+                    b.categoryName
+                )
+            )
+            .map(cat => {
+
+                const txCount =
+                    appData.transactions.filter(
+                        t =>
+                            t.budgetPosition ===
+                            cat.categoryName
+                    ).length;
+
+                const billCount =
+                    appData.recurringBills.filter(
+                        b =>
+                            b.budgetPosition ===
+                            cat.categoryName
+                    ).length;
+
+                const dependencyCount =
+                    txCount + billCount;
+
+                return `
+                    <div class="commitment-card">
+
+                        <div class="commitment-main-row">
+                            <div>
+                                <div class="commitment-name">
+                                    ${cat.categoryName}
+                                </div>
+
+                                <div class="commitment-due">
+                                    ${cat.budgetType}
+                                    •
+                                    ${cat.group}
+                                </div>
+                            </div>
+
+                            <div>
+                                ${
+                                    dependencyCount > 0
+                                    ? `<span style="color:#fbbf24;">
+                                           ⚠️ ${dependencyCount}
+                                       </span>`
+                                    : `<span style="color:#34d399;">
+                                           ✅ Unused
+                                       </span>`
+                                }
+                            </div>
+                        </div>
+
+                        <div
+                            style="
+                                display:flex;
+                                gap:8px;
+                                margin-top:12px;
+                            ">
+
+                            <button
+                                class="btn-secondary"
+                                onclick="
+                                    editCategory(
+                                        '${cat.categoryId}'
+                                    )
+                                ">
+                                ✏️ Edit
+                            </button>
+
+                            <button
+                                class="btn-danger"
+                                onclick="
+                                    deleteCategoryById(
+                                        '${cat.categoryId}'
+                                    )
+                                ">
+                                🗑 Delete
+                            </button>
+
+                        </div>
+
+                    </div>
+                `;
+            })
+            .join("");
 }
 
 function getCashRequirementPlan() {
