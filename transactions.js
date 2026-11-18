@@ -1036,6 +1036,8 @@ function closeCategoryManagerModal()
 
 function renderCategoryManager()
 {
+    console.log("Categories:", appData.categories);
+    console.log("Container:", document.getElementById("categoryManagerList"));
     const container =
         document.getElementById(
             "categoryManagerList"
