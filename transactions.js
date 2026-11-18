@@ -1124,14 +1124,35 @@ function renderCategoryManager()
             
             </div>
 
-                    <button
-                        class="btn-secondary"
-                        onclick="
-                            closeCategoryManagerModal();
-                            editCategory('${categoryId}');
-                        ">
-                        ✏️
-                    </button>
+            <div style="display:flex;gap:6px;">
+            
+                <button
+                    class="btn-secondary"
+                    onclick="
+                        closeCategoryManagerModal();
+                        editCategory('${categoryId}');
+                    ">
+                    ✏️
+                </button>
+            
+                ${
+                    used
+                        ? ""
+                        : `
+                        <button
+                            class="btn-danger"
+                            onclick="
+                                deleteCategoryFromManager(
+                                    '${categoryId}',
+                                    '${categoryName}'
+                                );
+                            ">
+                            🗑
+                        </button>
+                        `
+                }
+            
+            </div>
 
                 </div>
             `;
@@ -1180,5 +1201,54 @@ function isCategoryUsed(categoryName)
     return (
         usedInTransactions ||
         usedInBills
+    );
+}
+
+async function deleteCategoryFromManager(
+    categoryId,
+    categoryName
+)
+{
+    const confirmed =
+        await showConfirmDialog(
+            "Delete Category",
+            `Delete "${categoryName}"?`
+        );
+
+    if (!confirmed)
+        return;
+
+    const response =
+        await fetch(
+            `${BASE_URL}?action=deleteCategory`
+            + `&mode=${appMode}`
+            + `&categoryId=${encodeURIComponent(categoryId)}`
+        );
+
+    const result =
+        await response.json();
+
+    if (!result.success)
+    {
+        showStatus(
+            result.message ||
+            "Category cannot be deleted.",
+            "warning"
+        );
+
+        return;
+    }
+
+    await loadData();
+
+    renderCategoryManager();
+
+    loadTransactionPositions();
+
+    loadRecurringBillPositions();
+
+    showStatus(
+        "✅ Category deleted",
+        "success"
     );
 }
