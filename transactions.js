@@ -510,6 +510,10 @@ function showMoreTransactions() {
 function collapseTransactions() {
     transactionDisplayCount = 5;
     loadTransactions();
+
+    requestAnimationFrame(() => {
+        scrollToCardStart("execution");
+    });
 }
 
 function toggleTransactionMenu(
