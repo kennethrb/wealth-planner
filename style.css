@@ -1672,7 +1672,7 @@ tr.section-debt td:first-child {
     display: none;
     justify-content: center;
     align-items: center;
-    z-index: 99999;
+    z-index: 999999;
 }
 
 .confirm-modal.show {
