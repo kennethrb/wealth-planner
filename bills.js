@@ -629,12 +629,12 @@ function loadRecurringBills() {
 
         </div>
 
-        ${allBills.length > billDisplayCount
+        ${
+        allBills.length > 5
         ? `
         <div class="show-more-container">
         
             <div class="show-more-label">
-        
                 Showing
                 ${Math.min(
                     billDisplayCount,
@@ -643,20 +643,37 @@ function loadRecurringBills() {
                 of
                 ${allBills.length}
                 commitments
-        
             </div>
         
-            <button
-                class="btn-secondary"
-                onclick="showMoreBills()">
+            ${
+                billDisplayCount <
+                allBills.length
         
-                View More Commitments
+                ? `
+                <button
+                    class="btn-secondary"
+                    onclick="
+                        showMoreBills()
+                    ">
+                    View More Commitments
+                </button>
+                `
         
-            </button>
+                : `
+                <button
+                    class="btn-secondary"
+                    onclick="
+                        collapseBills()
+                    ">
+                    Collapse Commitments
+                </button>
+                `
+            }
         
         </div>
         `
-        : ""}
+        : ""
+        }
 
     `;
 }
@@ -691,6 +708,11 @@ function showMoreBills() {
 
     loadRecurringBills();
 
+}
+
+function collapseBills() {
+    billDisplayCount = 5;
+    loadRecurringBills();
 }
 
 function loadRecurringBillAccounts() {
