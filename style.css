@@ -1728,6 +1728,47 @@ tr.section-debt td:first-child {
     cursor:pointer;
 }
 
+.category-group
+{
+    margin-bottom: 20px;
+}
+
+.category-group-title
+{
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    color: var(--text-muted);
+
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.category-manager-row
+{
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 10px 0;
+
+    border-bottom:
+        1px solid var(--border);
+}
+
+.category-name
+{
+    font-weight: 600;
+}
+
+.category-manager-footer
+{
+    margin-top: 20px;
+}
+
+
 
 .confirm-card {
     width: 90%;
