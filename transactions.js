@@ -956,6 +956,25 @@ function editCategory(categoryId) {
 
     editingCategoryId = categoryId;
 
+    const funding =
+        document.getElementById(
+            "modalFundingSource"
+        );
+
+    if (funding) {
+
+        funding.innerHTML = "";
+
+        appData.accounts.forEach(account => {
+
+            funding.innerHTML += `
+                <option value="${account.accountId}">
+                    ${account.accountName}
+                </option>
+            `;
+        });
+    }
+
     document.getElementById(
         "modalCategoryName"
     ).value =
