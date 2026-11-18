@@ -487,7 +487,20 @@
                 <option value="Debt">Debt</option>
             </select>
 
-            <select id="billBudgetPosition"></select>
+            <div class="form-group">
+                <label>Category</label>
+            
+                <select id="billBudgetPosition"></select>
+            
+                <button
+                    type="button"
+                    class="btn-secondary"
+                    style="margin-top:8px;"
+                    onclick="openBillCategoryModal()">
+            
+                    ➕ Create Category
+                </button>
+            </div>
 
             <select id="billAmountType">
                 <option value="Fixed">Fixed</option>
