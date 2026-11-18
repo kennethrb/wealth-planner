@@ -1768,7 +1768,39 @@ tr.section-debt td:first-child {
     margin-top: 20px;
 }
 
+.category-action-bar
+{
+    display:flex;
+    gap:8px;
+    margin-top:8px;
+    flex-wrap:wrap;
+}
 
+.category-action-bar button
+{
+    flex:1;
+}
+
+.category-badge
+{
+    margin-top:4px;
+
+    font-size:10px;
+
+    font-weight:700;
+
+    letter-spacing:.08em;
+}
+
+.category-badge.used
+{
+    color:#60a5fa;
+}
+
+.category-badge.unused
+{
+    color:#94a3b8;
+}
 
 .confirm-card {
     width: 90%;
