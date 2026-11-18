@@ -600,6 +600,14 @@
         <div class="form-group">
           <label>Budget Position</label>
           <select id="txBudgetPosition"></select>
+        
+          <button
+              type="button"
+              class="btn-secondary"
+              style="margin-top:8px;"
+              onclick="openCategoryModal()">
+              ➕ Create Category
+          </button>
         </div>
   
         <div class="form-group"
@@ -621,6 +629,62 @@
   
     </div>
   
+  </div>
+
+  <div id="categoryModal" class="modal-overlay">
+      <div class="modal-card">
+  
+          <div class="modal-header">
+              <h2>🏷 Create Category</h2>
+  
+              <button
+                  class="modal-close"
+                  onclick="closeCategoryModal()">
+                  ✕
+              </button>
+          </div>
+  
+          <div class="form-row">
+  
+              <div class="form-group">
+                  <label>Category Name</label>
+                  <input
+                      type="text"
+                      id="modalCategoryName">
+              </div>
+  
+              <div class="form-group">
+                  <label>Budget Type</label>
+                  <select id="modalBudgetType">
+                      <option>Income</option>
+                      <option>Expense</option>
+                      <option>Savings</option>
+                      <option>Debt</option>
+                  </select>
+              </div>
+  
+              <div class="form-group">
+                  <label>Group</label>
+                  <input
+                      type="text"
+                      id="modalCategoryGroup"
+                      value="Other">
+              </div>
+  
+              <div class="form-group">
+                  <label>Funding Source</label>
+                  <select id="modalFundingSource"></select>
+              </div>
+  
+              <button
+                  type="button"
+                  onclick="saveCategoryFromModal()">
+                  Save Category
+              </button>
+  
+          </div>
+  
+      </div>
   </div>
   
   <!-- Confirmation Modal -->
