@@ -862,17 +862,27 @@ function loadBillExecutionQueue() {
 
         <div class="card payment-action-card">
 
+        <div class="payment-action-hero">
+        
             <div class="payment-action-label">
                 ⚠ PAYMENT ACTIONS
             </div>
-
+        
             <div class="payment-action-total">
                 ${formatCurrency(totalRequired)}
             </div>
-
+        
             <div class="payment-action-subtitle">
                 Required This Cycle
             </div>
+        
+            <div class="payment-action-count">
+                ${count}
+                Commitment${count > 1 ? "s" : ""}
+                Need Funding
+            </div>
+        
+        </div>
 
             <div class="advisor-action">
 
@@ -916,12 +926,36 @@ function loadBillExecutionQueue() {
                         </div>
 
                         <small class="text-muted">
-                            Due Day ${bill.dueDay}
+                        
+                        ${(() => {
+                        
+                            const dueDate =
+                                getNextDueDate(
+                                    Number(bill.dueDay)
+                                );
+                        
+                            const days =
+                                Math.ceil(
+                                    (dueDate - new Date())
+                                    /
+                                    (1000 * 60 * 60 * 24)
+                                );
+                        
+                            if (days <= 0)
+                                return "Due Today";
+                        
+                            if (days === 1)
+                                return "Due Tomorrow";
+                        
+                            return `Due in ${days} Days`;
+                        
+                        })()}
+                        
                         </small>
 
                     </div>
 
-                    <strong>
+                    <strong class="payment-bill-amount">
                         ${formatCurrency(
                             bill.defaultAmount
                         )}
