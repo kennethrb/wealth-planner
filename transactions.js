@@ -795,6 +795,8 @@ function closeTransactionModal() {
     resetTransactionForm()
 }
 
+let editingCategoryId = null;
+
 function openCategoryModal() {
 
     const budgetType =
@@ -837,10 +839,22 @@ function closeCategoryModal() {
     document.getElementById(
         "modalCategoryName"
     ).value = "";
-    
+
     document.getElementById(
         "modalCategoryGroup"
     ).value = "Other";
+
+    editingCategoryId = null;
+
+    const title =
+        document.querySelector(
+            "#categoryModal h2"
+        );
+
+    if (title) {
+        title.textContent =
+            "🏷 Create Category";
+    }
 }
 
 async function saveCategoryFromModal() {
@@ -848,8 +862,7 @@ async function saveCategoryFromModal() {
     const categoryName =
         document.getElementById(
             "modalCategoryName"
-        )?.value
-        ?.trim();
+        )?.value?.trim();
 
     const budgetType =
         document.getElementById(
@@ -867,46 +880,113 @@ async function saveCategoryFromModal() {
         )?.value;
 
     if (!categoryName) {
-
         showStatus(
             "⚠ Category name required",
             "warning"
         );
-
         return;
     }
 
-    await fetch(
-        `${BASE_URL}?action=addCategory`
+    const action =
+        editingCategoryId
+            ? "updateCategory"
+            : "addCategory";
+
+    let url =
+        `${BASE_URL}?action=${action}`
         + `&mode=${appMode}`
         + `&categoryName=${encodeURIComponent(categoryName)}`
         + `&budgetType=${encodeURIComponent(budgetType)}`
         + `&group=${encodeURIComponent(group)}`
-        + `&preferredFundingSource=${encodeURIComponent(fundingSource)}`
-    );
+        + `&preferredFundingSource=${encodeURIComponent(fundingSource)}`;
+
+    if (editingCategoryId) {
+        url +=
+            `&categoryId=${encodeURIComponent(editingCategoryId)}`;
+    }
+
+    await fetch(url);
 
     await loadData();
 
     const previousType = budgetType;
-    
+
     document.getElementById(
         "txBudgetType"
     ).value = previousType;
-    
+
     loadTransactionPositions();
-    
+
     setTimeout(() => {
-    
         document.getElementById(
             "txBudgetPosition"
         ).value = categoryName;
-    
     }, 10);
 
     showStatus(
-        "✅ Category created",
+        editingCategoryId
+            ? "✅ Category updated"
+            : "✅ Category created",
         "success"
     );
 
+    editingCategoryId = null;
+
+    const title =
+        document.querySelector(
+            "#categoryModal h2"
+        );
+
+    if (title) {
+        title.textContent =
+            "🏷 Create Category";
+    }
+
     closeCategoryModal();
+}
+
+function editCategory(categoryId) {
+
+    const category =
+        appData.categories.find(
+            c => c.categoryId === categoryId
+        );
+
+    if (!category) return;
+
+    editingCategoryId = categoryId;
+
+    document.getElementById(
+        "modalCategoryName"
+    ).value =
+        category.categoryName || "";
+
+    document.getElementById(
+        "modalBudgetType"
+    ).value =
+        category.budgetType || "Expense";
+
+    document.getElementById(
+        "modalCategoryGroup"
+    ).value =
+        category.group || "Other";
+
+    document.getElementById(
+        "modalFundingSource"
+    ).value =
+        category.preferredFundingSourceId || "";
+
+    document.querySelector(
+        "#categoryModal h2"
+    ).textContent =
+        "✏️ Edit Category";
+
+    document.querySelector(
+        "#categoryModal button[type='button']"
+    ).textContent =
+        "Save Changes";
+
+    document
+        .getElementById("categoryModal")
+        .classList.add("show");
 }
