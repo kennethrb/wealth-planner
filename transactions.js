@@ -507,6 +507,11 @@ function showMoreTransactions() {
 
 }
 
+function collapseTransactions() {
+    transactionDisplayCount = 5;
+    loadTransactions();
+}
+
 function toggleTransactionMenu(
     transactionId
 ) {
@@ -598,25 +603,42 @@ function loadTransactions() {
             </div>
         `;
     
-        if (
-            transactionDisplayCount <
-            recent.length
-        ) {
+    if (recent.length > 5) {
     
-            container.innerHTML += `
-                <div class="show-more-container">
+        container.innerHTML += `
+            <div class="show-more-container">
     
-                    <button
-                        class="btn-secondary"
-                        onclick="showMoreTransactions()">
-    
-                        Show More
-    
-                    </button>
-    
+                <div class="show-more-label">
+                    Showing
+                    ${Math.min(
+                        transactionDisplayCount,
+                        recent.length
+                    )}
+                    of
+                    ${recent.length}
+                    activities
                 </div>
-            `;
-        }
+    
+                ${transactionDisplayCount < recent.length
+                    ? `
+                        <button
+                            class="btn-secondary"
+                            onclick="showMoreTransactions()">
+                            View More Activities
+                        </button>
+                      `
+                    : `
+                        <button
+                            class="btn-secondary"
+                            onclick="collapseTransactions()">
+                            Collapse Activities
+                        </button>
+                      `
+                }
+    
+            </div>
+        `;
+    }
     
     }
     else {
