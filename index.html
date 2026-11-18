@@ -474,14 +474,22 @@
             
                 <select id="billBudgetPosition"></select>
             
+            <div style="display:flex;gap:8px;margin-top:8px;">
                 <button
                     type="button"
                     class="btn-secondary"
-                    style="margin-top:8px;"
                     onclick="openBillCategoryModal()">
-            
                     ➕ Create Category
                 </button>
+            
+                <button
+                    type="button"
+                    class="btn-secondary"
+                    onclick="openCategoryManagerModal()">
+                    ⚙ Manage
+                </button>
+            </div>
+
             </div>
 
             <select id="billAmountType">
@@ -596,13 +604,21 @@
           <label>Budget Position</label>
           <select id="txBudgetPosition"></select>
         
-          <button
-              type="button"
-              class="btn-secondary"
-              style="margin-top:8px;"
-              onclick="openCategoryModal()">
-              ➕ Create Category
-          </button>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+            <button
+                type="button"
+                class="btn-secondary"
+                onclick="openCategoryModal()">
+                ➕ Create Category
+            </button>
+        
+            <button
+                type="button"
+                class="btn-secondary"
+                onclick="openCategoryManagerModal()">
+                ⚙ Manage
+            </button>
+        </div>
         </div>
   
         <div class="form-group"
@@ -681,6 +697,28 @@
   
       </div>
   </div>
+
+  <div id="categoryManagerModal" class="modal-overlay">
+
+    <div class="modal-card">
+
+        <div class="modal-header">
+
+            <h2>🏷 Manage Categories</h2>
+
+            <button
+                class="modal-close"
+                onclick="closeCategoryManagerModal()">
+                ✕
+            </button>
+
+        </div>
+
+        <div id="categoryManagerList"></div>
+
+    </div>
+
+</div>
   
   <!-- Confirmation Modal -->
   <div id="confirmModal" class="confirm-modal">
