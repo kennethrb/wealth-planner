@@ -844,6 +844,16 @@ function closeCategoryModal() {
         "modalCategoryGroup"
     ).value = "Other";
 
+    const deleteButton =
+        document.getElementById(
+            "deleteCategoryButton"
+        );
+    
+    if (deleteButton)
+    {
+        deleteButton.remove();
+    }
+
     editingCategoryId = null;
 
     const title =
@@ -1009,9 +1019,70 @@ function editCategory(categoryId) {
     ).textContent =
         "Save Changes";
 
+    injectCategoryDeleteButton(category);
+
     document
         .getElementById("categoryModal")
         .classList.add("show");
+}
+
+function injectCategoryDeleteButton(
+    category
+)
+{
+    let existing =
+        document.getElementById(
+            "deleteCategoryButton"
+        );
+
+    if (existing)
+    {
+        existing.remove();
+    }
+
+    const saveButton =
+        document.querySelector(
+            "#categoryModal button[type='button']"
+        );
+
+    if (!saveButton)
+        return;
+
+    const deleteButton =
+        document.createElement(
+            "button"
+        );
+
+    deleteButton.id =
+        "deleteCategoryButton";
+
+    deleteButton.type =
+        "button";
+
+    deleteButton.className =
+        "btn-danger";
+
+    deleteButton.style.marginTop =
+        "12px";
+
+    deleteButton.textContent =
+        "🗑 Delete Category";
+
+    deleteButton.onclick =
+        async () =>
+    {
+        await deleteCategoryFromManager(
+            category.categoryId,
+            category.categoryName
+        );
+
+        closeCategoryModal();
+        closeCategoryManagerModal();
+    };
+
+    saveButton.parentNode.appendChild(
+        deleteButton
+    );
 }
 
 function openCategoryManagerModal()
@@ -1124,35 +1195,14 @@ function renderCategoryManager()
             
             </div>
 
-            <div style="display:flex;gap:6px;">
-            
-                <button
-                    class="btn-secondary"
-                    onclick="
-                        closeCategoryManagerModal();
-                        editCategory('${categoryId}');
-                    ">
-                    ✏️
-                </button>
-            
-                ${
-                    used
-                        ? ""
-                        : `
-                        <button
-                            class="btn-danger"
-                            onclick="
-                                deleteCategoryFromManager(
-                                    '${categoryId}',
-                                    '${categoryName}'
-                                );
-                            ">
-                            🗑
-                        </button>
-                        `
-                }
-            
-            </div>
+            <button
+                class="btn-secondary"
+                onclick="
+                    closeCategoryManagerModal();
+                    editCategory('${categoryId}');
+                ">
+                ✏️
+            </button>
 
                 </div>
             `;
