@@ -878,7 +878,7 @@ function loadCashRequirementPlan() {
 // Shared UI Helpers
 // ====================
 
-function scrollToCardStart(elementId, offset = 80) {
+function scrollToCardStart(elementId, offset = 100) {
     const el = document.getElementById(elementId);
 
     if (!el) return;
