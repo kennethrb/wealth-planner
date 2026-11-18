@@ -1148,7 +1148,7 @@ function renderCategoryManager()
                     closeCategoryManagerModal();
                     openCategoryModal();
                 ">
-                ➕ New Category
+                ➕ Create Category
             </button>
 
         </div>
