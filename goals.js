@@ -10,6 +10,10 @@ function showMoreGoals() {
 function collapseGoals() {
     goalDisplayCount = 5;
     loadGoals();
+
+    requestAnimationFrame(() => {
+        scrollToCardStart("financialGoals");
+    });
 }
 
 function toggleGoalMenu(goalId) {
