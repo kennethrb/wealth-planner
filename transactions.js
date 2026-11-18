@@ -1100,13 +1100,29 @@ function renderCategoryManager()
                 category.categoryName ||
                 category["Category Name"] ||
                 "Unnamed Category";
+            
+            const used =
+                isCategoryUsed(
+                    categoryName
+                );
 
             html += `
                 <div class="category-manager-row">
 
-                    <div class="category-name">
-                        ${categoryName}
-                    </div>
+            <div>
+            
+                <div class="category-name">
+                    ${categoryName}
+                </div>
+            
+                <div class="
+                    category-badge
+                    ${used ? 'used' : 'unused'}
+                ">
+                    ${used ? 'USED' : 'UNUSED'}
+                </div>
+            
+            </div>
 
                     <button
                         class="btn-secondary"
@@ -1139,4 +1155,30 @@ function renderCategoryManager()
     `;
 
     container.innerHTML = html;
+}
+
+function isCategoryUsed(categoryName)
+{
+    const usedInTransactions =
+        appData.transactions.some(
+            tx =>
+                (
+                    tx["Budget Position"] ||
+                    tx.budgetPosition
+                ) === categoryName
+        );
+
+    const usedInBills =
+        appData.recurringBills.some(
+            bill =>
+                (
+                    bill["Budget Position"] ||
+                    bill.budgetPosition
+                ) === categoryName
+        );
+
+    return (
+        usedInTransactions ||
+        usedInBills
+    );
 }
