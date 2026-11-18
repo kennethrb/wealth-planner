@@ -1044,12 +1044,24 @@ function renderCategoryManager()
     if (!container)
         return;
 
+    const categories =
+        appData.categories || [];
+
+    if (!categories.length)
+    {
+        container.innerHTML =
+            "<p>No categories found.</p>";
+
+        return;
+    }
+
     const grouped = {};
 
-    appData.categories.forEach(category =>
+    categories.forEach(category =>
     {
         const type =
             category.budgetType ||
+            category["Budget Type"] ||
             "Other";
 
         if (!grouped[type])
@@ -1068,33 +1080,37 @@ function renderCategoryManager()
     {
         html += `
             <div class="category-group">
+
                 <div class="category-group-title">
-                    ${type.toUpperCase()}
+                    ${type}
                 </div>
         `;
 
         grouped[type]
-            .sort((a,b)=>
-                a.categoryName.localeCompare(
-                    b.categoryName
-                )
-            )
             .forEach(category =>
         {
+            const categoryId =
+                category.categoryId ||
+                category["Category ID"] ||
+                "";
+
+            const categoryName =
+                category.categoryName ||
+                category["Category Name"] ||
+                "Unnamed Category";
+
             html += `
                 <div class="category-manager-row">
 
                     <div class="category-name">
-                        ${category.categoryName}
+                        ${categoryName}
                     </div>
 
                     <button
                         class="btn-secondary"
                         onclick="
                             closeCategoryManagerModal();
-                            editCategory(
-                                '${category.categoryId}'
-                            );
+                            editCategory('${categoryId}');
                         ">
                         ✏️
                     </button>
@@ -1120,6 +1136,5 @@ function renderCategoryManager()
         </div>
     `;
 
-    container.innerHTML =
-        html;
+    container.innerHTML = html;
 }
