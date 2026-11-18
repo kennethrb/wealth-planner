@@ -893,3 +893,101 @@ async function generateSelectedBills() {
         "success"
     );
 }
+
+function openBillCategoryModal() {
+
+    const billType =
+        document.getElementById(
+            "billBudgetType"
+        )?.value || "Expense";
+
+    document.getElementById(
+        "modalBudgetType"
+    ).value = billType;
+
+    const funding =
+        document.getElementById(
+            "modalFundingSource"
+        );
+
+    if (funding) {
+
+        funding.innerHTML = "";
+
+        appData.accounts.forEach(account => {
+
+            funding.innerHTML += `
+                <option value="${account.accountId}">
+                    ${account.accountName}
+                </option>
+            `;
+        });
+    }
+
+    document
+        .getElementById("categoryModal")
+        .classList.add("show");
+}
+
+async function saveCategoryFromBillModal() {
+
+    const categoryName =
+        document.getElementById(
+            "modalCategoryName"
+        )?.value?.trim();
+
+    const budgetType =
+        document.getElementById(
+            "modalBudgetType"
+        )?.value;
+
+    const group =
+        document.getElementById(
+            "modalCategoryGroup"
+        )?.value || "Other";
+
+    const fundingSource =
+        document.getElementById(
+            "modalFundingSource"
+        )?.value;
+
+    if (!categoryName) {
+        showStatus(
+            "⚠ Category name required",
+            "warning"
+        );
+        return;
+    }
+
+    await fetch(
+        `${BASE_URL}?action=addCategory`
+        + `&mode=${appMode}`
+        + `&categoryName=${encodeURIComponent(categoryName)}`
+        + `&budgetType=${encodeURIComponent(budgetType)}`
+        + `&group=${encodeURIComponent(group)}`
+        + `&preferredFundingSource=${encodeURIComponent(fundingSource)}`
+    );
+
+    await loadData();
+
+    document.getElementById(
+        "billBudgetType"
+    ).value = budgetType;
+
+    loadRecurringBillPositions();
+
+    setTimeout(() => {
+
+        document.getElementById(
+            "billBudgetPosition"
+        ).value = categoryName;
+
+    }, 10);
+
+    showStatus(
+        "✅ Category created",
+        "success"
+    );
+
+    closeCategoryModal();
+}
