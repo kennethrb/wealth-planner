@@ -359,6 +359,37 @@ html {
     border-color: rgba(16,185,129,.35);
 }
 
+/* ==========================
+   PAYMENT ACTIONS
+========================== */
+
+.payment-action-card {
+    border-left: 4px solid var(--wp-attention);
+}
+
+.payment-action-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.payment-action-total {
+    font-size: 2.4rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--wp-attention);
+    margin-top: 8px;
+}
+
+.payment-action-subtitle {
+    color: var(--text-muted);
+    margin-top: 6px;
+    margin-bottom: 12px;
+}
+
+
 .impact-label {
     font-size: .8rem;
     text-transform: uppercase;
