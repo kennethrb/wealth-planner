@@ -7,6 +7,11 @@ function showMoreGoals() {
     loadGoals();
 }
 
+function collapseGoals() {
+    goalDisplayCount = 5;
+    loadGoals();
+}
+
 function toggleGoalMenu(goalId) {
 
     const targetMenu =
@@ -417,44 +422,49 @@ function loadGoals() {
         </div>
 
         ${
-            allGoals.length >
-            goalDisplayCount
+        allGoals.length > 5
+        ? `
+        <div class="show-more-container">
+        
+            <div class="show-more-label">
+                Showing
+                ${Math.min(
+                    goalDisplayCount,
+                    allGoals.length
+                )}
+                of
+                ${allGoals.length}
+                goals
+            </div>
+        
+            ${
+                goalDisplayCount <
+                allGoals.length
+        
                 ? `
-                <div
-                    class="
-                        show-more-container
-                    "
-                >
-
-                    <div
-                        class="
-                            show-more-label
-                        "
-                    >
-                        Showing
-                        ${Math.min(
-                            goalDisplayCount,
-                            allGoals.length
-                        )}
-                        of
-                        ${allGoals.length}
-                        goals
-                    </div>
-
-                    <button
-                        class="
-                            btn-secondary
-                        "
-                        onclick="
-                            showMoreGoals()
-                        "
-                    >
-                        View More Goals
-                    </button>
-
-                </div>
+                <button
+                    class="btn-secondary"
+                    onclick="
+                        showMoreGoals()
+                    ">
+                    View More Goals
+                </button>
                 `
-                : ""
+        
+                : `
+                <button
+                    class="btn-secondary"
+                    onclick="
+                        collapseGoals()
+                    ">
+                    Collapse Goals
+                </button>
+                `
+            }
+        
+        </div>
+        `
+        : ""
         }
 
     `;
