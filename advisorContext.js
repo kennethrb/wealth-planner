@@ -51,12 +51,12 @@ function getAdvisorContext() {
     const completableGoals =
         activeGoals.filter(goal => {
 
-            const remaining =
-                Math.max(
-                    0,
-                    Number(goal.target || 0) -
-                    Number(goal.current || 0)
-                );
+        const remaining =
+            Math.max(
+                0,
+                Number(goal.target || 0) -
+                getGoalCurrent(goal)
+            );
 
             return remaining <= cashFlow.opportunity;
         });
@@ -88,9 +88,11 @@ function getAdvisorContext() {
         },
 
         obligations: {
-            protectedBills: protection.protectedObligations,
-            requiredProtection: protection.requiredProtection,
-            protectionGap: protection.protectionGap
+            requiredProtection:
+                protection.requiredProtection,
+        
+            protectionGap:
+                protection.protectionGap
         },
 
         goals: {
