@@ -854,6 +854,29 @@ function closeCategoryModal() {
         deleteButton.remove();
     }
 
+    const actionBar =
+        document.querySelector(
+            ".category-modal-actions"
+        );
+    
+    if (actionBar)
+    {
+        const saveButton =
+            actionBar.querySelector(
+                "button:not(#deleteCategoryButton)"
+            );
+    
+        if (saveButton)
+        {
+            actionBar.parentNode.insertBefore(
+                saveButton,
+                actionBar
+            );
+        }
+    
+        actionBar.remove();
+    }
+
     editingCategoryId = null;
 
     const title =
@@ -1026,19 +1049,21 @@ function editCategory(categoryId) {
         .classList.add("show");
 }
 
-function injectCategoryDeleteButton(
-    category
-)
-{
-    let existing =
+function injectCategoryDeleteButton(category){
+    let existingDelete =
         document.getElementById(
             "deleteCategoryButton"
         );
 
-    if (existing)
+    if (existingDelete)
     {
-        existing.remove();
+        existingDelete.remove();
     }
+
+    let actionBar =
+        document.querySelector(
+            ".category-modal-actions"
+        );
 
     const saveButton =
         document.querySelector(
@@ -1047,6 +1072,26 @@ function injectCategoryDeleteButton(
 
     if (!saveButton)
         return;
+
+    if (!actionBar)
+    {
+        actionBar =
+            document.createElement(
+                "div"
+            );
+
+        actionBar.className =
+            "category-modal-actions";
+
+        saveButton.parentNode.insertBefore(
+            actionBar,
+            saveButton
+        );
+
+        actionBar.appendChild(
+            saveButton
+        );
+    }
 
     const deleteButton =
         document.createElement(
@@ -1077,23 +1122,6 @@ function injectCategoryDeleteButton(
         closeCategoryManagerModal();
     };
 
-    const actionBar =
-        document.createElement(
-            "div"
-        );
-    
-    actionBar.className =
-        "category-modal-actions";
-    
-    saveButton.parentNode.insertBefore(
-        actionBar,
-        saveButton
-    );
-    
-    actionBar.appendChild(
-        saveButton
-    );
-    
     actionBar.appendChild(
         deleteButton
     );
