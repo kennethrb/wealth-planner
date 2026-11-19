@@ -44,6 +44,21 @@ function getAdvisorContext() {
             return remaining <= cashFlow.opportunity;
         });
 
+
+    console.log(
+        "AdvisorContext Protection",
+        {
+            requiredProtection:
+                protection.requiredProtection,
+    
+            protectionGap:
+                protection.protectionGap,
+    
+            totalCash:
+                protection.totalCash
+        }
+    );
+
     return {
 
         generatedAt:
