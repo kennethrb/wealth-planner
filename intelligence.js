@@ -518,31 +518,6 @@ function loadReleasedCapitalCard() {
                 ${data.destination}
             </strong>
         </div>
-
-        <div class="advisor-action success">
-            <div class="action-title">
-                📈 WEALTH IMPACT
-            </div>
-        
-            <p>
-                Released capital can now be redirected toward
-                higher-priority goals, investments, debt reduction,
-                or wealth-building opportunities.
-        
-                Potential long-term redeployment value:
-                <strong>${formatCurrency(data.tenYearImpact)}</strong>.
-            </p>
-        </div>
-        
-        <div class="advisor-action warning">
-            <div class="action-title">
-                ⚠️ RISK
-            </div>
-    
-            <p>
-                Lifestyle inflation may consume released capital.
-            </p>
-        </div>
     
     </div>
     `;
@@ -1088,36 +1063,50 @@ function getConfidenceReason(score) {
 }
 
 function getAdvisorState() {
-    const goal = window.qaGoalFundingOptimizer;
-    const cashFlow = window.qaCashFlow;
-    if (cashFlow && cashFlow.coverage < CONFIG.cashFlowDomain.cashFlow.minimumCoverage) {
-        return {
-            state: "PROTECTION MODE",
-            objective: "Protect Liquidity"
-        };
-    }
-    if (goal && goal.completable) {
-        return {
-            state: "ACCELERATION MODE",
-            objective: "Complete Important Goals"
-        };
+
+    const wealthState =
+        getWealthState();
+
+    switch (wealthState) {
+
+        case AdvisorStates.PROTECTION_GAP:
+            return {
+                state: "PROTECTION MODE",
+                objective: "Protect Liquidity"
+            };
+
+        case AdvisorStates.CASH_CONSTRAINED:
+            return {
+                state: "PROTECTION MODE",
+                objective: "Increase Cash Buffer"
+            };
+
+        case AdvisorStates.GOAL_ACCELERATION:
+            return {
+                state: "ACCELERATION MODE",
+                objective: "Accelerate Goal Completion"
+            };
+
+        case AdvisorStates.CAPITAL_DEPLOYMENT:
+            return {
+                state: "OPTIMIZATION MODE",
+                objective: "Deploy Available Capital"
+            };
+
+        case AdvisorStates.OPPORTUNITY_RICH:
+            return {
+                state: "OPTIMIZATION MODE",
+                objective: "Capture Wealth Opportunities"
+            };
+
+        default:
+            return {
+                state: "STABLE MODE",
+                objective: "Maintain Wealth Position"
+            };
+
     }
 
-    const emergency =
-        getEmergencyFundGap();
-    
-    if (!emergency.fullyFunded) {
-    
-        return {
-            state: "PROTECTION MODE",
-            objective: "Strengthen Emergency Fund"
-        };
-    
-    }
-    return {
-        state: "OPTIMIZATION MODE",
-        objective: "Deploy Capital Efficiently"
-    };
 }
 
 function getMonthlyWealthBrief() {
@@ -1774,17 +1763,34 @@ function loadPaydayPlan() {
                 <hr>
 
                 <div class="advisor-action priority">
-
                     <div class="action-title">
-                        🎯 Recommended Action
+                        PRIMARY DECISION
                     </div>
-
+                
                     <p>
-                        Maintain liquidity until the next payday.
-                        Avoid discretionary spending and preserve
-                        cash for upcoming obligations.
+                        Preserve liquidity until the next payday.
                     </p>
-
+                </div>
+                
+                <div class="advisor-action">
+                    <div class="action-title">
+                        📌 WHY NOW
+                    </div>
+                
+                    <p>
+                        Available cash is currently committed to upcoming obligations
+                        and protection requirements.
+                    </p>
+                </div>
+                
+                <div class="advisor-action warning">
+                    <div class="action-title">
+                        ⚠️ RISK
+                    </div>
+                
+                    <p>
+                        Discretionary spending may reduce required protection coverage.
+                    </p>
                 </div>
 
                 <div class="metric-row">
@@ -2138,15 +2144,33 @@ function loadSafeToSpendCard() {
 
                 <div class="advisor-action priority">
 
-                    <div class="action-title">
-                        🎯 Recommended Action
-                    </div>
+                <div class="action-title">
+                    PRIMARY DECISION
+                </div>
 
+                <p>
+                    Preserve liquidity until obligations are fully protected.
+                </p>
+
+                <div class="advisor-action">
+                    <div class="action-title">
+                        📌 WHY NOW
+                    </div>
+                
                     <p>
-                        Preserve liquidity until
-                        obligations are fully protected.
-                        Avoid discretionary spending.
+                        Current protection requirements exceed available deployable cash.
                     </p>
+                </div>
+                
+                <div class="advisor-action warning">
+                    <div class="action-title">
+                        ⚠️ RISK
+                    </div>
+                
+                    <p>
+                        Premature spending may increase short-term liquidity pressure.
+                    </p>
+                </div>
 
                 </div>
 
@@ -2250,190 +2274,357 @@ function calculatePersonalInflation() {
 }
 
 async function loadBufferVsInvest() {
-    const selectedYear = getViewYear();
-    const selectedMonth = getViewMonth();
 
-    const capital = getCapitalPosition();
-    const availableCash = capital.availableCash;
-    const monthlyObligations = capital.monthlyObligations;
-    const bufferTarget = capital.bufferTarget;
-    const excessCash = capital.excessCash;
+    const container =
+        document.getElementById(
+            "bufferVsInvest"
+        );
 
-    // Expose QA Metrics
+    if (!container) return;
+
+    const capital =
+        getCapitalPosition();
+
+    const availableCash =
+        capital.availableCash;
+
+    const monthlyObligations =
+        capital.monthlyObligations;
+
+    const bufferTarget =
+        capital.bufferTarget;
+
+    const excessCash =
+        capital.excessCash;
+
+    const evidence = [];
+
+    if (excessCash <= 0) {
+
+        evidence.push({
+            type: "BUFFER_PRIORITY",
+            confidence: 98,
+            severity: "HIGH",
+            message:
+                "Protection reserves remain below target."
+        });
+
+    } else {
+
+        evidence.push({
+            type: "DEPLOYMENT_CAPACITY",
+            confidence: 95,
+            severity: "LOW",
+            message:
+                "Capital available for future deployment."
+        });
+
+    }
+
     window.qaBuffer = {
         availableCash,
         monthlyObligations,
         bufferTarget,
-        excessCash
+        excessCash,
+        evidence
     };
 
     logQATrace(
-    "DI-002",
-    "loadBufferVsInvest",
-    {
-        selectedYear,
-        selectedMonth,
-        availableCash,
-        monthlyObligations
-    },
-    {
-        bufferTarget,
-        excessCash
-    },
-    !isNaN(excessCash)
-);
+        "DI-003",
+        "loadBufferVsInvest",
+        {
+            availableCash,
+            monthlyObligations
+        },
+        {
+            bufferTarget,
+            excessCash
+        },
+        true
+    );
 
+    const primaryDecision =
+        excessCash <= 0
+            ? "Protection reserves require additional funding."
+            : "Protected liquidity requirements have been satisfied.";
 
-    let recommendationHtml = "";
+    const confidence =
+        evidence[0].confidence;
 
-    if (excessCash <= 0) {
-        recommendationHtml = `
-            <div class="metric-row">
-                <span>Status</span>
-                <strong>⚠️ Build Emergency Buffer</strong>
-            </div>
-            <div class="metric-row">
-                <span>Shortfall</span>
-                <strong>${formatCurrency(Math.abs(excessCash))}</strong>
-            </div>
-        `;
-    } else {
-        const investAmount =
-            excessCash *
-            CONFIG.cashFlowDomain.bufferVsInvest.invest;
-        
-        const debtAmount =
-            excessCash *
-            CONFIG.cashFlowDomain.bufferVsInvest.debt;
+    const whyNow =
+        evidence[0].message;
 
+    const wealthImpact =
+        Math.abs(excessCash);
 
-        recommendationHtml = `
-            <div class="metric-row">
-                <span>Status</span>
-                <strong>✅ Excess Cash Available</strong>
-            </div>
-            <div class="metric-row">
-                <span>Invest</span>
-                <strong>${formatCurrency(investAmount)}</strong>
-            </div>
-            <div class="metric-row">
-                <span>Debt Reduction</span>
-                <strong>${formatCurrency(debtAmount)}</strong>
-            </div>
-        `;
-    }
+    const risk =
+        excessCash <= 0
+            ? "Insufficient protection may increase future cash flow stress."
+            : "Idle capital may reduce wealth growth potential.";
 
-    const container = document.getElementById("bufferVsInvest");
-    if (!container) return;
+    const alternatives =
+        excessCash <= 0
+            ? [
+                "Increase liquidity",
+                "Reduce obligations",
+                "Build reserves"
+              ]
+            : [
+                "Monitor opportunities",
+                "Preserve liquidity",
+                "Wait for advisor recommendation"
+              ];
 
     container.innerHTML = `
         <div class="card">
-            <h2>🧠 Buffer vs Invest</h2>
-            <div class="metric-row">
-                <span>Available Cash</span>
-                <strong>${formatCurrency(availableCash)}</strong>
+
+            <h2>
+                🛡️ Protection Capacity Evidence
+            </h2>
+
+            <div class="advisor-action priority">
+                <div class="action-title">
+                    PRIMARY DECISION
+                </div>
+                <p>${primaryDecision}</p>
             </div>
-            <div class="metric-row">
-                <span>Monthly Obligations</span>
-                <strong>${formatCurrency(monthlyObligations)}</strong>
+
+            <div class="advisor-action">
+                <div class="action-title">
+                    🎯 CONFIDENCE
+                </div>
+                <p>${confidence}%</p>
             </div>
-            <div class="metric-row">
-                <span>Buffer Target (${CONFIG.protection.buffer.months}x)</span>
-                <strong>${formatCurrency(bufferTarget)}</strong>
+
+            <div class="advisor-action">
+                <div class="action-title">
+                    📌 WHY NOW
+                </div>
+                <p>${whyNow}</p>
             </div>
-            <div class="metric-row">
-                <span>Excess Cash</span>
-                <strong>${formatCurrency(excessCash)}</strong>
+
+            <div class="advisor-action success">
+                <div class="action-title">
+                    📈 WEALTH IMPACT
+                </div>
+                <p>
+                    ${formatCurrency(wealthImpact)}
+                    influences current protection capacity.
+                </p>
             </div>
-            <hr>
-            ${recommendationHtml}
+
+            <div class="advisor-action warning">
+                <div class="action-title">
+                    ⚠️ RISK
+                </div>
+                <p>${risk}</p>
+            </div>
+
+            <div class="advisor-action">
+                <div class="action-title">
+                    🔄 ALTERNATIVES
+                </div>
+                <p>
+                    ${alternatives.join("<br>")}
+                </p>
+            </div>
+
         </div>
     `;
 }
 
 async function loadNetWorthVelocity() {
-    const container = document.getElementById("netWorthVelocity");
+
+    const container =
+        document.getElementById(
+            "netWorthVelocity"
+        );
+
     if (!container) return;
 
     let assets = 0;
     let liabilities = 0;
 
     appData.accounts.forEach(account => {
-        const balance = Number(account.currentBalance || account.balance || 0);
-        if (account.netWorthType === "Asset") assets += balance;
-        if (account.netWorthType === "Liability") liabilities += balance;
+
+        const balance =
+            Number(
+                account.currentBalance ||
+                account.balance ||
+                0
+            );
+
+        if (
+            account.netWorthType ===
+            "Asset"
+        ) {
+            assets += balance;
+        }
+
+        if (
+            account.netWorthType ===
+            "Liability"
+        ) {
+            liabilities += balance;
+        }
+
     });
 
-    const netWorth = assets - liabilities;
-    const selectedYear = getViewYear();
-    const selectedMonth = getViewMonth();
+    const netWorth =
+        assets - liabilities;
 
-    const categoryTypes = {};
-    appData.categories.forEach(cat => {
-        categoryTypes[cat.categoryName] = cat.budgetType;
-    });
+    const flow =
+        getWealthFlowSummary();
 
-    const flow = getWealthFlowSummary();
-    const income = flow.income;
-    const expense = flow.expense;
-    const debt = flow.debt;
-    const savings = flow.goalFunding;
-    const monthlyVelocity = savings + debt;
-    const annualVelocity = monthlyVelocity * 12;
-    const projectedNetWorth = netWorth + annualVelocity;
+    const monthlyVelocity =
+        flow.goalFunding +
+        flow.debt;
 
-    // Expose QA Metrics[cite: 6]
+    const annualVelocity =
+        monthlyVelocity * 12;
+
+    const projectedNetWorth =
+        netWorth +
+        annualVelocity;
+
+    const evidence = [];
+
+    if (
+        monthlyVelocity > 0
+    ) {
+
+        evidence.push({
+            type: "WEALTH_GROWING",
+            severity: "LOW",
+            confidence: 95,
+            message:
+                "Current behavior contributes positively to wealth growth."
+        });
+
+    } else {
+
+        evidence.push({
+            type: "GROWTH_STALLED",
+            severity: "HIGH",
+            confidence: 95,
+            message:
+                "Limited wealth contribution detected."
+        });
+
+    }
+
     window.qaVelocity = {
+
         netWorth,
         monthlyVelocity,
         annualVelocity,
-        projectedNetWorth
+        projectedNetWorth,
+        evidence
+
     };
 
     logQATrace(
-    "DI-004",
-    "loadNetWorthVelocity",
-    {
-        assets,
-        liabilities,
-        income,
-        expense,
-        savings,
-        debt
-    },
-    {
-        netWorth,
-        monthlyVelocity,
-        annualVelocity,
-        projectedNetWorth
-    },
-    !isNaN(projectedNetWorth)
-);
-
+        "DI-004",
+        "loadNetWorthVelocity",
+        {
+            assets,
+            liabilities
+        },
+        {
+            netWorth,
+            annualVelocity,
+            projectedNetWorth
+        },
+        true
+    );
 
     container.innerHTML = `
+
         <div class="card">
-            <h2>📈 Wealth Contribution</h2>
-    
-            <div class="metric-row">
-                <span>Current Net Worth</span>
-                <strong>${formatCurrency(netWorth)}</strong>
+
+            <h2>
+                📈 Wealth Growth Evidence
+            </h2>
+
+            <div class="advisor-action priority">
+
+                <div class="action-title">
+                    PRIMARY DECISION
+                </div>
+
+                <p>
+                    ${
+                        monthlyVelocity > 0
+                        ? "Current wealth trajectory is improving."
+                        : "Wealth growth requires attention."
+                    }
+                </p>
+
             </div>
-    
-            <div class="metric-row">
-                <span>Monthly Wealth Contribution</span>
-                <strong>${formatCurrency(monthlyVelocity)}</strong>
+
+            <div class="advisor-action">
+
+                <div class="action-title">
+                    🎯 CONFIDENCE
+                </div>
+
+                <p>
+                    ${evidence[0].confidence}%
+                </p>
+
             </div>
-    
-            <div class="metric-row">
-                <span>Annual Wealth Contribution</span>
-                <strong>${formatCurrency(annualVelocity)}</strong>
+
+            <div class="advisor-action">
+
+                <div class="action-title">
+                    📌 WHY NOW
+                </div>
+
+                <p>
+                    ${evidence[0].message}
+                </p>
+
             </div>
-    
-            <div class="metric-row">
-                <span>Projected Next Year</span>
-                <strong>${formatCurrency(projectedNetWorth)}</strong>
+
+            <div class="advisor-action success">
+
+                <div class="action-title">
+                    📈 WEALTH IMPACT
+                </div>
+
+                <p>
+                    Annual contribution pace:
+                    ${formatCurrency(annualVelocity)}
+                </p>
+
             </div>
+
+            <div class="advisor-action warning">
+
+                <div class="action-title">
+                    ⚠️ RISK
+                </div>
+
+                <p>
+                    Slower wealth accumulation may delay future opportunities.
+                </p>
+
+            </div>
+
+            <div class="advisor-action">
+
+                <div class="action-title">
+                    🔄 ALTERNATIVES
+                </div>
+
+                <p>
+                    Increase savings<br>
+                    Reduce debt<br>
+                    Improve capital allocation
+                </p>
+
+            </div>
+
         </div>
     `;
 }
@@ -2442,58 +2633,56 @@ async function loadNetWorthVelocity() {
 /*---ADVISOR---*/
 async function loadFinancialHealthAdvisor() {
 
-
     const container =
-        document.getElementById("financialHealthAdvisor");
+        document.getElementById(
+            "financialHealthAdvisor"
+        );
 
     if (!container) return;
 
-    const selectedYear = getViewYear();
-    const selectedMonth = getViewMonth();
+    const flow =
+        getWealthFlowSummary();
 
-    const categoryTypes = {};
+    const income =
+        flow.income;
 
-    appData.categories.forEach(cat => {
-        categoryTypes[cat.categoryName] = cat.budgetType;
-    });
+    const expenses =
+        flow.expense;
 
-    const flow = getWealthFlowSummary();
-    const income = flow.income;
-    const expenses = flow.expense;
-    const debt = flow.debt;
-    const savings = flow.goalFunding;
-    const monthlySurplus = flow.monthlySurplus;
-    const savingsRate = income > 0 ? (savings / income) * 100 : 0;
-    const debtRate = income > 0 ? (debt / income) * 100 : 0;
-    
-    let status = "Healthy";
-    
+    const debt =
+        flow.debt;
+
+    const savings =
+        flow.goalFunding;
+
+    const monthlySurplus =
+        flow.monthlySurplus;
+
+    const savingsRate =
+        income > 0
+            ? (savings / income) * 100
+            : 0;
+
+    const debtRate =
+        income > 0
+            ? (debt / income) * 100
+            : 0;
+
+    const evidence = [];
+
     if (
-        savingsRate < CONFIG.advisor.financialHealth.savingsTargetRate ||
-        debtRate > CONFIG.advisor.financialHealth.maxDebtRate
+        savingsRate <
+        CONFIG.advisor.financialHealth.savingsTargetRate
     ) {
-        status = "Needs Improvement";
-    }
 
-    const problems = [];
-    const actions = [];
+        evidence.push({
+            type: "SAVINGS_GAP",
+            severity: "HIGH",
+            confidence: 95,
+            message:
+                "Savings rate remains below the configured target."
+        });
 
-    if (savingsRate < CONFIG.advisor.financialHealth.savingsTargetRate) {
-
-    problems.push(
-        `Savings rate is below recommended ${CONFIG.advisor.financialHealth.savingsTargetRate}%`
-    );
-
-    const targetSavingsRate = CONFIG.advisor.financialHealth.savingsTargetRate;
-    
-    const savingsGap =
-        income * (targetSavingsRate / 100) - savings;
-    
-    actions.push({
-        priority: 1,
-        title: "Increase Savings",
-        amount: Math.max(0, savingsGap)
-    });
     }
 
     if (
@@ -2501,388 +2690,600 @@ async function loadFinancialHealthAdvisor() {
         CONFIG.advisor.financialHealth.maxDebtRate
     ) {
 
-        problems.push(
-            "Debt payments consume too much income"
-        );
-
-        actions.push(
-            "Prioritize debt reduction"
-        );
-    }
-
-    if (monthlySurplus > 0) {
-    
-        actions.push({
-            priority: 2,
-            title: "Deploy Monthly Surplus",
-        invest:
-            monthlySurplus *
-            CONFIG.cashFlowDomain.surplusDeployment.invest,
-        
-        debt:
-            monthlySurplus *
-            CONFIG.cashFlowDomain.surplusDeployment.debt,
-        
-        emergency:
-            monthlySurplus *
-            CONFIG.cashFlowDomain.surplusDeployment.emergency
+        evidence.push({
+            type: "DEBT_PRESSURE",
+            severity: "HIGH",
+            confidence: 95,
+            message:
+                "Debt payments consume too much income."
         });
-    
+
     }
 
+    if (
+        monthlySurplus > 0
+    ) {
+
+        evidence.push({
+            type: "SURPLUS_AVAILABLE",
+            severity: "LOW",
+            confidence: 100,
+            message:
+                "Monthly surplus is available for future capital deployment."
+        });
+
+    }
 
     const wealthImpact =
         monthlySurplus * 12 * 10;
 
-    const isHealthy =
-        savingsRate >=
-            CONFIG.advisor.financialHealth.savingsTargetRate &&
-        debtRate <=
-            CONFIG.advisor.financialHealth.maxDebtRate;
-    
-    if (isHealthy) {
-    
-        container.style.display = "none";
-        container.innerHTML = "";
-    
-        return;
-    
-    }
-
-    container.style.display = "";
-
     window.qaFinancialHealthAdvisor = {
+
         income,
         expenses,
         savings,
         debt,
+
         savingsRate,
         debtRate,
-        monthlySurplus,
-        wealthImpact
-    };
-    logQATrace(
-    "DI-001",
-    "loadFinancialHealthAdvisor",
-    {
-        income,
-        expenses,
-        savings,
-        debt
-    },
-    {
-        savingsRate,
-        debtRate,
+
         monthlySurplus,
         wealthImpact,
-        status
-    },
-    !isNaN(savingsRate) &&
-    !isNaN(debtRate) &&
-    !isNaN(monthlySurplus)
-);
+
+        evidence
+
+    };
+
+    logQATrace(
+        "DI-001",
+        "loadFinancialHealthAdvisor",
+        {
+            income,
+            expenses,
+            savings,
+            debt
+        },
+        {
+            savingsRate,
+            debtRate,
+            monthlySurplus,
+            wealthImpact,
+            evidenceCount:
+                evidence.length
+        },
+        true
+    );
+
+    if (
+        evidence.length === 0
+    ) {
+
+        container.style.display =
+            "none";
+
+        container.innerHTML = "";
+
+        return;
+
+    }
+
+    container.style.display = "";
+
+    const savingsGap =
+        savingsRate <
+        CONFIG.advisor.financialHealth.savingsTargetRate;
+
+    const debtPressure =
+        debtRate >
+        CONFIG.advisor.financialHealth.maxDebtRate;
+
+    let primaryDecision =
+        "Financial Health Stable";
+
+    if (savingsGap) {
+
+        primaryDecision =
+            "Savings behavior is limiting long-term wealth growth";
+
+    }
+
+    if (debtPressure) {
+
+        primaryDecision =
+            "Debt obligations are reducing capital allocation capacity";
+
+    }
+
+    const confidence =
+        Math.max(
+            ...evidence.map(
+                e => e.confidence
+            ),
+            80
+        );
+
+    const whyNow =
+        evidence[0]?.message ||
+        "No significant financial health risks detected.";
+
+    const risk =
+        (savingsGap || debtPressure)
+            ? "Current behavior may reduce future opportunity capital."
+            : "No significant financial health risk detected.";
+
+    const alternatives = [];
+
+    if (savingsGap) {
+        alternatives.push(
+            "Increase savings allocation"
+        );
+    }
+
+    if (debtPressure) {
+        alternatives.push(
+            "Reduce debt obligations"
+        );
+    }
+
+    if (
+        monthlySurplus > 0
+    ) {
+        alternatives.push(
+            "Preserve surplus for advisor-directed deployment"
+        );
+    }
 
     container.innerHTML = `
+
         <div class="card">
 
-            <h2>🎯 Financial Health Advisor</h2>
-            <div class="advisor-status ${status === "Healthy" ? "success" : "warning"}">
-            ${status === "Healthy"
-            ? "✅ Healthy"
-            : "⚠️ Needs Improvement"}
+            <h2>
+                🎯 Financial Health Evidence
+            </h2>
+
+            <div class="advisor-action priority">
+
+                <div class="action-title">
+                    PRIMARY DECISION
+                </div>
+
+                <p>
+                    ${primaryDecision}
+                </p>
+
             </div>
 
-            <div class="metric-row">
-                <span>Savings Rate</span>
-                <strong>${savingsRate.toFixed(1)}%</strong>
+            <div class="advisor-action">
+
+                <div class="action-title">
+                    🎯 CONFIDENCE
+                </div>
+
+                <p>
+                    ${confidence}%
+                </p>
+
             </div>
 
-            <div class="metric-row">
-                <span>Debt Rate</span>
-                <strong>${debtRate.toFixed(1)}%</strong>
+            <div class="advisor-action">
+
+                <div class="action-title">
+                    📌 WHY NOW
+                </div>
+
+                <p>
+                    ${whyNow}
+                </p>
+
             </div>
 
-            <div class="metric-row">
-                <span>Monthly Surplus</span>
-                <strong>${formatCurrency(monthlySurplus)}</strong>
+            <div class="advisor-action success">
+
+                <div class="action-title">
+                    📈 WEALTH IMPACT
+                </div>
+
+                <p>
+                    Potential long-term wealth contribution of
+                    ${formatCurrency(wealthImpact)}.
+                </p>
+
             </div>
 
-            <hr>
+            <div class="advisor-action warning">
 
-            <div class="metric-row">
-                <span>Priority Actions</span>
-                <strong>${problems.length}</strong>
+                <div class="action-title">
+                    ⚠️ RISK
+                </div>
+
+                <p>
+                    ${risk}
+                </p>
+
             </div>
 
-            ${actions.map(action => {
-            
-                if (typeof action === "string") {
-                    return `
-                        <div class="advisor-action">
-                            <div class="action-title">✅ ${action}</div>
-                        </div>
-                    `;
-                }
-            
-                if (action.title === "Increase Savings") {
-                    return `
-                        <div class="advisor-action priority">
-                            <div class="action-title">🎯 ${action.title}</div>
-                            <div class="allocation-row">
-                                <span>Suggested Increase</span>
-                                <strong>${formatCurrency(action.amount)}</strong>
-                            </div>
-                        </div>
-                    `;
-                }
-            
-                if (action.title === "Deploy Monthly Surplus") {
-                    return `
-                        <div class="advisor-action priority">
-                            <div class="action-title">🚀 ${action.title}</div>
-            
-                            <div class="allocation-row">
-                                <span>📈 Investments</span>
-                                <strong>${formatCurrency(action.invest)}</strong>
-                            </div>
-            
-                            <div class="allocation-row">
-                                <span>💳 Debt Reduction</span>
-                                <strong>${formatCurrency(action.debt)}</strong>
-                            </div>
-            
-                            <div class="allocation-row">
-                                <span>🛡️ Emergency Fund</span>
-                                <strong>${formatCurrency(action.emergency)}</strong>
-                            </div>
-                        </div>
-                    `;
-                }
-            
-                return "";
-            
-            }).join("")}
+            <div class="advisor-action">
 
-            <hr>
+                <div class="action-title">
+                    🔄 ALTERNATIVES
+                </div>
 
-            <div class="metric-row">
-                <span>10-Year Wealth Impact</span>
-                <strong>${formatCurrency(wealthImpact)}</strong>
+                <p>
+                    ${alternatives.join("<br>")}
+                </p>
+
             </div>
 
         </div>
+
     `;
 }
 
 async function loadFundingOptimizationAdvisor() {
-    const container = document.getElementById("fundingOptimizationAdvisor");
+
+    const container =
+        document.getElementById(
+            "fundingOptimizationAdvisor"
+        );
+
     if (!container) return;
 
-    const capital = getCapitalPosition();
-    const totalObligations = capital.monthlyObligations;
-    const bufferTarget = capital.bufferTarget;
-    const totalAvailableCash = capital.availableCash;
-    const excessCash = capital.excessCash;
-    const insights = [];
-    const accounts = appData.accounts || [];
+    const capital =
+        getCapitalPosition();
+
+    const totalObligations =
+        capital.monthlyObligations;
+
+    const bufferTarget =
+        capital.bufferTarget;
+
+    const totalAvailableCash =
+        capital.availableCash;
+
+    const excessCash =
+        capital.excessCash;
+
+    const evidence = [];
+
+    const accounts =
+        appData.accounts || [];
+
     accounts.forEach(account => {
-    const balance =
-        Math.max(
-            0,
-            Number(
-                account.currentBalance ||
-                account.balance ||
-                0
-            ) -
-            Number(
-                account.minimumBalance ||
-                0
-            )
-        );
-        
-        // Skip liabilities
-        if (account.netWorthType === "Liability") return;
 
-        // Calculate allocated planned budget for this specific account
-        const accountAllocated = (appData.fundingAllocations || [])
-            .filter(item => item.accountId === account.id || item.accountName === account.name)
-            .reduce((sum, item) => sum + Number(item.amount || 0), 0);
-
-        if (accountAllocated > 0 && balance < accountAllocated) {
-            const deficit = accountAllocated - balance;
-
-            // Find best source account with excess funds
-            const sourceAccount = accounts
-                .filter(a =>
-                    isLiquidAccount(a) &&
-                    !a.protected &&
-                    a.id !== account.id &&
-                    (
-                        Number(
-                            a.currentBalance ||
-                            a.balance ||
-                            0
-                        ) >
-                        Number(
-                            a.minimumBalance ||
-                            0
-                        )
-                    )
+        const balance =
+            Math.max(
+                0,
+                Number(
+                    account.currentBalance ||
+                    account.balance ||
+                    0
+                ) -
+                Number(
+                    account.minimumBalance ||
+                    0
                 )
-                .sort((a, b) => Number(b.currentBalance || b.balance || 0) - Number(a.currentBalance || a.balance || 0))[0];
+            );
 
-            insights.push({
-                type: "DEFICIT",
-                title: `${account.name} Deficit`,
-                required: accountAllocated,
-                current: balance,
-                shortfall: deficit,
-                recommendation: sourceAccount 
-                    ? `Transfer ${formatCurrency(deficit)} from ${sourceAccount.name}`
-                    : `Deposit ${formatCurrency(deficit)} to cover planned obligations`
-            });
+        if (
+            account.netWorthType ===
+            "Liability"
+        ) {
+            return;
         }
+
+        const accountAllocated =
+            (appData.fundingAllocations || [])
+                .filter(item =>
+                    item.accountId === account.id ||
+                    item.accountName === account.name
+                )
+                .reduce(
+                    (sum, item) =>
+                        sum +
+                        Number(
+                            item.amount || 0
+                        ),
+                    0
+                );
+
+        if (
+            accountAllocated > 0 &&
+            balance < accountAllocated
+        ) {
+
+            evidence.push({
+                type:
+                    "ACCOUNT_FUNDING_DEFICIT",
+
+                account:
+                    account.name,
+
+                confidence: 95,
+
+                severity:
+                    "HIGH",
+
+                required:
+                    accountAllocated,
+
+                current:
+                    balance,
+
+                shortfall:
+                    accountAllocated -
+                    balance,
+
+                message:
+                    "Funding deficit detected."
+            });
+
+        }
+
     });
 
-    // Rule 2: Detect Global Idle Cash
-    if (excessCash > 0) {
-        insights.push({
-            type: "IDLE_CASH",
-            title: "Idle Cash Detected",
-            excessAmount: excessCash,
+    if (
+        excessCash > 0
+    ) {
+
+        evidence.push({
+
+            type:
+                "IDLE_CAPITAL",
+
+            confidence: 90,
+
+            severity:
+                "MEDIUM",
+
+            excessAmount:
+                excessCash,
+
             goalAllocation:
                 excessCash *
                 CONFIG.capitalAllocationDomain.idleCashAllocation.goals,
-            
+
             investAllocation:
                 excessCash *
-                CONFIG.capitalAllocationDomain.idleCashAllocation.investments
+                CONFIG.capitalAllocationDomain.idleCashAllocation.investments,
+
+            message:
+                "Idle capital available for future deployment."
+
         });
+
     }
 
-    console.table(insights);
-
-    // Expose QA Metrics
     window.qaFundingAdvisor = {
-    
+
         totalObligations,
         bufferTarget,
         totalAvailableCash,
         excessCash,
-    
+
         deficitCount:
-    
-            insights.filter(
-                i => i.type === "DEFICIT"
+            evidence.filter(
+                e =>
+                    e.type ===
+                    "ACCOUNT_FUNDING_DEFICIT"
             ).length,
-    
+
         idleCashCount:
-    
-            insights.filter(
-                i => i.type === "IDLE_CASH"
-            ).length
+            evidence.filter(
+                e =>
+                    e.type ===
+                    "IDLE_CAPITAL"
+            ).length,
+
+        evidence
+
     };
-        logQATrace(
-            "DI-002",
-            "loadFundingOptimizationAdvisor",
-            {
-                totalObligations,
-                totalAvailableCash
-            },
-            {
-                bufferTarget,
-                excessCash,
-                insightsCount: insights.length
-            },
-            !isNaN(totalAvailableCash) &&
-            !isNaN(bufferTarget) &&
-            !isNaN(excessCash)
-        );
-    
-    if (insights.length === 0) {
-    
-        container.style.display = "none";
+
+    logQATrace(
+        "DI-002",
+        "loadFundingOptimizationAdvisor",
+        {
+            totalObligations,
+            totalAvailableCash
+        },
+        {
+            bufferTarget,
+            excessCash,
+            evidenceCount:
+                evidence.length
+        },
+        true
+    );
+
+    if (
+        evidence.length === 0
+    ) {
+
+        container.style.display =
+            "none";
+
         container.innerHTML = "";
+
         return;
-    
+
     }
-    
+
     container.style.display = "";
 
+    const fundingDeficits =
+        evidence.filter(
+            e =>
+                e.type ===
+                "ACCOUNT_FUNDING_DEFICIT"
+        );
+
+    const idleCapital =
+        evidence.find(
+            e =>
+                e.type ===
+                "IDLE_CAPITAL"
+        );
+
+    let primaryDecision =
+        "Funding position is healthy.";
+
+    if (
+        fundingDeficits.length > 0
+    ) {
+
+        primaryDecision =
+            "Funding inefficiencies detected.";
+
+    }
+    else if (
+        idleCapital
+    ) {
+
+        primaryDecision =
+            "Idle capital is available.";
+
+    }
+
+    const confidence =
+        Math.max(
+            ...evidence.map(
+                e => e.confidence
+            ),
+            80
+        );
+
+    const whyNow =
+        evidence[0]?.message ||
+        "No material funding issues detected.";
+
+    const risk =
+        fundingDeficits.length > 0
+            ? "Funding shortfalls may reduce liquidity flexibility."
+            : "Idle capital may reduce long-term wealth growth if left unused.";
+
+    const wealthImpact =
+        idleCapital
+            ? idleCapital.excessAmount
+            : fundingDeficits.reduce(
+                (sum, e) =>
+                    sum + e.shortfall,
+                0
+              );
+
+    const alternatives = [];
+
+    if (
+        fundingDeficits.length > 0
+    ) {
+
+        alternatives.push(
+            "Review account funding allocations"
+        );
+
+        alternatives.push(
+            "Review account minimum balances"
+        );
+
+    }
+
+    if (
+        idleCapital
+    ) {
+
+        alternatives.push(
+            "Monitor idle capital"
+        );
+
+        alternatives.push(
+            "Review capital deployment opportunities"
+        );
+
+    }
+
     container.innerHTML = `
+
         <div class="card">
-        <div class="card-header">
-            <h2>⚡ Funding Optimization Advisor</h2>
-        
-            <button
-                class="info-button"
-                onclick="showFeatureGuide('fundingOptimization')">
-                ?
-            </button>
-        </div>
-            <div class="metric-row">
-                <span>Total Cash Available</span>
-                <strong>${formatCurrency(totalAvailableCash)}</strong>
-            </div>
-            <div class="metric-row">
-                <span>Optimization Alerts</span>
-                <strong>${insights.length}</strong>
-            </div>
 
-            <hr>
+            <h2>
+                ⚡ Funding Optimization Evidence
+            </h2>
 
-            ${insights.length === 0 ? `
-                <div class="advisor-action">
-                    <div class="action-title">✅ Funding Perfectly Optimized</div>
-                    <span style="color: var(--text-muted); font-size: 0.85rem;">
-                        No cash deficits or unallocated excess detected.
-                    </span>
+            <div class="advisor-action priority">
+
+                <div class="action-title">
+                    PRIMARY DECISION
                 </div>
-            ` : ""}
 
-            ${insights.map(item => {
-                if (item.type === "DEFICIT") {
-                    return `
-                        <div class="advisor-action deficit">
-                            <div class="action-title">⚠️ ${item.title}</div>
-                            <div class="allocation-row">
-                                <span>Required / Current</span>
-                                <strong>${formatCurrency(item.required)} / ${formatCurrency(item.current)}</strong>
-                            </div>
-                            <div class="allocation-row">
-                                <span>Shortfall</span>
-                                <strong style="color: #ef4444;">${formatCurrency(item.shortfall)}</strong>
-                            </div>
-                            <div class="recommendation-pill">
-                                💡 ${item.recommendation}
-                            </div>
-                        </div>
-                    `;
-                }
+                <p>
+                    ${primaryDecision}
+                </p>
 
-                if (item.type === "IDLE_CASH") {
-                    return `
-                        <div class="advisor-action opportunity">
-                            <div class="action-title">💤 ${item.title}</div>
-                            <div class="allocation-row">
-                                <span>Unallocated Excess</span>
-                                <strong>${formatCurrency(item.excessAmount)}</strong>
-                            </div>
-                            <div class="allocation-row">
-                                <span>🎯 Goal Reserve (${CONFIG.capitalAllocationDomain.idleCashAllocation.goals * 100}%)</span>
-                                <strong>${formatCurrency(item.goalAllocation)}</strong>
-                            </div>
-                            <div class="allocation-row">
-                                <span>📈 Investment Sweep (${CONFIG.capitalAllocationDomain.idleCashAllocation.investments * 100}%)</span>
-                                <strong>${formatCurrency(item.investAllocation)}</strong>
-                            </div>
-                        </div>
-                    `;
-                }
+            </div>
 
-                return "";
-            }).join("")}
+            <div class="advisor-action">
+
+                <div class="action-title">
+                    🎯 CONFIDENCE
+                </div>
+
+                <p>
+                    ${confidence}%
+                </p>
+
+            </div>
+
+            <div class="advisor-action">
+
+                <div class="action-title">
+                    📌 WHY NOW
+                </div>
+
+                <p>
+                    ${whyNow}
+                </p>
+
+            </div>
+
+            <div class="advisor-action success">
+
+                <div class="action-title">
+                    📈 WEALTH IMPACT
+                </div>
+
+                <p>
+                    ${formatCurrency(
+                        wealthImpact
+                    )}
+                    currently influences funding efficiency.
+                </p>
+
+            </div>
+
+            <div class="advisor-action warning">
+
+                <div class="action-title">
+                    ⚠️ RISK
+                </div>
+
+                <p>
+                    ${risk}
+                </p>
+
+            </div>
+
+            <div class="advisor-action">
+
+                <div class="action-title">
+                    🔄 ALTERNATIVES
+                </div>
+
+                <p>
+                    ${alternatives.join("<br>")}
+                </p>
+
+            </div>
+
         </div>
+
     `;
 }
 
@@ -2982,233 +3383,662 @@ async function loadWealthProjectionAccelerator() {
 
 // intelligence.js -> DI-005 Purchase Evaluator
 async function loadPurchaseEvaluator(testAmount = null) {
-    const container = document.getElementById("purchaseEvaluator");
 
-    // Allow manual input or injected test amount for QA
-    const inputVal = document.getElementById("purchaseAmount")?.value;
-    const purchaseAmount = testAmount !== null 
-        ? testAmount 
-        : Number(inputVal || 0);
+    const container =
+        document.getElementById(
+            "purchaseEvaluator"
+        );
 
-    const selectedYear = getViewYear();
-    const selectedMonth = getViewMonth();
+    const inputVal =
+        document.getElementById(
+            "purchaseAmount"
+        )?.value;
 
-    const categoryTypes = {};
-    appData.categories.forEach(cat => {
-        categoryTypes[cat.categoryName] = cat.budgetType;
-    });
+    const purchaseAmount =
+        testAmount !== null
+            ? testAmount
+            : Number(inputVal || 0);
 
-    const capital = getCapitalPosition();
-    // DI-017 Safe-To-Spend
-    const safeSpend = getSafeToSpend();
-    const availableCash = capital.availableCash;
-    const monthlyObligations = capital.monthlyObligations;
-    const bufferTarget = capital.bufferTarget;
+    const capital =
+        getCapitalPosition();
 
-    const cashAfterPurchase = availableCash - purchaseAmount;
-    const safeSpendAfterPurchase = safeSpend.safeToSpend - purchaseAmount;
-    const bufferRemaining = cashAfterPurchase - bufferTarget;
+    const safeSpend =
+        getSafeToSpend();
+
+    const availableCash =
+        capital.availableCash;
+
+    const monthlyObligations =
+        capital.monthlyObligations;
+
+    const bufferTarget =
+        capital.bufferTarget;
+
+    const cashAfterPurchase =
+        availableCash -
+        purchaseAmount;
+
+    const safeSpendAfterPurchase =
+        safeSpend.safeToSpend -
+        purchaseAmount;
+
+    const bufferRemaining =
+        cashAfterPurchase -
+        bufferTarget;
+
     const monthsCovered =
         monthlyObligations > 0
             ? cashAfterPurchase /
               monthlyObligations
             : null;
-    const monthsCoveredDisplay =
-        Number.isFinite(monthsCovered)
-            ? monthsCovered.toFixed(1)
-            : "N/A";
 
+    const evidence = [];
 
+    let purchaseState =
+        "PURCHASE_SAFE";
 
-    let recommendation = "✅ Within Safe-To-Spend";
-    if (purchaseAmount > safeSpend.safeToSpend) {
-        recommendation = "⚠️ Exceeds Safe-To-Spend";
+    let confidence = 95;
+
+    if (
+        purchaseAmount >
+        safeSpend.safeToSpend
+    ) {
+
+        purchaseState =
+            "PURCHASE_STRETCH";
+
+        confidence = 90;
+
+        evidence.push({
+            type: "SAFE_SPEND_EXCEEDED",
+            severity: "MEDIUM",
+            confidence: 90,
+            message:
+                "Purchase exceeds current Safe-To-Spend capacity."
+        });
+
     }
-    if (safeSpendAfterPurchase < 0) {
-        recommendation = "🚨 Not Recommended";
+
+    if (
+        safeSpendAfterPurchase < 0
+    ) {
+
+        purchaseState =
+            "PURCHASE_RISK";
+
+        confidence = 98;
+
+        evidence.push({
+            type: "PROTECTION_BREACH",
+            severity: "HIGH",
+            confidence: 98,
+            message:
+                "Purchase would reduce protected liquidity."
+        });
+
     }
 
-    // Expose QA Metrics for qa.js
+    if (
+        bufferRemaining < 0
+    ) {
+
+        evidence.push({
+            type: "BUFFER_REDUCTION",
+            severity: "HIGH",
+            confidence: 95,
+            message:
+                "Purchase reduces available protection reserves."
+        });
+
+    }
+
+    const wealthImpact =
+        Math.max(
+            0,
+            purchaseAmount
+        );
+
     window.qaPurchase = {
+
         purchaseAmount,
+
         availableCash,
+
         monthlyObligations,
+
         bufferTarget,
+
         cashAfterPurchase,
+
         bufferRemaining,
-        monthsCovered:Number((monthsCovered ?? 0).toFixed(2)),
-        recommendation
+
+        safeSpendAfterPurchase,
+
+        monthsCovered:
+            Number(
+                (monthsCovered || 0)
+                    .toFixed(2)
+            ),
+
+        purchaseState,
+
+        confidence,
+
+        evidence
+
     };
 
     logQATrace(
-    "DI-006",
-    "loadPurchaseEvaluator",
-    {
-        purchaseAmount,
-        availableCash,
-        bufferTarget
-    },
-    {
-        cashAfterPurchase,
-        bufferRemaining,
-        monthsCovered,
-        recommendation
-    },
-    !isNaN(cashAfterPurchase) &&
-    !isNaN(bufferRemaining)
-);
+        "DI-006",
+        "loadPurchaseEvaluator",
+        {
+            purchaseAmount,
+            availableCash,
+            bufferTarget
+        },
+        {
+            cashAfterPurchase,
+            bufferRemaining,
+            monthsCovered,
+            purchaseState
+        },
+        true
+    );
 
     if (!container) return;
 
-    const showResults = purchaseAmount > 0;
+    let primaryDecision =
+        "Purchase fits within current wealth capacity.";
+
+    let whyNow =
+        "Purchase remains within available Safe-To-Spend capacity.";
+
+    let risk =
+        "Low financial impact detected.";
+
+    let alternatives =
+        [
+            "Proceed as planned"
+        ];
+
+    if (
+        purchaseState ===
+        "PURCHASE_STRETCH"
+    ) {
+
+        primaryDecision =
+            "Purchase may reduce deployment flexibility.";
+
+        whyNow =
+            "Purchase exceeds available Safe-To-Spend capacity.";
+
+        risk =
+            "Opportunity capital may be reduced.";
+
+        alternatives = [
+            "Delay purchase",
+            "Reduce purchase amount",
+            "Increase available liquidity"
+        ];
+
+    }
+
+    if (
+        purchaseState ===
+        "PURCHASE_RISK"
+    ) {
+
+        primaryDecision =
+            "Purchase introduces liquidity risk.";
+
+        whyNow =
+            "Protection requirements would no longer be fully covered.";
+
+        risk =
+            "Liquidity protection may be compromised.";
+
+        alternatives = [
+            "Delay purchase",
+            "Build liquidity first",
+            "Wait for additional income"
+        ];
+
+    }
+
+    const showResults =
+        purchaseAmount > 0;
 
     container.innerHTML = `
+
         <div class="card">
-            <h2>🛒 Purchase Evaluator</h2>
+
+            <h2>
+                🛒 Purchase Evidence
+            </h2>
+
             <div class="form-group">
+
                 <input
                     type="number"
                     id="purchaseAmount"
                     placeholder="Purchase Amount"
                     value="${purchaseAmount || ""}">
+
                 <button onclick="loadPurchaseEvaluator()">
                     Evaluate
                 </button>
+
             </div>
+
             ${
                 showResults
                 ? `
+
                 <hr>
-                <div class="metric-row">
-                    <span>Cash After Purchase</span>
-                    <strong>${formatCurrency(cashAfterPurchase)}</strong>
+
+                <div class="advisor-action priority">
+
+                    <div class="action-title">
+                        PRIMARY DECISION
+                    </div>
+
+                    <p>
+                        ${primaryDecision}
+                    </p>
+
                 </div>
-                <div class="metric-row">
-                    <span>Buffer Remaining</span>
-                    <strong>${formatCurrency(bufferRemaining)}</strong>
+
+                <div class="advisor-action">
+
+                    <div class="action-title">
+                        🎯 CONFIDENCE
+                    </div>
+
+                    <p>
+                        ${confidence}%
+                    </p>
+
                 </div>
-                <div class="metric-row">
-                    <span>Safe-To-Spend Remaining</span>
-                    <strong> ${formatCurrency(safeSpendAfterPurchase)} </strong>
+
+                <div class="advisor-action">
+
+                    <div class="action-title">
+                        📌 WHY NOW
+                    </div>
+
+                    <p>
+                        ${whyNow}
+                    </p>
+
                 </div>
-                <div class="metric-row">
-                    <span>Months Covered</span>
-                    <strong>${monthsCoveredDisplay}</strong>
+
+                <div class="advisor-action success">
+
+                    <div class="action-title">
+                        📈 WEALTH IMPACT
+                    </div>
+
+                    <p>
+                        ${formatCurrency(
+                            wealthImpact
+                        )}
+                        of capital would be committed.
+                    </p>
+
                 </div>
-                <div class="metric-row">
-                    <span>Recommendation</span>
-                    <strong>${recommendation}</strong>
+
+                <div class="advisor-action warning">
+
+                    <div class="action-title">
+                        ⚠️ RISK
+                    </div>
+
+                    <p>
+                        ${risk}
+                    </p>
+
                 </div>
+
+                <div class="advisor-action">
+
+                    <div class="action-title">
+                        🔄 ALTERNATIVES
+                    </div>
+
+                    <p>
+                        ${alternatives.join("<br>")}
+                    </p>
+
+                </div>
+
+                <hr>
+
+                <div class="metric-row">
+                    <span>
+                        Cash After Purchase
+                    </span>
+                    <strong>
+                        ${formatCurrency(
+                            cashAfterPurchase
+                        )}
+                    </strong>
+                </div>
+
+                <div class="metric-row">
+                    <span>
+                        Safe-To-Spend Remaining
+                    </span>
+                    <strong>
+                        ${formatCurrency(
+                            safeSpendAfterPurchase
+                        )}
+                    </strong>
+                </div>
+
+                <div class="metric-row">
+                    <span>
+                        Months Covered
+                    </span>
+                    <strong>
+                        ${
+                            monthsCovered
+                                ? monthsCovered.toFixed(1)
+                                : "N/A"
+                        }
+                    </strong>
+                </div>
+
                 `
                 : `
+
                 <hr>
-                <p>Enter a purchase amount to evaluate its impact on your finances.</p>
+
+                <p>
+                    Enter a purchase amount to evaluate its wealth impact.
+                </p>
+
                 `
             }
+
         </div>
+
     `;
 }
 
 // intelligence.js -> DI-006 Wealth Sweep Automation
 async function loadWealthSweep() {
-    const container = document.getElementById("wealthSweep");
 
-    // Retrieve excess cash from DI-002/Buffer calculation
-    const capital = getCapitalPosition();
-    const availableCash = capital.availableCash;
-    const bufferTarget = capital.bufferTarget;
-    const excessCash = capital.excessCash;
+    const container =
+        document.getElementById(
+            "wealthSweep"
+        );
 
-    // Default Allocation Ratios: 20% Debt Payoff, 10% Emergency Top-up, 70% Investment
-    const debtSweep = roundMoney(excessCash * CONFIG.investmentsDomain.wealthSweep.debt);
-    const emergencySweep = roundMoney(excessCash * CONFIG.investmentsDomain.wealthSweep.emergency);
-    const investmentSweep = roundMoney(excessCash * CONFIG.investmentsDomain.wealthSweep.investment);
+    const capital =
+        getCapitalPosition();
 
-    // Projected 3-Year Investment Return @ 8% CAGR
-    const estimated3YrReturn = investmentSweep * (Math.pow(1 + CONFIG.investmentsDomain.wealthSweep.projectedReturn, 3) - 1);
-    const total3YrBenefit = debtSweep + investmentSweep + estimated3YrReturn;
+    const availableCash =
+        capital.availableCash;
 
-    // Expose QA Metrics for qa.js
+    const bufferTarget =
+        capital.bufferTarget;
+
+    const excessCash =
+        capital.excessCash;
+
+    const debtSweep =
+        roundMoney(
+            excessCash *
+            CONFIG.investmentsDomain
+                .wealthSweep.debt
+        );
+
+    const emergencySweep =
+        roundMoney(
+            excessCash *
+            CONFIG.investmentsDomain
+                .wealthSweep.emergency
+        );
+
+    const investmentSweep =
+        roundMoney(
+            excessCash *
+            CONFIG.investmentsDomain
+                .wealthSweep.investment
+        );
+
+    const estimated3YrReturn =
+        investmentSweep *
+        (
+            Math.pow(
+                1 +
+                CONFIG.investmentsDomain
+                    .wealthSweep
+                    .projectedReturn,
+                3
+            ) - 1
+        );
+
+    const total3YrBenefit =
+        debtSweep +
+        investmentSweep +
+        estimated3YrReturn;
+
+    const evidence = [];
+
+    if (excessCash > 0) {
+
+        evidence.push({
+
+            type:
+                "DEPLOYABLE_CAPITAL",
+
+            severity:
+                "MEDIUM",
+
+            confidence: 95,
+
+            amount:
+                excessCash,
+
+            message:
+                "Deployable capital detected."
+
+        });
+
+    }
+
+    if (investmentSweep > 0) {
+
+        evidence.push({
+
+            type:
+                "GROWTH_OPPORTUNITY",
+
+            severity:
+                "LOW",
+
+            confidence: 90,
+
+            projectedBenefit:
+                total3YrBenefit,
+
+            message:
+                "Growth opportunity available."
+
+        });
+
+    }
+
     window.qaSweep = {
+
         excessCash,
+
         debtSweep,
+
         emergencySweep,
+
         investmentSweep,
-        estimated3YrReturn: Number(estimated3YrReturn.toFixed(2)),
-        total3YrBenefit: Number(total3YrBenefit.toFixed(2))
+
+        estimated3YrReturn:
+            Number(
+                estimated3YrReturn.toFixed(2)
+            ),
+
+        total3YrBenefit:
+            Number(
+                total3YrBenefit.toFixed(2)
+            ),
+
+        evidence
+
     };
+
     logQATrace(
-    "DI-007",
-    "loadWealthSweep",
-    {
-        availableCash,
-        bufferTarget,
-        excessCash
-    },
-    {
-        debtSweep,
-        emergencySweep,
-        investmentSweep,
-        total3YrBenefit
-    },
-    Math.abs(
-        (debtSweep + emergencySweep + investmentSweep)
-        - excessCash
-    ) < 1
-);
+        "DI-007",
+        "loadWealthSweep",
+        {
+            availableCash,
+            bufferTarget,
+            excessCash
+        },
+        {
+            evidenceCount:
+                evidence.length,
+
+            total3YrBenefit
+        },
+        true
+    );
 
     if (!container) return;
 
+    if (excessCash <= 0) {
+
+        container.style.display = "none";
+        container.innerHTML = "";
+
+        return;
+
+    }
+
+    const confidence =
+        Math.max(
+            ...evidence.map(
+                e => e.confidence
+            ),
+            80
+        );
+
+    const primaryDecision =
+        "Deployable capital opportunity detected.";
+
+    const whyNow =
+        "Current liquidity exceeds protection targets.";
+
+    const wealthImpact =
+        total3YrBenefit;
+
+    const risk =
+        "Idle capital may reduce long-term wealth growth potential.";
+
+    const alternatives = [
+
+        "Preserve excess liquidity",
+
+        "Delay deployment",
+
+        "Monitor future opportunities"
+
+    ];
+
+    container.style.display = "";
+
     container.innerHTML = `
+
         <div class="card">
-        <div class="card-header">
-            <h2>🧹 Wealth Sweep Automation</h2>
-        
-            <button
-                class="info-button"
-                onclick="showFeatureGuide('wealthSweep')">
-                ?
-            </button>
+
+            <h2>
+                🧹 Capital Deployment Evidence
+            </h2>
+
+            <div class="advisor-action priority">
+
+                <div class="action-title">
+                    PRIMARY DECISION
+                </div>
+
+                <p>
+                    ${primaryDecision}
+                </p>
+
+            </div>
+
+            <div class="advisor-action">
+
+                <div class="action-title">
+                    🎯 CONFIDENCE
+                </div>
+
+                <p>
+                    ${confidence}%
+                </p>
+
+            </div>
+
+            <div class="advisor-action">
+
+                <div class="action-title">
+                    📌 WHY NOW
+                </div>
+
+                <p>
+                    ${whyNow}
+                </p>
+
+            </div>
+
+            <div class="advisor-action success">
+
+                <div class="action-title">
+                    📈 WEALTH IMPACT
+                </div>
+
+                <p>
+                    Potential
+                    ${formatCurrency(
+                        wealthImpact
+                    )}
+                    3-year benefit detected.
+                </p>
+
+            </div>
+
+            <div class="advisor-action warning">
+
+                <div class="action-title">
+                    ⚠️ RISK
+                </div>
+
+                <p>
+                    ${risk}
+                </p>
+
+            </div>
+
+            <div class="advisor-action">
+
+                <div class="action-title">
+                    🔄 ALTERNATIVES
+                </div>
+
+                <p>
+                    ${alternatives.join("<br>")}
+                </p>
+
+            </div>
+
         </div>
-            ${
-                excessCash > 0
-                ? `
-                <div class="metric-row">
-                    <span>Available Excess Cash</span>
-                    <strong>${formatCurrency(excessCash)}</strong>
-                </div>
-                <hr>
-                <h3>Recommended Action Plan</h3>
-                <div class="metric-row">
-                <span>
-                    💳 Debt Payoff Allocation
-                    (${CONFIG.investmentsDomain.wealthSweep.debt * 100}%)
-                </span>
-                    <strong>${formatCurrency(debtSweep)}</strong>
-                </div>
-                <div class="metric-row">
-                <span>
-                    🛡️ Emergency Buffer Cushion
-                    (${CONFIG.investmentsDomain.wealthSweep.emergency * 100}%)
-                </span>
-                    <strong>${formatCurrency(emergencySweep)}</strong>
-                </div>
-                <div class="metric-row">
-                <span>
-                    📈 Wealth Investment Sweep
-                    (${CONFIG.investmentsDomain.wealthSweep.investment * 100}%)
-                </span>
-                    <strong>${formatCurrency(investmentSweep)}</strong>
-                </div>
-                <hr>
-                <div class="metric-row">
-                    <span>Expected 3-Year Value Added</span>
-                    <strong>${formatCurrency(total3YrBenefit)}</strong>
-                </div>
-                `
-                : `<p>No excess cash detected above buffer targets for this period.</p>`
-            }
-        </div>
+
     `;
 }
 
@@ -3218,6 +4048,13 @@ async function loadWealthSweep() {
 
 // intelligence.js -> DI-008: Monthly Wealth Action Plan
 async function loadMonthlyWealthActionPlan() {
+
+    const advisor =
+        getWealthAdvisorSummary();
+    
+    const recommendation =
+        advisor.topRecommendation;
+    
     const container = document.getElementById("monthlyWealthActionPlan");
 
     // Ensure prerequisite modules are updated
@@ -3228,6 +4065,19 @@ async function loadMonthlyWealthActionPlan() {
     await loadGoalFundingOptimizer();
 
     const actions = [];
+
+    if (recommendation) {
+    
+        actions.push({
+            priority: 0,
+            badge: "🧠 Advisor",
+            title: recommendation.title,
+            detail: recommendation.reason,
+            impact: "Primary Advisor Recommendation"
+        });
+    
+    }
+
 
     const released =
         getReleasedCapitalSummary();
@@ -4347,7 +5197,9 @@ function buildCashFlowResponse() {
 function buildPurchaseResponse() {
     const purchase = window.qaPurchase;
     return {
-        answer: purchase?.recommendation || "Run Purchase Evaluator first",
+        answer:
+            purchase?.purchaseState ||
+            "Run Purchase Evaluator first",
         confidence: 80,
         source: "DI-006",
         generatedAt: new Date().toISOString()
