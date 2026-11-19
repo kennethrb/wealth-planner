@@ -548,14 +548,6 @@ function getPrimaryRecommendation()
     const recommendations =
         getRankedRecommendations();
 
-    console.table(
-        recommendations.map(r => ({
-            id: r.id,
-            priority: r.priority,
-            title: r.title
-        }))
-    );
-
     if (!recommendations.length)
     {
         return {
