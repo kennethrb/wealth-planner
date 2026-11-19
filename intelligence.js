@@ -470,14 +470,42 @@ function loadReleasedCapitalCard() {
     
         <div class="advisor-action priority">
             <div class="action-title">
-                RECOMMENDED ACTION
+                PRIMARY DECISION
             </div>
-    
+        
             <p>
-                Deploy
-                ${formatCurrency(data.totalReleasedCapital)}
-                per month toward
-                ${data.destination}
+                Capital has been released and is available for redeployment.
+            </p>
+        </div>
+        
+        <div class="advisor-action">
+            <div class="action-title">
+                📌 WHY NOW
+            </div>
+        
+            <p>
+                One or more completed or inactive funding commitments have released deployable capital.
+            </p>
+        </div>
+        
+        <div class="advisor-action success">
+            <div class="action-title">
+                📈 WEALTH IMPACT
+            </div>
+        
+            <p>
+                Released capital can now be redirected toward higher-priority goals,
+                investments, debt reduction, or wealth-building opportunities.
+            </p>
+        </div>
+        
+        <div class="advisor-action warning">
+            <div class="action-title">
+                ⚠️ RISK
+            </div>
+        
+            <p>
+                Idle released capital may reduce long-term wealth acceleration.
             </p>
         </div>
 
@@ -493,39 +521,19 @@ function loadReleasedCapitalCard() {
 
         <div class="advisor-action success">
             <div class="action-title">
-                CAPITAL DEPLOYMENT
+                📈 WEALTH IMPACT
             </div>
         
             <p>
-                Auto-allocation engine recommends
-                redirecting released capital toward
-                ${data.destination}.
-            </p>
-        </div>
-    
-        <div class="advisor-action">
-            <div class="action-title">
-                🎯 WHY NOW
-            </div>
-    
-            <p>
-                Completed goals have released
-                recurring contribution capacity.
-            </p>
-        </div>
-    
-        <div class="advisor-action success">
-            <div class="action-title">
-                💎 POTENTIAL WEALTH IMPACT
-            </div>
+                Released capital can now be redirected toward
+                higher-priority goals, investments, debt reduction,
+                or wealth-building opportunities.
         
-            <p>
-                Keeping this capital deployed could redirect
-                <strong>${formatCurrency(data.tenYearImpact)}</strong>
-                toward future wealth goals over the next decade.
+                Potential long-term redeployment value:
+                <strong>${formatCurrency(data.tenYearImpact)}</strong>.
             </p>
         </div>
-    
+        
         <div class="advisor-action warning">
             <div class="action-title">
                 ⚠️ RISK
@@ -852,17 +860,8 @@ function getWealthAdvisorActions() {
     const recommendation =
         getPrimaryRecommendation();
 
-    const released =
-        getReleasedCapitalSummary();
+    if (recommendation) {
 
-    const suppressEmergencyRecommendation =
-        released.state === "ACTIVE" &&
-        released.destination === "Emergency Fund";
-
-    if (
-        recommendation &&
-        !suppressEmergencyRecommendation
-    ) {
         actions.push({
             priority:
                 recommendation.priority || 1,
@@ -876,47 +875,12 @@ function getWealthAdvisorActions() {
 
             source: "AB-006"
         });
+
     }
 
-    if (released.state === "ACTIVE") {
-
-        actions.push({
-            priority: 1,
-
-            category: "Released Capital",
-
-            action:
-                `Redirect ${formatCurrency(
-                    released.totalReleasedCapital
-                )}/month toward ${released.destination}`,
-
-            source: "DI-028"
-        });
-    }
-
-    if (
-        window.qaGoalFundingOptimizer &&
-        recommendation?.state !==
-            AdvisorStates.GOAL_ACCELERATION
-    ) {
-
-        actions.push({
-            priority: 2,
-
-            category: "Goal Funding",
-
-            action:
-                window.qaGoalFundingOptimizer.priorityAction,
-
-            source: "DI-010"
-        });
-    }
-
-    actions.sort(
+    return actions.sort(
         (a, b) => a.priority - b.priority
     );
-
-    return actions;
 }
 
 function getRecommendationConfidence(recommendation) {
@@ -3622,17 +3586,35 @@ async function loadCashFlowCommandCenter() {
             </div>
 
             <div class="advisor-action priority">
-
                 <div class="action-title">
-                    🎯 Recommended Action
+                    PRIMARY DECISION
                 </div>
-
+            
                 <p>
-                    Protect liquidity before deploying capital.
-                    Available cash is currently insufficient
-                    to satisfy protection requirements.
+                    Liquidity protection is currently required.
                 </p>
-
+            </div>
+            
+            <div class="advisor-action">
+                <div class="action-title">
+                    📌 WHY NOW
+                </div>
+            
+                <p>
+                    Available cash is currently insufficient to
+                    satisfy protection requirements.
+                </p>
+            </div>
+            
+            <div class="advisor-action warning">
+                <div class="action-title">
+                    ⚠️ RISK
+                </div>
+            
+                <p>
+                    Deploying capital before closing the protection
+                    gap may create future cash flow stress.
+                </p>
             </div>
 
             <hr>
@@ -3717,16 +3699,48 @@ async function loadCashFlowCommandCenter() {
         </div>
 
         <div class="advisor-action priority">
-
             <div class="action-title">
-                🎯 Recommended Next Action
+                PRIMARY DECISION
             </div>
-
+        
             <p>
-                ${recommendation}
+                Capital is available for deployment.
             </p>
-
         </div>
+        
+        <div class="advisor-action">
+            <div class="action-title">
+                📌 WHY NOW
+            </div>
+        
+            <p>
+                ${status}
+            </p>
+        </div>
+        
+        <div class="advisor-action success">
+            <div class="action-title">
+                📈 WEALTH IMPACT
+            </div>
+        
+            <p>
+                ${formatCurrency(opportunity)}
+                is currently available for deployment toward
+                goals, investments, or debt reduction.
+            </p>
+        </div>
+        
+        <div class="advisor-action warning">
+            <div class="action-title">
+                ⚠️ RISK
+            </div>
+        
+            <p>
+                Leaving available capital idle may reduce
+                long-term wealth growth potential.
+            </p>
+        </div>
+
 
         <hr>
 
@@ -4088,17 +4102,15 @@ async function loadGoalFundingOptimizer() {
                 </div>
 
                 <div class="advisor-action priority">
-
                     <div class="action-title">
-                        Recommended Goal
+                        PRIMARY DECISION
                     </div>
-
                     <p>
                         <strong>
                             ${bestGoal.goal}
                         </strong>
+                            can be accelerated immediately
                     </p>
-
                 </div>
 
                 <div class="metric-row">
@@ -4149,27 +4161,37 @@ async function loadGoalFundingOptimizer() {
                 
                 <hr>
                 
-                <div class="advisor-action priority">
-                
+                <div class="advisor-action">
                     <div class="action-title">
-                        🎯 Recommended Action
+                        📌 WHY NOW
                     </div>
                 
                     <p>
-                        Fully fund this goal using
-                        <strong style="color:#10b981;">
-                            ${formatCurrency(suggestedFunding)}
-                        </strong>
-                        to accelerate completion and free future cash flow for other goals.
+                        ${bestGoal.reason}
                     </p>
+                </div>
                 
+                <div class="advisor-action success">
+                    <div class="action-title">
+                        📈 WEALTH IMPACT
+                    </div>
+                
+                    <p>
+                        Funding this goal would reduce the remaining gap by
+                        ${formatCurrency(suggestedFunding)}
+                        and increase goal completion velocity.
+                    </p>
                 </div>
-
-                <div class="metric-row">
-                    <span>Reason</span>
-                    <strong>${bestGoal.reason}</strong>
+                
+                <div class="advisor-action warning">
+                    <div class="action-title">
+                        ⚠️ RISK
+                    </div>
+                
+                    <p>
+                        Delaying deployment of available capital may slow goal completion.
+                    </p>
                 </div>
-
 
             </div>
 
