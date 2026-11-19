@@ -11,13 +11,30 @@ const AdvisorStates = {
 
 function getAdvisorContext() {
 
-    const protection =
-        getUnifiedProtectionStatus(
-            appData.accounts,
-            appData.recurringBills,
-            appData.goals,
-            []
-        );
+    const buffer =
+        window.qaBuffer ||
+        loadBufferVsInvest();
+    
+    const protection = {
+        totalCash:
+            Number(buffer.availableCash || 0),
+    
+        requiredProtection:
+            Number(buffer.bufferTarget || 0),
+    
+        protectionGap:
+            Math.max(
+                0,
+                Number(buffer.bufferTarget || 0) -
+                Number(buffer.availableCash || 0)
+            )
+    };
+
+    console.log(
+        "Protection Object",
+        protection
+    );
+
 
     const cashFlow =
         getOpportunityCapital();
