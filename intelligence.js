@@ -596,21 +596,6 @@ function getWealthAdvisorSummary() {
     const topRecommendation =
         advisorOutput.recommendation;
 
-    console.log(
-        "Advisor Output",
-        advisorOutput
-    );
-    
-    console.log(
-        "Recommendation",
-        advisorOutput.recommendation
-    );
-    
-    console.log(
-        "Wealth State",
-        advisorOutput.wealthState
-    );
-
     const actions =
         getWealthAdvisorActions();
 
