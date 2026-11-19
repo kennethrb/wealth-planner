@@ -858,96 +858,165 @@ function getWealthAdvisorActions() {
     );
 }
 
-function getRecommendationConfidence(recommendation) {
+function getRecommendationEvidence(recommendation)
+{
+    const evidence = [
+        ...(window.qaFinancialHealthAdvisor?.evidence || []),
+        ...(window.qaBuffer?.evidence || []),
+        ...(window.qaSweep?.evidence || []),
+        ...(window.qaPurchase?.evidence || [])
+    ];
 
-    const opportunity =
-        getOpportunityCapital();
-
-    const emergencyGap =
-        getEmergencyFundGap();
-
-    const liquidity =
-        opportunity.coverage || 0;
-
-    if (
-        liquidity <
-        CONFIG.cashFlowDomain.cashFlow.minimumCoverage
-    ) {
+    if (!recommendation)
+    {
         return {
-            score: 90,
-            level: "LIQUIDITY PROTECTION"
+            recommendationId: null,
+            evidence: [],
+            supportingEvidenceCount: 0,
+            conflictingEvidenceCount: 0,
+            confidenceRaw: 0,
+            confidenceAdjusted: 0
         };
     }
 
-    let score = 50;
+    const recommendationEvidenceMap = {
+        PROTECT_LIQUIDITY: [
+            "BUFFER_PRIORITY",
+            "PROTECTION_BREACH"
+        ],
 
-    if (liquidity >= 12) {
-        score += 20;
-    }
-    else if (liquidity >= 6) {
-        score += 10;
-    }
-    else {
-        score -= 10;
-    }
+        IMPROVE_SAVINGS_RATE: [
+            "SAVINGS_GAP"
+        ],
 
-    if (emergencyGap.gap <= 0) {
-        score += 15;
-    }
-    else if (emergencyGap.gap <= 50000) {
-        score += 5;
-    }
+        COMPLETE_GOAL: [
+            "SURPLUS_AVAILABLE",
+            "DEPLOYABLE_CAPITAL"
+        ],
 
-    if (
-        opportunity.opportunity >
-        CONFIG.opportunity.thresholds.opportunityRichThreshold
-    ) {
-        score += 10;
-    }
-    else if (
-        opportunity.opportunity >
-        CONFIG.opportunity.thresholds.idleCashThreshold
-    ) {
-        score += 5;
-    }
+        DEPLOY_CAPITAL: [
+            "DEPLOYABLE_CAPITAL",
+            "GROWTH_OPPORTUNITY",
+            "DEPLOYMENT_CAPACITY"
+        ],
 
-    switch (recommendation?.state) {
+        DEFER_PURCHASE: [
+            "PROTECTION_BREACH",
+            "SAFE_SPEND_EXCEEDED"
+        ]
+    };
 
-        case AdvisorStates.PROTECTION_GAP:
-            score += 10;
-            break;
+    const matchingEvidenceTypes =
+        recommendationEvidenceMap[
+            recommendation.id
+        ] || [];
 
-        case AdvisorStates.CASH_CONSTRAINED:
-            score += 10;
-            break;
+    const supportingEvidence =
+        evidence.filter(e =>
+            matchingEvidenceTypes.includes(
+                e.type
+            )
+        );
 
-        case AdvisorStates.GOAL_ACCELERATION:
-            score += 5;
-            break;
+    const conflictingEvidence =
+        evidence.filter(e =>
+            !matchingEvidenceTypes.includes(
+                e.type
+            )
+        );
 
-        case AdvisorStates.CAPITAL_DEPLOYMENT:
-            score += 5;
-            break;
+    let confidenceRaw = 0;
 
-        case AdvisorStates.OPPORTUNITY_RICH:
-            score += 5;
-            break;
-    }
+    supportingEvidence.forEach(e =>
+    {
+        confidenceRaw +=
+            Number(e.confidence || 0);
+    });
 
-    score =
+    confidenceRaw =
+        supportingEvidence.length > 0
+            ? confidenceRaw /
+              supportingEvidence.length
+            : 50;
+
+    const severityBonus =
+        supportingEvidence.reduce(
+            (total, e) =>
+            {
+                if (e.severity === "HIGH")
+                    return total + 10;
+
+                if (e.severity === "MEDIUM")
+                    return total + 5;
+
+                return total + 2;
+            },
+            0
+        );
+
+    const conflictPenalty =
+        conflictingEvidence.length * 2;
+
+    const confidenceAdjusted =
         Math.max(
             0,
-            Math.min(score, 100)
+            Math.min(
+                100,
+                confidenceRaw +
+                severityBonus -
+                conflictPenalty
+            )
         );
 
     return {
+        recommendationId:
+            recommendation.id,
+
+        evidence:
+            supportingEvidence,
+
+        supportingEvidenceCount:
+            supportingEvidence.length,
+
+        conflictingEvidenceCount:
+            conflictingEvidence.length,
+
+        confidenceRaw:
+            Math.round(confidenceRaw),
+
+        confidenceAdjusted:
+            Math.round(confidenceAdjusted)
+    };
+}
+
+function getRecommendationConfidence(recommendation)
+{
+    const result =
+        getRecommendationEvidence(
+            recommendation
+        );
+
+    const score =
+        result.confidenceAdjusted;
+
+    let level = "LOW";
+
+    if (score >= 90)
+    {
+        level = "HIGH";
+    }
+    else if (score >= 70)
+    {
+        level = "MEDIUM";
+    }
+
+    return {
         score,
-        level:
-            score >= 90
-                ? "HIGH"
-                : score >= 70
-                ? "MEDIUM"
-                : "LOW"
+        level,
+        supportingEvidence:
+            result.supportingEvidenceCount,
+        conflictingEvidence:
+            result.conflictingEvidenceCount
     };
 }
 
@@ -984,77 +1053,39 @@ function loadWealthAdvisor() {
 
 function getRecommendationConfidenceBreakdown(
     recommendation
-) {
-
-    const opportunity =
-        getOpportunityCapital();
-
-    const emergency =
-        getEmergencyFundGap();
-
-    const goal =
-        window.qaGoalFundingOptimizer;
-
-    const factors = [];
-
-    factors.push({
-        category: "Liquidity",
-        score:
-            opportunity.coverage >=
-            CONFIG.cashFlowDomain.cashFlow.healthyCoverage
-                ? 100
-                : opportunity.coverage >=
-                  CONFIG.cashFlowDomain.cashFlow.minimumCoverage
-                ? 70
-                : 30,
-        message:
-            opportunity.coverage >=
-            CONFIG.cashFlowDomain.cashFlow.healthyCoverage
-                ? "Liquidity protected"
-                : "Liquidity risk detected"
-    });
-
-    factors.push({
-        category: "Emergency Fund",
-        score:
-            emergency.fullyFunded
-                ? 100
-                : 40,
-        message:
-            emergency.fullyFunded
-                ? "Emergency reserve funded"
-                : "Emergency reserve below target"
-    });
-
-    factors.push({
-        category: "Goal Readiness",
-        score:
-            goal?.completable
-                ? 100
-                : 60,
-        message:
-            goal?.completable
-                ? "Goal can be completed"
-                : "Goal still requires funding"
-    });
-
-    factors.push({
-        category: "Advisor State",
-        score:
-            recommendation?.priority || 0,
-        message:
-            recommendation?.title ||
-            "No recommendation"
-    });
+)
+{
+    const evidenceResult =
+        getRecommendationEvidence(
+            recommendation
+        );
 
     return {
         score:
-            getRecommendationConfidence(
-                recommendation
-            ).score,
-        factors
+            evidenceResult.confidenceAdjusted,
+
+        factors:
+            evidenceResult.evidence.map(e => ({
+                category: e.type,
+
+                score:
+                    Number(
+                        e.confidence || 0
+                    ),
+
+                message:
+                    e.message || "",
+
+                status:
+                    e.severity === "HIGH"
+                        ? "GOOD"
+                        : e.severity === "MEDIUM"
+                        ? "FAIR"
+                        : "INFO"
+            }))
     };
 }
+
 
 function getConfidenceReason(score) {
     if (score >= 90) return "Strong financial data supports this recommendation.";
