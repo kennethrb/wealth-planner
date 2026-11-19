@@ -523,17 +523,47 @@ function loadReleasedCapitalCard() {
     `;
 }
 
-function getPrimaryRecommendation() {
+function getPrimaryRecommendation()
+{
+    /*
+    Ensure prerequisite advisor engines
+    are hydrated before ranking.
+    */
+
+    if (!window.qaBuffer)
+    {
+        loadBufferVsInvest();
+    }
+
+    if (!window.qaFinancialHealthAdvisor)
+    {
+        loadFinancialHealthAdvisor();
+    }
+
+    if (!window.qaSweep)
+    {
+        loadWealthSweep();
+    }
 
     const recommendations =
         getRankedRecommendations();
 
-    if (!recommendations.length) {
+    console.table(
+        recommendations.map(r => ({
+            id: r.id,
+            priority: r.priority,
+            title: r.title
+        }))
+    );
+
+    if (!recommendations.length)
+    {
         return {
             id: "NO_ACTION",
             priority: 0,
-            title: "Maintain stability",
-            reason: "No critical action detected."
+            title: "Maintain Stability",
+            reason:
+                "No critical action detected."
         };
     }
 
