@@ -117,6 +117,15 @@ function doGet(e) {
               mode: params.mode,
               categoryId: params.categoryId
           });
+      case "updateCategory":
+          return updateCategory({
+              mode: params.mode,
+              categoryId: params.categoryId,
+              budgetType: params.budgetType,
+              group: params.group,
+              categoryName: params.categoryName,
+              preferredFundingSource: params.preferredFundingSource
+          });
       case "addRecurringBill":
         return createJsonResponse(addRecurringBill(params));
       case "deleteRecurringBill":
@@ -127,17 +136,28 @@ function doGet(e) {
             })
         );
       case "updateRecurringBill":
-        return createJsonResponse(
-            updateRecurringBill({
-                mode: params.mode,
-                billId: params.billId,
-                amount: params.amount
-            })
-        );
+          return createJsonResponse(
+              updateRecurringBill({
+                  mode: params.mode,
+                  billId: params.billId,
+                  billName: params.billName,
+                  commitmentType: params.commitmentType,
+                  budgetType: params.budgetType,
+                  budgetPosition: params.budgetPosition,
+                  amountType: params.amountType,
+                  amount: params.amount,
+                  dueDay: params.dueDay,
+                  account: params.account
+              })
+          );
       case "generateBills":
         return createJsonResponse(
             generateBills(params.mode)
         );
+      case "generateSingleBill":
+          return createJsonResponse(
+              generateSingleBill(params)
+          );
       default:
         return createJsonResponse({ error: "Invalid Action: " + action });
     }
@@ -242,33 +262,45 @@ function getGoals(mode) {
     const target =
       Number(row["Target"] || 0);
 
-  return {
+    return {
+
       goalId:
           row["Goal ID"] || "",
 
       goal:
           row["Goal"] || "",
 
-      target: target,
+      target:
+          target,
 
-      current: current,
+      current:
+          current,
 
       monthlyContribution:
-        Number(
-          row["Monthly Contribution"] || 0
-        ),
+          Number(
+              row["Monthly Contribution"] || 0
+          ),
+
+      goalMode:
+          row["Goal Mode"] || "VIRTUAL",
+
+      protectionRole:
+          row["Protection Role"] || "OPTIONAL",
+
+      goalAccountId:
+          row["Goal Account ID"] || "",
 
       status:
           row["Status"] || "ACTIVE",
 
       graduatedDate:
-        row["Graduated Date"] || "",
+          row["Graduated Date"] || "",
 
       archivedDate:
-        row["Archived Date"] || ""
+          row["Archived Date"] || ""
+
     };
   });
-
 }
 
 function addGoal(data) {
@@ -323,6 +355,18 @@ function addGoal(data) {
           Number(
               data.monthlyContribution || 0
           );
+
+  if (cols["Goal Mode"])
+      row[cols["Goal Mode"] - 1] =
+          data.goalMode || "VIRTUAL";
+
+  if (cols["Protection Role"])
+      row[cols["Protection Role"] - 1] =
+          data.protectionRole || "OPTIONAL";
+
+  if (cols["Goal Account ID"])
+      row[cols["Goal Account ID"] - 1] =
+          data.goalAccountId || "";
 
   if (cols["Status"])
       row[
@@ -438,6 +482,33 @@ function updateGoal(data) {
              data.monthlyContribution || 0
           )
       );
+
+  if (cols["Goal Mode"]) {
+      sheet.getRange(
+          rowIndex,
+          cols["Goal Mode"]
+      ).setValue(
+          data.goalMode || "VIRTUAL"
+      );
+  }
+
+  if (cols["Protection Role"]) {
+      sheet.getRange(
+          rowIndex,
+          cols["Protection Role"]
+      ).setValue(
+          data.protectionRole || "OPTIONAL"
+      );
+  }
+
+  if (cols["Goal Account ID"]) {
+      sheet.getRange(
+          rowIndex,
+          cols["Goal Account ID"]
+      ).setValue(
+          data.goalAccountId || ""
+      );
+  }
 
   const calculatedStatus =
       getGoalStatus({
@@ -910,7 +981,7 @@ function checkAccountDependencies(accountId, mode) {
   const goalsSheet = getModeSheet(SHEET_GOALS, mode);
   if (goalsSheet) {
     const cols = getColumnIndexMap(SHEET_GOALS, mode);
-    const idCol = cols["Linked Account ID"] || cols["Account ID"] || cols["Preferred Funding Source ID"];
+    const idCol = cols["Goal Account ID"] || cols["Account ID"] || cols["Preferred Funding Source ID"];
     if (idCol) {
       const values = goalsSheet.getDataRange().getValues();
       for (let i = 1; i < values.length; i++) {
@@ -963,20 +1034,103 @@ function archiveAccount(params) {
 
 
 
-function getRecurringBills(mode) {
-  return getSheetObjects(SHEET_RECURRING,mode).map(row => ({
-    billId: row["Bill ID"] || "",
-    billName: row["Bill Name"] || "",
-    budgetType: row["Budget Type"] || "",
-    budgetPosition: row["Budget Position"] || "",
-    amountType: row["Amount Type"] || "",
-    defaultAmount: Number(row["Default Amount"] || 0),
-    dueDay: Number(row["Due Day"] || 0),
-    account: row["Account"] || "",
-    accountId: row["Account ID"] || "",
-    active: row["Active"]
-  }));
+function getRecurringBills(mode)
+{
+    return getSheetObjects(SHEET_RECURRING, mode)
+        .map(row => ({
+            billId: row["Bill ID"] || "",
+            billName: row["Bill Name"] || "",
+            commitmentType:
+                row["Commitment Type"] || "BILL",
+            budgetType:
+                row["Budget Type"] || "",
+            budgetPosition:
+                row["Budget Position"] || "",
+            amountType:
+                row["Amount Type"] || "",
+            defaultAmount:
+                Number(row["Default Amount"] || 0),
+            dueDay:
+                Number(row["Due Day"] || 0),
+
+            account:
+                row["Account"] || "",
+
+            accountId:
+                row["Account ID"] || "",
+
+            transferToAccount:
+                row["Transfer To Account"] || "",
+
+            transferToAccountId:
+                row["Transfer To Account ID"] || "",
+
+            active:
+                row["Active"]
+        }));
 }
+
+function generateSingleBill(params)
+{
+    const mode = params.mode;
+    const billId = params.billId;
+
+    const bill = getRecurringBills(mode)
+        .find(b => b.billId === billId);
+
+    if (!bill)
+    {
+        throw new Error(
+            "Bill not found: " + billId
+        );
+    }
+
+    let transferToAccount = "";
+    let transferToAccountId = "";
+
+    // Debt commitments should reduce a liability account
+    if (bill.commitmentType === "DEBT")
+    {
+        const liabilityAccount =
+            getAccounts(mode)
+                .find(a =>
+                    a.assetClass === bill.budgetPosition
+                );
+
+        if (liabilityAccount)
+        {
+            transferToAccount =
+                liabilityAccount.accountName || "";
+
+            transferToAccountId =
+                liabilityAccount.accountId || "";
+        }
+    }
+
+    const today = new Date();
+
+    addTransaction({
+        mode: mode,
+        date: Utilities.formatDate(
+            today,
+            Session.getScriptTimeZone(),
+            "yyyy-MM-dd"
+        ),
+        amount: bill.defaultAmount,
+        details: bill.billName,
+        account: bill.accountId,
+        budgetType: bill.budgetType,
+        budgetPosition: bill.budgetPosition,
+        transferToAccount: transferToAccount,
+        transferToAccountId: transferToAccountId,
+        recurringBillId: bill.billId
+    });
+
+    return {
+        success: true
+    };
+}
+
 
 function getAdvisorMemory(mode) {
 
@@ -1167,9 +1321,11 @@ function addTransaction(data) {
       );
 
   const txTransferToId =
-      data.transferToAccount ||
-      data["Transfer To Account"] ||
-      "";
+    data.transferToAccountId ||
+    data.transferToAccount ||
+    data["Transfer To Account ID"] ||
+    data["Transfer To Account"] ||
+    "";
 
   const txTransferToName =
       getAccountNameById(
@@ -1369,44 +1525,285 @@ function addCategory(request) {
   return createJsonResponse({ success: true });
 }
 
-function deleteCategory(request) {
-  const categoryId = request.categoryId;
-  if (!categoryId) return createJsonResponse({ success: false, message: "Category ID required" });
+function updateCategory(request) {
 
-  let categoryName = "";
+    const sheet =
+        getModeSheet(
+            SHEET_CATEGORIES,
+            request.mode
+        );
 
-  // Remove category from Categories sheet
-  const categorySheet =
-    getModeSheet(
-        SHEET_CATEGORIES,
-        request.mode
-    );
-  if (categorySheet) {
     const cols =
-    getColumnIndexMap(
-        SHEET_CATEGORIES,
-        request.mode
-    );
-    const catData = categorySheet.getDataRange().getValues();
+        getColumnIndexMap(
+            SHEET_CATEGORIES,
+            request.mode
+        );
 
-    if (catData.length > 1) {
-      const header = catData[0];
-      const idCol = cols["Category ID"] - 1;
-      const nameCol = cols["Category Name"] - 1;
+    const values =
+        sheet.getDataRange().getValues();
 
-      // Locate target row to get its name before deleting
-      const targetRow = catData.slice(1).find(row => row[idCol] === categoryId);
-      if (targetRow) categoryName = targetRow[nameCol];
+    const idCol =
+        cols["Category ID"] - 1;
 
-      const filtered = catData.slice(1).filter(row => row[idCol] !== categoryId);
-      const updated = [header, ...filtered];
+    for (let i = 1; i < values.length; i++) {
 
-      categorySheet.clearContents();
-      categorySheet.getRange(1, 1, updated.length, updated[0].length).setValues(updated);
+        if (
+            String(values[i][idCol]).trim() ===
+            String(request.categoryId).trim()
+        ) {
+
+            sheet.getRange(
+                i + 1,
+                cols["Budget Type"]
+            ).setValue(request.budgetType);
+
+            sheet.getRange(
+                i + 1,
+                cols["Group"]
+            ).setValue(request.group);
+
+            sheet.getRange(
+                i + 1,
+                cols["Category Name"]
+            ).setValue(request.categoryName);
+
+            const fundingSourceId =
+                request.preferredFundingSource || "";
+
+            const fundingSourceName =
+                getAccountNameById(
+                    fundingSourceId,
+                    request.mode
+                );
+
+            if (cols["Preferred Funding Source"]) {
+                sheet.getRange(
+                    i + 1,
+                    cols["Preferred Funding Source"]
+                ).setValue(
+                    fundingSourceName
+                );
+            }
+
+            if (cols["Preferred Funding Source ID"]) {
+                sheet.getRange(
+                    i + 1,
+                    cols["Preferred Funding Source ID"]
+                ).setValue(
+                    fundingSourceId
+                );
+            }
+
+            return createJsonResponse({
+                success: true
+            });
+        }
     }
-  }
 
-  return createJsonResponse({ success: true });
+    return createJsonResponse({
+        success: false,
+        error: "Category not found"
+    });
+}
+
+function checkCategoryDependencies(
+    categoryName,
+    mode
+) {
+
+    let transactionCount = 0;
+    let recurringBillCount = 0;
+
+    const transactions =
+        getTransactions(mode);
+
+    transactionCount =
+        transactions.filter(tx =>
+            String(
+                tx["Budget Position"] ||
+                tx.budgetPosition ||
+                ""
+            ).trim() ===
+            String(categoryName).trim()
+        ).length;
+
+    const bills =
+        getRecurringBills(mode);
+
+    recurringBillCount =
+        bills.filter(bill =>
+            String(
+                bill.budgetPosition || ""
+            ).trim() ===
+            String(categoryName).trim()
+        ).length;
+
+    return {
+        hasDependencies:
+            transactionCount > 0 ||
+            recurringBillCount > 0,
+        transactionCount,
+        recurringBillCount
+    };
+}
+
+function deleteCategory(request) {
+
+    const categoryId =
+        request.categoryId;
+
+    if (!categoryId) {
+        return createJsonResponse({
+            success: false,
+            message:
+                "Category ID required"
+        });
+    }
+
+    const categorySheet =
+        getModeSheet(
+            SHEET_CATEGORIES,
+            request.mode
+        );
+
+    if (!categorySheet) {
+        return createJsonResponse({
+            success: false,
+            message:
+                "Categories sheet not found"
+        });
+    }
+
+    const cols =
+        getColumnIndexMap(
+            SHEET_CATEGORIES,
+            request.mode
+        );
+
+    const catData =
+        categorySheet
+            .getDataRange()
+            .getValues();
+
+    const idCol =
+        cols["Category ID"] - 1;
+
+    const nameCol =
+        cols["Category Name"] - 1;
+
+    let categoryName = "";
+
+    for (
+        let i = 1;
+        i < catData.length;
+        i++
+    ) {
+
+        if (
+            String(
+                catData[i][idCol]
+            ).trim() ===
+            String(categoryId).trim()
+        ) {
+
+            categoryName =
+                catData[i][nameCol];
+
+            break;
+        }
+    }
+
+    if (!categoryName) {
+
+        return createJsonResponse({
+            success: false,
+            message:
+                "Category not found"
+        });
+
+    }
+
+    const dependencies =
+        checkCategoryDependencies(
+            categoryName,
+            request.mode
+        );
+
+    if (
+        dependencies.hasDependencies
+    ) {
+
+        return createJsonResponse({
+            success: false,
+            requiresConfirmation: true,
+            message:
+                `Category is used by ${
+                    dependencies.transactionCount
+                } transaction(s) and ${
+                    dependencies.recurringBillCount
+                } recurring bill(s).`,
+            dependencies
+        });
+
+    }
+
+    const header =
+        catData[0];
+
+    const filtered =
+        catData
+            .slice(1)
+            .filter(row =>
+                row[idCol] !==
+                categoryId
+            );
+
+    const updated = [
+        header,
+        ...filtered
+    ];
+
+    categorySheet.clearContents();
+
+    categorySheet
+        .getRange(
+            1,
+            1,
+            updated.length,
+            updated[0].length
+        )
+        .setValues(updated);
+
+    return createJsonResponse({
+        success: true
+    });
+}
+
+function generateRecurringBillId(mode) {
+
+    const bills =
+        getRecurringBills(mode);
+
+    let highest = 0;
+
+    bills.forEach(bill => {
+
+        const match =
+            String(bill.billId || "")
+                .match(/^RB(\d+)$/);
+
+        if (match) {
+
+            highest = Math.max(
+                highest,
+                Number(match[1])
+            );
+        }
+    });
+
+    return `RB${String(
+        highest + 1
+    ).padStart(3, "0")}`;
 }
 
 function addRecurringBill(params) {
@@ -1423,10 +1820,17 @@ function addRecurringBill(params) {
       );
 
   const row = new Array(sheet.getLastColumn()).fill("");
-  const billId = `RB${String(sheet.getLastRow()).padStart(3, "0")}`;
+  const billId =
+    generateRecurringBillId(
+        params.mode
+    );
 
   row[cols["Bill ID"] - 1] = billId;
   row[cols["Bill Name"] - 1] = params.billName;
+    if (cols["Commitment Type"]) {
+        row[cols["Commitment Type"] - 1] =
+            params.commitmentType || "BILL";
+    }
   row[cols["Budget Type"] - 1] = params.budgetType;
   row[cols["Budget Position"] - 1] = params.budgetPosition;
   row[cols["Amount Type"] - 1] = params.amountType;
@@ -1451,13 +1855,12 @@ function addRecurringBill(params) {
 }
 
 function updateRecurringBill(request) {
+
   if (!request.billId) {
-    return { success: false, message: "Missing Bill ID" };
-  }
-  
-  const amount = Number(request.amount);
-  if (isNaN(amount) || amount < 0) {
-    return { success: false, message: "Invalid amount value" };
+    return {
+      success: false,
+      message: "Missing Bill ID"
+    };
   }
 
   const sheet =
@@ -1466,24 +1869,134 @@ function updateRecurringBill(request) {
           request.mode
       );
 
-  if (!sheet) return { success: false, message: "Sheet not found" };
+  if (!sheet) {
+    return {
+      success: false,
+      message: "Sheet not found"
+    };
+  }
 
   const cols =
       getColumnIndexMap(
           SHEET_RECURRING,
           request.mode
       );
-  const data = sheet.getDataRange().getValues();
-  const billIdCol = cols["Bill ID"] - 1;
 
-  for (let i = 1; i < data.length; i++) {
-    if (String(data[i][billIdCol]).trim() === String(request.billId).trim()) {
-      sheet.getRange(i + 1, cols["Default Amount"]).setValue(amount);
-      return { success: true };
+  const values =
+      sheet.getDataRange().getValues();
+
+  const billIdCol =
+      cols["Bill ID"] - 1;
+
+  for (let i = 1; i < values.length; i++) {
+
+    if (
+      String(values[i][billIdCol]).trim() ===
+      String(request.billId).trim()
+    ) {
+
+      const row = i + 1;
+
+      if (cols["Bill Name"]) {
+        sheet.getRange(
+          row,
+          cols["Bill Name"]
+        ).setValue(
+          request.billName || ""
+        );
+      }
+
+      if (cols["Commitment Type"]) {
+        sheet.getRange(
+          row,
+          cols["Commitment Type"]
+        ).setValue(
+          request.commitmentType || "BILL"
+        );
+      }
+
+      if (cols["Budget Type"]) {
+        sheet.getRange(
+          row,
+          cols["Budget Type"]
+        ).setValue(
+          request.budgetType || ""
+        );
+      }
+
+      if (cols["Budget Position"]) {
+        sheet.getRange(
+          row,
+          cols["Budget Position"]
+        ).setValue(
+          request.budgetPosition || ""
+        );
+      }
+
+      if (cols["Amount Type"]) {
+        sheet.getRange(
+          row,
+          cols["Amount Type"]
+        ).setValue(
+          request.amountType || ""
+        );
+      }
+
+      if (cols["Default Amount"]) {
+        sheet.getRange(
+          row,
+          cols["Default Amount"]
+        ).setValue(
+          Number(request.amount || 0)
+        );
+      }
+
+      if (cols["Due Day"]) {
+        sheet.getRange(
+          row,
+          cols["Due Day"]
+        ).setValue(
+          Number(request.dueDay || 0)
+        );
+      }
+
+      const accountId =
+          request.account || "";
+
+      const accountName =
+          getAccountNameById(
+              accountId,
+              request.mode
+          );
+
+      if (cols["Account"]) {
+        sheet.getRange(
+          row,
+          cols["Account"]
+        ).setValue(
+          accountName
+        );
+      }
+
+      if (cols["Account ID"]) {
+        sheet.getRange(
+          row,
+          cols["Account ID"]
+        ).setValue(
+          accountId
+        );
+      }
+
+      return {
+        success: true
+      };
     }
   }
 
-  return { success: false, message: "Bill ID not found" };
+  return {
+    success: false,
+    message: "Bill not found"
+  };
 }
 
 function deleteRecurringBill(request) {
@@ -1713,19 +2226,40 @@ function getModeSheet(
 
 function getGoalStatus(goal) {
 
-  if (goal.status === "ARCHIVED") {
+  const current =
+      Number(goal.current || 0);
+
+  const target =
+      Number(goal.target || 0);
+
+  const status =
+      String(
+          goal.status || ""
+      ).toUpperCase();
+
+  if (status === "ARCHIVED") {
+
       return "ARCHIVED";
+
   }
 
-  if (goal.status === "GRADUATED") {
+  if (status === "GRADUATED") {
+
       return "GRADUATED";
+
   }
 
-  if (goal.status === "FUNDED") {
+  if (
+      target > 0 &&
+      current >= target
+  ) {
+
       return "FUNDED";
+
   }
 
   return "ACTIVE";
+
 }
 
 
