@@ -1,87 +1,152 @@
 // ==================== FILE: recommendationRanking.js ====================
 
-function getRankedRecommendations() {
-
-    const context = getAdvisorContext();
+function getRankedRecommendations()
+{
     const wealthState = getWealthState();
 
     const recommendations = [];
 
-    if (wealthState === AdvisorStates.PROTECTION_GAP) {
+    //
+    // EVIDENCE COLLECTION
+    //
+
+    const healthEvidence =
+        window.qaFinancialHealthAdvisor?.evidence || [];
+
+    const protectionEvidence =
+        window.qaBuffer?.evidence || [];
+
+    const deploymentEvidence =
+        window.qaSweep?.evidence || [];
+
+    const purchaseEvidence =
+        window.qaPurchase?.evidence || [];
+
+    //
+    // PROTECTION FIRST
+    //
+
+    const hasProtectionGap =
+        wealthState === AdvisorStates.PROTECTION_GAP ||
+        protectionEvidence.some(
+            e => e.type === "BUFFER_PRIORITY"
+        );
+
+    if (hasProtectionGap)
+    {
         recommendations.push({
             id: "PROTECT_LIQUIDITY",
-            priority: 100,
-            title: "Protect liquidity",
-            reason: "Cash reserves are below protection requirements.",
-            state: wealthState
+            priority: 1000,
+            title: "Increase Protection Reserve",
+            reason:
+                "Protection Gap detected. Available liquidity remains below protection requirements.",
+            state: AdvisorStates.PROTECTION_GAP
         });
     }
 
-    if (wealthState === AdvisorStates.CASH_CONSTRAINED) {
+    //
+    // CASH FLOW
+    //
+
+    const hasSavingsGap =
+        healthEvidence.some(
+            e => e.type === "SAVINGS_GAP"
+        );
+
+    if (hasSavingsGap)
+    {
         recommendations.push({
-            id: "INCREASE_CASH_BUFFER",
-            priority: 90,
-            title: "Increase cash buffer",
-            reason: "Coverage level remains below target.",
-            state: wealthState
+            id: "IMPROVE_SAVINGS_RATE",
+            priority: 700,
+            title: "Increase Savings Rate",
+            reason:
+                "Current savings behavior is limiting long‑term wealth growth.",
+            state: "SAVINGS_GAP"
         });
     }
 
-    if (wealthState === AdvisorStates.GOAL_ACCELERATION) {
+    //
+    // GOAL ACCELERATION
+    //
+
+    if (
+        wealthState === AdvisorStates.GOAL_ACCELERATION &&
+        window.qaGoalFundingOptimizer?.completable
+    )
+    {
         recommendations.push({
             id: "COMPLETE_GOAL",
-            priority: 80,
-            title: "Accelerate a goal",
-            reason: "Available capital can complete a goal now.",
-            state: wealthState
+            priority: 800,
+            title:
+                window.qaGoalFundingOptimizer.priorityAction,
+            reason:
+                window.qaGoalFundingOptimizer.reason,
+            state: AdvisorStates.GOAL_ACCELERATION
         });
     }
 
-    if (wealthState === AdvisorStates.CAPITAL_DEPLOYMENT) {
+    //
+    // CAPITAL DEPLOYMENT
+    //
+
+    const hasDeploymentCapacity =
+        deploymentEvidence.some(
+            e => e.type === "DEPLOYABLE_CAPITAL"
+        );
+
+    if (
+        wealthState === AdvisorStates.CAPITAL_DEPLOYMENT ||
+        hasDeploymentCapacity
+    )
+    {
         recommendations.push({
             id: "DEPLOY_CAPITAL",
-            priority: 70,
-            title: "Deploy excess capital",
-            reason: "Protected capital appears available.",
-            state: wealthState
+            priority: 600,
+            title: "Deploy Available Capital",
+            reason:
+                "Protected capital is available for wealth acceleration.",
+            state: AdvisorStates.CAPITAL_DEPLOYMENT
         });
     }
 
-    const opportunities =
-        getRankedOpportunities();
-    
-    if (
-        recommendations.length === 0 &&
-        opportunities.length > 0
-    ) {
-    
-        const topOpportunity =
-            opportunities[0];
-    
-        recommendations.push({
-    
-            id:
-                "TOP_OPPORTUNITY",
-    
-            priority:
-                50,
-    
-            title:
-                topOpportunity.title,
-    
-            reason:
-                topOpportunity.description,
-    
-            state:
-                AdvisorStates.OPPORTUNITY_RICH
-    
-        });
-    
-    }
-    
-    return recommendations
-        .sort(
-            (a, b) =>
-                b.priority - a.priority
+    //
+    // PURCHASE RISK
+    //
+
+    const hasPurchaseRisk =
+        purchaseEvidence.some(
+            e => e.type === "PROTECTION_BREACH"
         );
+
+    if (hasPurchaseRisk)
+    {
+        recommendations.push({
+            id: "DEFER_PURCHASE",
+            priority: 900,
+            title: "Delay Major Purchase",
+            reason:
+                "Purchase would reduce protected liquidity below required levels.",
+            state: "PURCHASE_RISK"
+        });
+    }
+
+    //
+    // FALLBACK
+    //
+
+    if (recommendations.length === 0)
+    {
+        recommendations.push({
+            id: "MAINTAIN_STABILITY",
+            priority: 1,
+            title: "Maintain Stability",
+            reason:
+                "No critical action detected.",
+            state: AdvisorStates.STABLE
+        });
+    }
+
+    return recommendations.sort(
+        (a, b) => b.priority - a.priority
+    );
 }
