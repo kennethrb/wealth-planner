@@ -42,14 +42,58 @@ function closeReceiptModal() {
         ?.classList
         .remove("show");
 
-    document
-        .getElementById("receiptImage").value = "";
+    resetReceiptForm();
+}
 
-    document
-        .getElementById("receiptPreview").style.display = "none";
+function resetReceiptForm() {
 
-    document
-        .getElementById("receiptDecisionCard").innerHTML = "";
+    const preview =
+        document.getElementById(
+            "receiptPreview"
+        );
+
+    document.getElementById(
+        "receiptImage"
+    ).value = "";
+
+    preview.src = "";
+    preview.style.display = "none";
+
+    document.getElementById(
+        "receiptDecisionCard"
+    ).innerHTML = "";
+
+    document.getElementById(
+        "ocrMerchant"
+    ).value = "";
+
+    document.getElementById(
+        "ocrAmount"
+    ).value = "";
+
+    document.getElementById(
+        "ocrDate"
+    ).value = "";
+
+    if (
+        document.getElementById(
+            "ocrAccount"
+        )
+    ) {
+        document.getElementById(
+            "ocrAccount"
+        ).selectedIndex = 0;
+    }
+
+    if (
+        document.getElementById(
+            "ocrCategory"
+        )
+    ) {
+        document.getElementById(
+            "ocrCategory"
+        ).selectedIndex = 0;
+    }
 }
 
 function previewReceipt(event) {
@@ -335,74 +379,14 @@ function renderOCRDecisionCard() {
 
     card.innerHTML =
     `
-    <div class="advisor-action success">
+    <div class="advisor-action priority">
 
         <div class="action-title">
-            RECOMMENDED ACTION
+            📷 RECEIPT READY
         </div>
 
         <p>
-            Save Receipt Transaction
-        </p>
-
-    </div>
-
-    <div class="advisor-action">
-
-        <div class="action-title">
-            CONFIDENCE
-        </div>
-
-        <p>
-            OCR Extraction Completed
-        </p>
-
-    </div>
-
-    <div class="advisor-action">
-
-        <div class="action-title">
-            WHY NOW
-        </div>
-
-        <p>
-            Receipt details captured automatically
-        </p>
-
-    </div>
-
-    <div class="advisor-action success">
-
-        <div class="action-title">
-            WEALTH IMPACT
-        </div>
-
-        <p>
-            Faster transaction capture improves wealth intelligence
-        </p>
-
-    </div>
-
-    <div class="advisor-action warning">
-
-        <div class="action-title">
-            RISK
-        </div>
-
-        <p>
-            Verify extracted values before saving
-        </p>
-
-    </div>
-
-    <div class="advisor-action">
-
-        <div class="action-title">
-            ALTERNATIVE
-        </div>
-
-        <p>
-            Manual transaction entry
+            Review extracted details and save transaction.
         </p>
 
     </div>
@@ -459,29 +443,58 @@ function loadOCRAccounts() {
 
 function saveReceiptDraft() {
 
-    document.getElementById("txDate").value =
-        document.getElementById("ocrDate").value;
+    document.getElementById(
+        "txDate"
+    ).value =
+    document.getElementById(
+        "ocrDate"
+    ).value;
 
-    document.getElementById("txAmount").value =
-        document.getElementById("ocrAmount").value;
+    document.getElementById(
+        "txAmount"
+    ).value =
+    document.getElementById(
+        "ocrAmount"
+    ).value;
 
-    document.getElementById("txDetails").value =
-        document.getElementById("ocrMerchant").value;
+    document.getElementById(
+        "txDetails"
+    ).value =
+    document.getElementById(
+        "ocrMerchant"
+    ).value;
 
-    document.getElementById("txAccount").value =
-        document.getElementById("ocrAccount").value;
+    document.getElementById(
+        "txAccount"
+    ).value =
+    document.getElementById(
+        "ocrAccount"
+    ).value;
 
-    document.getElementById("txBudgetType").value =
-        "Expense";
+    document.getElementById(
+        "txBudgetType"
+    ).value =
+    "Expense";
 
     toggleTransactionFields();
 
-    document.getElementById("txBudgetPosition").value =
-        document.getElementById("ocrCategory").value;
-
-    closeReceiptModal();
+    document.getElementById(
+        "txBudgetPosition"
+    ).value =
+    document.getElementById(
+        "ocrCategory"
+    ).value;
 
     addTransaction();
+
+    resetReceiptForm();
+
+    document
+        .getElementById(
+            "receiptModal"
+        )
+        .classList
+        .remove("show");
 }
 
 document.addEventListener(
