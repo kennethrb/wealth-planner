@@ -253,3 +253,53 @@ function saveReceiptDraft() {
 
     addTransaction();
 }
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        document
+            .getElementById(
+                "recordActivityLauncher"
+            )
+            ?.addEventListener(
+                "click",
+                openActivityMethodModal
+            );
+
+    }
+);
+
+function openActivityMethodModal(){
+
+    document
+        .getElementById(
+            "activityMethodModal"
+        )
+        ?.classList
+        .add("show");
+}
+
+function closeActivityMethodModal(){
+
+    document
+        .getElementById(
+            "activityMethodModal"
+        )
+        ?.classList
+        .remove("show");
+}
+
+function openManualTransactionFlow(){
+
+    closeActivityMethodModal();
+
+    openTransactionModal();
+}
+
+function openReceiptFlow(){
+
+    closeActivityMethodModal();
+
+    openReceiptModal();
+}
