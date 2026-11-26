@@ -2116,6 +2116,24 @@ tr.section-debt td:first-child {
     color:var(--text-muted);
 }
 
+.receipt-save-container{
+
+    width:100%;
+
+    margin-top:12px;
+}
+
+.receipt-save-container button{
+
+    width:100%;
+
+    min-height:52px;
+
+    font-size:15px;
+
+    font-weight:700;
+}
+
 .transaction-date {
     color: var(--text-muted);
     font-size: 12px;
