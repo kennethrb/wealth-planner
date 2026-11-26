@@ -81,7 +81,14 @@ function previewReceipt(event) {
     reader.readAsDataURL(file);
 }
 
-function simulateOCR() {
+async function simulateOCR() {
+
+    const file =
+        document.getElementById(
+            "receiptImage"
+        )?.files?.[0];
+
+    if (!file) return;
 
     const card =
         document.getElementById(
@@ -89,137 +96,270 @@ function simulateOCR() {
         );
 
     card.innerHTML =
+    `
+    <div class="advisor-action priority">
+
+        <div class="action-title">
+            📷 ANALYZING RECEIPT
+        </div>
+
+        <p>
+            Reading receipt...
+        </p>
+
+    </div>
+    `;
+
+    try {
+
+        const result =
+            await Tesseract.recognize(
+                file,
+                "eng"
+            );
+
+        const rawText =
+            result.data.text || "";
+
+        console.log(
+            "OCR RESULT",
+            rawText
+        );
+
+        populateOCRFields(
+            rawText
+        );
+
+    } catch(error) {
+
+        console.error(error);
+
+        card.innerHTML =
         `
-        <div class="advisor-action priority">
+        <div class="advisor-action danger">
+
             <div class="action-title">
-                📷 ANALYZING RECEIPT
+                OCR FAILED
             </div>
 
             <p>
-                Processing...
+                Could not read receipt.
             </p>
+
         </div>
         `;
+    }
+}
 
-    setTimeout(() => {
+function populateOCRFields(
+    text
+) {
 
-        document.getElementById(
-            "ocrMerchant"
-        ).value =
-            "Tong Yang Venice";
+    const amount =
+        extractAmount(text);
 
-        document.getElementById(
-            "ocrAmount"
-        ).value =
-            4704.86;
+    const merchant =
+        extractMerchant(text);
 
-        document.getElementById(
-            "ocrDate"
-        ).value =
-            "2026-11-22";
+    const date =
+        extractDate(text);
 
-        const account =
-            document.getElementById(
-                "ocrAccount"
+    document.getElementById(
+        "ocrMerchant"
+    ).value =
+        merchant;
+
+    document.getElementById(
+        "ocrAmount"
+    ).value =
+        amount;
+
+    document.getElementById(
+        "ocrDate"
+    ).value =
+        date;
+
+    renderOCRDecisionCard();
+}
+
+function extractMerchant(
+    text
+) {
+
+    const lines =
+        text.split("\n")
+            .filter(
+                line =>
+                    line.trim()
             );
-        
-        if (
-            account &&
-            account.options.length > 0
-        ){
-            account.selectedIndex = 0;
-        }
 
-        const category =
-            document.getElementById(
-                "ocrCategory"
-            );
+    if (
+        lines.length === 0
+    ) {
+        return "";
+    }
 
-        if (category) {
+    return lines[0]
+        .trim()
+        .substring(0,50);
+}
 
-            for (
-                let i = 0;
-                i < category.options.length;
-                i++
-            ) {
+function extractAmount(
+    text
+) {
 
-                if (
-                    category.options[i]
-                        .text
-                        .toLowerCase()
-                        .includes("dining")
-                ) {
+    const matches =
+        text.match(
+            /\d{1,3}(,\d{3})*(\.\d{2})/g
+        );
 
-                    category.selectedIndex = i;
-                    break;
-                }
-            }
-        }
+    if (
+        !matches ||
+        !matches.length
+    ) {
+        return "";
+    }
 
-        card.innerHTML =
-            `
-            <div class="advisor-action priority">
+    const values =
+        matches.map(
+            value =>
+                parseFloat(
+                    value.replace(
+                        /,/g,
+                        ""
+                    )
+                )
+        );
 
-                <div class="action-title">
-                    RECOMMENDED ACTION
-                </div>
+    return Math.max(
+        ...values
+    );
+}
 
-                <p>
-                    Save Receipt Transaction
-                </p>
+function extractDate(
+    text
+) {
 
-            </div>
+    const match =
+        text.match(
+            /\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/
+        );
 
-            <div class="advisor-action">
+    if (!match)
+        return "";
 
-                <div class="action-title">
-                    CONFIDENCE
-                </div>
+    const parts =
+        match[0]
+        .split(/[\/\-]/);
 
-                <p>
-                    High
-                </p>
+    const month =
+        parts[0]
+        .padStart(
+            2,
+            "0"
+        );
 
-            </div>
+    const day =
+        parts[1]
+        .padStart(
+            2,
+            "0"
+        );
 
-            <div class="advisor-action">
+    let year =
+        parts[2];
 
-                <div class="action-title">
-                    WHY NOW
-                </div>
+    if (
+        year.length === 2
+    ) {
+        year =
+            "20" + year;
+    }
 
-                <p>
-                    Transaction detected successfully
-                </p>
+    return `${year}-${month}-${day}`;
+}
 
-            </div>
+function renderOCRDecisionCard() {
 
-            <div class="advisor-action success">
+    const card =
+        document.getElementById(
+            "receiptDecisionCard"
+        );
 
-                <div class="action-title">
-                    WEALTH IMPACT
-                </div>
+    card.innerHTML =
+    `
+    <div class="advisor-action success">
 
-                <p>
-                    Improves spending intelligence
-                </p>
+        <div class="action-title">
+            RECOMMENDED ACTION
+        </div>
 
-            </div>
+        <p>
+            Save Receipt Transaction
+        </p>
 
-            <div class="advisor-action warning">
+    </div>
 
-                <div class="action-title">
-                    RISK
-                </div>
+    <div class="advisor-action">
 
-                <p>
-                    Merchant category could be incorrect
-                </p>
+        <div class="action-title">
+            CONFIDENCE
+        </div>
 
-            </div>
-            `;
+        <p>
+            OCR Extraction Completed
+        </p>
 
-    }, 1200);
+    </div>
+
+    <div class="advisor-action">
+
+        <div class="action-title">
+            WHY NOW
+        </div>
+
+        <p>
+            Receipt details captured automatically
+        </p>
+
+    </div>
+
+    <div class="advisor-action success">
+
+        <div class="action-title">
+            WEALTH IMPACT
+        </div>
+
+        <p>
+            Faster transaction capture improves wealth intelligence
+        </p>
+
+    </div>
+
+    <div class="advisor-action warning">
+
+        <div class="action-title">
+            RISK
+        </div>
+
+        <p>
+            Verify extracted values before saving
+        </p>
+
+    </div>
+
+    <div class="advisor-action">
+
+        <div class="action-title">
+            ALTERNATIVE
+        </div>
+
+        <p>
+            Manual transaction entry
+        </p>
+
+    </div>
+    `;
 }
 
 function loadOCRCategories() {
