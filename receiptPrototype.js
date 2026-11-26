@@ -236,47 +236,94 @@ function extractAmount(
     );
 }
 
-function extractDate(
-    text
-) {
+function extractDate(text) {
 
-    const match =
+    // Format:
+    // 11/22/2026
+    // 11-22-2026
+
+    let match =
         text.match(
             /\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/
         );
 
-    if (!match)
-        return "";
+    if (match) {
 
-    const parts =
-        match[0]
-        .split(/[\/\-]/);
+        const parts =
+            match[0]
+            .split(/[\/\-]/);
 
-    const month =
-        parts[0]
-        .padStart(
-            2,
-            "0"
-        );
+        let month =
+            parts[0]
+            .padStart(2, "0");
 
-    const day =
-        parts[1]
-        .padStart(
-            2,
-            "0"
-        );
+        let day =
+            parts[1]
+            .padStart(2, "0");
 
-    let year =
-        parts[2];
+        let year =
+            parts[2];
 
-    if (
-        year.length === 2
-    ) {
-        year =
-            "20" + year;
+        if (year.length === 2) {
+            year = "20" + year;
+        }
+
+        return `${year}-${month}-${day}`;
     }
 
-    return `${year}-${month}-${day}`;
+    // Format:
+    // NOV 22, 26
+
+    match =
+        text.match(
+            /\b(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\s+\d{1,2},\s*\d{2,4}/i
+        );
+
+    if (match) {
+
+        const dateString =
+            match[0]
+                .toUpperCase()
+                .replace(",", "");
+
+        const parts =
+            dateString.split(/\s+/);
+
+        const monthMap = {
+
+            JAN: "01",
+            FEB: "02",
+            MAR: "03",
+            APR: "04",
+            MAY: "05",
+            JUN: "06",
+            JUL: "07",
+            AUG: "08",
+            SEP: "09",
+            OCT: "10",
+            NOV: "11",
+            DEC: "12"
+
+        };
+
+        const month =
+            monthMap[parts[0]];
+
+        const day =
+            parts[1]
+                .padStart(2, "0");
+
+        let year =
+            parts[2];
+
+        if (year.length === 2) {
+            year = "20" + year;
+        }
+
+        return `${year}-${month}-${day}`;
+    }
+
+    return "";
 }
 
 function renderOCRDecisionCard() {
