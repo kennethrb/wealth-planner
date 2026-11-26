@@ -2037,6 +2037,85 @@ tr.section-debt td:first-child {
     padding: 18px;
 }
 
+.activity-choice-container{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.activity-choice-btn{
+    display:flex;
+    align-items:center;
+    gap:16px;
+
+    width:100%;
+    padding:18px;
+
+    border-radius:16px;
+
+    border:1px solid var(--border);
+
+    background:rgba(255,255,255,.03);
+
+    color:var(--text-main);
+
+    cursor:pointer;
+
+    transition:.2s ease;
+
+    text-align:left;
+}
+
+.activity-choice-btn:hover{
+
+    border-color:#34d399;
+
+    background:rgba(52,211,153,.08);
+
+    transform:translateY(-2px);
+}
+
+.activity-icon{
+
+    width:48px;
+    height:48px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:12px;
+
+    background:rgba(255,255,255,.05);
+
+    font-size:22px;
+
+    flex-shrink:0;
+}
+
+.activity-content{
+
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+}
+
+.activity-title{
+
+    font-size:15px;
+
+    font-weight:700;
+
+    color:var(--text-main);
+}
+
+.activity-subtitle{
+
+    font-size:13px;
+
+    color:var(--text-muted);
+}
+
 .transaction-date {
     color: var(--text-muted);
     font-size: 12px;
