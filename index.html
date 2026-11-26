@@ -169,11 +169,19 @@
           💳 Recent Activity
       </h2>
       
-          <button
-              id="openTransactionModal"
-              class="btn-primary">
-              ➕ Record Activity
-          </button>
+          <div style="display:flex; gap:8px;">
+              <button
+                  id="openTransactionModal"
+                  class="btn-primary">
+                  ➕ Record Activity
+              </button>
+          
+              <button
+                  id="openReceiptModal"
+                  class="btn-secondary">
+                  📷 Scan Receipt
+              </button>
+          </div>
       </div>
     
     
@@ -697,6 +705,83 @@
     </div>
 
 </div>
+
+<div id="receiptModal" class="modal-overlay">
+
+    <div class="modal-card">
+
+        <div class="modal-header">
+            <h2>📷 Scan Receipt</h2>
+
+            <button
+                class="modal-close"
+                onclick="closeReceiptModal()">
+                ✕
+            </button>
+        </div>
+
+        <div class="form-row">
+
+            <div class="form-group">
+                <label>Receipt Image</label>
+
+                <input
+                    type="file"
+                    id="receiptImage"
+                    accept="image/*" />
+            </div>
+
+            <img
+                id="receiptPreview"
+                style="
+                    display:none;
+                    width:100%;
+                    border-radius:12px;
+                    margin-top:10px;
+                ">
+
+            <div id="receiptDecisionCard"></div>
+
+            <div class="form-group">
+                <label>Merchant</label>
+
+                <input
+                    type="text"
+                    id="ocrMerchant" />
+            </div>
+
+            <div class="form-group">
+                <label>Amount</label>
+
+                <input
+                    type="number"
+                    id="ocrAmount" />
+            </div>
+
+            <div class="form-group">
+                <label>Date</label>
+
+                <input
+                    type="date"
+                    id="ocrDate" />
+            </div>
+
+            <div class="form-group">
+                <label>Category</label>
+
+                <select id="ocrCategory"></select>
+            </div>
+
+            <button
+                onclick="saveReceiptDraft()">
+                Save Transaction
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
   
   <!-- Confirmation Modal -->
   <div id="confirmModal" class="confirm-modal">
@@ -805,6 +890,7 @@
   <script src="qa.js"></script>
   <!-- UI: -->  
   <script src="featureGuide.js"></script>
+  <script src="receiptPrototype.js"></script>
   <!-- Application Bootstrap: -->  
   <script src="app.js"></script>
 </body>
