@@ -169,19 +169,11 @@
           💳 Recent Activity
       </h2>
       
-          <div style="display:flex; gap:8px;">
-              <button
-                  id="openTransactionModal"
-                  class="btn-primary">
-                  ➕ Record Activity
-              </button>
-          
-              <button
-                  id="openReceiptModal"
-                  class="btn-secondary">
-                  📷 Scan Receipt
-              </button>
-          </div>
+        <button
+            id="recordActivityLauncher"
+            class="btn-primary">
+            ➕ Record Activity
+        </button>
       </div>
     
     
@@ -775,6 +767,72 @@
             <button
                 onclick="saveReceiptDraft()">
                 Save Transaction
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div id="activityMethodModal" class="modal-overlay">
+
+    <div class="modal-card">
+
+        <div class="modal-header">
+            <h2>Record Activity</h2>
+
+            <button
+                class="modal-close"
+                onclick="closeActivityMethodModal()">
+                ✕
+            </button>
+        </div>
+
+        <div class="activity-choice-container">
+
+            <button
+                class="activity-choice-btn"
+                onclick="openManualTransactionFlow()">
+
+                <div class="activity-icon">
+                    ✍️
+                </div>
+
+                <div class="activity-content">
+
+                    <div class="activity-title">
+                        Manual Entry
+                    </div>
+
+                    <div class="activity-subtitle">
+                        Record a transaction manually
+                    </div>
+
+                </div>
+
+            </button>
+
+            <button
+                class="activity-choice-btn"
+                onclick="openReceiptFlow()">
+
+                <div class="activity-icon">
+                    📷
+                </div>
+
+                <div class="activity-content">
+
+                    <div class="activity-title">
+                        Scan Receipt
+                    </div>
+
+                    <div class="activity-subtitle">
+                        Extract transaction from receipt
+                    </div>
+
+                </div>
+
             </button>
 
         </div>
