@@ -25,8 +25,12 @@ function openReceiptModal() {
 
     loadOCRCategories();
 
+    loadOCRAccounts();
+
     document
-        .getElementById("receiptModal")
+        .getElementById(
+            "receiptModal"
+        )
         ?.classList
         .add("show");
 }
@@ -113,6 +117,18 @@ function simulateOCR() {
             "ocrDate"
         ).value =
             "2026-11-22";
+
+        const account =
+            document.getElementById(
+                "ocrAccount"
+            );
+        
+        if (
+            account &&
+            account.options.length > 0
+        ){
+            account.selectedIndex = 0;
+        }
 
         const category =
             document.getElementById(
@@ -230,6 +246,30 @@ function loadOCRCategories() {
         });
 }
 
+function loadOCRAccounts() {
+
+    const dropdown =
+        document.getElementById(
+            "ocrAccount"
+        );
+
+    if (!dropdown) return;
+
+    dropdown.innerHTML = "";
+
+    (appData.accounts || [])
+        .forEach(account => {
+
+            dropdown.innerHTML +=
+            `
+            <option
+                value="${account.accountId}">
+                ${account.accountName}
+            </option>
+            `;
+        });
+}
+
 function saveReceiptDraft() {
 
     document.getElementById("txDate").value =
@@ -240,6 +280,9 @@ function saveReceiptDraft() {
 
     document.getElementById("txDetails").value =
         document.getElementById("ocrMerchant").value;
+
+    document.getElementById("txAccount").value =
+        document.getElementById("ocrAccount").value;
 
     document.getElementById("txBudgetType").value =
         "Expense";
